@@ -2217,7 +2217,60 @@
           "viewAuthor": "عرض المؤلف",
           "searchAndFilter": "البحث والتصفية",
           "filterByStatus": "تصفية حسب الحالة",
-          "unmoderated": "غير معتدل"
+          "unmoderated": "غير معتدل",
+          "viewAllMessages": "عرض جميع الرسائل",
+          "viewMoreMessages": "عرض المزيد من الرسائل"
+        },
+        "form": {
+          "name": "الاسم",
+          "description": "الوصف",
+          "capacity": "السعة",
+          "gender": "الجنس",
+          "visibility": "الظهور",
+          "joinMethod": "طريقة الانضمام",
+          "joinCode": "رمز الانضمام",
+          "status": "الحالة",
+          "paused": "متوقف",
+          "active": "نشط",
+          "inactive": "غير نشط",
+          "public": "عام",
+          "private": "خاص",
+          "anyMethod": "أي طريقة",
+          "adminOnly": "المشرفين فقط",
+          "codeOnly": "بالرمز فقط"
+        },
+        "messagesTable": {
+          "headers": {
+            "sender": "المرسل",
+            "message": "الرسالة",
+            "status": "الحالة",
+            "timestamp": "الوقت",
+            "actions": "الإجراءات"
+          },
+          "statuses": {
+            "pending": "قيد المراجعة",
+            "approved": "مُوافق عليها", 
+            "blocked": "محظورة",
+            "deleted": "محذوفة",
+            "hidden": "مخفية"
+          },
+          "actions": {
+            "approve": "الموافقة",
+            "block": "الحظر", 
+            "hide": "الإخفاء",
+            "delete": "الحذف",
+            "unmoderate": "إلغاء المراجعة"
+          },
+          "filters": {
+            "all": "جميع الرسائل",
+            "pending": "قيد المراجعة",
+            "approved": "المُوافق عليها",
+            "blocked": "المحظورة/المخفية",
+            "deleted": "المحذوفة"
+          },
+          "search": "البحث في الرسائل...",
+          "noMessages": "لا توجد رسائل",
+          "loading": "تحميل الرسائل..."
         }
       },
       "features": {
@@ -2606,6 +2659,7 @@
       "close": "إغلاق",
       "last7Days": "آخر 7 أيام",
       "last30Days": "آخر 30 يوماً",
-      "last90Days": "آخر 90 يوماً"
+      "last90Days": "آخر 90 يوماً",
+      "yesterday": "أمس"
     }
   }

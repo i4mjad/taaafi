@@ -2182,7 +2182,60 @@
           "viewAuthor": "View Author",
           "searchAndFilter": "Search & Filter",
           "filterByStatus": "Filter by status",
-          "unmoderated": "Unmoderated"
+          "unmoderated": "Unmoderated",
+          "viewAllMessages": "View All Messages",
+          "viewMoreMessages": "View more messages"
+        },
+        "form": {
+          "name": "Name",
+          "description": "Description",
+          "capacity": "Capacity",
+          "gender": "Gender",
+          "visibility": "Visibility",
+          "joinMethod": "Join Method",
+          "joinCode": "Join Code",
+          "status": "Status",
+          "paused": "Paused",
+          "active": "Active",
+          "inactive": "Inactive",
+          "public": "Public",
+          "private": "Private",
+          "anyMethod": "Any Method",
+          "adminOnly": "Admin Only",
+          "codeOnly": "Code Only"
+        },
+        "messagesTable": {
+          "headers": {
+            "sender": "Sender",
+            "message": "Message",
+            "status": "Status",
+            "timestamp": "Time",
+            "actions": "Actions"
+          },
+          "statuses": {
+            "pending": "Pending Review",
+            "approved": "Approved", 
+            "blocked": "Blocked",
+            "deleted": "Deleted",
+            "hidden": "Hidden"
+          },
+          "actions": {
+            "approve": "Approve",
+            "block": "Block", 
+            "hide": "Hide",
+            "delete": "Delete",
+            "unmoderate": "Unmoderate"
+          },
+          "filters": {
+            "all": "All Messages",
+            "pending": "Pending Review",
+            "approved": "Approved",
+            "blocked": "Blocked/Hidden",
+            "deleted": "Deleted"
+          },
+          "search": "Search messages...",
+          "noMessages": "No messages found",
+          "loading": "Loading messages..."
         }
       },
       "admin": {
@@ -2914,7 +2967,8 @@
       "close": "Close",
       "last7Days": "Last 7 days",
       "last30Days": "Last 30 days",
-      "last90Days": "Last 90 days"
+      "last90Days": "Last 90 days",
+      "yesterday": "Yesterday"
     },
     "posts": {
       "totalAcrossAllPosts": "Total across all posts",

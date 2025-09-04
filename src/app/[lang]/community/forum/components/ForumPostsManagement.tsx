@@ -575,9 +575,7 @@ export default function ForumPostsManagement() {
                     />
                   </TableHead>
                   <TableHead>{t('modules.community.posts.table.columns.title')}</TableHead>
-                  <TableHead>{t('modules.community.posts.table.columns.author')}</TableHead>
                   <TableHead>{t('modules.community.posts.table.columns.category')}</TableHead>
-                  <TableHead className="text-center">{t('modules.community.posts.table.columns.status')}</TableHead>
                   <TableHead className="text-center">{t('modules.community.posts.table.columns.likes')}</TableHead>
                   <TableHead className="text-center">{t('modules.community.posts.table.columns.dislikes')}</TableHead>
                   <TableHead className="text-center">{t('modules.community.posts.table.columns.comments')}</TableHead>
@@ -589,7 +587,7 @@ export default function ForumPostsManagement() {
               <TableBody>
                 {paginatedPosts.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={11} className="h-24 text-center">
+                    <TableCell colSpan={9} className="h-24 text-center">
                       {t('modules.community.posts.table.noData')}
                     </TableCell>
                   </TableRow>
@@ -617,35 +615,9 @@ export default function ForumPostsManagement() {
                         )}
                       </TableCell>
                       <TableCell>
-                        <div className="flex items-center space-x-2">
-                          <User className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-sm">{post.authorCPId}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
                         <Badge variant="outline">
                           {getCategoryName(post.category)}
                         </Badge>
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <div className="flex items-center justify-center space-x-1">
-                          {post.isPinned && (
-                            <Badge variant="default" className="text-xs">
-                              <Pin className="h-3 w-3 mr-1" />
-                              {t('modules.community.posts.pinned')}
-                            </Badge>
-                          )}
-                          {post.isDeleted && (
-                            <Badge variant="destructive" className="text-xs">
-                              {t('modules.community.posts.deleted')}
-                            </Badge>
-                          )}
-                          {post.isHidden && (
-                            <Badge variant="secondary" className="text-xs">
-                              {t('modules.community.posts.hidden')}
-                            </Badge>
-                          )}
-                        </div>
                       </TableCell>
                       <TableCell className="text-center">
                         <div className="flex items-center justify-center space-x-1">

@@ -1,16 +1,21 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useTranslation } from '@/contexts/TranslationContext';
-import { doc, getDoc, collection, query, where, orderBy, limit as queryLimit, updateDoc, deleteDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, orderBy, limit as queryLimit, startAfter, endBefore, updateDoc, deleteDoc, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 import { useDocument, useCollection } from 'react-firebase-hooks/firestore';
 import { db } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { 
   ArrowLeft, 
   Users, 
@@ -28,12 +33,20 @@ import {
   Flag,
   Key,
   Lock,
-  Globe
+  Globe,
+  Clock,
+  Search,
+  ChevronLeft,
+  ChevronRight,
+  RefreshCw,
+  CheckCheck
 } from 'lucide-react';
-import { format } from 'date-fns';
+import { format, isToday, isYesterday } from 'date-fns';
 import { Group, GroupMember, GroupMessage } from '@/types/community';
 import { toast } from 'sonner';
 import { SiteHeader } from '@/components/site-header';
+
+const MESSAGES_PER_PAGE = 25;
 
 export default function GroupDetailPage() {
   const params = useParams();
@@ -41,11 +54,18 @@ export default function GroupDetailPage() {
   const { t, locale } = useTranslation();
   const isRTL = locale === 'ar';
   const groupId = params.groupId as string;
+  
+  // Log groupId to make sure we have it
+  console.log('📱 Group ID from params:', { groupId, params });
 
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedMember, setSelectedMember] = useState<GroupMember | null>(null);
   const [selectedMessage, setSelectedMessage] = useState<GroupMessage | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Messages filtering state - simplified
+  const [search, setSearch] = useState('');
+  const [filterStatus, setFilterStatus] = useState<'all' | 'pending' | 'approved' | 'blocked' | 'deleted'>('all');
 
   // Fetch group data
   const [groupDoc, groupLoading, groupError] = useDocument(doc(db, 'groups', groupId));
@@ -58,6 +78,7 @@ export default function GroupDetailPage() {
       updatedAt: groupDoc.data().updatedAt?.toDate(),
     } as Group;
   }, [groupDoc]);
+
 
   // Fetch group members
   const [membersValue, membersLoading, membersError] = useCollection(
@@ -78,18 +99,19 @@ export default function GroupDetailPage() {
     })) as GroupMember[];
   }, [membersValue]);
 
-  // Fetch group messages (using correct schema fields)
+  // Simple messages query without complex pagination
   const [messagesValue, messagesLoading, messagesError] = useCollection(
-    query(
+    groupId ? query(
       collection(db, 'group_messages'),
       where('groupId', '==', groupId),
       orderBy('createdAt', 'desc'),
-      queryLimit(100)
-    )
+      queryLimit(100) // Get more messages at once, simpler approach
+    ) : null
   );
 
   const messages: GroupMessage[] = useMemo(() => {
-    if (!messagesValue) return [];
+    if (!messagesValue?.docs) return [];
+    
     return messagesValue.docs.map(doc => {
       const data = doc.data();
       return {
@@ -107,21 +129,49 @@ export default function GroupDetailPage() {
         moderation: data.moderation,
         createdAt: data.createdAt?.toDate() || new Date(),
         senderDisplayName: data.senderDisplayName,
-      };
-    }) as GroupMessage[];
+      } as GroupMessage;
+    });
   }, [messagesValue]);
 
-  // Filter out deleted messages for display
-  const visibleMessages = useMemo(() => {
-    return messages.filter(message => !message.isDeleted);
-  }, [messages]);
+
+  // Filter messages with search and status filters
+  const filteredMessages = useMemo(() => {
+    let filtered = messages;
+
+    // Search filter
+    if (search.trim()) {
+      const searchLower = search.toLowerCase();
+      filtered = filtered.filter(message => 
+        message.body?.toLowerCase().includes(searchLower) ||
+        message.senderCpId?.toLowerCase().includes(searchLower) ||
+        message.senderDisplayName?.toLowerCase().includes(searchLower)
+      );
+    }
+
+    // Status filter
+    if (filterStatus !== 'all') {
+      filtered = filtered.filter(message => {
+        switch (filterStatus) {
+          case 'deleted': return message.isDeleted;
+          case 'pending': return message.moderation?.status === 'pending';
+          case 'approved': return message.moderation?.status === 'approved';
+          case 'blocked': return message.moderation?.status === 'blocked' || message.isHidden;
+          default: return true;
+        }
+      });
+    }
+
+    return filtered;
+  }, [messages, search, filterStatus]);
 
   // Calculate stats using correct schema fields
   const stats = useMemo(() => {
     const totalMembers = members.length;
     const admins = members.filter(m => m.role === 'admin').length;
-    const totalMessages = visibleMessages.length;
-    const moderatedMessages = visibleMessages.filter(m => m.moderation?.status === 'blocked' || m.isHidden).length;
+    const totalMessages = messages.filter(m => !m.isDeleted).length;
+    const moderated = messages.filter(m => (m.isHidden || m.moderation?.status === 'blocked') && !m.isDeleted).length;
+    const pending = messages.filter(m => m.moderation?.status === 'pending' && !m.isDeleted).length;
+    const deleted = messages.filter(m => m.isDeleted).length;
     const totalPoints = members.reduce((sum, m) => sum + (m.pointsTotal || 0), 0);
     const averagePoints = totalMembers > 0 ? Math.round(totalPoints / totalMembers) : 0;
 
@@ -129,15 +179,40 @@ export default function GroupDetailPage() {
       totalMembers,
       admins,
       totalMessages,
-      moderatedMessages,
+      moderated,
+      pending,
+      deleted,
       totalPoints,
       averagePoints
     };
-  }, [members, visibleMessages]);
+  }, [members, messages]);
 
   const headerDictionary = {
     documents: group?.name || t('modules.groupsManagement.groupDetail.title'),
   };
+
+  // Format date for chat-like display
+  const formatMessageDate = (date: Date) => {
+    if (isToday(date)) {
+      return format(date, 'HH:mm');
+    } else if (isYesterday(date)) {
+      return `${t('common.yesterday')} ${format(date, 'HH:mm')}`;
+    } else {
+      return format(date, 'MMM dd, HH:mm');
+    }
+  };
+
+  // Get user initials for avatar
+  const getUserInitials = (name: string) => {
+    if (!name) return 'U';
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+  };
+
+  // Reset filters when groupId changes
+  useEffect(() => {
+    setSearch('');
+    setFilterStatus('all');
+  }, [groupId]);
 
   // Removed send message functionality - this is for moderation only
 
@@ -211,6 +286,8 @@ export default function GroupDetailPage() {
     try {
       await updateDoc(doc(db, 'group_messages', message.id), {
         isDeleted: true,
+        deletedAt: new Date(),
+        deletedBy: 'admin',
       });
 
       toast.success(t('modules.groupsManagement.groupDetail.messageDeleted') || 'Message deleted successfully');
@@ -218,6 +295,29 @@ export default function GroupDetailPage() {
     } catch (error) {
       console.error('Error deleting message:', error);
       toast.error(t('modules.groupsManagement.groupDetail.deleteError') || 'Error deleting message');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleUnmoderateMessage = async (message: GroupMessage) => {
+    setIsSubmitting(true);
+    try {
+      await updateDoc(doc(db, 'group_messages', message.id), {
+        isHidden: false,
+        moderation: {
+          status: 'approved',
+          reason: 'Unmoderated by admin',
+          moderatedBy: 'admin',
+          moderatedAt: new Date(),
+        }
+      });
+
+      toast.success(t('modules.groupsManagement.groupDetail.messageUnmoderated') || 'Message unmoderated successfully');
+      setSelectedMessage(null);
+    } catch (error) {
+      console.error('Error unmoderating message:', error);
+      toast.error(t('modules.groupsManagement.groupDetail.unmoderateError') || 'Error unmoderating message');
     } finally {
       setIsSubmitting(false);
     }
@@ -419,23 +519,34 @@ export default function GroupDetailPage() {
                   </div>
                   <div>
                     <h4 className="font-medium text-sm text-muted-foreground">
-                      Visibility
+                      {t('modules.groupsManagement.form.visibility') || 'Visibility'}
                     </h4>
                     <Badge variant="outline" className="flex items-center gap-1 w-fit">
                       {group.visibility === 'public' ? <Globe className="h-3 w-3" /> : <Lock className="h-3 w-3" />}
-                      {group.visibility === 'public' ? 'Public' : 'Private'}
+                      {group.visibility === 'public' 
+                        ? t('modules.groupsManagement.form.public') || 'Public'
+                        : t('modules.groupsManagement.form.private') || 'Private'
+                      }
                     </Badge>
                   </div>
                   <div>
                     <h4 className="font-medium text-sm text-muted-foreground">
-                      Join Method
+                      {t('modules.groupsManagement.form.joinMethod') || 'Join Method'}
                     </h4>
-                    <p>{group.joinMethod.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}</p>
+                    <p>{
+                      group.joinMethod === 'any' 
+                        ? t('modules.groupsManagement.form.anyMethod') || 'Any Method'
+                        : group.joinMethod === 'admin_only' 
+                        ? t('modules.groupsManagement.form.adminOnly') || 'Admin Only'
+                        : group.joinMethod === 'code_only'
+                        ? t('modules.groupsManagement.form.codeOnly') || 'Code Only'
+                        : group.joinMethod
+                    }</p>
                   </div>
                   {group.joinCode && (
                     <div>
                       <h4 className="font-medium text-sm text-muted-foreground">
-                        Join Code
+                        {t('modules.groupsManagement.form.joinCode') || 'Join Code'}
                       </h4>
                       <Badge variant="secondary" className="flex items-center gap-1 w-fit">
                         <Key className="h-3 w-3" />
@@ -446,10 +557,10 @@ export default function GroupDetailPage() {
                   {group.isPaused && (
                     <div>
                       <h4 className="font-medium text-sm text-muted-foreground">
-                        Status
+                        {t('modules.groupsManagement.form.status') || 'Status'}
                       </h4>
                       <Badge variant="destructive">
-                        Paused
+                        {t('modules.groupsManagement.form.paused') || 'Paused'}
                         {group.pauseReason && <span className="ml-2">({group.pauseReason})</span>}
                       </Badge>
                     </div>
@@ -592,117 +703,220 @@ export default function GroupDetailPage() {
 
           {/* Messages Tab */}
           <TabsContent value="messages" className="space-y-4">
-            {/* Messages List - Moderation Only */}
+            {/* Compact Stats Row */}
+            <div className="grid grid-cols-4 gap-4">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-blue-600">{stats.totalMessages}</div>
+                <div className="text-xs text-muted-foreground">{t('modules.groupsManagement.messagesTable.headers.message') || 'Messages'}</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-orange-600">{stats.pending}</div>
+                <div className="text-xs text-muted-foreground">{t('modules.groupsManagement.messagesTable.statuses.pending') || 'Pending'}</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-red-600">{stats.moderated}</div>
+                <div className="text-xs text-muted-foreground">{t('modules.groupsManagement.messagesTable.statuses.blocked') || 'Blocked'}</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-gray-600">{stats.deleted}</div>
+                <div className="text-xs text-muted-foreground">{t('modules.groupsManagement.messagesTable.statuses.deleted') || 'Deleted'}</div>
+              </div>
+            </div>
+
+            {/* Search and Filter - Compact */}
+            <div className="flex gap-4">
+              <div className="flex-1 relative">
+                <Search className={`absolute top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground ${isRTL ? 'right-3' : 'left-3'}`} />
+                <Input
+                  placeholder={t('modules.groupsManagement.messagesTable.search') || 'Search messages...'}
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className={isRTL ? 'pr-10' : 'pl-10'}
+                  dir={isRTL ? 'rtl' : 'ltr'}
+                />
+              </div>
+              <Select value={filterStatus} onValueChange={setFilterStatus}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t('modules.groupsManagement.messagesTable.filters.all') || 'All Messages'}</SelectItem>
+                  <SelectItem value="pending">{t('modules.groupsManagement.messagesTable.filters.pending') || 'Pending Review'}</SelectItem>
+                  <SelectItem value="approved">{t('modules.groupsManagement.messagesTable.filters.approved') || 'Approved'}</SelectItem>
+                  <SelectItem value="blocked">{t('modules.groupsManagement.messagesTable.filters.blocked') || 'Blocked/Hidden'}</SelectItem>
+                  <SelectItem value="deleted">{t('modules.groupsManagement.messagesTable.filters.deleted') || 'Deleted'}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Messages Table */}
             <Card>
-              <CardHeader>
-                <CardTitle>
-                  {t('modules.groupsManagement.groupDetail.messagesList') || 'Group Messages'} ({stats.totalMessages})
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center text-base">
+                  <MessageSquare className="h-4 w-4 mr-2" />
+                  {t('modules.groupsManagement.messagesTable.headers.message') || 'Messages'} ({filteredMessages.length})
                 </CardTitle>
-                <CardDescription>
-                  {t('modules.groupsManagement.groupDetail.messagesDescription') || 'View and moderate group messages'}
-                </CardDescription>
               </CardHeader>
-              <CardContent>
-                {visibleMessages.length === 0 ? (
-                  <div className="text-center py-8">
-                    <MessageSquare className="mx-auto h-12 w-12 text-muted-foreground/50" />
-                    <h3 className="mt-4 text-lg font-semibold">
-                      {t('modules.groupsManagement.groupDetail.noMessages') || 'No messages'}
+              
+              <CardContent className="p-0">
+                {messagesLoading ? (
+                  <div className="flex flex-col items-center justify-center py-12 text-center">
+                    <RefreshCw className="h-8 w-8 animate-spin text-primary mb-4" />
+                    <h3 className="text-lg font-semibold mb-2">
+                      {t('modules.groupsManagement.messagesTable.loading') || 'Loading messages...'}
                     </h3>
-                    <p className="text-muted-foreground">
-                      {t('modules.groupsManagement.groupDetail.noMessagesDesc') || 'No messages in this group yet'}
+                  </div>
+                ) : messagesError ? (
+                  <div className="flex flex-col items-center justify-center py-12 text-center">
+                    <AlertTriangle className="h-12 w-12 text-destructive mb-4" />
+                    <h3 className="text-lg font-semibold mb-2 text-destructive">
+                      {t('modules.groupsManagement.messagesTable.loading') || 'Error loading messages'}
+                    </h3>
+                    <p className="text-muted-foreground mb-4">
+                      {messagesError.message || 'Failed to load messages from database'}
                     </p>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => window.location.reload()}
+                      className="mt-2"
+                    >
+                      <RefreshCw className="h-4 w-4 mr-2" />
+                      {t('common.retry') || 'Retry'}
+                    </Button>
+                  </div>
+                ) : filteredMessages.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-12 text-center">
+                    <MessageSquare className="h-12 w-12 text-muted-foreground/50 mb-4" />
+                    <h3 className="text-lg font-semibold mb-2">
+                      {t('modules.groupsManagement.messagesTable.noMessages') || 'No messages found'}
+                    </h3>
                   </div>
                 ) : (
-                  <div className="space-y-4">
-                    {visibleMessages.map((message) => (
-                      <div 
-                        key={message.id} 
-                        className={`p-4 border rounded-lg transition-colors ${
-                          message.isHidden || message.moderation?.status === 'blocked'
-                            ? 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950/20' 
-                            : message.moderation?.status === 'pending'
-                            ? 'border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-950/20'
-                            : 'border-gray-200 hover:bg-muted/50'
-                        }`}
-                      >
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <span className="font-medium">
-                                {message.senderDisplayName || message.senderCpId}
-                              </span>
-                              <span className="text-xs text-muted-foreground">
-                                {format(message.createdAt, 'MMM dd, yyyy HH:mm')}
-                              </span>
-                              {message.isHidden && (
-                                <Badge variant="destructive" className="text-xs">
-                                  <Shield className="h-3 w-3 mr-1" />
-                                  Hidden
-                                </Badge>
-                              )}
-                              {message.moderation?.status === 'blocked' && (
-                                <Badge variant="destructive" className="text-xs">
-                                  <Shield className="h-3 w-3 mr-1" />
-                                  Blocked
-                                </Badge>
-                              )}
-                              {message.moderation?.status === 'pending' && (
-                                <Badge variant="outline" className="text-xs bg-yellow-100 text-yellow-800 border-yellow-200">
-                                  <Flag className="h-3 w-3 mr-1" />
-                                  Pending Review
-                                </Badge>
-                              )}
-                            </div>
-                            <p className={`${isRTL ? 'text-right' : 'text-left'} whitespace-pre-wrap mb-2`}>
-                              {message.body}
-                            </p>
-                            {message.quotedPreview && (
-                              <div className="text-sm text-muted-foreground italic border-l-2 border-gray-300 pl-2 mb-2">
-                                "{message.quotedPreview}"
-                              </div>
-                            )}
-                            {message.moderation?.reason && (
-                              <p className="text-xs text-red-600 bg-red-100 p-2 rounded mt-2">
-                                <strong>{t('modules.groupsManagement.groupDetail.moderationReason') || 'Moderation reason:'}</strong> {message.moderation.reason}
-                              </p>
-                            )}
-                          </div>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className={isRTL ? 'text-right' : 'text-left'}>
+                          {t('modules.groupsManagement.messagesTable.headers.sender') || 'Sender'}
+                        </TableHead>
+                        <TableHead className={isRTL ? 'text-right' : 'text-left'}>
+                          {t('modules.groupsManagement.messagesTable.headers.message') || 'Message'}
+                        </TableHead>
+                        <TableHead className={isRTL ? 'text-right' : 'text-left'}>
+                          {t('modules.groupsManagement.messagesTable.headers.status') || 'Status'}
+                        </TableHead>
+                        <TableHead className={isRTL ? 'text-right' : 'text-left'}>
+                          {t('modules.groupsManagement.messagesTable.headers.timestamp') || 'Time'}
+                        </TableHead>
+                        <TableHead className={isRTL ? 'text-right' : 'text-left'}>
+                          {t('modules.groupsManagement.messagesTable.headers.actions') || 'Actions'}
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredMessages.map((message) => {
+                        const getStatusBadge = () => {
+                          if (message.isDeleted) {
+                            return <Badge variant="secondary">{t('modules.groupsManagement.messagesTable.statuses.deleted') || 'Deleted'}</Badge>;
+                          }
+                          if (message.isHidden) {
+                            return <Badge variant="destructive">{t('modules.groupsManagement.messagesTable.statuses.hidden') || 'Hidden'}</Badge>;
+                          }
+                          if (message.moderation?.status === 'blocked') {
+                            return <Badge variant="destructive">{t('modules.groupsManagement.messagesTable.statuses.blocked') || 'Blocked'}</Badge>;
+                          }
+                          if (message.moderation?.status === 'pending') {
+                            return <Badge variant="outline">{t('modules.groupsManagement.messagesTable.statuses.pending') || 'Pending'}</Badge>;
+                          }
+                          if (message.moderation?.status === 'approved') {
+                            return <Badge variant="default">{t('modules.groupsManagement.messagesTable.statuses.approved') || 'Approved'}</Badge>;
+                          }
+                          return <Badge variant="outline">-</Badge>;
+                        };
 
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" className="h-8 w-8 p-0">
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align={isRTL ? 'start' : 'end'}>
-                              <DropdownMenuItem onClick={() => {/* View sender profile */}}>
-                                <Eye className="mr-2 h-4 w-4" />
-                                {t('modules.groupsManagement.groupDetail.viewAuthor') || 'View Author'}
-                              </DropdownMenuItem>
-                              {!message.isHidden && message.moderation?.status !== 'blocked' && (
-                                <DropdownMenuItem 
-                                  onClick={() => handleModerateMessage(message)}
-                                  disabled={isSubmitting}
-                                >
-                                  <Flag className="mr-2 h-4 w-4" />
-                                  {t('modules.groupsManagement.groupDetail.moderateMessage') || 'Moderate'}
-                                </DropdownMenuItem>
-                              )}
-                              <DropdownMenuItem 
-                                onClick={() => handleDeleteMessage(message)}
-                                className="text-destructive"
-                                disabled={isSubmitting}
-                              >
-                                <Trash2 className="mr-2 h-4 w-4" />
-                                {t('modules.groupsManagement.groupDetail.deleteMessage') || 'Delete Message'}
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                        return (
+                          <TableRow key={message.id} className={
+                            message.isHidden || message.moderation?.status === 'blocked'
+                              ? 'bg-red-50 dark:bg-red-950/20'
+                              : message.moderation?.status === 'pending'
+                              ? 'bg-yellow-50 dark:bg-yellow-950/20'
+                              : ''
+                          }>
+                            <TableCell className={`font-medium ${isRTL ? 'text-right' : 'text-left'}`}>
+                              <div className="flex items-center gap-2">
+                                <Avatar className="h-6 w-6">
+                                  <AvatarFallback className="text-xs">
+                                    {getUserInitials(message.senderDisplayName || message.senderCpId)}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <span className="truncate">
+                                  {message.senderDisplayName || message.senderCpId}
+                                </span>
+                              </div>
+                            </TableCell>
+                            <TableCell className={`max-w-md ${isRTL ? 'text-right' : 'text-left'}`}>
+                              <div className="space-y-1">
+                                {message.quotedPreview && (
+                                  <div className="text-xs text-muted-foreground italic border-l-2 border-gray-300 pl-2 bg-gray-50 dark:bg-gray-900 rounded p-1">
+                                    "{message.quotedPreview}"
+                                  </div>
+                                )}
+                                <p className="text-sm truncate" title={message.body}>
+                                  {message.body}
+                                </p>
+                                {message.moderation?.reason && (
+                                  <div className="text-xs text-red-700 bg-red-100 dark:bg-red-900/30 p-1 rounded">
+                                    <strong>Reason:</strong> {message.moderation.reason}
+                                  </div>
+                                )}
+                              </div>
+                            </TableCell>
+                            <TableCell className={isRTL ? 'text-right' : 'text-left'}>
+                              {getStatusBadge()}
+                            </TableCell>
+                            <TableCell className={`text-sm text-muted-foreground ${isRTL ? 'text-right' : 'text-left'}`}>
+                              {formatMessageDate(message.createdAt)}
+                            </TableCell>
+                            <TableCell className={isRTL ? 'text-right' : 'text-left'}>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                    <MoreHorizontal className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align={isRTL ? 'start' : 'end'}>
+                                  {!message.isHidden && message.moderation?.status !== 'blocked' ? (
+                                    <DropdownMenuItem 
+                                      onClick={() => handleModerateMessage(message)}
+                                      disabled={isSubmitting}
+                                    >
+                                      <Flag className="mr-2 h-4 w-4" />
+                                      {t('modules.groupsManagement.messagesTable.actions.block') || 'Block'}
+                                    </DropdownMenuItem>
+                                  ) : (
+                                    <DropdownMenuItem 
+                                      onClick={() => handleUnmoderateMessage(message)}
+                                      disabled={isSubmitting}
+                                    >
+                                      <CheckCheck className="mr-2 h-4 w-4" />
+                                      {t('modules.groupsManagement.messagesTable.actions.approve') || 'Approve'}
+                                    </DropdownMenuItem>
+                                  )}
+                                  <DropdownMenuItem 
+                                    onClick={() => handleDeleteMessage(message)}
+                                    className="text-destructive"
+                                    disabled={isSubmitting}
+                                  >
+                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    {t('modules.groupsManagement.messagesTable.actions.delete') || 'Delete'}
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
                 )}
               </CardContent>
             </Card>

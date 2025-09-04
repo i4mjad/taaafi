@@ -1,35 +1,42 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useTranslation } from '@/contexts/TranslationContext';
-import { doc, collection, query, where, orderBy, limit as queryLimit, updateDoc, addDoc } from 'firebase/firestore';
+import { doc, collection, query, where, orderBy, limit as queryLimit, startAfter, endBefore, updateDoc, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 import { useDocument, useCollection } from 'react-firebase-hooks/firestore';
 import { db } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { 
   ArrowLeft, 
   MessageSquare, 
   Search, 
-  Send,
   Shield,
   Flag,
   Trash2,
   MoreHorizontal,
   AlertTriangle,
   Filter,
-  Eye
+  Eye,
+  ChevronLeft,
+  ChevronRight,
+  RefreshCw,
+  CheckCheck,
+  Clock
 } from 'lucide-react';
-import { format } from 'date-fns';
+import { format, isToday, isYesterday } from 'date-fns';
 import { Group, GroupMessage } from '@/types/community';
 import { toast } from 'sonner';
 import { SiteHeader } from '@/components/site-header';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ScrollArea } from '@/components/ui/scroll-area';
+
+const MESSAGES_PER_PAGE = 25;
 
 export default function GroupMessagesPage() {
   const params = useParams();
@@ -40,6 +47,11 @@ export default function GroupMessagesPage() {
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [lastVisible, setLastVisible] = useState<QueryDocumentSnapshot<DocumentData> | null>(null);
+  const [firstVisible, setFirstVisible] = useState<QueryDocumentSnapshot<DocumentData> | null>(null);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Fetch group data
   const [groupDoc] = useDocument(doc(db, 'groups', groupId));
@@ -53,18 +65,50 @@ export default function GroupMessagesPage() {
     } as Group;
   }, [groupDoc]);
 
-  // Fetch group messages
-  const [messagesValue, messagesLoading, messagesError] = useCollection(
-    query(
+  // Build paginated query
+  const buildQuery = (direction: 'next' | 'prev' = 'next') => {
+    let baseQuery = query(
       collection(db, 'group_messages'),
       where('groupId', '==', groupId),
       orderBy('createdAt', 'desc'),
-      queryLimit(200)
-    )
+      queryLimit(MESSAGES_PER_PAGE)
+    );
+
+    if (direction === 'next' && lastVisible) {
+      baseQuery = query(
+        collection(db, 'group_messages'),
+        where('groupId', '==', groupId),
+        orderBy('createdAt', 'desc'),
+        startAfter(lastVisible),
+        queryLimit(MESSAGES_PER_PAGE)
+      );
+    } else if (direction === 'prev' && firstVisible) {
+      baseQuery = query(
+        collection(db, 'group_messages'),
+        where('groupId', '==', groupId),
+        orderBy('createdAt', 'desc'),
+        endBefore(firstVisible),
+        queryLimit(MESSAGES_PER_PAGE)
+      );
+    }
+
+    return baseQuery;
+  };
+
+  // Fetch current page messages
+  const [messagesValue, messagesLoading, messagesError] = useCollection(
+    buildQuery()
   );
 
   const messages: GroupMessage[] = useMemo(() => {
     if (!messagesValue) return [];
+    
+    // Update pagination cursors
+    if (messagesValue.docs.length > 0) {
+      setFirstVisible(messagesValue.docs[0]);
+      setLastVisible(messagesValue.docs[messagesValue.docs.length - 1]);
+    }
+
     return messagesValue.docs.map(doc => {
       const data = doc.data();
       return {
@@ -98,12 +142,14 @@ export default function GroupMessagesPage() {
       
       const matchesFilter = filterStatus === 'all' || 
         (filterStatus === 'moderated' && (message.isHidden || message.moderation?.status === 'blocked')) ||
-        (filterStatus === 'unmoderated' && !message.isHidden && message.moderation?.status !== 'blocked');
+        (filterStatus === 'unmoderated' && !message.isHidden && message.moderation?.status !== 'blocked') ||
+        (filterStatus === 'pending' && message.moderation?.status === 'pending');
       
       return matchesSearch && matchesFilter;
     });
   }, [messages, search, filterStatus]);
 
+  // Calculate stats
   const stats = useMemo(() => {
     const total = messages.filter(m => !m.isDeleted).length;
     const moderated = messages.filter(m => (m.isHidden || m.moderation?.status === 'blocked') && !m.isDeleted).length;
@@ -117,8 +163,24 @@ export default function GroupMessagesPage() {
     documents: `${group?.name} - ${t('modules.groupsManagement.groupDetail.messages')}` || 'Group Messages',
   };
 
-  // Removed send message functionality - this is for moderation only
-  
+  // Format date for chat-like display
+  const formatMessageDate = (date: Date) => {
+    if (isToday(date)) {
+      return format(date, 'HH:mm');
+    } else if (isYesterday(date)) {
+      return `${t('common.yesterday')} ${format(date, 'HH:mm')}`;
+    } else {
+      return format(date, 'MMM dd, HH:mm');
+    }
+  };
+
+  // Get user initials for avatar
+  const getUserInitials = (name: string) => {
+    if (!name) return 'U';
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+  };
+
+  // Moderation actions
   const handleModerateMessage = async (message: GroupMessage, reason?: string) => {
     setIsSubmitting(true);
     try {
@@ -127,7 +189,7 @@ export default function GroupMessagesPage() {
         moderation: {
           status: 'blocked',
           reason: reason || 'Content moderated by admin',
-          moderatedBy: 'admin', // Replace with actual admin CP ID
+          moderatedBy: 'admin',
           moderatedAt: new Date(),
         }
       });
@@ -150,6 +212,8 @@ export default function GroupMessagesPage() {
     try {
       await updateDoc(doc(db, 'group_messages', message.id), {
         isDeleted: true,
+        deletedAt: new Date(),
+        deletedBy: 'admin',
       });
 
       toast.success(t('modules.groupsManagement.groupDetail.messageDeleted') || 'Message deleted successfully');
@@ -168,7 +232,7 @@ export default function GroupMessagesPage() {
         isHidden: false,
         moderation: {
           status: 'approved',
-          reason: 'Moderation removed by admin',
+          reason: 'Unmoderated by admin',
           moderatedBy: 'admin',
           moderatedAt: new Date(),
         }
@@ -183,16 +247,36 @@ export default function GroupMessagesPage() {
     }
   };
 
-  if (messagesLoading) {
+  // Pagination handlers
+  const handleNextPage = () => {
+    if (lastVisible) {
+      setCurrentPage(prev => prev + 1);
+      setIsLoadingMore(true);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(prev => prev - 1);
+      setIsLoadingMore(true);
+    }
+  };
+
+  // Auto-scroll to bottom on new messages
+  useEffect(() => {
+    if (messagesEndRef.current && currentPage === 1) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+    setIsLoadingMore(false);
+  }, [filteredMessages, currentPage]);
+
+  if (messagesLoading && currentPage === 1) {
     return (
       <>
         <SiteHeader dictionary={headerDictionary} />
         <div className="container mx-auto py-6 px-4">
           <div className="flex items-center justify-center py-12">
-            <div className="text-center">
-              <MessageSquare className="h-12 w-12 text-muted-foreground mx-auto mb-4 animate-pulse" />
-              <p className="text-muted-foreground">{t('modules.groupsManagement.groupDetail.loading') || 'Loading messages...'}</p>
-            </div>
+            <RefreshCw className="h-8 w-8 animate-spin text-primary" />
           </div>
         </div>
       </>
@@ -222,7 +306,7 @@ export default function GroupMessagesPage() {
   return (
     <>
       <SiteHeader dictionary={headerDictionary} />
-      <div className="container mx-auto py-6 px-4 max-w-7xl">
+      <div className="container mx-auto py-6 px-4 max-w-5xl">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-4">
@@ -231,7 +315,7 @@ export default function GroupMessagesPage() {
               {t('modules.groupsManagement.groupDetail.backToGroup') || 'Back to Group'}
             </Button>
             <div className={isRTL ? 'text-right' : 'text-left'}>
-              <h1 className="text-3xl font-bold tracking-tight">
+              <h1 className="text-2xl font-bold tracking-tight">
                 {t('modules.groupsManagement.groupDetail.messages') || 'Messages'}
               </h1>
               <p className="text-muted-foreground">{group?.name || 'Group Messages'}</p>
@@ -239,195 +323,185 @@ export default function GroupMessagesPage() {
           </div>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                {t('modules.groupsManagement.groupDetail.totalMessages') || 'Total Messages'}
-              </CardTitle>
-              <MessageSquare className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.total}</div>
-              <p className="text-xs text-muted-foreground">
-                {t('modules.groupsManagement.groupDetail.active') || 'Active'}
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                {t('modules.groupsManagement.groupDetail.moderated') || 'Moderated'}
-              </CardTitle>
-              <Shield className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.moderated}</div>
-              <p className="text-xs text-muted-foreground">
-                {stats.total > 0 ? Math.round((stats.moderated / stats.total) * 100) : 0}% {t('modules.groupsManagement.groupDetail.ofTotal') || 'of total'}
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                {t('modules.groupsManagement.groupDetail.pending') || 'Pending Review'}
-              </CardTitle>
-              <Flag className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.pending}</div>
-              <p className="text-xs text-muted-foreground">
-                {t('modules.groupsManagement.groupDetail.needsReview') || 'Needs review'}
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                {t('modules.groupsManagement.groupDetail.deleted') || 'Deleted'}
-              </CardTitle>
-              <Trash2 className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.deleted}</div>
-              <p className="text-xs text-muted-foreground">
-                {t('modules.groupsManagement.groupDetail.removed') || 'Removed'}
-              </p>
-            </CardContent>
-          </Card>
+        {/* Stats Row - Compact */}
+        <div className="grid grid-cols-4 gap-4 mb-6">
+          <div className="text-center">
+            <div className="text-2xl font-bold text-blue-600">{stats.total}</div>
+            <div className="text-xs text-muted-foreground">{t('modules.groupsManagement.groupDetail.totalMessages') || 'Total'}</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-orange-600">{stats.pending}</div>
+            <div className="text-xs text-muted-foreground">{t('modules.groupsManagement.groupDetail.pending') || 'Pending'}</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-red-600">{stats.moderated}</div>
+            <div className="text-xs text-muted-foreground">{t('modules.groupsManagement.groupDetail.moderated') || 'Moderated'}</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-gray-600">{stats.deleted}</div>
+            <div className="text-xs text-muted-foreground">{t('modules.groupsManagement.groupDetail.deleted') || 'Deleted'}</div>
+          </div>
         </div>
 
-        {/* Removed send message - this is for moderation only */}
+        {/* Search and Filter - Compact */}
+        <div className="flex gap-4 mb-6">
+          <div className="flex-1 relative">
+            <Search className={`absolute top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground ${isRTL ? 'right-3' : 'left-3'}`} />
+            <Input
+              placeholder={t('modules.groupsManagement.groupDetail.searchMessagesPlaceholder') || 'Search messages or authors...'}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className={isRTL ? 'pr-10' : 'pl-10'}
+              dir={isRTL ? 'rtl' : 'ltr'}
+            />
+          </div>
+          <Select value={filterStatus} onValueChange={setFilterStatus}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t('common.all') || 'All Messages'}</SelectItem>
+              <SelectItem value="unmoderated">{t('modules.groupsManagement.groupDetail.unmoderated') || 'Unmoderated'}</SelectItem>
+              <SelectItem value="pending">{t('modules.groupsManagement.groupDetail.pending') || 'Pending Review'}</SelectItem>
+              <SelectItem value="moderated">{t('modules.groupsManagement.groupDetail.moderated') || 'Moderated'}</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
-        {/* Search and Filter */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Filter className="h-5 w-5 mr-2" />
-              {t('modules.groupsManagement.groupDetail.searchAndFilter') || 'Search & Filter'}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="md:col-span-2">
-                <div className={`relative ${isRTL ? 'rtl' : 'ltr'}`}>
-                  <Search className={`absolute top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground ${isRTL ? 'right-3' : 'left-3'}`} />
-                  <Input
-                    placeholder={t('modules.groupsManagement.groupDetail.searchMessagesPlaceholder') || 'Search messages or authors...'}
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    className={isRTL ? 'pr-10' : 'pl-10'}
-                    dir={isRTL ? 'rtl' : 'ltr'}
-                  />
+        {/* Chat-like Messages Container */}
+        <Card className="h-[600px] flex flex-col">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center text-base">
+                <MessageSquare className="h-4 w-4 mr-2" />
+                {t('modules.groupsManagement.groupDetail.messagesList') || 'Messages'} ({filteredMessages.length})
+              </CardTitle>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">
+                  {t('common.page')} {currentPage}
+                </span>
+                <div className="flex gap-1">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handlePrevPage}
+                    disabled={currentPage === 1 || isLoadingMore}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleNextPage}
+                    disabled={filteredMessages.length < MESSAGES_PER_PAGE || isLoadingMore}
+                  >
+                    {isLoadingMore ? <RefreshCw className="h-4 w-4 animate-spin" /> : <ChevronRight className="h-4 w-4" />}
+                  </Button>
                 </div>
               </div>
-              <div>
-                <Select value={filterStatus} onValueChange={setFilterStatus}>
-                  <SelectTrigger>
-                    <SelectValue placeholder={t('modules.groupsManagement.groupDetail.filterByStatus') || 'Filter by status'} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">{t('common.all') || 'All Messages'}</SelectItem>
-                    <SelectItem value="unmoderated">{t('modules.groupsManagement.groupDetail.unmoderated') || 'Unmoderated'}</SelectItem>
-                    <SelectItem value="moderated">{t('modules.groupsManagement.groupDetail.moderated') || 'Moderated'}</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Messages List */}
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              {t('modules.groupsManagement.groupDetail.messagesList') || 'Messages'} ({filteredMessages.length})
-            </CardTitle>
-            <CardDescription>
-              {t('modules.groupsManagement.groupDetail.messagesDescription') || 'View and moderate group messages'}
-            </CardDescription>
           </CardHeader>
-          <CardContent>
-            {filteredMessages.length === 0 ? (
-              <div className="text-center py-8">
-                <MessageSquare className="mx-auto h-12 w-12 text-muted-foreground/50" />
-                <h3 className="mt-4 text-lg font-semibold">
-                  {search || filterStatus !== 'all' 
-                    ? (t('modules.groupsManagement.groupDetail.noSearchResults') || 'No messages found') 
-                    : (t('modules.groupsManagement.groupDetail.noMessages') || 'No messages')
-                  }
-                </h3>
-                <p className="text-muted-foreground">
-                  {search || filterStatus !== 'all'
-                    ? (t('modules.groupsManagement.groupDetail.tryDifferentSearch') || 'Try adjusting your search or filter')
-                    : (t('modules.groupsManagement.groupDetail.noMessagesDesc') || 'No messages in this group yet')
-                  }
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                                    {filteredMessages.map((message) => (
+          
+          <CardContent className="flex-1 p-0">
+            <ScrollArea className="h-full px-4">
+              {filteredMessages.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <MessageSquare className="h-12 w-12 text-muted-foreground/50 mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">
+                    {search || filterStatus !== 'all' 
+                      ? (t('modules.groupsManagement.groupDetail.noSearchResults') || 'No messages found') 
+                      : (t('modules.groupsManagement.groupDetail.noMessages') || 'No messages')
+                    }
+                  </h3>
+                  <p className="text-muted-foreground">
+                    {search || filterStatus !== 'all'
+                      ? (t('modules.groupsManagement.groupDetail.tryDifferentSearch') || 'Try adjusting your search or filter')
+                      : (t('modules.groupsManagement.groupDetail.noMessagesDesc') || 'No messages in this group yet')
+                    }
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-3 py-4">
+                  {filteredMessages.map((message) => {
+                    const showModerationStatus = message.isHidden || message.moderation?.status === 'blocked' || message.moderation?.status === 'pending';
+                    
+                    return (
                       <div 
                         key={message.id} 
-                        className={`p-4 border rounded-lg transition-colors ${
+                        className={`group flex gap-3 p-3 rounded-lg transition-all hover:bg-muted/30 ${
                           message.isHidden || message.moderation?.status === 'blocked'
-                            ? 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950/20' 
+                            ? 'bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800' 
                             : message.moderation?.status === 'pending'
-                            ? 'border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-950/20'
-                            : 'border-gray-200 hover:bg-muted/50'
+                            ? 'bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-800'
+                            : 'hover:bg-gray-50'
                         }`}
                       >
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <span className="font-medium">
-                                {message.senderDisplayName || message.senderCpId}
-                              </span>
-                              <span className="text-xs text-muted-foreground">
-                                {format(message.createdAt, 'MMM dd, yyyy HH:mm')}
-                              </span>
-                              {message.isHidden && (
-                                <Badge variant="destructive" className="text-xs">
-                                  <Shield className="h-3 w-3 mr-1" />
-                                  Hidden
-                                </Badge>
-                              )}
-                              {message.moderation?.status === 'blocked' && (
-                                <Badge variant="destructive" className="text-xs">
-                                  <Shield className="h-3 w-3 mr-1" />
-                                  Blocked
-                                </Badge>
-                              )}
-                              {message.moderation?.status === 'pending' && (
-                                <Badge variant="outline" className="text-xs bg-yellow-100 text-yellow-800 border-yellow-200">
-                                  <Flag className="h-3 w-3 mr-1" />
-                                  Pending Review
-                                </Badge>
-                              )}
-                            </div>
-                            <p className={`${isRTL ? 'text-right' : 'text-left'} whitespace-pre-wrap mb-2`}>
-                              {message.body}
-                            </p>
-                            {message.quotedPreview && (
-                              <div className="text-sm text-muted-foreground italic border-l-2 border-gray-300 pl-2 mb-2">
-                                "{message.quotedPreview}"
+                        {/* Avatar */}
+                        <Avatar className="h-8 w-8 shrink-0 mt-1">
+                          <AvatarFallback className="text-xs font-medium">
+                            {getUserInitials(message.senderDisplayName || message.senderCpId)}
+                          </AvatarFallback>
+                        </Avatar>
+
+                        {/* Message Content */}
+                        <div className="flex-1 min-w-0">
+                          {/* Header */}
+                          <div className="flex items-baseline gap-2 mb-1">
+                            <span className="font-medium text-sm truncate">
+                              {message.senderDisplayName || message.senderCpId}
+                            </span>
+                            <span className="text-xs text-muted-foreground shrink-0">
+                              {formatMessageDate(message.createdAt)}
+                            </span>
+                            {showModerationStatus && (
+                              <div className="flex gap-1">
+                                {message.isHidden && (
+                                  <Badge variant="destructive" className="text-xs px-1.5 py-0.5 h-5">
+                                    <Shield className="h-3 w-3 mr-1" />
+                                    Hidden
+                                  </Badge>
+                                )}
+                                {message.moderation?.status === 'blocked' && (
+                                  <Badge variant="destructive" className="text-xs px-1.5 py-0.5 h-5">
+                                    <Flag className="h-3 w-3 mr-1" />
+                                    Blocked
+                                  </Badge>
+                                )}
+                                {message.moderation?.status === 'pending' && (
+                                  <Badge variant="outline" className="text-xs px-1.5 py-0.5 h-5 bg-yellow-100 text-yellow-800 border-yellow-200">
+                                    <Clock className="h-3 w-3 mr-1" />
+                                    Pending
+                                  </Badge>
+                                )}
                               </div>
-                            )}
-                            {message.moderation?.reason && (
-                              <p className="text-xs text-red-600 bg-red-100 p-2 rounded mt-2">
-                                <strong>{t('modules.groupsManagement.groupDetail.moderationReason') || 'Moderation reason:'}</strong> {message.moderation.reason}
-                              </p>
                             )}
                           </div>
 
+                          {/* Reply context */}
+                          {message.quotedPreview && (
+                            <div className="text-xs text-muted-foreground italic border-l-2 border-gray-300 pl-2 mb-2 bg-gray-50 dark:bg-gray-900 rounded p-2">
+                              "{message.quotedPreview}"
+                            </div>
+                          )}
+
+                          {/* Message body */}
+                          <p className={`text-sm ${isRTL ? 'text-right' : 'text-left'} whitespace-pre-wrap break-words`}>
+                            {message.body}
+                          </p>
+
+                          {/* Moderation reason */}
+                          {message.moderation?.reason && (
+                            <div className="text-xs text-red-700 bg-red-100 dark:bg-red-900/30 p-2 rounded mt-2">
+                              <strong>{t('modules.groupsManagement.groupDetail.moderationReason') || 'Reason:'}</strong> {message.moderation.reason}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Actions */}
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" className="h-8 w-8 p-0">
+                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
                                 <MoreHorizontal className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
@@ -449,8 +523,8 @@ export default function GroupMessagesPage() {
                                   onClick={() => handleUnmoderateMessage(message)}
                                   disabled={isSubmitting}
                                 >
-                                  <Shield className="mr-2 h-4 w-4" />
-                                  {t('modules.groupsManagement.groupDetail.unmoderateMessage') || 'Remove Moderation'}
+                                  <CheckCheck className="mr-2 h-4 w-4" />
+                                  {t('modules.groupsManagement.groupDetail.unmoderateMessage') || 'Approve'}
                                 </DropdownMenuItem>
                               )}
                               <DropdownMenuItem 
@@ -459,15 +533,18 @@ export default function GroupMessagesPage() {
                                 disabled={isSubmitting}
                               >
                                 <Trash2 className="mr-2 h-4 w-4" />
-                                {t('modules.groupsManagement.groupDetail.deleteMessage') || 'Delete Message'}
+                                {t('modules.groupsManagement.groupDetail.deleteMessage') || 'Delete'}
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </div>
                       </div>
-                    ))}
-              </div>
-            )}
+                    );
+                  })}
+                  <div ref={messagesEndRef} />
+                </div>
+              )}
+            </ScrollArea>
           </CardContent>
         </Card>
       </div>
