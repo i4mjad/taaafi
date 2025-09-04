@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { MoonIcon, SunIcon } from "lucide-react"
+import { useTranslation } from "@/contexts/TranslationContext"
 
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
@@ -12,6 +13,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
  * the `dark` class on the `<html>` element.
  */
 export function ThemeSwitcher() {
+  const { t } = useTranslation()
   const [theme, setTheme] = useState<"light" | "dark">("light")
   const [mounted, setMounted] = useState(false)
 
@@ -49,11 +51,11 @@ export function ThemeSwitcher() {
       <TabsList className="grid w-full grid-cols-2">
         <TabsTrigger value="light">
           <SunIcon />
-          <span className="sr-only">Light</span>
+          <span className="sr-only">{t('appSidebar.themeSwitcher.light')}</span>
         </TabsTrigger>
         <TabsTrigger value="dark">
           <MoonIcon />
-          <span className="sr-only">Dark</span>
+          <span className="sr-only">{t('appSidebar.themeSwitcher.dark')}</span>
         </TabsTrigger>
       </TabsList>
     </Tabs>

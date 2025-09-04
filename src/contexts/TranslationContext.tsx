@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Locale } from '../../i18n.config';
 
-type TranslationFunction = (key: string) => string;
+type TranslationFunction = (key: string, interpolations?: Record<string, string | number>) => string;
 
 interface TranslationContextType {
   t: TranslationFunction;
@@ -24,7 +24,7 @@ export function TranslationProvider({ children, locale, initialDictionary }: Tra
   const [isLoading, setIsLoading] = useState(false);
 
   // Create translation function
-  const t: TranslationFunction = (key: string) => {
+  const t: TranslationFunction = (key: string, interpolations?: Record<string, string | number>) => {
     const keys = key.split('.');
     let value: any = dictionary;
     
@@ -32,7 +32,17 @@ export function TranslationProvider({ children, locale, initialDictionary }: Tra
       value = value?.[k];
     }
     
-    return typeof value === 'string' ? value : key;
+    if (typeof value === 'string') {
+      // Handle interpolations
+      if (interpolations) {
+        return Object.keys(interpolations).reduce((str, key) => {
+          return str.replace(new RegExp(`{${key}}`, 'g'), String(interpolations[key]));
+        }, value);
+      }
+      return value;
+    }
+    
+    return key;
   };
 
   // Update dictionary when locale changes

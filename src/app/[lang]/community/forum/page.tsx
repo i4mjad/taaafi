@@ -1,25 +1,61 @@
 'use client';
 
 import { useTranslation } from "@/contexts/TranslationContext";
+import { SiteHeader } from '@/components/site-header';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import PostCategoriesManagement from "./components/PostCategoryForm";
+import CommunityProfilesManagement from "./components/CommunityProfilesManagement";
+import ForumPostsManagement from "./components/ForumPostsManagement";
+import ForumCommentsManagement from "./components/ForumCommentsManagement";
+import CommunityAnalytics from "./components/CommunityAnalytics";
 
 export default function ForumPage() {
   const { t } = useTranslation();
 
+  const headerDictionary = {
+    documents: t('appSidebar.forum') || 'Forum Management',
+  };
+
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">{t('sidebar.forum')}</h1>
+    <>
+      <SiteHeader dictionary={headerDictionary} />
+      <div className="p-6">
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold tracking-tight">{t('appSidebar.forum')}</h1>
         <p className="text-muted-foreground">
-          {t('modules.community.forumDescription') || 'Manage forum discussions and topics'}
+          {t('modules.community.forumDescription')}
         </p>
       </div>
       
-      <div className="rounded-lg border p-8 text-center">
-        <h2 className="text-xl font-semibold mb-2">Forum Management</h2>
-        <p className="text-muted-foreground">
-          Forum management interface will be implemented here.
-        </p>
+      <Tabs defaultValue="posts" className="w-full">
+        <TabsList className="grid w-full grid-cols-5 mb-6">
+          <TabsTrigger value="posts">{t('modules.community.posts.title')}</TabsTrigger>
+          <TabsTrigger value="comments">{t('modules.community.comments.title')}</TabsTrigger>
+          <TabsTrigger value="profiles">{t('modules.community.profiles.title')}</TabsTrigger>
+          <TabsTrigger value="categories">{t('modules.community.postCategories.title')}</TabsTrigger>
+          <TabsTrigger value="analytics">{t('modules.community.analytics.title')}</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="posts" className="space-y-4">
+          <ForumPostsManagement />
+        </TabsContent>
+        <TabsContent value="comments" className="space-y-4">
+          <ForumCommentsManagement />
+        </TabsContent>
+        
+        <TabsContent value="profiles" className="space-y-4">
+          <CommunityProfilesManagement />
+        </TabsContent>
+        
+        <TabsContent value="categories" className="space-y-4">
+          <PostCategoriesManagement />
+        </TabsContent>
+        
+        <TabsContent value="analytics" className="space-y-4">
+          <CommunityAnalytics />
+        </TabsContent>
+      </Tabs>
       </div>
-    </div>
+    </>
   );
 } 

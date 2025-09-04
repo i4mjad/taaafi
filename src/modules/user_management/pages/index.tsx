@@ -155,7 +155,7 @@ export default function UserManagementPage({ t, locale }: UserManagementPageProp
         <div>
           <h1 className="text-3xl font-bold tracking-tight">{t('modules.userManagement.title')}</h1>
           <p className="text-muted-foreground">
-            {t('modules.userManagement.description') || 'Manage platform users and their permissions'}
+            {t('modules.userManagement.description')}
           </p>
         </div>
         <Button>
@@ -171,7 +171,7 @@ export default function UserManagementPage({ t, locale }: UserManagementPageProp
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{t('modules.userManagement.totalUsers') || 'Total Users'}</CardTitle>
+                <CardTitle className="text-sm font-medium">{t('modules.userManagement.totalUsers')}</CardTitle>
                 <Users className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
@@ -181,7 +181,7 @@ export default function UserManagementPage({ t, locale }: UserManagementPageProp
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{t('modules.userManagement.activeUsers') || 'Active Users'}</CardTitle>
+                <CardTitle className="text-sm font-medium">{t('modules.userManagement.activeUsers')}</CardTitle>
                 <UserCheck className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
@@ -191,7 +191,7 @@ export default function UserManagementPage({ t, locale }: UserManagementPageProp
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{t('modules.userManagement.admins') || 'Administrators'}</CardTitle>
+                <CardTitle className="text-sm font-medium">{t('modules.userManagement.admins')}</CardTitle>
                 <Shield className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
@@ -201,7 +201,7 @@ export default function UserManagementPage({ t, locale }: UserManagementPageProp
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{t('modules.userManagement.moderators') || 'Moderators'}</CardTitle>
+                <CardTitle className="text-sm font-medium">{t('modules.userManagement.moderators')}</CardTitle>
                 <UserCheck className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
@@ -219,7 +219,7 @@ export default function UserManagementPage({ t, locale }: UserManagementPageProp
               <div className="flex flex-col gap-4 md:flex-row md:items-end">
                 <div className="flex-1">
                   <Input
-                    placeholder={t('modules.userManagement.searchPlaceholder') || 'Search by email or name...'}
+                    placeholder={t('modules.userManagement.searchPlaceholder')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
@@ -230,7 +230,7 @@ export default function UserManagementPage({ t, locale }: UserManagementPageProp
                   onValueChange={(value) => setFilters({ ...filters, role: value as any })}
                 >
                   <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder={t('modules.userManagement.filterByRole') || 'Filter by role'} />
+                    <SelectValue placeholder={t('modules.userManagement.filterByRole')} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="admin">Admin</SelectItem>
@@ -243,7 +243,7 @@ export default function UserManagementPage({ t, locale }: UserManagementPageProp
                   onValueChange={(value) => setFilters({ ...filters, status: value as any })}
                 >
                   <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder={t('modules.userManagement.filterByStatus') || 'Filter by status'} />
+                    <SelectValue placeholder={t('modules.userManagement.filterByStatus')} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="active">Active</SelectItem>
@@ -264,7 +264,7 @@ export default function UserManagementPage({ t, locale }: UserManagementPageProp
             <CardHeader>
               <CardTitle>{t('modules.userManagement.users')}</CardTitle>
               <CardDescription>
-                {t('modules.userManagement.usersDescription') || 'Manage user accounts and permissions'}
+                {t('modules.userManagement.usersDescription')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -278,11 +278,11 @@ export default function UserManagementPage({ t, locale }: UserManagementPageProp
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>{t('modules.userManagement.user') || 'User'}</TableHead>
+                      <TableHead>{t('modules.userManagement.user')}</TableHead>
                       <TableHead>{t('modules.userManagement.userRole')}</TableHead>
                       <TableHead>{t('modules.userManagement.userStatus')}</TableHead>
-                      <TableHead>{t('modules.userManagement.lastLogin') || 'Last Login'}</TableHead>
-                      <TableHead>{t('modules.userManagement.createdAt') || 'Created'}</TableHead>
+                      <TableHead>{t('modules.userManagement.lastLogin')}</TableHead>
+                      <TableHead>{t('modules.userManagement.createdAt')}</TableHead>
                       <TableHead className="text-right">{t('common.actions')}</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -306,7 +306,7 @@ export default function UserManagementPage({ t, locale }: UserManagementPageProp
                         <TableCell>{getRoleBadge(user.role)}</TableCell>
                         <TableCell>{getStatusBadge(user.status)}</TableCell>
                         <TableCell>
-                          {user.lastLoginAt ? formatDate(user.lastLoginAt) : t('common.never') || 'Never'}
+                          {user.lastLoginAt ? formatDate(user.lastLoginAt) : t('common.never')}
                         </TableCell>
                         <TableCell>{formatDate(user.createdAt)}</TableCell>
                         <TableCell className="text-right">
@@ -327,14 +327,14 @@ export default function UserManagementPage({ t, locale }: UserManagementPageProp
                                   onClick={() => handleStatusChange(user.uid, 'suspended')}
                                 >
                                   <UserX className="h-4 w-4 mr-2" />
-                                  {t('modules.userManagement.suspendUser') || 'Suspend'}
+                                  {t('modules.userManagement.suspendUser')}
                                 </DropdownMenuItem>
                               ) : (
                                 <DropdownMenuItem
                                   onClick={() => handleStatusChange(user.uid, 'active')}
                                 >
                                   <UserCheck className="h-4 w-4 mr-2" />
-                                  {t('modules.userManagement.activateUser') || 'Activate'}
+                                  {t('modules.userManagement.activateUser')}
                                 </DropdownMenuItem>
                               )}
                               <DropdownMenuSeparator />
@@ -359,7 +359,7 @@ export default function UserManagementPage({ t, locale }: UserManagementPageProp
                   <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                   <p className="text-lg font-medium">{t('common.noData')}</p>
                   <p className="text-muted-foreground">
-                    {t('modules.userManagement.noUsersFound') || 'No users found matching your criteria'}
+                    {t('modules.userManagement.noUsersFound')}
                   </p>
                 </div>
               )}

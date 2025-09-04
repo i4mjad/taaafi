@@ -89,6 +89,8 @@ export const schema = z.object({
   target: z.string(),
   limit: z.string(),
   reviewer: z.string(),
+  userId: z.string(),
+  provider: z.string(),
 })
 
 // Create a separate component for the drag handle
@@ -265,6 +267,25 @@ function TableCellViewer({ item, dictionary, lang }: TableCellViewerProps) {
                 </SelectContent>
               </Select>
             </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col gap-3">
+                <Label htmlFor="userId">{dictionary.formLabels.userId}</Label>
+                <Input id="userId" defaultValue={item.userId} className="font-mono" />
+              </div>
+              <div className="flex flex-col gap-3">
+                <Label htmlFor="provider">{dictionary.formLabels.provider}</Label>
+                <Select defaultValue={item.provider}>
+                  <SelectTrigger id="provider" className="w-full">
+                    <SelectValue placeholder={dictionary.formLabels.selectAProvider} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Google">Google</SelectItem>
+                    <SelectItem value="Apple">Apple</SelectItem>
+                    <SelectItem value="Email">Email</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
           </form>
         </div>
         <SheetFooter className="mt-auto flex gap-2 sm:flex-col sm:space-x-0">
@@ -419,6 +440,24 @@ const getColumns = (dictionary: Dictionary["dataTable"], lang: Locale): ColumnDe
         </>
       )
     },
+  },
+  {
+    accessorKey: "userId",
+    header: dictionary.headers.userId,
+    cell: ({ row }) => (
+      <div className="font-mono text-sm text-muted-foreground">
+        {row.original.userId}
+      </div>
+    ),
+  },
+  {
+    accessorKey: "provider",
+    header: dictionary.headers.provider,
+    cell: ({ row }) => (
+      <Badge variant="secondary" className="px-2 py-1">
+        {row.original.provider}
+      </Badge>
+    ),
   },
   {
     id: "actions",
@@ -661,7 +700,7 @@ export function DataTable({ data: initialData, dictionary, lang }: DataTableProp
                   <SelectValue placeholder={table.getState().pagination.pageSize} />
                 </SelectTrigger>
                 <SelectContent side="top">
-                  {[10, 20, 30, 40, 50].map((pageSize) => (
+                  {[10, 20, 30, 40, 50, 100, 250].map((pageSize) => (
                     <SelectItem key={pageSize} value={`${pageSize}`}>
                       {pageSize}
                     </SelectItem>

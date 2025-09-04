@@ -12,8 +12,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar"
-import type { Dictionary } from "@/app/[lang]/dashboard/page"
 import { useAuth } from '@/auth/AuthProvider'
+import { useTranslation } from '@/contexts/TranslationContext'
 
 interface NavUserProps {
   user: {
@@ -21,12 +21,12 @@ interface NavUserProps {
     email: string
     avatar: string
   }
-  dictionary: Dictionary["appSidebar"]["userMenu"]
 }
 
-export function NavUser({ user, dictionary }: NavUserProps) {
+export function NavUser({ user }: NavUserProps) {
   const { isMobile } = useSidebar()
   const { signOut } = useAuth()
+  const { t } = useTranslation()
 
   return (
     <SidebarMenu>
@@ -69,7 +69,7 @@ export function NavUser({ user, dictionary }: NavUserProps) {
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={async () => await signOut()}>
               <LogOutIcon className="ltr:mr-2 rtl:ml-2" />
-              {dictionary.logOut}
+              {t('appSidebar.userMenu.logOut')}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

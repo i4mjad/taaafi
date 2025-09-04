@@ -68,7 +68,7 @@ export default function ContentPage({ t, locale }: ContentPageProps) {
   const contentModules = [
     {
       title: t('sidebar.contentTypes'),
-      description: t('modules.content.typesDescription') || 'Manage different types of content (articles, videos, resources)',
+      description: t('modules.content.typesDescription'),
       icon: FileText,
       href: `/${locale}/content/types`,
       stats: `${contentStats.contentTypes} types`,
@@ -76,7 +76,7 @@ export default function ContentPage({ t, locale }: ContentPageProps) {
     },
     {
       title: t('sidebar.contentOwners'),
-      description: t('modules.content.ownersDescription') || 'Manage content creators and their permissions',
+      description: t('modules.content.ownersDescription'),
       icon: Users,
       href: `/${locale}/content/owners`,
       stats: `${contentStats.contentOwners} owners`,
@@ -84,7 +84,7 @@ export default function ContentPage({ t, locale }: ContentPageProps) {
     },
     {
       title: t('sidebar.categories'),
-      description: t('modules.content.categoriesDescription') || 'Organize content into categories and topics',
+      description: t('modules.content.categoriesDescription'),
       icon: Tag,
       href: `/${locale}/content/categories`,
       stats: `${contentStats.categories} categories`,
@@ -92,7 +92,7 @@ export default function ContentPage({ t, locale }: ContentPageProps) {
     },
     {
       title: t('sidebar.contentItems'),
-      description: t('modules.content.itemsDescription') || 'Manage individual content pieces and their metadata',
+      description: t('modules.content.itemsDescription'),
       icon: FileText,
       href: `/${locale}/content`,
       stats: `${contentStats.totalContent} items`,
@@ -100,7 +100,7 @@ export default function ContentPage({ t, locale }: ContentPageProps) {
     },
     {
       title: t('sidebar.contentLists'),
-      description: t('modules.content.listsDescription') || 'Create and manage curated content collections',
+      description: t('modules.content.listsDescription'),
       icon: List,
       href: `/${locale}/content/lists`,
       stats: `${contentStats.contentLists} lists`,
@@ -129,12 +129,12 @@ export default function ContentPage({ t, locale }: ContentPageProps) {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">{t('modules.content.title')}</h1>
           <p className="text-muted-foreground">
-            {t('modules.content.description') || 'Manage content, categories, and publishing workflow'}
+            {t('modules.content.description')}
           </p>
         </div>
         <Button>
           <Plus className="h-4 w-4 mr-2" />
-          {t('modules.content.createContent') || 'Create Content'}
+          {t('modules.content.createContent')}
         </Button>
       </div>
 
@@ -142,52 +142,52 @@ export default function ContentPage({ t, locale }: ContentPageProps) {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Content</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('modules.content.totalContent')}</CardTitle>
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{contentStats.totalContent.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">
-              <span className="text-green-600">+{contentStats.publishedToday}</span> published today
+              <span className="text-green-600">+{contentStats.publishedToday}</span> {t('modules.content.publishedToday')}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Draft Content</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('modules.content.draftContent')}</CardTitle>
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{contentStats.draftContent}</div>
             <p className="text-xs text-muted-foreground">
-              Ready for review
+              {t('modules.content.readyForReview')}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Content Types</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('modules.content.contentTypes')}</CardTitle>
             <FolderOpen className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{contentStats.contentTypes}</div>
             <p className="text-xs text-muted-foreground">
-              Active content types
+              {t('modules.content.activeContentTypes')}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending Review</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('modules.content.pendingReview')}</CardTitle>
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-orange-600">{contentStats.pendingReview}</div>
             <p className="text-xs text-muted-foreground">
-              Awaiting approval
+              {t('modules.content.awaitingApproval')}
             </p>
           </CardContent>
         </Card>
@@ -209,7 +209,7 @@ export default function ContentPage({ t, locale }: ContentPageProps) {
                 <p className="text-sm text-muted-foreground">{module.stats}</p>
                 <Button asChild size="sm">
                   <Link href={module.href}>
-                    Manage
+                    {t('modules.content.manage')}
                     <ArrowRight className="h-4 w-4 ml-2" />
                   </Link>
                 </Button>
@@ -222,8 +222,8 @@ export default function ContentPage({ t, locale }: ContentPageProps) {
       {/* Recent Content */}
       <Card>
         <CardHeader>
-          <CardTitle>Recent Content</CardTitle>
-          <CardDescription>Latest content updates and publications</CardDescription>
+          <CardTitle>{t('modules.content.recentContent')}</CardTitle>
+          <CardDescription>{t('modules.content.recentContentDescription')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -252,7 +252,7 @@ export default function ContentPage({ t, locale }: ContentPageProps) {
           <div className="mt-6 text-center">
             <Button variant="outline" asChild>
               <Link href={`/${locale}/content`}>
-                View All Content
+                {t('modules.content.viewAllContent')}
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Link>
             </Button>

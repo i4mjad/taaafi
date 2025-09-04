@@ -1,0 +1,403 @@
+"use client";
+
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Loader2, Send, AlertCircle, CheckCircle, Users, Smartphone } from 'lucide-react';
+import { useTranslation } from "@/contexts/TranslationContext";
+// Firebase imports
+import { useCollection } from 'react-firebase-hooks/firestore';
+import { collection, query, where, orderBy } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+
+interface NotificationData {
+  title: string;
+  body: string;
+  imageUrl?: string;
+  clickAction?: string;
+  priority: 'high' | 'normal';
+  topic: string;
+}
+
+interface Group {
+  id: string;
+  name: string;
+  nameAr: string;
+  description?: string;
+  descriptionAr?: string;
+  topicId: string;
+  memberCount: number;
+  isActive: boolean;
+}
+
+export default function PushNotificationForm() {
+  const { t, locale } = useTranslation();
+  const [isLoading, setIsLoading] = useState(false);
+  const [alert, setAlert] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [formData, setFormData] = useState<NotificationData>({
+    title: '',
+    body: '',
+    imageUrl: '',
+    clickAction: '',
+    priority: 'normal',
+    topic: ''
+  });
+
+  // Use Firebase hooks to fetch active groups
+  const [groupsSnapshot, groupsLoading, groupsError] = useCollection(
+    query(
+      collection(db, 'usersMessagingGroups'), 
+      where('isActive', '==', true),
+      orderBy('name')
+    )
+  );
+
+  // Convert Firestore documents to Group objects
+  const groups: Group[] = groupsSnapshot?.docs.map(doc => {
+    const data = doc.data();
+    return {
+      id: doc.id,
+      name: data.name,
+      nameAr: data.nameAr,
+      description: data.description,
+      descriptionAr: data.descriptionAr,
+      topicId: data.topicId,
+      memberCount: data.memberCount || 0,
+      isActive: data.isActive !== false,
+    };
+  }) || [];
+
+  // Get available topics from database groups only
+  const getAvailableTopics = () => {
+    return groups.map(group => ({
+      value: group.topicId,
+      label: locale === 'ar' && group.nameAr ? group.nameAr : group.name,
+      description: locale === 'ar' && group.descriptionAr ? group.descriptionAr : group.description || '',
+      icon: '👥',
+      memberCount: group.memberCount
+    }));
+  };
+
+  const validateForm = () => {
+    const errors: string[] = [];
+    
+    if (groups.length === 0) {
+      errors.push(t('modules.userManagement.notifications.pushNotifications.errors.noGroupsAvailable') || 'No groups available. Please create a group first.');
+    }
+    
+    if (!formData.title.trim()) {
+      errors.push(t('modules.userManagement.notifications.pushNotifications.errors.titleRequired') || 'Title is required');
+    }
+    
+    if (!formData.body.trim()) {
+      errors.push(t('modules.userManagement.notifications.pushNotifications.errors.messageRequired') || 'Message is required');
+    }
+    
+    if (!formData.topic) {
+      errors.push(t('modules.userManagement.notifications.pushNotifications.errors.targetGroupRequired') || 'Please select a target group');
+    }
+    
+    if (formData.imageUrl && !isValidUrl(formData.imageUrl)) {
+      errors.push(t('modules.userManagement.notifications.pushNotifications.errors.invalidImageUrl') || 'Please enter a valid image URL');
+    }
+    
+    if (formData.clickAction && !isValidUrl(formData.clickAction)) {
+      errors.push(t('modules.userManagement.notifications.pushNotifications.errors.invalidClickAction') || 'Please enter a valid URL');
+    }
+    
+    return errors;
+  };
+
+  const isValidUrl = (string: string) => {
+    try {
+      new URL(string);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  };
+
+  const getSelectedTopicInfo = () => {
+    const availableTopics = getAvailableTopics();
+    return availableTopics.find(topic => topic.value === formData.topic);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const validationErrors = validateForm();
+    if (validationErrors.length > 0) {
+      setAlert({ type: 'error', message: validationErrors[0] });
+      return;
+    }
+
+    setIsLoading(true);
+    setAlert(null);
+
+    try {
+      const response = await fetch('/api/admin/notifications/send-all', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          topic: formData.topic,
+          notification: {
+            title: formData.title,
+            body: formData.body,
+            ...(formData.imageUrl && { image: formData.imageUrl })
+          },
+          android: {
+            priority: formData.priority,
+            ...(formData.clickAction && {
+              notification: {
+                click_action: formData.clickAction
+              }
+            })
+          },
+          webpush: {
+            ...(formData.clickAction && {
+              fcm_options: {
+                link: formData.clickAction
+              }
+            })
+          }
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        const selectedTopic = getSelectedTopicInfo();
+        setAlert({ 
+          type: 'success', 
+          message: `${t('modules.userManagement.notifications.pushNotifications.success') || 'Push notification sent successfully'} to ${selectedTopic?.label || formData.topic}!`
+        });
+        // Reset form
+        setFormData({
+          title: '',
+          body: '',
+          imageUrl: '',
+          clickAction: '',
+          priority: 'normal',
+          topic: ''
+        });
+      } else {
+        setAlert({ type: 'error', message: result.error || t('modules.userManagement.notifications.pushNotifications.error') || 'Failed to send push notification' });
+      }
+    } catch (error) {
+      setAlert({ type: 'error', message: t('modules.userManagement.notifications.pushNotifications.error') || 'Failed to send push notification' });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const selectedTopicInfo = getSelectedTopicInfo();
+  const availableTopics = getAvailableTopics();
+
+  // Show error state if groups failed to load
+  if (groupsError) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Smartphone className="h-5 w-5" />
+            {t('modules.userManagement.notifications.pushNotifications.title') || 'Push Notifications'}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-8">
+            <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
+            <h3 className="text-lg font-medium mb-2">Error loading groups</h3>
+            <p className="text-muted-foreground">{groupsError.message}</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Smartphone className="h-5 w-5" />
+          {t('modules.userManagement.notifications.pushNotifications.title') || 'Push Notifications'}
+        </CardTitle>
+        <CardDescription>
+          {t('modules.userManagement.notifications.pushNotifications.description') || 'Send push notifications to selected user groups'}
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        {!groupsLoading && groups.length === 0 ? (
+          <div className="text-center py-8">
+            <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-lg font-medium mb-2">
+              {t('modules.userManagement.notifications.pushNotifications.noGroupsTitle') || 'No Groups Available'}
+            </h3>
+            <p className="text-muted-foreground mb-4">
+              {t('modules.userManagement.notifications.pushNotifications.noGroupsDescription') || 'You need to create messaging groups before sending notifications. Groups allow you to target specific user segments.'}
+            </p>
+            <Button asChild>
+              <a href={`/${locale}/user-management/settings/groups`}>
+                {t('modules.userManagement.groups.createFirstGroup') || 'Create First Group'}
+              </a>
+            </Button>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {alert && (
+              <div className={`flex items-center gap-2 p-3 rounded-lg border ${
+                alert.type === 'error' 
+                  ? 'bg-destructive/10 border-destructive text-destructive' 
+                  : 'bg-green-50 border-green-200 text-green-800'
+              }`}>
+                {alert.type === 'error' ? (
+                  <AlertCircle className="h-4 w-4" />
+                ) : (
+                  <CheckCircle className="h-4 w-4" />
+                )}
+                <span className="text-sm">{alert.message}</span>
+              </div>
+            )}
+
+          {/* Target Group Selection */}
+          <div className="space-y-2">
+            <Label htmlFor="topic">{t('modules.userManagement.notifications.pushNotifications.targetGroup') || 'Target Group'}</Label>
+            {groupsLoading ? (
+              <Skeleton className="h-10 w-full" />
+            ) : (
+              <Select
+                value={formData.topic}
+                onValueChange={(value) => setFormData({ ...formData, topic: value })}
+                disabled={isLoading}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={t('modules.userManagement.notifications.pushNotifications.selectTargetGroup') || 'Select target group'} />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableTopics.map((topic) => (
+                    <SelectItem key={topic.value} value={topic.value}>
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg">{topic.icon}</span>
+                        <div className="flex flex-col">
+                          <span className="font-medium">{topic.label}</span>
+                          <span className="text-xs text-muted-foreground">
+                            {topic.description}
+                            {topic.memberCount !== null && (
+                              <> • {topic.memberCount} {t('modules.userManagement.groups.members') || 'members'}</>
+                            )}
+                          </span>
+                        </div>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+            {selectedTopicInfo && (
+              <div className="flex items-center gap-2">
+                <Badge variant="secondary" className="flex items-center gap-1">
+                  <Users className="h-3 w-3" />
+                  {t('modules.userManagement.notifications.pushNotifications.sendingTo') || 'Sending to:'} {selectedTopicInfo.label}
+                  {selectedTopicInfo.memberCount !== null && (
+                    <span className="ml-1">({selectedTopicInfo.memberCount})</span>
+                  )}
+                </Badge>
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="title">{t('modules.userManagement.notifications.pushNotifications.messageTitle') || 'Notification Title'}</Label>
+            <Input
+              id="title"
+              value={formData.title}
+              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              placeholder={t('modules.userManagement.notifications.pushNotifications.messageTitlePlaceholder') || 'Enter notification title'}
+              disabled={isLoading}
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="body">{t('modules.userManagement.notifications.pushNotifications.messageBody') || 'Message Content'}</Label>
+            <Textarea
+              id="body"
+              value={formData.body}
+              onChange={(e) => setFormData({ ...formData, body: e.target.value })}
+              placeholder={t('modules.userManagement.notifications.pushNotifications.messageBodyPlaceholder') || 'Enter your message content'}
+              disabled={isLoading}
+              required
+              rows={4}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="imageUrl">{t('modules.userManagement.notifications.pushNotifications.imageUrl') || 'Image URL (Optional)'}</Label>
+            <Input
+              id="imageUrl"
+              type="url"
+              value={formData.imageUrl}
+              onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
+              placeholder={t('modules.userManagement.notifications.pushNotifications.imageUrlPlaceholder') || 'https://example.com/image.jpg'}
+              disabled={isLoading}
+            />
+            <p className="text-sm text-muted-foreground">{t('modules.userManagement.notifications.pushNotifications.imageUrlHelp') || 'Optional image to display in the notification'}</p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="clickAction">{t('modules.userManagement.notifications.pushNotifications.clickAction') || 'Click Action URL (Optional)'}</Label>
+            <Input
+              id="clickAction"
+              type="url"
+              value={formData.clickAction}
+              onChange={(e) => setFormData({ ...formData, clickAction: e.target.value })}
+              placeholder={t('modules.userManagement.notifications.pushNotifications.clickActionPlaceholder') || 'https://example.com/page'}
+              disabled={isLoading}
+            />
+            <p className="text-sm text-muted-foreground">{t('modules.userManagement.notifications.pushNotifications.clickActionHelp') || 'URL to open when notification is clicked'}</p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="priority">{t('modules.userManagement.notifications.pushNotifications.priority') || 'Priority'}</Label>
+            <Select
+              value={formData.priority}
+              onValueChange={(value: 'high' | 'normal') => setFormData({ ...formData, priority: value })}
+              disabled={isLoading}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="normal">{t('modules.userManagement.notifications.pushNotifications.priorityNormal') || 'Normal'}</SelectItem>
+                <SelectItem value="high">{t('modules.userManagement.notifications.pushNotifications.priorityHigh') || 'High'}</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-sm text-muted-foreground">{t('modules.userManagement.notifications.pushNotifications.priorityHelp') || 'High priority notifications are delivered immediately'}</p>
+          </div>
+
+          <Button type="submit" disabled={isLoading || groupsLoading} className="w-full">
+            {isLoading ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                {t('modules.userManagement.notifications.pushNotifications.sending') || 'Sending...'}
+              </>
+            ) : (
+              <>
+                <Send className="w-4 h-4 mr-2" />
+                {t('modules.userManagement.notifications.pushNotifications.sendTo') || 'Send to'} {selectedTopicInfo?.label || t('modules.userManagement.notifications.pushNotifications.selectTargetGroup') || 'Selected Group'}
+              </>
+            )}
+          </Button>
+          </form>
+        )}
+      </CardContent>
+    </Card>
+  );
+} 

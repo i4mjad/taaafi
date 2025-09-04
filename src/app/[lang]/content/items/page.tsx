@@ -21,13 +21,13 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+  ResponsiveDialog as Dialog,
+  ResponsiveDialogContent as DialogContent,
+  ResponsiveDialogDescription as DialogDescription,
+  ResponsiveDialogFooter as DialogFooter,
+  ResponsiveDialogHeader as DialogHeader,
+  ResponsiveDialogTitle as DialogTitle,
+} from '@/components/ui/responsive-dialog';
 import { SiteHeader } from '@/components/site-header';
 import { useTranslation } from '@/contexts/TranslationContext';
 import { useCollection } from 'react-firebase-hooks/firestore';

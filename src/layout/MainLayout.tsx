@@ -1,114 +1,195 @@
 'use client';
 
-import React from 'react';
-import { usePathname } from 'next/navigation';
+import React, { useEffect } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/app-sidebar';
 import { useAuth } from '@/auth/AuthProvider';
 import { useTranslation } from '@/contexts/TranslationContext';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
+import { LoginForm } from '@/components/login-form';
+import { HeartHandshakeIcon } from 'lucide-react';
+import { LocaleSwitcher } from '@/components/locale-switcher';
+import { ThemeSwitcher } from '@/components/theme-switcher';
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from '@/components/ui/sidebar';
 
 interface MainLayoutProps {
   children: React.ReactNode;
 }
 
+// Limited sidebar for non-authenticated users
+function LimitedSidebar({ locale, side }: { locale: string; side: 'left' | 'right' }) {
+  const { t } = useTranslation();
+  
+  return (
+    <Sidebar collapsible="offcanvas" side={side}>
+      <SidebarHeader className="flex flex-col gap-2">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild className="data-[slot=sidebar-menu-button]:!p-1.5">
+              <a href="#">
+                <HeartHandshakeIcon className="h-5 w-5" />
+                <span className="text-base font-semibold">{t('appSidebar.appName')}</span>
+              </a>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+        <LocaleSwitcher currentLocale={locale as any} />
+        <ThemeSwitcher />
+      </SidebarHeader>
+      <SidebarContent>
+        {/* Empty content for non-authenticated users */}
+      </SidebarContent>
+    </Sidebar>
+  );
+}
+
 export function MainLayout({ children }: MainLayoutProps) {
-  const { user, loading } = useAuth();
+  const { user, loading, signOut } = useAuth();
   const { t, locale } = useTranslation();
   const pathname = usePathname();
+  const router = useRouter();
 
-  // Check if we're on a public route (login page)
   const isLoginPage = pathname.includes('/login');
 
-  // Don't show full loading layout, handle loading in content area instead
+  // Handle redirects for authenticated users on login page
+  useEffect(() => {
+    if (loading) return;
 
-  // If user is not authenticated and NOT on login page, show access denied
-  if (!user && !isLoginPage) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="text-center space-y-4">
-          <h1 className="text-2xl font-bold">{t('auth.accessDenied')}</h1>
-          <p className="text-muted-foreground">
-            Please sign in with an administrator or moderator account.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  // If we're on the login page, render without sidebar
-  if (isLoginPage) {
-    return (
-      <div className={`font-sans min-h-screen ${locale === 'ar' ? 'rtl' : 'ltr'}`}>
-        {children}
-      </div>
-    );
-  }
-
-  // Create dictionary object for the existing AppSidebar
-  const sidebarDictionary = {
-    appName: t('appSidebar.appName') || 'Ta\'aafi Platform Admin Panel',
-    taafiPlatform: t('appSidebar.taafiPlatform') || 'Ta\'aafi Platform',
-    quickCreate: t('appSidebar.quickCreate') || 'Quick Create',
-    inbox: t('appSidebar.inbox') || 'Inbox',
-    dashboard: t('appSidebar.dashboard') || 'Dashboard',
-    userManagement: t('appSidebar.userManagement') || 'User Management',
-    users: t('appSidebar.users') || 'Users',
-    roles: t('appSidebar.roles') || 'Roles',
-    permissions: t('appSidebar.permissions') || 'Permissions',
-    community: t('appSidebar.community') || 'Community',
-    forum: t('appSidebar.forum') || 'Forum',
-    groups: t('appSidebar.groups') || 'Groups',
-    directMessages: t('appSidebar.directMessages') || 'Direct Messages',
-    reports: t('appSidebar.reports') || 'Reports',
-    content: t('appSidebar.content') || 'Content',
-    contentTypes: t('appSidebar.contentTypes') || 'Content Types',
-    contentOwners: t('appSidebar.contentOwners') || 'Content Owners',
-    categories: t('appSidebar.categories') || 'Categories',
-    contentLists: t('appSidebar.contentLists') || 'Content Lists',
-    features: t('appSidebar.features') || 'Features',
-    settings: t('appSidebar.settings') || 'Settings',
-    getHelp: t('appSidebar.getHelp') || 'Get Help',
-    search: t('appSidebar.search') || 'Search',
-    // Legacy properties for compatibility
-    lifecycle: t('appSidebar.userManagement') || 'User Management',
-    analytics: t('appSidebar.features') || 'Features',
-    projects: t('appSidebar.community') || 'Community',
-    team: t('appSidebar.content') || 'Content',
-    documents: t('appSidebar.documents') || 'Documents',
-    dataLibrary: t('appSidebar.dataLibrary') || 'Data Library',
-    wordAssistant: t('appSidebar.wordAssistant') || 'Word Assistant',
-    more: t('appSidebar.more') || 'More',
-    userMenu: {
-      account: t('appSidebar.userMenu.account') || 'Account',
-      billing: t('appSidebar.userMenu.billing') || 'Billing',
-      notifications: t('appSidebar.userMenu.notifications') || 'Notifications',
-      logOut: t('appSidebar.userMenu.logOut') || 'Log out',
-    },
-    localeSwitcher: {
-      english: t('appSidebar.localeSwitcher.english') || 'English',
-      arabic: t('appSidebar.localeSwitcher.arabic') || 'Arabic',
-    },
-  };
+    // If authenticated and on login page, redirect to dashboard
+    if (user && isLoginPage) {
+      const [, locale] = pathname.split('/');
+      router.replace(`/${locale || 'ar'}/dashboard`);
+    }
+  }, [user, loading, pathname, isLoginPage, router]);
 
   // Dynamic sidebar position based on locale
   const sidebarSide = locale === 'ar' ? 'right' : 'left';
 
-  // Normal authenticated layout with single sidebar
+  // If we're on the login page, render with limited sidebar
+  if (isLoginPage) {
+    // Show loading for login page during auth
+    if (loading) {
+      return (
+        <SidebarProvider>
+          <div className={`font-sans flex h-screen w-full ${locale === 'ar' ? 'rtl' : 'ltr'}`}>
+            <LimitedSidebar locale={locale} side={sidebarSide} />
+            <SidebarInset className="flex-1 min-w-0">
+              <main className="h-full w-full overflow-auto flex items-center justify-center">
+                <span>{t('auth.loading')}</span>
+              </main>
+            </SidebarInset>
+          </div>
+        </SidebarProvider>
+      );
+    }
+    return (
+      <SidebarProvider>
+        <div className={`font-sans flex h-screen w-full ${locale === 'ar' ? 'rtl' : 'ltr'}`}>
+          <LimitedSidebar locale={locale} side={sidebarSide} />
+          <SidebarInset className="flex-1 min-w-0">
+            <main className="h-full w-full overflow-auto">
+              {children}
+            </main>
+          </SidebarInset>
+        </div>
+      </SidebarProvider>
+    );
+  }
+
+  // For non-authenticated users: show limited sidebar + login form in content
+  if (!user && !loading) {
+    return (
+      <SidebarProvider>
+        <div className={`font-sans flex h-screen w-full ${locale === 'ar' ? 'rtl' : 'ltr'}`}>
+          {/* Limited sidebar for non-authenticated users */}
+          <LimitedSidebar locale={locale} side={sidebarSide} />
+          
+          {/* Main content area with login form */}
+          <SidebarInset className="flex-1 min-w-0">
+            <main className="h-full w-full overflow-auto flex items-center justify-center p-8">
+              <div className="w-full max-w-md">
+                <LoginForm 
+                  dict={{
+                    login: {
+                      companyName: t('appSidebar.appName') || 'Ta\'aafi Platform',
+                      welcome: t('login.welcome') || 'Welcome to Ta\'aafi Platform',
+                      email: t('login.email') || 'Email',
+                      emailPlaceholder: t('login.emailPlaceholder') || 'm@example.com',
+                      password: t('login.password') || 'Password',
+                      passwordPlaceholder: t('login.passwordPlaceholder') || '********',
+                      loginButton: t('login.loginButton') || 'Login',
+                      or: t('login.or') || 'Or',
+                      continueWithApple: t('login.continueWithApple') || 'Continue with Apple',
+                      continueWithGoogle: t('login.continueWithGoogle') || 'Continue with Google',
+                      agreement: t('login.agreement') || 'By clicking continue, you agree to our',
+                      termsOfService: t('login.termsOfService') || 'Terms of Service',
+                      and: t('login.and') || 'and',
+                      privacyPolicy: t('login.privacyPolicy') || 'Privacy Policy',
+                    }
+                  }}
+                />
+              </div>
+            </main>
+          </SidebarInset>
+        </div>
+      </SidebarProvider>
+    );
+  }
+
+  // If user is unauthorised but still passed check (non-admin), show denied WITH sidebar
+  if (!loading && user && user.role !== 'admin') {
+    return (
+      <SidebarProvider>
+        <div className={`font-sans flex h-screen w-full ${locale === 'ar' ? 'rtl' : 'ltr'}`}>
+          <AppSidebar lang={locale} side={sidebarSide} />
+          <SidebarInset className="flex-1 min-w-0">
+            <main className="h-full w-full overflow-auto flex items-center justify-center">
+              <div className="flex flex-col gap-4 text-center">
+                <p className="text-lg font-semibold text-destructive px-4">
+                  {t('auth.insufficientPermissions')}
+                </p>
+                <Button
+                  variant="outline"
+                  onClick={async () => {
+                    await signOut();
+                    const [, locale] = pathname.split('/');
+                    router.replace(`/${locale || 'ar'}/login`);
+                  }}
+                >
+                  {t('auth.logOut')}
+                </Button>
+              </div>
+            </main>
+          </SidebarInset>
+        </div>
+      </SidebarProvider>
+    );
+  }
+
+  // Normal authenticated layout - ALWAYS show sidebar, show loading only in content area
   return (
     <SidebarProvider>
       <div className={`font-sans flex h-screen w-full ${locale === 'ar' ? 'rtl' : 'ltr'}`}>
-        {/* Single sidebar that changes position based on locale */}
+        {/* Sidebar is ALWAYS visible */}
         <AppSidebar 
           lang={locale}
-          dictionary={sidebarDictionary}
           side={sidebarSide}
         />
         
-        {/* Main content area - takes remaining space */}
+        {/* Main content area */}
         <SidebarInset className="flex-1 min-w-0">
           <main className="h-full w-full overflow-auto">
             {loading ? (
+              // Show loading skeleton in content area only, sidebar stays visible
               <div className="p-8">
                 <div className="space-y-4">
                   <Skeleton className="h-8 w-1/3" />
@@ -126,6 +207,7 @@ export function MainLayout({ children }: MainLayoutProps) {
                 </div>
               </div>
             ) : (
+              // Normal content
               children
             )}
           </main>

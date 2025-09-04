@@ -2,15 +2,12 @@
 
 import type * as React from "react"
 import {
-  BarChartIcon,
   FolderIcon,
   HeartHandshakeIcon,
   LayoutDashboardIcon,
   ListIcon,
   UsersIcon,
   MessageSquareIcon,
-  ShieldIcon,
-  KeyIcon,
   SettingsIcon,
   FileTextIcon,
   UserIcon,
@@ -19,6 +16,10 @@ import {
   MessageCircleIcon,
   AlertTriangleIcon,
   CrownIcon,
+  BellIcon,
+  ShieldIcon,
+  TrophyIcon,
+  UserPlusIcon,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -38,58 +39,18 @@ import {
 
 import { Locale } from "../../i18n.config"
 import { useAuth } from '@/auth/AuthProvider'
+import { useTranslation } from '@/contexts/TranslationContext'
 
-interface SidebarDictionary {
-  appName: string;
-  taafiPlatform: string;
-  quickCreate: string;
-  inbox: string;
-  dashboard: string;
-  userManagement: string;
-  users: string;
-  roles: string;
-  permissions: string;
-  community: string;
-  forum: string;
-  groups: string;
-  directMessages: string;
-  reports: string;
-  content: string;
-  contentTypes: string;
-  contentOwners: string;
-  categories: string;
-  contentLists: string;
-  features: string;
-  settings: string;
-  getHelp: string;
-  search: string;
-  lifecycle: string;
-  analytics: string;
-  projects: string;
-  team: string;
-  documents: string;
-  dataLibrary: string;
-  wordAssistant: string;
-  more: string;
-  userMenu: {
-    account: string;
-    billing: string;
-    notifications: string;
-    logOut: string;
-  };
-  localeSwitcher: {
-    english: string;
-    arabic: string;
-  };
-}
+
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   lang: Locale
-  dictionary: SidebarDictionary
+  
 }
 
-export function AppSidebar({ lang, dictionary, ...props }: AppSidebarProps) {
+export function AppSidebar({ lang, ...props }: AppSidebarProps) {
   const { user } = useAuth();
+  const { t } = useTranslation();
 
   const data = {
     user: {
@@ -109,8 +70,8 @@ export function AppSidebar({ lang, dictionary, ...props }: AppSidebarProps) {
         icon: UsersIcon,
         items: [
           { titleKey: "users", url: `/${lang}/user-management/users`, icon: UserIcon },
-          { titleKey: "roles", url: `/${lang}/user-management/roles`, icon: CrownIcon },
-          { titleKey: "permissions", url: `/${lang}/user-management/permissions`, icon: KeyIcon },
+          { titleKey: "reports", url: `/${lang}/user-management/reports`, icon: AlertTriangleIcon },
+          { titleKey: "notifications", url: `/${lang}/user-management/notifications`, icon: BellIcon },
           { titleKey: "settings", url: `/${lang}/user-management/settings`, icon: SettingsIcon },
         ]
       },
@@ -120,10 +81,23 @@ export function AppSidebar({ lang, dictionary, ...props }: AppSidebarProps) {
         icon: HeartHandshakeIcon,
         items: [
           { titleKey: "forum", url: `/${lang}/community/forum`, icon: MessageSquareIcon },
-          { titleKey: "groups", url: `/${lang}/community/groups`, icon: UsersIcon },
-          { titleKey: "directMessages", url: `/${lang}/community/direct-messages`, icon: MessageCircleIcon },
           { titleKey: "reports", url: `/${lang}/community/reports`, icon: AlertTriangleIcon },
           { titleKey: "settings", url: `/${lang}/community/settings`, icon: SettingsIcon },
+        ]
+      },
+      // Groups Management - Combined admin and management tools
+      {
+        titleKey: "groupAdministration", 
+        url: "#", 
+        icon: CrownIcon,
+        items: [
+          { titleKey: "allGroups", url: `/${lang}/groups-management`, icon: UsersIcon },
+          { titleKey: "adminDashboard", url: `/${lang}/community/groups/admin-overview`, icon: LayoutDashboardIcon },
+          { titleKey: "memberManagement", url: `/${lang}/community/groups/memberships`, icon: UsersIcon },
+          { titleKey: "contentModeration", url: `/${lang}/community/groups/admin-content`, icon: MessageSquareIcon },
+          { titleKey: "reportsManagement", url: `/${lang}/community/groups/admin-reports`, icon: ShieldIcon },
+          { titleKey: "challengeManagement", url: `/${lang}/community/groups/admin-challenges`, icon: TrophyIcon },
+          { titleKey: "groupSettings", url: `/${lang}/community/groups/admin-settings`, icon: SettingsIcon },
         ]
       },
       { 
@@ -141,7 +115,11 @@ export function AppSidebar({ lang, dictionary, ...props }: AppSidebarProps) {
       { 
         titleKey: "features", 
         url: `/${lang}/features`, 
-        icon: FlagIcon 
+        icon: FlagIcon,
+        items: [
+          { titleKey: "featureFlags", url: `/${lang}/features`, icon: FlagIcon },
+          { titleKey: "appFeatures", url: `/${lang}/features/app-features`, icon: SettingsIcon },
+        ]
       },
     ],
     documents: [
@@ -163,12 +141,12 @@ export function AppSidebar({ lang, dictionary, ...props }: AppSidebarProps) {
               <a href="#">
                 <HeartHandshakeIcon className="h-5 w-5" />
                 
-                <span className="text-base font-semibold">{dictionary.appName}</span>
+                <span className="text-base font-semibold">{t('appSidebar.appName')}</span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
-        <LocaleSwitcher currentLocale={lang} dictionary={dictionary.localeSwitcher} />
+        <LocaleSwitcher currentLocale={lang} />
         <ThemeSwitcher />
       </SidebarHeader>
       <SidebarSeparator />
@@ -176,19 +154,18 @@ export function AppSidebar({ lang, dictionary, ...props }: AppSidebarProps) {
         <NavMain
           items={data.navMain.map((item) => ({
             ...item,
-            title: String(dictionary[item.titleKey as keyof typeof dictionary] ?? item.titleKey),
+            title: t(`appSidebar.${item.titleKey}`),
             items: item.items?.map((subItem) => ({
               ...subItem,
-              title: String(dictionary[subItem.titleKey as keyof typeof dictionary] ?? subItem.titleKey),
+              title: t(`appSidebar.${subItem.titleKey}`),
             })),
           }))}
-          dictionary={dictionary}
         />
     
    
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} dictionary={dictionary.userMenu} />
+        <NavUser user={data.user} />
       </SidebarFooter>
     </Sidebar>
   )

@@ -5,6 +5,7 @@ import { GalleryVerticalEnd } from "lucide-react"
 import { useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/auth/AuthProvider';
+import { useTranslation } from '@/contexts/TranslationContext';
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -21,6 +22,7 @@ export function LoginForm({
   ...props
 }: LoginFormProps) {
   const { signInWithEmail, signInWithGoogle, signInWithApple, loading } = useAuth();
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -36,7 +38,7 @@ export function LoginForm({
       const [, locale] = pathname.split('/');
       router.replace(`/${locale || 'ar'}/dashboard`);
     } catch (err: any) {
-      setError(err?.message || 'Failed to sign in');
+      setError(err?.message || t('auth.signInError'));
     }
   };
 

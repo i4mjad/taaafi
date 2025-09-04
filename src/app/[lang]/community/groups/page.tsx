@@ -1,25 +1,20 @@
 'use client';
 
+import GroupsPage from "@/modules/groups/pages";
 import { useTranslation } from "@/contexts/TranslationContext";
+import { SiteHeader } from '@/components/site-header';
 
-export default function GroupsPage() {
-  const { t } = useTranslation();
-
+export default function GroupsRoute() {
+  const { t, locale } = useTranslation();
+  
+  const headerDictionary = {
+    documents: t('appSidebar.groups') || 'Groups',
+  };
+  
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">{t('sidebar.groups')}</h1>
-        <p className="text-muted-foreground">
-          {t('modules.community.groupsDescription') || 'Manage support groups and communities'}
-        </p>
-      </div>
-      
-      <div className="rounded-lg border p-8 text-center">
-        <h2 className="text-xl font-semibold mb-2">Groups Management</h2>
-        <p className="text-muted-foreground">
-          Support groups management interface will be implemented here.
-        </p>
-      </div>
-    </div>
+    <>
+      <SiteHeader dictionary={headerDictionary} />
+      <GroupsPage t={t} locale={locale} />
+    </>
   );
-} 
+}
