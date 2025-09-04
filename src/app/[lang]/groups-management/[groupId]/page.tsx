@@ -436,7 +436,7 @@ export default function GroupDetailPage() {
             <CardContent>
               <div className="text-2xl font-bold">{stats.totalMessages}</div>
               <p className="text-xs text-muted-foreground">
-                {stats.moderatedMessages} {t('modules.groupsManagement.groupDetail.moderated') || 'moderated'}
+                {stats.moderated} {t('modules.groupsManagement.groupDetail.moderated') || 'moderated'}
               </p>
             </CardContent>
           </Card>
@@ -735,7 +735,7 @@ export default function GroupDetailPage() {
                   dir={isRTL ? 'rtl' : 'ltr'}
                 />
               </div>
-              <Select value={filterStatus} onValueChange={setFilterStatus}>
+              <Select value={filterStatus} onValueChange={(value) => setFilterStatus(value as 'all' | 'pending' | 'approved' | 'blocked' | 'deleted')}>
                 <SelectTrigger className="w-[180px]">
                   <SelectValue />
                 </SelectTrigger>
