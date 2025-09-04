@@ -390,7 +390,10 @@ export function MessagesTable({
                     <TableHead className="w-[50px]">
                       <Checkbox
                         checked={allModeratable}
-                        indeterminate={someSelected ? true : undefined}
+                        ref={(el) => {
+                          const inputEl = el?.querySelector('input');
+                          if (inputEl) inputEl.indeterminate = someSelected;
+                        }}
                         onCheckedChange={handleSelectAll}
                       />
                     </TableHead>

@@ -5,6 +5,7 @@ import { useCollection, useDocument } from 'react-firebase-hooks/firestore';
 import { collection, query, where, doc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/auth/AuthProvider';
+import { Group } from '@/types/community';
 
 export interface GroupMembership {
   id: string;
@@ -86,12 +87,12 @@ export const useGroupMembers = (groupId: string) => {
 export const useGroup = (groupId: string) => {
   const [groupSnapshot, loading, error] = useDocument(doc(db, 'groups', groupId));
 
-  const group = groupSnapshot?.exists() ? {
+  const group: Group | null = groupSnapshot?.exists() ? {
     id: groupSnapshot.id,
     ...groupSnapshot.data(),
     createdAt: groupSnapshot.data()?.createdAt?.toDate() || new Date(),
     updatedAt: groupSnapshot.data()?.updatedAt?.toDate(),
-  } : null;
+  } as Group : null;
 
   return { group, loading, error };
 };

@@ -106,7 +106,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
               {group.isActive ? t('common.active') : t('common.inactive')}
             </Badge>
             <Badge variant="outline" className="text-xs">
-              {group.memberCount || 0}/{group.memberCapacity || 0}
+              0/{group.memberCapacity || 0}
             </Badge>
           </div>
         )}

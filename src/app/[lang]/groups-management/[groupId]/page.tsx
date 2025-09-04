@@ -150,7 +150,7 @@ export default function GroupDetailPage() {
       });
 
       toast.success(t('modules.groupsManagement.groupDetail.memberRemoved') || 'Member removed successfully');
-      setShowMemberActions(false);
+      // setShowMemberActions // Removed unused state(false);
       setSelectedMember(null);
     } catch (error) {
       console.error('Error removing member:', error);
@@ -169,7 +169,7 @@ export default function GroupDetailPage() {
       });
 
       toast.success(t('modules.groupsManagement.groupDetail.userPromoted') || 'User promoted to admin');
-      setShowMemberActions(false);
+      // setShowMemberActions // Removed unused state(false);
       setSelectedMember(null);
     } catch (error) {
       console.error('Error promoting user:', error);

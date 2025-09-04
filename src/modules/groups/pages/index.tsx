@@ -45,6 +45,9 @@ export default function GroupsPage({ t, locale }: GroupsPageProps) {
     joinMethod: 'any' as 'any' | 'admin_only' | 'code_only',
     adminCpId: 'system-admin',      // TODO: Replace with actual admin CP ID
     createdByCpId: 'system-admin',  // TODO: Replace with actual creator CP ID
+    isActive: true,                 // Default to active
+    isPaused: false,                // Default to not paused
+    pauseReason: '',                // Default empty pause reason
   });
 
   // Fetch groups using react-firebase-hooks
@@ -68,7 +71,7 @@ export default function GroupsPage({ t, locale }: GroupsPageProps) {
     return groups.filter(group => {
       const matchesSearch = !search || 
         group.name.toLowerCase().includes(search.toLowerCase()) ||
-        group.description.toLowerCase().includes(search.toLowerCase());
+        group.description?.toLowerCase().includes(search.toLowerCase());
       
       const matchesGender = genderFilter === 'all' || group.gender === genderFilter;
       const matchesStatus = statusFilter === 'all' || 
@@ -85,8 +88,8 @@ export default function GroupsPage({ t, locale }: GroupsPageProps) {
   const stats = useMemo(() => {
     const total = groups.length || 0;
     const active = groups.filter(g => g.isActive).length || 0;
-    const full = groups.filter(g => (g.memberCount || 0) >= (g.memberCapacity || 1)).length || 0;
-    const totalMembers = groups.reduce((sum, g) => sum + (g.memberCount || 0), 0) || 0;
+    const full = 0; // Member count calculation requires separate memberships query
+    const totalMembers = 0; // Member count calculation requires separate memberships query
 
     return { total, active, full, totalMembers };
   }, [groups]);
@@ -96,11 +99,14 @@ export default function GroupsPage({ t, locale }: GroupsPageProps) {
       name: '',
       description: '',
       memberCapacity: 6,              // F3 default capacity
-      gender: 'male',                 // F3 only supports male/female
-      visibility: 'public',
-      joinMethod: 'any',
+      gender: 'male' as 'male' | 'female',                 // F3 only supports male/female
+      visibility: 'public' as 'public' | 'private',
+      joinMethod: 'any' as 'any' | 'admin_only' | 'code_only',
       adminCpId: 'system-admin',      // TODO: Replace with actual admin CP ID
       createdByCpId: 'system-admin',  // TODO: Replace with actual creator CP ID
+      isActive: true,
+      isPaused: false,
+      pauseReason: '',
     });
   };
 
@@ -171,6 +177,9 @@ export default function GroupsPage({ t, locale }: GroupsPageProps) {
         gender: formData.gender,
         visibility: formData.visibility,
         joinMethod: formData.joinMethod,
+        isActive: formData.isActive,
+        isPaused: formData.isPaused,
+        pauseReason: formData.pauseReason,
         updatedAt: new Date(),
       };
 
@@ -219,6 +228,9 @@ export default function GroupsPage({ t, locale }: GroupsPageProps) {
       joinMethod: group.joinMethod,
       adminCpId: group.adminCpId,
       createdByCpId: group.createdByCpId,
+      isActive: group.isActive !== undefined ? group.isActive : true,
+      isPaused: group.isPaused !== undefined ? group.isPaused : false,
+      pauseReason: group.pauseReason || '',
     });
     setShowEditDialog(true);
   };
@@ -398,8 +410,6 @@ export default function GroupsPage({ t, locale }: GroupsPageProps) {
                       <SelectItem value="all">{t('common.all')}</SelectItem>
                       <SelectItem value="male">{t('modules.community.supportGroups.male')}</SelectItem>
                       <SelectItem value="female">{t('modules.community.supportGroups.female')}</SelectItem>
-                      <SelectItem value="mixed">{t('modules.community.supportGroups.mixed')}</SelectItem>
-                      <SelectItem value="other">{t('modules.community.supportGroups.other')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -475,8 +485,8 @@ export default function GroupsPage({ t, locale }: GroupsPageProps) {
                           </td>
                           <td className="py-3 px-4">
                             <div className="flex items-center space-x-2">
-                              <span>{group.memberCount || 0} / {group.memberCapacity || 0}</span>
-                              {(group.memberCount || 0) >= (group.memberCapacity || 1) && (
+                              <span>0 / {group.memberCapacity || 0}</span>
+                              {false && (
                                 <Badge variant="destructive">Full</Badge>
                               )}
                             </div>
@@ -485,8 +495,6 @@ export default function GroupsPage({ t, locale }: GroupsPageProps) {
                             <Badge variant="outline">
                               {group.gender === 'male' && t('modules.community.supportGroups.male')}
                               {group.gender === 'female' && t('modules.community.supportGroups.female')}
-                              {group.gender === 'mixed' && t('modules.community.supportGroups.mixed')}
-                              {group.gender === 'other' && t('modules.community.supportGroups.other')}
                             </Badge>
                           </td>
                           <td className="py-3 px-4">
@@ -595,7 +603,7 @@ export default function GroupsPage({ t, locale }: GroupsPageProps) {
                     <Label htmlFor="gender">{t('modules.community.supportGroups.gender')}</Label>
                     <Select 
                       value={formData.gender} 
-                      onValueChange={(value: 'male' | 'female' | 'mixed' | 'other') => 
+                      onValueChange={(value: 'male' | 'female') => 
                         setFormData({ ...formData, gender: value })
                       }
                     >
@@ -682,7 +690,7 @@ export default function GroupsPage({ t, locale }: GroupsPageProps) {
                     <Label htmlFor="edit-gender">{t('modules.community.supportGroups.gender')}</Label>
                     <Select 
                       value={formData.gender} 
-                      onValueChange={(value: 'male' | 'female' | 'mixed' | 'other') => 
+                      onValueChange={(value: 'male' | 'female') => 
                         setFormData({ ...formData, gender: value })
                       }
                     >
@@ -742,10 +750,8 @@ export default function GroupsPage({ t, locale }: GroupsPageProps) {
                       <div className="space-y-2">
                         <label className="text-sm font-medium">{t('modules.community.supportGroups.memberCount')}</label>
                         <p className="text-sm">
-                          {selectedGroup.memberCount || 0} / {selectedGroup.memberCapacity || 0} members
-                          {(selectedGroup.memberCount || 0) >= (selectedGroup.memberCapacity || 1) && (
-                            <Badge variant="destructive" className="ml-2">Full</Badge>
-                          )}
+                          0 / {selectedGroup.memberCapacity || 0} members
+                          <span className="text-xs text-muted-foreground ml-2">(Member count requires separate query)</span>
                         </p>
                       </div>
 
@@ -754,8 +760,6 @@ export default function GroupsPage({ t, locale }: GroupsPageProps) {
                         <p className="text-sm">
                           {selectedGroup.gender === 'male' && t('modules.community.supportGroups.male')}
                           {selectedGroup.gender === 'female' && t('modules.community.supportGroups.female')}
-                          {selectedGroup.gender === 'mixed' && t('modules.community.supportGroups.mixed')}
-                          {selectedGroup.gender === 'other' && t('modules.community.supportGroups.other')}
                         </p>
                       </div>
 

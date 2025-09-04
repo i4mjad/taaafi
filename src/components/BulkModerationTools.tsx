@@ -148,7 +148,8 @@ export const BulkModerationTools: React.FC<BulkModerationToolsProps> = ({
               id="select-all"
               checked={allSelected}
               ref={(el) => {
-                if (el) el.indeterminate = someSelected;
+                const inputEl = el?.querySelector('input');
+                if (inputEl) inputEl.indeterminate = someSelected;
               }}
               onCheckedChange={handleSelectAll}
             />

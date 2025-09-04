@@ -7,6 +7,8 @@ import { SiteHeader } from '@/components/site-header';
 import { useCollection } from 'react-firebase-hooks/firestore';
 import { collection, query, orderBy, doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { UserReport } from '@/types/reports';
+import { Group } from '@/types/community';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -65,19 +67,31 @@ export default function SystemAdminReportsPage() {
     return groupsSnapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),
-    }));
+      createdAt: doc.data().createdAt?.toDate() || new Date(),
+      updatedAt: doc.data().updatedAt?.toDate(),
+    })) as Group[];
   }, [groupsSnapshot]);
 
   const reports = useMemo(() => {
     if (!reportsSnapshot) return [];
     return reportsSnapshot.docs.filter(doc => 
       doc.data().relatedContent?.type?.startsWith('group_')
-    ).map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-      time: doc.data().time?.toDate() || new Date(),
-      lastUpdated: doc.data().lastUpdated?.toDate() || new Date(),
-    }));
+    ).map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        uid: data.uid,
+        time: data.time,
+        reportTypeId: data.reportTypeId,
+        status: data.status,
+        initialMessage: data.initialMessage,
+        lastUpdated: data.lastUpdated,
+        messagesCount: data.messagesCount,
+        relatedContent: data.relatedContent,
+        targetId: data.targetId,
+        targetType: data.targetType,
+      } as UserReport;
+    });
   }, [reportsSnapshot]);
 
   const messages = useMemo(() => {
@@ -107,12 +121,12 @@ export default function SystemAdminReportsPage() {
       filtered = filtered.filter(report => 
         report.initialMessage?.toLowerCase().includes(search.toLowerCase()) ||
         report.uid?.toLowerCase().includes(search.toLowerCase()) ||
-        groupsLookup[report.relatedContent?.groupId]?.name?.toLowerCase().includes(search.toLowerCase())
+        (report.relatedContent?.contentId && groupsLookup[report.relatedContent.contentId]?.name?.toLowerCase().includes(search.toLowerCase()))
       );
     }
 
     if (groupFilter !== 'all') {
-      filtered = filtered.filter(report => report.relatedContent?.groupId === groupFilter);
+      filtered = filtered.filter(report => report.relatedContent?.contentId === groupFilter);
     }
 
     if (statusFilter !== 'all') {
@@ -124,11 +138,11 @@ export default function SystemAdminReportsPage() {
 
   const stats = useMemo(() => {
     const total = reports.length;
-    const open = reports.filter(r => r.status === 'open').length;
-    const inReview = reports.filter(r => r.status === 'in_review').length;
-    const closed = reports.filter(r => r.status === 'closed').length;
-    const messageReports = reports.filter(r => r.relatedContent?.type === 'group_message').length;
-    const memberReports = reports.filter(r => r.relatedContent?.type === 'group_member').length;
+    const open = reports.filter(r => r.status === 'pending').length;
+    const inReview = reports.filter(r => r.status === 'inProgress' || r.status === 'waitingForAdminResponse').length;
+    const closed = reports.filter(r => r.status === 'closed' || r.status === 'finalized').length;
+    const messageReports = reports.filter(r => r.relatedContent?.type === 'comment').length;
+    const memberReports = reports.filter(r => r.relatedContent?.type === 'user').length;
 
     return { total, open, inReview, closed, messageReports, memberReports };
   }, [reports]);
@@ -323,8 +337,8 @@ export default function SystemAdminReportsPage() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All Status</SelectItem>
-                      <SelectItem value="open">Open</SelectItem>
-                      <SelectItem value="in_review">In Review</SelectItem>
+                      <SelectItem value="pending">Open</SelectItem>
+                      <SelectItem value="inProgress">In Review</SelectItem>
                       <SelectItem value="closed">Closed</SelectItem>
                     </SelectContent>
                   </Select>
@@ -349,7 +363,7 @@ export default function SystemAdminReportsPage() {
               ) : (
                 <div className="space-y-4">
                   {filteredReports.map((report) => {
-                    const group = groupsLookup[report.relatedContent?.groupId];
+                    const group = report.relatedContent?.contentId ? groupsLookup[report.relatedContent.contentId] : null;
                     const content = getReportedContent(report);
                     
                     return (
@@ -363,7 +377,7 @@ export default function SystemAdminReportsPage() {
                               </span>
                               <Badge variant="outline" className="text-xs">
                                 <Users className="h-3 w-3 mr-1" />
-                                {group?.name || report.relatedContent?.groupId}
+                                {group?.name || report.relatedContent?.contentId}
                               </Badge>
                               {getStatusBadge(report.status)}
                             </div>
@@ -372,7 +386,7 @@ export default function SystemAdminReportsPage() {
                               <p className="text-sm font-medium mb-1">Reported by: {report.uid}</p>
                               <p className="text-sm text-muted-foreground mb-2">{report.initialMessage}</p>
                               
-                              {report.relatedContent?.type === 'group_message' && (
+                              {report.relatedContent?.type === 'comment' && (
                                 <div className="p-2 bg-muted/50 rounded border-l-2 border-orange-500">
                                   <p className="text-xs text-muted-foreground">Reported content:</p>
                                   <p className="text-sm">{content.preview}</p>
@@ -382,7 +396,7 @@ export default function SystemAdminReportsPage() {
                             </div>
 
                             <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                              <span>{format(report.time, 'MMM dd, yyyy HH:mm')}</span>
+                              <span>{format(report.time?.toDate ? report.time.toDate() : new Date(), 'MMM dd, yyyy HH:mm')}</span>
                               <span>{report.messagesCount || 1} message(s)</span>
                             </div>
                           </div>
@@ -401,7 +415,7 @@ export default function SystemAdminReportsPage() {
                                 <Eye className="mr-2 h-4 w-4" />
                                 View Details
                               </DropdownMenuItem>
-                              {report.status === 'open' && (
+                              {report.status === 'pending' && (
                                 <>
                                   <DropdownMenuItem 
                                     onClick={() => openActionDialog(report, 'resolve')}

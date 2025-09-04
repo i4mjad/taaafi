@@ -111,7 +111,7 @@ export default function GroupsManagementPage({ t, locale }: GroupsManagementPage
     return groupsWithMemberCounts.filter(group => {
       const matchesSearch = !search || 
         group.name.toLowerCase().includes(search.toLowerCase()) ||
-        group.description.toLowerCase().includes(search.toLowerCase()) ||
+        group.description?.toLowerCase().includes(search.toLowerCase()) ||
         group.id.toLowerCase().includes(search.toLowerCase());
       
       const matchesGender = genderFilter === 'all' || group.gender === genderFilter;
@@ -543,13 +543,7 @@ export default function GroupsManagementPage({ t, locale }: GroupsManagementPage
                                   <MessageSquareIcon className="mr-2 h-4 w-4" />
                                   {t('modules.groupsManagement.actions.viewMessages') || 'View Messages'}
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={(e) => {
-                                  e.stopPropagation();
-                                  openEditDialog(group);
-                                }}>
-                                  <Edit className="mr-2 h-4 w-4" />
-                                  {t('modules.groupsManagement.actions.edit') || 'Edit'}
-                                </DropdownMenuItem>
+                                {/* Edit functionality removed as requested */}
                                 <DropdownMenuItem 
                                   onClick={(e) => {
                                     e.stopPropagation();

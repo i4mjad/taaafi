@@ -7,6 +7,7 @@ import { useCollection } from 'react-firebase-hooks/firestore';
 import { collection, query, where, orderBy, doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useGroup } from '@/hooks/useGroupAdmin';
+import { GroupMessage } from '@/types/community';
 import { AdminRoute } from '@/components/AdminRoute';
 import { AdminLayout } from '@/components/AdminLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -50,14 +51,7 @@ interface UserReport {
   reportTypeId?: string;
 }
 
-interface GroupMessage {
-  id: string;
-  senderCpId: string;
-  body: string;
-  createdAt: Date;
-  isDeleted: boolean;
-  isHidden: boolean;
-}
+// GroupMessage interface now imported from @/types/community
 
 export default function GroupReportsPage() {
   const params = useParams();
@@ -104,11 +98,23 @@ export default function GroupReportsPage() {
     if (!messagesSnapshot) return {};
     
     return messagesSnapshot.docs.reduce((acc, doc) => {
+      const data = doc.data();
       acc[doc.id] = {
         id: doc.id,
-        ...doc.data(),
-        createdAt: doc.data().createdAt?.toDate() || new Date(),
-      };
+        groupId: data.groupId,
+        senderCpId: data.senderCpId,
+        body: data.body,
+        replyToMessageId: data.replyToMessageId,
+        quotedPreview: data.quotedPreview,
+        mentions: data.mentions || [],
+        mentionHandles: data.mentionHandles || [],
+        tokens: data.tokens || [],
+        isDeleted: data.isDeleted || false,
+        isHidden: data.isHidden || false,
+        moderation: data.moderation,
+        createdAt: data.createdAt?.toDate() || new Date(),
+        senderDisplayName: data.senderDisplayName,
+      } as GroupMessage;
       return acc;
     }, {} as Record<string, GroupMessage>);
   }, [messagesSnapshot]);

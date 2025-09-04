@@ -5,6 +5,7 @@ import { format } from "date-fns"
 import { useCollection } from 'react-firebase-hooks/firestore'
 import { collection, query, where } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
+import { UserReport } from '@/types/reports'
 
 import { useTranslation } from '@/contexts/TranslationContext'
 import { Badge } from "@/components/ui/badge"
@@ -50,23 +51,37 @@ export function MembershipDetailsModal({
 
   const reports = React.useMemo(() => {
     if (!reportsSnapshot) return []
-    return reportsSnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-      createdAt: doc.data().createdAt?.toDate?.() || doc.data().createdAt || new Date(),
-    }))
+    return reportsSnapshot.docs.map(doc => {
+      const data = doc.data()
+      return {
+        id: doc.id,
+        uid: data.uid,
+        time: data.time,
+        reportTypeId: data.reportTypeId,
+        status: data.status,
+        initialMessage: data.initialMessage,
+        lastUpdated: data.lastUpdated,
+        messagesCount: data.messagesCount,
+        relatedContent: data.relatedContent,
+        targetId: data.targetId,
+        targetType: data.targetType,
+      } as UserReport
+    })
   }, [reportsSnapshot])
 
   if (!membership || !group) return null
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'open':
-        return <Badge variant="destructive" className="flex items-center gap-1"><AlertTriangle className="h-3 w-3" />Open</Badge>
-      case 'resolved':
-        return <Badge variant="default" className="flex items-center gap-1"><CheckCircle className="h-3 w-3" />Resolved</Badge>
-      case 'dismissed':
-        return <Badge variant="secondary" className="flex items-center gap-1"><XCircle className="h-3 w-3" />Dismissed</Badge>
+      case 'pending':
+        return <Badge variant="destructive" className="flex items-center gap-1"><AlertTriangle className="h-3 w-3" />Pending</Badge>
+      case 'inProgress':
+        return <Badge variant="default" className="flex items-center gap-1"><Clock className="h-3 w-3" />In Progress</Badge>
+      case 'waitingForAdminResponse':
+        return <Badge variant="secondary" className="flex items-center gap-1"><Clock className="h-3 w-3" />Waiting</Badge>
+      case 'closed':
+      case 'finalized':
+        return <Badge variant="outline" className="flex items-center gap-1"><CheckCircle className="h-3 w-3" />Closed</Badge>
       default:
         return <Badge variant="outline">{status}</Badge>
     }
@@ -240,7 +255,7 @@ export function MembershipDetailsModal({
                       </div>
                       <CardDescription className="flex items-center gap-2">
                         <Clock className="h-3 w-3" />
-                        {format(report.createdAt, 'PPp')}
+                        {format(report.time?.toDate ? report.time.toDate() : new Date(), 'PPp')}
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-3">
@@ -248,33 +263,24 @@ export function MembershipDetailsModal({
                         <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                           {t('modules.admin.memberships.reportType')}
                         </label>
-                        <p className="text-sm">{report.type || t('modules.admin.memberships.userReport')}</p>
+                        <p className="text-sm">{report.reportTypeId || t('modules.admin.memberships.userReport')}</p>
                       </div>
 
-                      {report.reason && (
+                      {report.initialMessage && (
                         <div>
                           <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                             {t('modules.admin.memberships.reportReason')}
                           </label>
-                          <p className="text-sm">{report.reason}</p>
+                          <p className="text-sm">{report.initialMessage}</p>
                         </div>
                       )}
 
-                      {report.description && (
-                        <div>
-                          <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                            {t('modules.admin.memberships.reportDescription')}
-                          </label>
-                          <p className="text-sm">{report.description}</p>
-                        </div>
-                      )}
-
-                      {report.reporterId && (
+                      {report.uid && (
                         <div>
                           <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                             {t('modules.admin.memberships.reportedBy')}
                           </label>
-                          <p className="text-sm font-mono">{report.reporterId}</p>
+                          <p className="text-sm font-mono">{report.uid}</p>
                         </div>
                       )}
 
@@ -284,7 +290,7 @@ export function MembershipDetailsModal({
                             {t('modules.admin.memberships.relatedContent')}
                           </label>
                           <p className="text-sm">
-                            {report.relatedContent.type}: {report.relatedContent.id}
+                            {report.relatedContent.type}: {report.relatedContent.contentId}
                           </p>
                         </div>
                       )}

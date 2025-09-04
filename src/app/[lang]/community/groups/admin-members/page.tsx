@@ -7,6 +7,7 @@ import { SiteHeader } from '@/components/site-header';
 import { useCollection } from 'react-firebase-hooks/firestore';
 import { collection, query, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { GroupMember, Group } from '@/types/community';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -43,17 +44,26 @@ export default function GroupMembershipsPage() {
       id: doc.id,
       ...doc.data(),
       createdAt: doc.data().createdAt?.toDate() || new Date(),
-    }));
+      updatedAt: doc.data().updatedAt?.toDate(),
+    })) as Group[];
   }, [groupsSnapshot]);
 
   const memberships = useMemo(() => {
     if (!membershipsSnapshot) return [];
-    return membershipsSnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-      joinedAt: doc.data().joinedAt?.toDate() || new Date(),
-      leftAt: doc.data().leftAt?.toDate(),
-    }));
+    return membershipsSnapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        groupId: data.groupId,
+        cpId: data.cpId,
+        role: data.role,
+        isActive: data.isActive,
+        joinedAt: data.joinedAt?.toDate() || new Date(),
+        leftAt: data.leftAt?.toDate(),
+        pointsTotal: data.pointsTotal || 0,
+        displayName: data.displayName,
+      } as GroupMember;
+    });
   }, [membershipsSnapshot]);
 
   // Create a lookup for group names

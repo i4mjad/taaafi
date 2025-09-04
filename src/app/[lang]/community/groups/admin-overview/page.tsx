@@ -7,6 +7,8 @@ import { SiteHeader } from '@/components/site-header';
 import { useCollection } from 'react-firebase-hooks/firestore';
 import { collection, query, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { Group, GroupMember, GroupMessage } from '@/types/community';
+import { UserReport } from '@/types/reports';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ContentActivityChart } from '@/components/admin-content-activity-chart';
@@ -52,34 +54,71 @@ export default function SystemAdminOverviewPage() {
       id: doc.id,
       ...doc.data(),
       createdAt: doc.data().createdAt?.toDate() || new Date(),
-    }));
+      updatedAt: doc.data().updatedAt?.toDate(),
+    })) as Group[];
   }, [groupsSnapshot]);
 
   const memberships = useMemo(() => {
     if (!membershipsSnapshot) return [];
-    return membershipsSnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+    return membershipsSnapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        groupId: data.groupId,
+        cpId: data.cpId,
+        role: data.role,
+        isActive: data.isActive,
+        joinedAt: data.joinedAt?.toDate() || new Date(),
+        leftAt: data.leftAt?.toDate(),
+        pointsTotal: data.pointsTotal || 0,
+        displayName: data.displayName,
+      } as GroupMember;
+    });
   }, [membershipsSnapshot]);
 
   const messages = useMemo(() => {
     if (!messagesSnapshot) return [];
-    return messagesSnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-      createdAt: doc.data().createdAt?.toDate() || new Date(),
-    }));
+    return messagesSnapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        groupId: data.groupId,
+        senderCpId: data.senderCpId,
+        body: data.body,
+        replyToMessageId: data.replyToMessageId,
+        quotedPreview: data.quotedPreview,
+        mentions: data.mentions || [],
+        mentionHandles: data.mentionHandles || [],
+        tokens: data.tokens || [],
+        isDeleted: data.isDeleted || false,
+        isHidden: data.isHidden || false,
+        moderation: data.moderation,
+        createdAt: data.createdAt?.toDate() || new Date(),
+        senderDisplayName: data.senderDisplayName,
+      } as GroupMessage;
+    });
   }, [messagesSnapshot]);
 
   const reports = useMemo(() => {
     if (!reportsSnapshot) return [];
     return reportsSnapshot.docs.filter(doc => 
       doc.data().relatedContent?.type?.startsWith('group_')
-    ).map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+    ).map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        uid: data.uid,
+        time: data.time,
+        reportTypeId: data.reportTypeId,
+        status: data.status,
+        initialMessage: data.initialMessage,
+        lastUpdated: data.lastUpdated,
+        messagesCount: data.messagesCount,
+        relatedContent: data.relatedContent,
+        targetId: data.targetId,
+        targetType: data.targetType,
+      } as UserReport;
+    });
   }, [reportsSnapshot]);
 
   // Calculate comprehensive stats
@@ -90,7 +129,7 @@ export default function SystemAdminOverviewPage() {
     const admins = memberships.filter(m => m.role === 'admin' && m.isActive).length;
     const totalMessages = messages.length;
     const pendingMessages = messages.filter(m => m.moderation?.status === 'pending').length;
-    const openReports = reports.filter(r => r.status === 'open').length;
+    const openReports = reports.filter(r => r.status === 'pending' || r.status === 'inProgress').length;
     const totalReports = reports.length;
 
     return {
