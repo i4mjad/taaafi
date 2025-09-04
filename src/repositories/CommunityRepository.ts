@@ -513,13 +513,33 @@ export class CommunityRepository {
 
   async createGroup(data: CreateGroupRequest): Promise<Group> {
     try {
-      const docRef = await addDoc(collection(db, 'groups'), {
-        ...data,
-        memberCount: 0,
+      // F3 Support Groups Schema Compliant Creation
+      const groupData: any = {
+        name: data.name,
+        description: data.description,
+        memberCapacity: data.memberCapacity,
+        gender: data.gender,
+        adminCpId: data.adminCpId,
+        createdByCpId: data.createdByCpId,
+        visibility: data.visibility,
+        joinMethod: data.joinMethod,
+        joinCodeExpiresAt: null,
+        joinCodeMaxUses: null,
+        joinCodeUseCount: 0,
         isActive: true,
+        isPaused: false,
+        pauseReason: null,
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now(),
-      });
+        // NOTE: memberCount is NOT stored per F3 schema - calculated from group_memberships
+      };
+
+      // Generate join code for code_only groups
+      if (data.joinMethod === 'code_only') {
+        groupData.joinCode = this.generateJoinCode();
+      }
+
+      const docRef = await addDoc(collection(db, 'groups'), groupData);
       
       const created = await this.getGroup(docRef.id);
       if (!created) throw new Error('Failed to retrieve created group');
@@ -528,6 +548,16 @@ export class CommunityRepository {
       console.error('Error creating group:', error);
       throw error;
     }
+  }
+
+  // Helper method to generate join codes for code_only groups
+  private generateJoinCode(): string {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let result = '';
+    for (let i = 0; i < 5; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
   }
 
   async updateGroup(id: string, data: UpdateGroupRequest): Promise<Group> {

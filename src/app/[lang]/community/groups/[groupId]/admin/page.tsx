@@ -98,8 +98,8 @@ export default function GroupAdminPage() {
                     </Badge>
                     <Badge variant="outline">
                       {t('admin.dashboard.capacity', { 
-                        current: stats.totalMembers, 
-                        max: group.capacity 
+                        current: stats.totalMembers,
+                        max: group.memberCapacity 
                       })}
                     </Badge>
                     <Badge variant="outline">
@@ -172,7 +172,7 @@ export default function GroupAdminPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {group && group.capacity > 0 ? Math.round((stats.totalMembers / group.capacity) * 100) : 0}%
+                  {group && group.memberCapacity > 0 ? Math.round((stats.totalMembers / group.memberCapacity) * 100) : 0}%
                 </div>
                 <p className="text-xs text-muted-foreground">
                   {t('admin.stats.capacityUsed')}

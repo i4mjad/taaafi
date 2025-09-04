@@ -180,7 +180,7 @@ export default function GroupMembersPage() {
               <CardContent>
                 <div className="text-2xl font-bold">{stats.totalMembers}</div>
                 <p className="text-xs text-muted-foreground">
-                  {group?.capacity ? `${t('admin.members.stats.of')} ${group.capacity}` : ''}
+                  {group?.memberCapacity ? `${t('admin.members.stats.of')} ${group.memberCapacity}` : ''}
                 </p>
               </CardContent>
             </Card>
@@ -224,7 +224,7 @@ export default function GroupMembersPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {group?.capacity && group.capacity > 0 ? Math.round((stats.totalMembers / group.capacity) * 100) : 0}%
+                  {group?.memberCapacity && group.memberCapacity > 0 ? Math.round((stats.totalMembers / group.memberCapacity) * 100) : 0}%
                 </div>
                 <p className="text-xs text-muted-foreground">
                   {t('admin.members.stats.used')}

@@ -35,13 +35,16 @@ export default function GroupsPage({ t, locale }: GroupsPageProps) {
   const [editingGroup, setEditingGroup] = useState<Group | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Form state for create/edit
+  // Form state for create/edit - F3 Support Groups Schema Compliant
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    capacity: 50,
-    gender: 'mixed' as 'male' | 'female' | 'mixed' | 'other',
-    isActive: true,
+    memberCapacity: 6,              // F3 default capacity
+    gender: 'male' as 'male' | 'female',  // F3 only supports male/female
+    visibility: 'public' as 'public' | 'private',
+    joinMethod: 'any' as 'any' | 'admin_only' | 'code_only',
+    adminCpId: 'system-admin',      // TODO: Replace with actual admin CP ID
+    createdByCpId: 'system-admin',  // TODO: Replace with actual creator CP ID
   });
 
   // Fetch groups using react-firebase-hooks
@@ -76,11 +79,13 @@ export default function GroupsPage({ t, locale }: GroupsPageProps) {
     });
   }, [groups, search, genderFilter, statusFilter]);
 
-  // Calculate stats - Fix NaN issues
+  // Calculate stats - F3 Schema Compliant
+  // NOTE: memberCount should ideally be calculated from group_memberships collection
+  // but keeping legacy logic for backward compatibility
   const stats = useMemo(() => {
     const total = groups.length || 0;
     const active = groups.filter(g => g.isActive).length || 0;
-    const full = groups.filter(g => (g.memberCount || 0) >= (g.capacity || 1)).length || 0;
+    const full = groups.filter(g => (g.memberCount || 0) >= (g.memberCapacity || 1)).length || 0;
     const totalMembers = groups.reduce((sum, g) => sum + (g.memberCount || 0), 0) || 0;
 
     return { total, active, full, totalMembers };
@@ -90,9 +95,12 @@ export default function GroupsPage({ t, locale }: GroupsPageProps) {
     setFormData({
       name: '',
       description: '',
-      capacity: 50,
-      gender: 'mixed',
-      isActive: true,
+      memberCapacity: 6,              // F3 default capacity
+      gender: 'male',                 // F3 only supports male/female
+      visibility: 'public',
+      joinMethod: 'any',
+      adminCpId: 'system-admin',      // TODO: Replace with actual admin CP ID
+      createdByCpId: 'system-admin',  // TODO: Replace with actual creator CP ID
     });
   };
 
@@ -104,11 +112,26 @@ export default function GroupsPage({ t, locale }: GroupsPageProps) {
 
     setIsSubmitting(true);
     try {
+      // F3 Support Groups Schema Compliant Creation
       await addDoc(collection(db, 'groups'), {
-        ...formData,
-        memberCount: 0,
+        name: formData.name,
+        description: formData.description,
+        memberCapacity: formData.memberCapacity,
+        gender: formData.gender,
+        adminCpId: formData.adminCpId,
+        createdByCpId: formData.createdByCpId,
+        visibility: formData.visibility,
+        joinMethod: formData.joinMethod,
+        joinCode: formData.joinMethod === 'code_only' ? generateJoinCode() : null,
+        joinCodeExpiresAt: null,
+        joinCodeMaxUses: null,
+        joinCodeUseCount: 0,
+        isActive: true,
+        isPaused: false,
+        pauseReason: null,
         createdAt: new Date(),
         updatedAt: new Date(),
+        // NOTE: memberCount is NOT stored per F3 schema - calculated from group_memberships
       });
       
       toast.success(t('modules.community.supportGroups.createSuccess'));
@@ -122,6 +145,16 @@ export default function GroupsPage({ t, locale }: GroupsPageProps) {
     }
   };
 
+  // Helper function to generate join codes for code_only groups
+  const generateJoinCode = (): string => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let result = '';
+    for (let i = 0; i < 5; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+  };
+
   const handleEditGroup = async () => {
     if (!editingGroup || !formData.name.trim() || !formData.description.trim()) {
       toast.error(t('modules.community.supportGroups.errors.nameRequired'));
@@ -130,10 +163,24 @@ export default function GroupsPage({ t, locale }: GroupsPageProps) {
 
     setIsSubmitting(true);
     try {
-      await updateDoc(doc(db, 'groups', editingGroup.id), {
-        ...formData,
+      // F3 Support Groups Schema Compliant Update
+      const updateData: any = {
+        name: formData.name,
+        description: formData.description,
+        memberCapacity: formData.memberCapacity,
+        gender: formData.gender,
+        visibility: formData.visibility,
+        joinMethod: formData.joinMethod,
         updatedAt: new Date(),
-      });
+      };
+
+      // Handle join code generation for code_only groups
+      if (formData.joinMethod === 'code_only' && !editingGroup.joinCode) {
+        updateData.joinCode = generateJoinCode();
+        updateData.joinCodeUseCount = 0;
+      }
+
+      await updateDoc(doc(db, 'groups', editingGroup.id), updateData);
       
       toast.success(t('modules.community.supportGroups.updateSuccess'));
       setShowEditDialog(false);
@@ -165,10 +212,13 @@ export default function GroupsPage({ t, locale }: GroupsPageProps) {
     setEditingGroup(group);
     setFormData({
       name: group.name,
-      description: group.description,
-      capacity: group.capacity,
+      description: group.description || '',
+      memberCapacity: group.memberCapacity,
       gender: group.gender,
-      isActive: group.isActive ?? true,
+      visibility: group.visibility,
+      joinMethod: group.joinMethod,
+      adminCpId: group.adminCpId,
+      createdByCpId: group.createdByCpId,
     });
     setShowEditDialog(true);
   };
@@ -425,8 +475,8 @@ export default function GroupsPage({ t, locale }: GroupsPageProps) {
                           </td>
                           <td className="py-3 px-4">
                             <div className="flex items-center space-x-2">
-                              <span>{group.memberCount || 0} / {group.capacity || 0}</span>
-                              {(group.memberCount || 0) >= (group.capacity || 1) && (
+                              <span>{group.memberCount || 0} / {group.memberCapacity || 0}</span>
+                              {(group.memberCount || 0) >= (group.memberCapacity || 1) && (
                                 <Badge variant="destructive">Full</Badge>
                               )}
                             </div>
@@ -529,15 +579,15 @@ export default function GroupsPage({ t, locale }: GroupsPageProps) {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="capacity">{t('modules.community.supportGroups.capacity')}</Label>
+                    <Label htmlFor="memberCapacity">{t('modules.community.supportGroups.capacity')}</Label>
                     <Input
-                      id="capacity"
+                      id="memberCapacity"
                       type="number"
                       min="1"
                       max="1000"
                       placeholder={t('modules.community.supportGroups.capacityPlaceholder')}
-                      value={formData.capacity}
-                      onChange={(e) => setFormData({ ...formData, capacity: parseInt(e.target.value) || 50 })}
+                      value={formData.memberCapacity}
+                      onChange={(e) => setFormData({ ...formData, memberCapacity: parseInt(e.target.value) || 6 })}
                     />
                   </div>
 
@@ -616,15 +666,15 @@ export default function GroupsPage({ t, locale }: GroupsPageProps) {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="edit-capacity">{t('modules.community.supportGroups.capacity')}</Label>
+                    <Label htmlFor="edit-memberCapacity">{t('modules.community.supportGroups.capacity')}</Label>
                     <Input
-                      id="edit-capacity"
+                      id="edit-memberCapacity"
                       type="number"
                       min="1"
                       max="1000"
                       placeholder={t('modules.community.supportGroups.capacityPlaceholder')}
-                      value={formData.capacity}
-                      onChange={(e) => setFormData({ ...formData, capacity: parseInt(e.target.value) || 50 })}
+                      value={formData.memberCapacity}
+                      onChange={(e) => setFormData({ ...formData, memberCapacity: parseInt(e.target.value) || 6 })}
                     />
                   </div>
 
@@ -692,8 +742,8 @@ export default function GroupsPage({ t, locale }: GroupsPageProps) {
                       <div className="space-y-2">
                         <label className="text-sm font-medium">{t('modules.community.supportGroups.memberCount')}</label>
                         <p className="text-sm">
-                          {selectedGroup.memberCount || 0} / {selectedGroup.capacity || 0} members
-                          {(selectedGroup.memberCount || 0) >= (selectedGroup.capacity || 1) && (
+                          {selectedGroup.memberCount || 0} / {selectedGroup.memberCapacity || 0} members
+                          {(selectedGroup.memberCount || 0) >= (selectedGroup.memberCapacity || 1) && (
                             <Badge variant="destructive" className="ml-2">Full</Badge>
                           )}
                         </p>

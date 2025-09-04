@@ -189,7 +189,7 @@ export function MembershipDetailsModal({
                     <label className="text-sm font-medium text-muted-foreground">
                       {t('modules.admin.memberships.capacity')}
                     </label>
-                    <p>{group.memberCount || 0} / {group.capacity} {t('modules.admin.memberships.members')}</p>
+                    <p>{group.memberCount || 0} / {group.memberCapacity} {t('modules.admin.memberships.members')}</p>
                   </div>
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">

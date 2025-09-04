@@ -69,19 +69,57 @@ export interface Interaction {
 
 export interface Group {
   id: string;              // Document ID
-  name: string;
-  description: string;
-  memberCount: number;     // Current member count
-  capacity: number;        // Maximum members allowed
-  gender: 'male' | 'female' | 'mixed' | 'other';  // Target gender for the group
-  isActive?: boolean;      // Whether group is accepting new members
-  isPaused?: boolean;      // Whether group is paused
-  joinMethod?: 'any' | 'admin_only' | 'code_only';  // How members can join
-  visibility?: 'public' | 'private';  // Group visibility
-  adminCpId?: string;      // Admin community profile ID
-  createdByCpId?: string;  // Creator community profile ID
+  name: string;            // 1–60 characters
+  description?: string;    // 0–500 characters, optional
+  memberCapacity: number;  // Maximum members allowed (default 6)
+  gender: 'male' | 'female';  // Target gender for the group (from schema)
+  adminCpId: string;       // FK → communityProfiles (current admin)
+  createdByCpId: string;   // FK → communityProfiles (original creator)
+  visibility: 'public' | 'private';  // Group visibility
+  joinMethod: 'any' | 'admin_only' | 'code_only';  // How members can join
+  joinCode?: string;       // Join code for code_only groups
+  joinCodeExpiresAt?: Date;  // Join code expiration
+  joinCodeMaxUses?: number;  // Maximum uses for join code
+  joinCodeUseCount: number;  // Current usage count
+  isActive: boolean;       // Whether group is active (default true)
+  isPaused: boolean;       // Whether group is paused (default false)
+  pauseReason?: string;    // Reason for pause
   createdAt: Date;
   updatedAt?: Date;
+}
+
+export interface GroupMember {
+  id: string;              // Document ID (${groupId}_${cpId} or random)
+  groupId: string;         // FK → groups
+  cpId: string;            // FK → communityProfiles
+  role: 'admin' | 'member'; // Member role
+  isActive: boolean;       // Whether membership is active (default true)
+  joinedAt: Date;          // When they joined
+  leftAt?: Date;           // When they left (if applicable)
+  pointsTotal: number;     // Total points earned (default 0)
+  displayName?: string;    // Cached display name from CP
+}
+
+export interface GroupMessage {
+  id: string;              // Document ID
+  groupId: string;         // FK → groups
+  senderCpId: string;      // FK → communityProfiles
+  body: string;            // Message content (1–5000 chars)
+  replyToMessageId?: string; // Reply to another message
+  quotedPreview?: string;  // Small excerpt for replies
+  mentions: string[];      // Array of cpIds mentioned
+  mentionHandles: string[]; // Array of handles for rendering
+  tokens: string[];        // Tokenized terms for search
+  isDeleted: boolean;      // Hard delete flag (default false)
+  isHidden: boolean;       // Moderation hide flag (default false)
+  moderation?: {
+    status: 'pending' | 'approved' | 'blocked';
+    reason?: string;
+    moderatedBy?: string;
+    moderatedAt?: Date;
+  };
+  createdAt: Date;
+  senderDisplayName?: string; // Cached display name
 }
 
 export interface FeatureInterest {
@@ -211,15 +249,22 @@ export interface UpdateCommentRequest {
 
 export interface CreateGroupRequest {
   name: string;
-  description: string;
-  capacity: number;
-  gender: 'male' | 'female' | 'mixed' | 'other';
+  description?: string;           // Optional per F3 schema
+  memberCapacity: number;         // Correct field name
+  gender: 'male' | 'female';      // F3 only supports male/female
+  visibility: 'public' | 'private';
+  joinMethod: 'any' | 'admin_only' | 'code_only';
+  adminCpId: string;              // Required admin CP ID
+  createdByCpId: string;          // Required creator CP ID
 }
 
 export interface UpdateGroupRequest {
   name?: string;
   description?: string;
-  capacity?: number;
-  gender?: 'male' | 'female' | 'mixed' | 'other';
+  memberCapacity?: number;        // Correct field name
+  visibility?: 'public' | 'private';
+  joinMethod?: 'any' | 'admin_only' | 'code_only';
   isActive?: boolean;
+  isPaused?: boolean;
+  pauseReason?: string;
 } 

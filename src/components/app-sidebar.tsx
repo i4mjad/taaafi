@@ -81,18 +81,17 @@ export function AppSidebar({ lang, ...props }: AppSidebarProps) {
         icon: HeartHandshakeIcon,
         items: [
           { titleKey: "forum", url: `/${lang}/community/forum`, icon: MessageSquareIcon },
-          { titleKey: "groups", url: `/${lang}/community/groups`, icon: UsersIcon },
-          { titleKey: "directMessages", url: `/${lang}/community/direct-messages`, icon: MessageCircleIcon },
           { titleKey: "reports", url: `/${lang}/community/reports`, icon: AlertTriangleIcon },
           { titleKey: "settings", url: `/${lang}/community/settings`, icon: SettingsIcon },
         ]
       },
-      // System Admin - Group Administration Tools (ALWAYS VISIBLE)
+      // Groups Management - Combined admin and management tools
       {
         titleKey: "groupAdministration", 
         url: "#", 
         icon: CrownIcon,
         items: [
+          { titleKey: "allGroups", url: `/${lang}/groups-management`, icon: UsersIcon },
           { titleKey: "adminDashboard", url: `/${lang}/community/groups/admin-overview`, icon: LayoutDashboardIcon },
           { titleKey: "memberManagement", url: `/${lang}/community/groups/memberships`, icon: UsersIcon },
           { titleKey: "contentModeration", url: `/${lang}/community/groups/admin-content`, icon: MessageSquareIcon },
