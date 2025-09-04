@@ -18,6 +18,13 @@
       "groups": "Groups",
       "directMessages": "Direct Messages",
       "reports": "Reports",
+      "groupAdministration": "Group Administration",
+      "adminDashboard": "Admin Dashboard",
+      "memberManagement": "Member Management",
+      "contentModeration": "Content Moderation",
+      "reportsManagement": "Reports Management",
+      "challengeManagement": "Challenge Management",
+      "groupSettings": "Group Settings",
       "content": "Content",
       "contentTypes": "Content Types",
       "contentOwners": "Content Owners",
@@ -2045,6 +2052,339 @@
           "exportComingSoon": "Export functionality coming soon"
         }
       },
+      "admin": {
+        "title": "Group Admin",
+        "checkingPermissions": "Checking permissions...",
+        "permissionError": "Permission Error",
+        "tryAgainLater": "Please try again later",
+        "accessDenied": "Access Denied",
+        "adminOnlyAccess": "This area is only accessible to group administrators",
+        "loadingGroup": "Loading group information...",
+        "backToGroups": "Back to Groups",
+        "navigation": {
+          "overview": "Overview",
+          "members": "Members",
+          "content": "Content",
+          "reports": "Reports",
+          "challenges": "Challenges",
+          "invitations": "Invitations",
+          "settings": "Settings"
+        },
+        "dashboard": {
+          "title": "Admin Dashboard",
+          "description": "Manage your group and monitor activity",
+          "capacity": "{current}/{max} members",
+          "created": "Created",
+          "updated": "Updated",
+          "quickActions": "Quick Actions",
+          "quickActionsDesc": "Common administrative tasks",
+          "recentMembers": "Recent Members",
+          "recentMembersDesc": "Recently joined group members",
+          "joined": "Joined"
+        },
+        "stats": {
+          "totalMembers": "Total Members",
+          "admins": "admins",
+          "totalPoints": "Total Points",
+          "fromChallenges": "from challenges",
+          "capacity": "Capacity",
+          "capacityUsed": "capacity used",
+          "pendingActions": "Pending Actions",
+          "requiresAttention": "requires attention",
+          "totalGroups": "Total Groups",
+          "totalMessages": "Total Messages",
+          "openReports": "Open Reports"
+        },
+        "actions": {
+          "manageMembers": "Manage Members",
+          "manageMembersDesc": "Add, remove, and manage group members",
+          "moderateContent": "Moderate Content",
+          "moderateContentDesc": "Review and moderate group messages",
+          "manageChallenges": "Manage Challenges",
+          "manageChallengesDesc": "Create and manage group challenges",
+          "manageReports": "Manage Reports",
+          "manageReportsDesc": "Review and manage user reports",
+          "groupSettings": "Group Settings",
+          "groupSettingsDesc": "Configure group settings and permissions"
+        },
+        "members": {
+          "title": "Member Management",
+          "description": "Manage group members, roles, and permissions",
+          "loading": "Loading members...",
+          "loadError": "Error loading members",
+          "memberRemoved": "Member removed successfully",
+          "removeMemberError": "Failed to remove member",
+          "memberPromoted": "Member promoted to admin",
+          "promoteMemberError": "Failed to promote member",
+          "memberDemoted": "Member demoted from admin",
+          "demoteMemberError": "Failed to demote member",
+          "removing": "Removing...",
+          "removeMember": "Remove Member",
+          "noMembers": "No members found",
+          "noMembersDesc": "This group currently has no active members",
+          "noSearchResults": "No members found",
+          "tryDifferentSearch": "Try a different search term",
+          "joined": "Joined",
+          "points": "points",
+          "stats": {
+            "total": "Total Members",
+            "of": "of",
+            "admins": "Admins",
+            "regularMembers": "regular members",
+            "averagePoints": "Average Points",
+            "perMember": "per member",
+            "capacity": "Capacity",
+            "used": "used"
+          },
+          "search": {
+            "title": "Search Members",
+            "placeholder": "Search by member ID..."
+          },
+          "list": {
+            "title": "Members",
+            "description": "All active group members and their roles"
+          },
+          "roles": {
+            "admin": "Admin",
+            "member": "Member"
+          },
+          "actions": {
+            "promoteToAdmin": "Promote to Admin",
+            "demoteFromAdmin": "Demote from Admin",
+            "removeMember": "Remove Member"
+          },
+          "removeDialog": {
+            "title": "Remove Member",
+            "description": "Are you sure you want to remove {member} from this group? This action cannot be undone and they will need to rejoin to participate again."
+          }
+        },
+        "content": {
+          "title": "Content Moderation",
+          "description": "Review and moderate group messages and reported content",
+          "loading": "Loading messages...",
+          "loadError": "Error loading content",
+          "noMessages": "No messages found",
+          "noMessagesDesc": "This group doesn't have any messages yet",
+          "noResults": "No messages match your filters",
+          "tryDifferentFilters": "Try adjusting your search or filter criteria",
+          "messageDeleted": "[This message has been deleted]",
+          "messageHidden": "[This message has been hidden]",
+          "messageModerated": "Message moderated successfully",
+          "moderationError": "Failed to moderate message",
+          "moderating": "Moderating...",
+          "stats": {
+            "totalMessages": "Total Messages",
+            "allTime": "all time",
+            "pendingReview": "Pending Review",
+            "needsAttention": "needs attention",
+            "reported": "Reported",
+            "openReports": "open reports",
+            "moderated": "Moderated",
+            "actionsTaken": "actions taken"
+          },
+          "filters": {
+            "title": "Filter Messages",
+            "search": "Search Messages",
+            "searchPlaceholder": "Search by content or sender...",
+            "status": "Moderation Status",
+            "selectStatus": "Select status"
+          },
+          "status": {
+            "pending": "Pending Review",
+            "approved": "Approved",
+            "blocked": "Blocked",
+            "reported": "Reported"
+          },
+          "messages": {
+            "title": "Messages",
+            "description": "All group messages with moderation status"
+          },
+          "actions": {
+            "viewDetails": "View Details",
+            "approve": "Approve",
+            "hide": "Hide",
+            "delete": "Delete"
+          },
+          "messageDetails": {
+            "title": "Message Details",
+            "description": "Detailed information about this message",
+            "sender": "Sender",
+            "status": "Status",
+            "created": "Created",
+            "moderated": "Moderated",
+            "content": "Message Content",
+            "moderationReason": "Moderation Reason",
+            "replyTo": "Reply To"
+          },
+          "moderation": {
+            "approveTitle": "Approve Message",
+            "approveDesc": "Mark this message as approved and appropriate",
+            "hideTitle": "Hide Message",
+            "hideDesc": "Hide this message from group members while keeping it for review",
+            "deleteTitle": "Delete Message",
+            "deleteDesc": "Permanently delete this message. This action cannot be undone.",
+            "reason": "Reason (Optional)",
+            "reasonPlaceholder": "Explain why you're taking this action..."
+          },
+          "bulk": {
+            "title": "Bulk Actions",
+            "clearSelection": "Clear Selection",
+            "selectAll": "Select all {count} messages",
+            "deselectAll": "Deselect all",
+            "selected": "{count} messages selected",
+            "selectPending": "Select Pending",
+            "selectReported": "Select Reported",
+            "success": "Successfully moderated {count} messages",
+            "error": "Failed to moderate messages",
+            "processing": "Processing...",
+            "approveTitle": "Approve Messages",
+            "hideTitle": "Hide Messages",
+            "deleteTitle": "Delete Messages",
+            "confirmAction": "Are you sure you want to {action} the selected {count} messages?",
+            "confirm": "{action} Selected"
+          }
+        },
+        "reports": {
+          "title": "Reports Management",
+          "description": "Review and manage user reports for group content",
+          "loading": "Loading reports...",
+          "loadError": "Error loading reports",
+          "noReports": "No reports found",
+          "noReportsDesc": "This group has no reports yet",
+          "noResults": "No reports match your filters",
+          "tryDifferentFilters": "Try adjusting your search or filter criteria",
+          "actionSuccess": "Report action completed successfully",
+          "actionError": "Failed to process report",
+          "processing": "Processing...",
+          "stats": {
+            "totalReports": "Total Reports",
+            "allTime": "all time",
+            "openReports": "Open Reports",
+            "needsReview": "need review",
+            "messageReports": "Message Reports",
+            "contentReports": "content reports",
+            "memberReports": "Member Reports",
+            "userReports": "user reports"
+          },
+          "filters": {
+            "title": "Filter Reports",
+            "search": "Search Reports",
+            "searchPlaceholder": "Search by reporter, content, or message...",
+            "status": "Report Status",
+            "selectStatus": "Select status"
+          },
+          "status": {
+            "open": "Open",
+            "inReview": "In Review",
+            "closed": "Closed"
+          },
+          "list": {
+            "title": "Reports",
+            "description": "All user reports for this group"
+          },
+          "actions": {
+            "viewDetails": "View Details",
+            "resolve": "Resolve",
+            "dismiss": "Dismiss",
+            "resolveTitle": "Resolve Report",
+            "resolveDesc": "Mark this report as resolved after taking appropriate action",
+            "dismissTitle": "Dismiss Report",
+            "dismissDesc": "Dismiss this report as invalid or not requiring action",
+            "reason": "Resolution Reason",
+            "reasonPlaceholder": "Explain how this report was handled..."
+          },
+          "details": {
+            "title": "Report Details",
+            "description": "Detailed information about this report",
+            "reporter": "Reporter",
+            "status": "Status",
+            "reported": "Reported",
+            "contentType": "Content Type",
+            "reportMessage": "Report Message",
+            "reportedContent": "Reported Content"
+          }
+        },
+        "systemAdmin": {
+          "title": "System Administration",
+          "description": "System-wide group administration and oversight",
+          "groupFilter": "Group Filter",
+          "selectGroup": "Select a group",
+          "allGroups": "All Groups",
+          "quickActionsDesc": "Quick access to system administration tools",
+          "recentGroups": "Recent Groups",
+          "recentGroupsDesc": "Recently created groups requiring attention",
+          "manageGroup": "Manage",
+          "membersDescription": "System-wide member management across all groups",
+          "contentDescription": "System-wide content moderation and management",
+          "reportsDescription": "System-wide reports management and resolution",
+          "selectGroupPlaceholder": "Select group",
+          "selectRolePlaceholder": "Select role",
+          "selectStatusPlaceholder": "Select status",
+          "searchPlaceholder": "Search messages, senders, or groups...",
+          "searchMembersPlaceholder": "Search members or groups...",
+          "searchReportsPlaceholder": "Search reports, users, or groups...",
+          "allRoles": "All Roles",
+          "allStatus": "All Status",
+          "filterByGroup": "Filter by Group",
+          "filterByRole": "Filter by Role",
+          "moderationStatus": "Moderation Status",
+          "reportStatus": "Report Status",
+          "noMessagesFound": "No messages found",
+          "noMembersFound": "No members found",
+          "noReportsFound": "No reports found",
+          "tryAdjustingFilters": "Try adjusting your filters",
+          "acrossAllGroups": "across all groups",
+          "needAttention": "need attention",
+          "openReports": "open reports",
+          "actionsTaken": "actions taken",
+          "contentReports": "content reports",
+          "userReports": "user reports",
+          "allTime": "all time",
+          "needReview": "need review",
+          "matchingCriteria": "matching criteria",
+          "ofTotal": "of {total} total",
+          "regularMembers": "regular members",
+          "totalMessages": "Total Messages",
+          "pendingReview": "Pending Review", 
+          "reportedContent": "Reported Content",
+          "moderatedContent": "Moderated",
+          "totalReports": "Total Reports",
+          "openReports": "Open Reports",
+          "messageReports": "Message Reports",
+          "memberReports": "Member Reports",
+          "filteredResults": "Filtered Results",
+          "activeGroups": "Active Groups",
+          "totalGroups": "Total Groups",
+          "viewDetails": "View Details",
+          "approve": "Approve",
+          "hide": "Hide",
+          "delete": "Delete",
+          "resolve": "Resolve",
+          "dismiss": "Dismiss",
+          "approveMessage": "Approve Message",
+          "hideMessage": "Hide Message", 
+          "deleteMessage": "Delete Message",
+          "approveDesc": "Mark this message as approved and appropriate",
+          "hideDesc": "Hide this message from group members",
+          "deleteDesc": "Permanently delete this message",
+          "resolveReport": "Resolve Report",
+          "dismissReport": "Dismiss Report",
+          "resolveDesc": "Mark this report as resolved after taking appropriate action",
+          "dismissDesc": "Dismiss this report as invalid or not requiring action",
+          "reasonOptional": "Reason (Optional)",
+          "reasonPlaceholder": "Explain why you're taking this action...",
+          "resolutionReason": "Resolution Reason",
+          "resolutionPlaceholder": "Explain how this report was handled...",
+          "processing": "Processing...",
+          "cancel": "Cancel",
+          "messageDeleted": "[Message Deleted]",
+          "messageHidden": "[Message Hidden]",
+          "contentNotFound": "Content not found",
+          "unknown": "Unknown",
+          "reportActionSuccess": "Report action completed successfully",
+          "reportActionError": "Failed to process report"
+        }
+      },
       "features": {
         "title": "Feature Management",
         "description": "Manage feature flags and experimental features",
@@ -2126,6 +2466,277 @@
             "settings": "Settings"
           }
         }
+      },
+      "admin": {
+        "content": {
+          "title": "Content Moderation",
+          "messageModerated": "Message moderated successfully",
+          "moderationError": "Failed to moderate message",
+          "filters": {
+            "title": "Filter Content"
+          },
+          "status": {
+            "pending": "Pending",
+            "approved": "Approved",
+            "blocked": "Blocked",
+            "reported": "Reported"
+          },
+          "messages": {
+            "title": "Messages"
+          },
+          "messageDetails": {
+            "title": "Message Details",
+            "description": "View detailed information about this message",
+            "sender": "Sender",
+            "content": "Content",
+            "status": "Status", 
+            "created": "Created"
+          },
+          "actions": {
+            "viewDetails": "View Details",
+            "approve": "Approve",
+            "hide": "Hide",
+            "delete": "Delete"
+          },
+          "moderation": {
+            "reason": "Reason (Optional)",
+            "reasonPlaceholder": "Explain why you're taking this action..."
+          },
+          "bulk": {
+            "title": "Bulk Actions",
+            "clearSelection": "Clear Selection",
+            "selectAll": "Select all {count} messages",
+            "deselectAll": "Deselect All",
+            "selected": "{count} messages selected",
+            "selectPending": "Select Pending",
+            "selectReported": "Select Reported",
+            "success": "Successfully moderated {count} messages",
+            "error": "Failed to moderate messages",
+            "processing": "Processing...",
+            "approveTitle": "Approve Messages",
+            "hideTitle": "Hide Messages", 
+            "deleteTitle": "Delete Messages",
+            "confirmAction": "Are you sure you want to {action} the {count} selected messages?",
+            "confirm": "{action} Selected"
+          }
+        },
+        "systemAdmin": {
+          "title": "System Administration",
+          "description": "Comprehensive system overview and management tools",
+          "groupFilter": "Group Filter",
+          "selectGroup": "Select a group",
+          "allGroups": "All Groups",
+          "selectGroupPlaceholder": "Choose a group to filter",
+          "contentDescription": "Monitor and moderate all content across groups",
+          "membersDescription": "Manage all members across the platform",
+          "reportsDescription": "Review and handle user reports",
+          "quickActionsDesc": "Quick access to common administrative tasks",
+          "recentGroups": "Recent Groups",
+          "recentGroupsDesc": "Latest groups created on the platform",
+          "manageGroup": "Manage Group",
+          "searchPlaceholder": "Search content...",
+          "filterByGroup": "Filter by Group",
+          "moderationStatus": "Moderation Status",
+          "selectStatusPlaceholder": "Select status",
+          "allStatus": "All Status",
+          "searchMembersPlaceholder": "Search members...",
+          "filterByRole": "Filter by Role",
+          "selectRolePlaceholder": "Select role",
+          "allRoles": "All Roles",
+          "totalMessages": "Total Messages",
+          "acrossAllGroups": "across all groups",
+          "pendingReview": "Pending Review",
+          "needAttention": "need attention",
+          "reportedContent": "Reported Content",
+          "openReports": "open reports",
+          "moderatedContent": "Moderated Content",
+          "actionsTaken": "actions taken",
+          "totalReports": "Total Reports",
+          "allTime": "all time",
+          "needReview": "need review",
+          "messageReports": "Message Reports",
+          "contentReports": "content related",
+          "memberReports": "Member Reports",
+          "userReports": "user related",
+          "approveMessage": "Approve Message",
+          "hideMessage": "Hide Message",
+          "deleteMessage": "Delete Message",
+          "approveDesc": "This message will be made visible to all group members",
+          "hideDesc": "This message will be hidden but preserved for review",
+          "deleteDesc": "This message will be permanently deleted",
+          "resolveReport": "Resolve Report",
+          "dismissReport": "Dismiss Report",
+          "resolveDesc": "Mark this report as resolved and take appropriate action",
+          "dismissDesc": "Dismiss this report without taking action",
+          "resolutionReason": "Resolution Reason",
+          "resolutionPlaceholder": "Explain the action taken or reason for dismissal...",
+          "cancel": "Cancel",
+          "processing": "Processing...",
+          "reportActionSuccess": "Report action completed successfully",
+          "reportActionError": "Failed to process report action",
+          "contentNotFound": "Content not found",
+          "unknown": "Unknown"
+        },
+        "stats": {
+          "totalGroups": "Total Groups",
+          "totalMembers": "Total Members",
+          "totalMessages": "Total Messages",
+          "openReports": "Open Reports"
+        },
+        "actions": {
+          "manageMembers": "Manage Members",
+          "manageMembersDesc": "Add, remove, and manage group members and roles",
+          "moderateContent": "Moderate Content",
+          "moderateContentDesc": "Review and moderate group messages and content",
+          "manageReports": "Manage Reports",
+          "manageReportsDesc": "Review and handle user reports and complaints",
+          "groupSettings": "Group Settings",
+          "groupSettingsDesc": "Configure group settings and permissions"
+        },
+        "dashboard": {
+          "quickActions": "Quick Actions"
+        },
+        "charts": {
+          "contentActivity": "Content & Moderation Activity",
+          "contentActivityDesc": "Daily messages and reports submitted across all groups",
+          "systemHealth": "System Health",
+          "systemHealthDesc": "Active groups and moderation actions taken daily"
+        },
+        "memberships": {
+          "title": "Group Memberships",
+          "description": "Manage all group memberships across the platform",
+          "totalMemberships": "Total Memberships",
+          "groupAdmins": "Group Admins",
+          "regularMembers": "regular members",
+          "activeGroups": "Active Groups",
+          "filteredResults": "Filtered Results",
+          "acrossGroups": "across {count} groups",
+          "ofTotal": "of {total} total",
+          "matchingCriteria": "matching criteria",
+          "searchAndFilter": "Search & Filter",
+          "searchLabel": "Search",
+          "searchPlaceholder": "Search by group ID or group name...",
+          "filterByRole": "Filter by Role", 
+          "filterByStatus": "Filter by Status",
+          "selectRole": "Select a role",
+          "selectStatus": "Select a status",
+          "allRoles": "All Roles",
+          "allStatuses": "All Statuses",
+          "admin": "Admin",
+          "member": "Member",
+          "membershipsList": "Memberships List",
+          "userId": "User ID",
+          "groupName": "Group Name",
+          "role": "Role",
+          "status": "Status",
+          "joinedAt": "Joined",
+          "points": "Points",
+          "membershipDetails": "Membership Details",
+          "membershipDetailsDesc": "Detailed information about this group membership and related reports",
+          "membershipInfo": "Membership Information",
+          "memberInfo": "Member Information",
+          "groupInfo": "Group Information",
+          "groupStatus": "Group Status",
+          "userReports": "User Reports",
+          "noReports": "No Reports Found",
+          "noReportsDesc": "This user has no reports submitted against them",
+          "reportTitle": "Report",
+          "reportType": "Report Type",
+          "reportReason": "Reason",
+          "reportDescription": "Description",
+          "reportedBy": "Reported By",
+          "relatedContent": "Related Content",
+          "userReport": "User Report",
+          "groupCreated": "Group Created",
+          "groupDescription": "Group Description",
+          "capacity": "Capacity",
+          "members": "members",
+          "pts": "pts",
+          "manageGroup": "Manage Group",
+          "viewDetails": "View Details",
+          "columns": "Columns",
+          "noData": "No memberships found.",
+          "pagination": {
+            "selected": "row(s) selected.",
+            "rowsPerPage": "Rows per page",
+            "page": "Page",
+            "of": "of"
+          }
+        },
+        "content": {
+          "title": "Content Moderation",
+          "messageModerated": "Message has been moderated successfully",
+          "moderationError": "Failed to moderate message",
+          "filters": {
+            "title": "Filter Content"
+          },
+          "status": {
+            "pending": "Pending",
+            "approved": "Approved",
+            "blocked": "Blocked",
+            "reported": "Reported"
+          },
+          "actions": {
+            "viewDetails": "View Details",
+            "approve": "Approve",
+            "hide": "Hide",
+            "delete": "Delete"
+          },
+          "moderation": {
+            "reason": "Reason (Optional)",
+            "reasonPlaceholder": "Explain why you're taking this action..."
+          },
+          "bulk": {
+            "title": "Bulk Actions",
+            "clearSelection": "Clear Selection",
+            "selectAll": "Select all {count} messages",
+            "deselectAll": "Deselect all",
+            "selected": "{count} messages selected",
+            "selectPending": "Select Pending",
+            "selectReported": "Select Reported",
+            "success": "Successfully moderated {count} messages",
+            "error": "Failed to moderate messages",
+            "processing": "Processing...",
+            "approveTitle": "Approve Messages",
+            "hideTitle": "Hide Messages",
+            "deleteTitle": "Delete Messages",
+            "confirmAction": "Are you sure you want to {action} the selected {count} messages?",
+            "confirm": "{action} Selected"
+          }
+        },
+        "reports": {
+          "title": "Reports Management"
+        },
+        "members": {
+          "title": "Member Management",
+          "description": "Manage all platform members and their roles",
+          "memberRemoved": "Member has been removed successfully",
+          "removeMemberError": "Failed to remove member",
+          "memberPromoted": "Member has been promoted to admin",
+          "promoteMemberError": "Failed to promote member",
+          "memberDemoted": "Member has been demoted from admin",
+          "demoteMemberError": "Failed to demote member",
+          "stats": {
+            "total": "Total Members",
+            "admins": "Admins"
+          },
+          "search": {
+            "title": "Search Members",
+            "placeholder": "Search members"
+          },
+          "roles": {
+            "admin": "Admin",
+            "member": "Member"
+          },
+          "actions": {
+            "promoteToAdmin": "Promote to Admin",
+            "demoteFromAdmin": "Demote from Admin",
+            "removeMember": "Remove Member"
+          },
+          "removeDialog": {
+            "title": "Remove Member"
+          }
+        }
       }
     },
     "common": {
@@ -2155,13 +2766,22 @@
       "code": "Code",      
       "never": "Never",
       "all": "All",
+      "shown": "shown",
+      "page": "Page",
+      "previous": "Previous", 
+      "next": "Next",
+      "group": "Group",
+      "close": "Close",
       "activate": "Activate",
       "deactivate": "Deactivate",
       "back": "Back",
       "unknown": "Unknown",
       "yes": "Yes",
       "no": "No",
-      "close": "Close"
+      "close": "Close",
+      "last7Days": "Last 7 days",
+      "last30Days": "Last 30 days",
+      "last90Days": "Last 90 days"
     },
     "posts": {
       "totalAcrossAllPosts": "Total across all posts",

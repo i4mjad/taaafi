@@ -1,6 +1,7 @@
 'use client';
 
 import { useTranslation } from "@/contexts/TranslationContext";
+import { SiteHeader } from '@/components/site-header';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PostCategoriesManagement from "./components/PostCategoryForm";
 import CommunityProfilesManagement from "./components/CommunityProfilesManagement";
@@ -11,8 +12,14 @@ import CommunityAnalytics from "./components/CommunityAnalytics";
 export default function ForumPage() {
   const { t } = useTranslation();
 
+  const headerDictionary = {
+    documents: t('appSidebar.forum') || 'Forum Management',
+  };
+
   return (
-    <div className="p-6">
+    <>
+      <SiteHeader dictionary={headerDictionary} />
+      <div className="p-6">
       <div className="mb-6">
         <h1 className="text-3xl font-bold tracking-tight">{t('appSidebar.forum')}</h1>
         <p className="text-muted-foreground">
@@ -48,6 +55,7 @@ export default function ForumPage() {
           <CommunityAnalytics />
         </TabsContent>
       </Tabs>
-    </div>
+      </div>
+    </>
   );
 } 

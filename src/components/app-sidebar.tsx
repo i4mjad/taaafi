@@ -17,6 +17,9 @@ import {
   AlertTriangleIcon,
   CrownIcon,
   BellIcon,
+  ShieldIcon,
+  TrophyIcon,
+  UserPlusIcon,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -82,6 +85,20 @@ export function AppSidebar({ lang, ...props }: AppSidebarProps) {
           { titleKey: "directMessages", url: `/${lang}/community/direct-messages`, icon: MessageCircleIcon },
           { titleKey: "reports", url: `/${lang}/community/reports`, icon: AlertTriangleIcon },
           { titleKey: "settings", url: `/${lang}/community/settings`, icon: SettingsIcon },
+        ]
+      },
+      // System Admin - Group Administration Tools (ALWAYS VISIBLE)
+      {
+        titleKey: "groupAdministration", 
+        url: "#", 
+        icon: CrownIcon,
+        items: [
+          { titleKey: "adminDashboard", url: `/${lang}/community/groups/admin-overview`, icon: LayoutDashboardIcon },
+          { titleKey: "memberManagement", url: `/${lang}/community/groups/memberships`, icon: UsersIcon },
+          { titleKey: "contentModeration", url: `/${lang}/community/groups/admin-content`, icon: MessageSquareIcon },
+          { titleKey: "reportsManagement", url: `/${lang}/community/groups/admin-reports`, icon: ShieldIcon },
+          { titleKey: "challengeManagement", url: `/${lang}/community/groups/admin-challenges`, icon: TrophyIcon },
+          { titleKey: "groupSettings", url: `/${lang}/community/groups/admin-settings`, icon: SettingsIcon },
         ]
       },
       { 

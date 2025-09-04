@@ -18,6 +18,13 @@
       "groups": "المجموعات",
       "directMessages": "الرسائل المباشرة",
       "reports": "التقارير",
+      "groupAdministration": "إدارة المجموعات",
+      "adminDashboard": "لوحة تحكم الإدارة",
+      "memberManagement": "إدارة الأعضاء",
+      "contentModeration": "مراجعة المحتوى",
+      "reportsManagement": "إدارة البلاغات",
+      "challengeManagement": "إدارة التحديات",
+      "groupSettings": "إعدادات المجموعة",
       "content": "المحتوى",
       "contentTypes": "أنواع المحتوى",
       "contentOwners": "مالكو المحتوى",
@@ -2161,6 +2168,267 @@
             "settings": "الإعدادات"
           }
         }
+      },
+      "admin": {
+        "systemAdmin": {
+          "title": "إدارة النظام",
+          "description": "نظرة عامة شاملة على النظام وأدوات الإدارة",
+          "groupFilter": "تصفية المجموعات",
+          "selectGroup": "اختر مجموعة",
+          "allGroups": "جميع المجموعات",
+          "selectGroupPlaceholder": "اختر مجموعة للتصفية",
+          "contentDescription": "مراقبة وإدارة جميع المحتوى عبر المجموعات",
+          "membersDescription": "إدارة جميع الأعضاء عبر المنصة",
+          "reportsDescription": "مراجعة ومعالجة بلاغات المستخدمين",
+          "quickActionsDesc": "وصول سريع للمهام الإدارية الشائعة",
+          "recentGroups": "المجموعات الحديثة",
+          "recentGroupsDesc": "أحدث المجموعات المُنشأة على المنصة",
+          "manageGroup": "إدارة المجموعة",
+          "searchPlaceholder": "البحث في المحتوى...",
+          "filterByGroup": "التصفية بالمجموعة",
+          "moderationStatus": "حالة الإشراف",
+          "selectStatusPlaceholder": "اختر الحالة",
+          "allStatus": "جميع الحالات",
+          "searchMembersPlaceholder": "البحث في الأعضاء...",
+          "filterByRole": "التصفية بالدور",
+          "selectRolePlaceholder": "اختر الدور",
+          "allRoles": "جميع الأدوار",
+          "totalMessages": "إجمالي الرسائل",
+          "acrossAllGroups": "عبر جميع المجموعات",
+          "pendingReview": "في انتظار المراجعة",
+          "needAttention": "تحتاج اهتمام",
+          "reportedContent": "المحتوى المُبلّغ عنه",
+          "openReports": "البلاغات المفتوحة",
+          "moderatedContent": "المحتوى المُراجع",
+          "actionsTaken": "الإجراءات المُتخذة",
+          "totalReports": "إجمالي البلاغات",
+          "allTime": "كل الأوقات",
+          "needReview": "تحتاج مراجعة",
+          "messageReports": "بلاغات الرسائل",
+          "contentReports": "متعلقة بالمحتوى",
+          "memberReports": "بلاغات الأعضاء",
+          "userReports": "متعلقة بالمستخدمين",
+          "approveMessage": "الموافقة على الرسالة",
+          "hideMessage": "إخفاء الرسالة",
+          "deleteMessage": "حذف الرسالة",
+          "approveDesc": "ستظهر هذه الرسالة لجميع أعضاء المجموعة",
+          "hideDesc": "ستُخفى هذه الرسالة ولكن ستُحفظ للمراجعة",
+          "deleteDesc": "ستُحذف هذه الرسالة نهائياً",
+          "resolveReport": "حل البلاغ",
+          "dismissReport": "رفض البلاغ",
+          "resolveDesc": "ضع علامة على هذا البلاغ كمحلول واتخذ الإجراء المناسب",
+          "dismissDesc": "رفض هذا البلاغ دون اتخاذ إجراء",
+          "resolutionReason": "سبب القرار",
+          "resolutionPlaceholder": "اشرح الإجراء المُتخذ أو سبب الرفض...",
+          "cancel": "إلغاء",
+          "processing": "جاري المعالجة...",
+          "reportActionSuccess": "تم تنفيذ إجراء البلاغ بنجاح",
+          "reportActionError": "فشل في معالجة إجراء البلاغ",
+          "contentNotFound": "المحتوى غير موجود",
+          "unknown": "غير معروف"
+        },
+        "stats": {
+          "totalGroups": "إجمالي المجموعات",
+          "totalMembers": "إجمالي الأعضاء",
+          "totalMessages": "إجمالي الرسائل",
+          "openReports": "البلاغات المفتوحة"
+        },
+        "actions": {
+          "manageMembers": "إدارة الأعضاء",
+          "manageMembersDesc": "إضافة وإزالة وإدارة أعضاء المجموعة والأدوار",
+          "moderateContent": "إدارة المحتوى",
+          "moderateContentDesc": "مراجعة وإدارة رسائل المجموعة والمحتوى",
+          "manageReports": "إدارة البلاغات",
+          "manageReportsDesc": "مراجعة ومعالجة بلاغات وشكاوى المستخدمين",
+          "groupSettings": "إعدادات المجموعة",
+          "groupSettingsDesc": "تكوين إعدادات المجموعة والصلاحيات"
+        },
+        "dashboard": {
+          "quickActions": "الإجراءات السريعة"
+        },
+        "charts": {
+          "contentActivity": "نشاط المحتوى والإشراف",
+          "contentActivityDesc": "الرسائل والبلاغات المرسلة يومياً عبر جميع المجموعات",
+          "systemHealth": "صحة النظام",
+          "systemHealthDesc": "المجموعات النشطة والإجراءات الإشرافية المتخذة يومياً"
+        },
+        "memberships": {
+          "title": "عضويات المجموعات",
+          "description": "إدارة جميع عضويات المجموعات عبر المنصة",
+          "totalMemberships": "إجمالي العضويات",
+          "groupAdmins": "مشرفو المجموعات",
+          "regularMembers": "أعضاء عاديون",
+          "activeGroups": "المجموعات النشطة",
+          "filteredResults": "النتائج المصفاة",
+          "acrossGroups": "عبر {count} مجموعة",
+          "ofTotal": "من {total} إجمالي",
+          "matchingCriteria": "تطابق المعايير",
+          "searchAndFilter": "البحث والتصفية",
+          "searchLabel": "بحث",
+          "searchPlaceholder": "البحث بمعرف المجموعة أو اسم المجموعة...",
+          "filterByRole": "تصفية حسب الدور",
+          "filterByStatus": "تصفية حسب الحالة", 
+          "selectRole": "اختر دور",
+          "selectStatus": "اختر الحالة",
+          "allRoles": "جميع الأدوار",
+          "allStatuses": "جميع الحالات",
+          "admin": "مشرف",
+          "member": "عضو",
+          "membershipsList": "قائمة العضويات",
+          "userId": "معرف المستخدم",
+          "groupName": "اسم المجموعة",
+          "role": "الدور",
+          "status": "الحالة",
+          "joinedAt": "تاريخ الانضمام",
+          "points": "النقاط",
+          "membershipDetails": "تفاصيل العضوية",
+          "membershipDetailsDesc": "معلومات مفصلة حول عضوية هذه المجموعة والبلاغات ذات الصلة",
+          "membershipInfo": "معلومات العضوية",
+          "memberInfo": "معلومات العضو",
+          "groupInfo": "معلومات المجموعة",
+          "groupStatus": "حالة المجموعة",
+          "userReports": "بلاغات المستخدم",
+          "noReports": "لا توجد بلاغات",
+          "noReportsDesc": "لا توجد بلاغات مقدمة ضد هذا المستخدم",
+          "reportTitle": "بلاغ",
+          "reportType": "نوع البلاغ",
+          "reportReason": "السبب",
+          "reportDescription": "الوصف",
+          "reportedBy": "أبلغ من قبل",
+          "relatedContent": "المحتوى ذو الصلة",
+          "userReport": "بلاغ مستخدم",
+          "groupCreated": "تاريخ إنشاء المجموعة",
+          "groupDescription": "وصف المجموعة",
+          "capacity": "السعة",
+          "members": "أعضاء",
+          "pts": "نقطة",
+          "manageGroup": "إدارة المجموعة",
+          "viewDetails": "عرض التفاصيل",
+          "columns": "الأعمدة",
+          "noData": "لم يتم العثور على عضويات.",
+          "pagination": {
+            "selected": "صف (صفوف) محددة.",
+            "rowsPerPage": "صفوف لكل صفحة",
+            "page": "صفحة",
+            "of": "من"
+          }
+        },
+        "content": {
+          "title": "إدارة المحتوى",
+          "messageModerated": "تمت إدارة الرسالة بنجاح",
+          "moderationError": "فشل في إدارة الرسالة",
+          "filters": {
+            "title": "تصفية المحتوى"
+          },
+          "status": {
+            "pending": "في انتظار المراجعة",
+            "approved": "موافق عليها",
+            "blocked": "محظورة",
+            "reported": "مُبلّغ عنها"
+          },
+          "bulk": {
+            "title": "الإجراءات المجمعة",
+            "clearSelection": "مسح التحديد",
+            "selectAll": "اختر جميع الـ {count} رسائل",
+            "deselectAll": "إلغاء تحديد الكل",
+            "selected": "{count} رسالة مختارة",
+            "selectPending": "اختر المعلقة",
+            "selectReported": "اختر المبلغ عنها",
+            "success": "تم مراجعة {count} رسالة بنجاح",
+            "error": "فشل في مراجعة الرسائل",
+            "processing": "جاري المعالجة...",
+            "approveTitle": "الموافقة على الرسائل",
+            "hideTitle": "إخفاء الرسائل",
+            "deleteTitle": "حذف الرسائل",
+            "confirmAction": "هل أنت متأكد من أنك تريد {action} الـ {count} رسالة المحددة؟",
+            "confirm": "{action} المختارة"
+          }
+        },
+        "content": {
+          "title": "إدارة المحتوى",
+          "messageModerated": "تم إجراء المراجعة على الرسالة بنجاح",
+          "moderationError": "فشل في مراجعة الرسالة",
+          "filters": {
+            "title": "تصفية المحتوى"
+          },
+          "status": {
+            "pending": "معلق",
+            "approved": "موافق عليه",
+            "blocked": "محظور",
+            "reported": "مبلّغ عنه"
+          },
+          "messages": {
+            "title": "الرسائل"
+          },
+          "messageDetails": {
+            "title": "تفاصيل الرسالة",
+            "description": "عرض معلومات مفصلة حول هذه الرسالة",
+            "sender": "المرسل",
+            "content": "المحتوى",
+            "status": "الحالة",
+            "created": "تاريخ الإنشاء"
+          },
+          "actions": {
+            "viewDetails": "عرض التفاصيل",
+            "approve": "موافقة",
+            "hide": "إخفاء",
+            "delete": "حذف"
+          },
+          "moderation": {
+            "reason": "السبب (اختياري)",
+            "reasonPlaceholder": "اشرح سبب اتخاذ هذا الإجراء..."
+          },
+          "bulk": {
+            "title": "الإجراءات المجمعة",
+            "clearSelection": "مسح التحديد",
+            "selectAll": "اختر جميع الـ {count} رسائل",
+            "deselectAll": "إلغاء تحديد الكل",
+            "selected": "{count} رسالة مختارة",
+            "selectPending": "اختر المعلقة",
+            "selectReported": "اختر المبلغ عنها",
+            "success": "تم مراجعة {count} رسالة بنجاح",
+            "error": "فشل في مراجعة الرسائل",
+            "processing": "جاري المعالجة...",
+            "approveTitle": "الموافقة على الرسائل",
+            "hideTitle": "إخفاء الرسائل",
+            "deleteTitle": "حذف الرسائل",
+            "confirmAction": "هل أنت متأكد من أنك تريد {action} الـ {count} رسالة المحددة؟",
+            "confirm": "{action} المختارة"
+          }
+        },
+        "reports": {
+          "title": "إدارة البلاغات"
+        },
+        "members": {
+          "title": "إدارة الأعضاء",
+          "description": "إدارة جميع أعضاء المنصة وأدوارهم",
+          "memberRemoved": "تمت إزالة العضو بنجاح",
+          "removeMemberError": "فشل في إزالة العضو",
+          "memberPromoted": "تم ترقية العضو إلى مدير",
+          "promoteMemberError": "فشل في ترقية العضو",
+          "memberDemoted": "تم تخفيض رتبة العضو من مدير",
+          "demoteMemberError": "فشل في تخفيض رتبة العضو",
+          "stats": {
+            "total": "إجمالي الأعضاء",
+            "admins": "المدراء"
+          },
+          "search": {
+            "title": "البحث في الأعضاء",
+            "placeholder": "البحث في الأعضاء"
+          },
+          "roles": {
+            "admin": "مدير",
+            "member": "عضو"
+          },
+          "actions": {
+            "promoteToAdmin": "ترقية إلى مدير",
+            "demoteFromAdmin": "تخفيض رتبة من مدير",
+            "removeMember": "إزالة العضو"
+          },
+          "removeDialog": {
+            "title": "إزالة العضو"
+          }
+        }
       }
     },
     "common": {
@@ -2189,6 +2457,12 @@
       "technicalDetails": "التفاصيل التقنية",
       "code": "الرمز",
       "never": "أبداً",
+      "shown": "معروض",
+      "page": "صفحة",
+      "previous": "السابق",
+      "next": "التالي", 
+      "group": "المجموعة",
+      "close": "إغلاق",
       "all": "الكل",
       "activate": "تفعيل",
       "deactivate": "إلغاء التفعيل",
@@ -2196,7 +2470,9 @@
       "unknown": "غير معروف",
       "yes": "نعم",
       "no": "لا",
-      "close": "إغلاق"
+      "close": "إغلاق",
+      "last7Days": "آخر 7 أيام",
+      "last30Days": "آخر 30 يوماً",
+      "last90Days": "آخر 90 يوماً"
     }
   }
-  

@@ -75,6 +75,11 @@ export interface Group {
   capacity: number;        // Maximum members allowed
   gender: 'male' | 'female' | 'mixed' | 'other';  // Target gender for the group
   isActive?: boolean;      // Whether group is accepting new members
+  isPaused?: boolean;      // Whether group is paused
+  joinMethod?: 'any' | 'admin_only' | 'code_only';  // How members can join
+  visibility?: 'public' | 'private';  // Group visibility
+  adminCpId?: string;      // Admin community profile ID
+  createdByCpId?: string;  // Creator community profile ID
   createdAt: Date;
   updatedAt?: Date;
 }
