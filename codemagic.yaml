@@ -101,7 +101,7 @@ workflows:
           VERSION=$(cat pubspec.yaml | grep 'version:' | head -1 | awk '{print $2}' | cut -d '+' -f 1)
           BUILD_NUMBER=$(app-store-connect get-latest-testflight-build-number "$APP_STORE_APPLE_ID")
           BUILD_NUMBER=$((BUILD_NUMBER + 1))
-          shorebird release ios --flutter-version=3.32.5 --export-options-plist=ios/buildInfo.plist
+          shorebird release ios --flutter-version=3.32.5
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
