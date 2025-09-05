@@ -217,7 +217,6 @@ class _JoinCooldownTimerState extends ConsumerState<JoinCooldownTimer> {
                   style: TextStyles.h4.copyWith(
                     color: theme.warn[800],
                     fontWeight: FontWeight.w700,
-                    fontFamily: 'monospace',
                   ),
                 ),
               ],
