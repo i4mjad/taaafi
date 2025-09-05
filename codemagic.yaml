@@ -86,13 +86,6 @@ workflows:
       - name: Install pods
         script: |
           find . -name "Podfile" -execdir pod install \;
-      
-      - name: Fetch signing files
-        script: |
-          app-store-connect fetch-signing-files \
-            "com.amjadkhalfan.RebootApp" \
-            --type IOS_APP_STORE \
-            --create
 
       - name: Update Info.plist
         script: |
