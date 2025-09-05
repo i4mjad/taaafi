@@ -25,13 +25,57 @@ class JoinGroupModal extends ConsumerStatefulWidget {
 
 class _JoinGroupModalState extends ConsumerState<JoinGroupModal> {
   final _groupCodeController = TextEditingController();
-  bool _hideIdentity = false;
+  bool _hideIdentity = false; // Will be updated based on existing profile
   bool _isLoading = false;
+  bool _isLoadingProfile = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkExistingProfile();
+  }
 
   @override
   void dispose() {
     _groupCodeController.dispose();
     super.dispose();
+  }
+
+  /// Check if user has existing community profile and set anonymity accordingly
+  Future<void> _checkExistingProfile() async {
+    try {
+      final profileAsync = ref.read(currentCommunityProfileProvider);
+      await profileAsync.when(
+        data: (profile) async {
+          if (profile != null) {
+            setState(() {
+              _hideIdentity = profile.isAnonymous;
+              _isLoadingProfile = false;
+            });
+          } else {
+            setState(() {
+              _isLoadingProfile = false;
+            });
+          }
+        },
+        loading: () async {
+          setState(() {
+            _isLoadingProfile = true;
+          });
+        },
+        error: (error, stack) async {
+          setState(() {
+            _isLoadingProfile = false;
+            // Keep default anonymity setting on error
+          });
+        },
+      );
+    } catch (e) {
+      setState(() {
+        _isLoadingProfile = false;
+        // Keep default anonymity setting on error
+      });
+    }
   }
 
   @override
@@ -101,19 +145,32 @@ class _JoinGroupModalState extends ConsumerState<JoinGroupModal> {
                       ),
                     ),
                     const Spacer(),
-                    PlatformSwitch(
-                      value: _hideIdentity,
-                      onChanged: (value) {
-                        setState(() {
-                          _hideIdentity = value;
-                        });
-                      },
-                    ),
+                    _isLoadingProfile
+                        ? SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                theme.primary[600]!,
+                              ),
+                            ),
+                          )
+                        : PlatformSwitch(
+                            value: _hideIdentity,
+                            onChanged: (value) {
+                              setState(() {
+                                _hideIdentity = value;
+                              });
+                            },
+                          ),
                   ],
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  l10n.translate('hide-identity-description'),
+                  _isLoadingProfile
+                      ? l10n.translate('loading')
+                      : l10n.translate('hide-identity-description'),
                   style: TextStyles.caption.copyWith(
                     color: theme.grey[600],
                     height: 1.4,
