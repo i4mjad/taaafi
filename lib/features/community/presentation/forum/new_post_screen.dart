@@ -1158,20 +1158,53 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
 
   /// Attachment action handlers (for Plus users)
   void _handleImageAttachment() async {
-    try {
-      final imageService = ref.read(attachmentImageServiceProvider);
-      final images = await imageService.pickImages(maxImages: 4);
+    // Use FeatureAccessGuard for media sharing
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      useSafeArea: true,
+      builder: (context) => FeatureAccessGuard(
+        featureUniqueName: AppFeaturesConfig.shareMedia,
+        onTap: () async {
+          Navigator.of(context).pop(); // Close the guard modal
+          // Execute the image attachment logic
+          try {
+            final imageService = ref.read(attachmentImageServiceProvider);
+            final images = await imageService.pickImages(maxImages: 4);
 
-      if (images.isNotEmpty) {
-        ref.read(postAttachmentsProvider.notifier).updateImages(images);
-      }
-    } catch (e) {
-      getErrorSnackBar(context, 'Failed to select images');
-    }
+            if (images.isNotEmpty) {
+              ref.read(postAttachmentsProvider.notifier).updateImages(images);
+            }
+          } catch (e) {
+            getErrorSnackBar(context, 'Failed to select images');
+          }
+        },
+        customBanMessage:
+            AppLocalizations.of(context).translate('media-sharing-restricted'),
+        child: Container(), // Empty container since we're using onTap
+      ),
+    );
   }
 
   void _handlePollAttachment() {
-    _showPollCreationModal();
+    // Use FeatureAccessGuard for poll creation
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      useSafeArea: true,
+      builder: (context) => FeatureAccessGuard(
+        featureUniqueName: AppFeaturesConfig.createPoll,
+        onTap: () {
+          Navigator.of(context).pop(); // Close the guard modal
+          _showPollCreationModal(); // Show the poll creation modal
+        },
+        customBanMessage:
+            AppLocalizations.of(context).translate('poll-creation-restricted'),
+        child: Container(), // Empty container since we're using onTap
+      ),
+    );
   }
 
   void _handleGroupInviteAttachment() {

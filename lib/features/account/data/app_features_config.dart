@@ -12,11 +12,12 @@ class AppFeaturesConfig {
   static const String postCreation = 'post_creation';
   static const String commentCreation = 'comment_creation';
 
-  // static const String directMessaging = 'direct_messaging';
-  // static const String groupCreation = 'group_creation';
-  // static const String feedbackSubmission = 'feedback_submission';
-  // static const String profileUpdate = 'profile_update';
-  // static const String communityAccess = 'community_access';
+  // Quick action guard
+  static const String sendMessage = 'sending_in_groups';
+  // Feature access guard
+  static const String createPoll = 'create_a_poll';
+  static const String shareMedia = 'share_a_media';
+  static const String createOrJoinGroups = 'create_or_join_a_group';
 
   /// Get all active app features from Firestore
   static Future<List<AppFeature>> getAllFeatures() async {

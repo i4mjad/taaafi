@@ -23,6 +23,10 @@ import '../../../../core/shared_widgets/snackbar.dart';
 import '../../../../core/shared_widgets/action_modal.dart';
 import '../widgets/group_chat_profile_modal.dart';
 
+// Feature access guard imports
+import '../../../account/presentation/widgets/feature_access_guard.dart';
+import '../../../account/data/app_features_config.dart';
+
 /// Model for chat message
 class ChatMessage {
   final String id;
@@ -1588,71 +1592,82 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
   Future<void> _handleSubmit(String text) async {
     if (text.trim().isEmpty || _isSubmitting || widget.groupId == null) return;
 
-    // Show loader immediately so the user gets instant feedback
-    setState(() {
-      _isSubmitting = true;
-    });
+    // Use QuickActionGuard to check sendMessage feature access
+    await checkFeatureAccessAndShowBanSnackbar(
+      context,
+      ref,
+      AppFeaturesConfig.sendMessage,
+      customMessage:
+          AppLocalizations.of(context).translate('send-message-restricted'),
+    ).then((canAccess) async {
+      if (!canAccess) return;
 
-    // Give the UI a chance to rebuild before heavy async work starts
-    await Future.delayed(Duration.zero);
-
-    try {
-      final groupChatService = ref.read(groupChatServiceProvider.notifier);
-
-      // Prepare reply information if replying
-      String? quotedPreview;
-      if (_replyState.isReplying && _replyState.replyToMessage != null) {
-        quotedPreview = ref.read(
-            generateQuotedPreviewProvider(_replyState.replyToMessage!.content));
-      }
-
-      // Send message via service
-      await groupChatService.sendMessage(
-        groupId: widget.groupId!,
-        body: text.trim(),
-        replyToMessageId: _replyState.replyToMessageId,
-        quotedPreview: quotedPreview,
-      );
-
-      // Clear the input and reply state
-      _messageController.clear();
-      if (_replyState.isReplying) {
-        setState(() {
-          _replyState = const ChatReplyState();
-        });
-        _replyPreviewController.value = 1.0; // Reset animation for next reply
-      }
-
-      // Scroll to bottom after a short delay to allow messages to load
-      // For reversed list, scroll to position 0 (which is the bottom/latest)
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        Future.delayed(const Duration(milliseconds: 100), () {
-          if (_scrollController.hasClients) {
-            _scrollController.animateTo(
-              0, // For reversed list, 0 is the bottom (latest messages)
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeOut,
-            );
-          }
-        });
+      // Show loader immediately so the user gets instant feedback
+      setState(() {
+        _isSubmitting = true;
       });
-    } catch (error) {
-      // Show error using the proper snackbar system
-      if (mounted) {
-        if (error.toString().contains('already in progress')) {
-          getSystemSnackBar(context, 'يتم إرسال رسالة أخرى، يرجى الانتظار');
-        } else {
-          getSystemSnackBar(context, 'فشل في إرسال الرسالة');
+
+      // Give the UI a chance to rebuild before heavy async work starts
+      await Future.delayed(Duration.zero);
+
+      try {
+        final groupChatService = ref.read(groupChatServiceProvider.notifier);
+
+        // Prepare reply information if replying
+        String? quotedPreview;
+        if (_replyState.isReplying && _replyState.replyToMessage != null) {
+          quotedPreview = ref.read(generateQuotedPreviewProvider(
+              _replyState.replyToMessage!.content));
+        }
+
+        // Send message via service
+        await groupChatService.sendMessage(
+          groupId: widget.groupId!,
+          body: text.trim(),
+          replyToMessageId: _replyState.replyToMessageId,
+          quotedPreview: quotedPreview,
+        );
+
+        // Clear the input and reply state
+        _messageController.clear();
+        if (_replyState.isReplying) {
+          setState(() {
+            _replyState = const ChatReplyState();
+          });
+          _replyPreviewController.value = 1.0; // Reset animation for next reply
+        }
+
+        // Scroll to bottom after a short delay to allow messages to load
+        // For reversed list, scroll to position 0 (which is the bottom/latest)
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          Future.delayed(const Duration(milliseconds: 100), () {
+            if (_scrollController.hasClients) {
+              _scrollController.animateTo(
+                0, // For reversed list, 0 is the bottom (latest messages)
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOut,
+              );
+            }
+          });
+        });
+      } catch (error) {
+        // Show error using the proper snackbar system
+        if (mounted) {
+          if (error.toString().contains('already in progress')) {
+            getSystemSnackBar(context, 'يتم إرسال رسالة أخرى، يرجى الانتظار');
+          } else {
+            getSystemSnackBar(context,
+                AppLocalizations.of(context).translate('message-send-failed'));
+          }
+        }
+      } finally {
+        if (mounted) {
+          setState(() {
+            _isSubmitting = false;
+          });
         }
       }
-      print('Error sending message: $error');
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isSubmitting = false;
-        });
-      }
-    }
+    });
   }
 
   // Demo messages method removed - now using real-time Firestore data

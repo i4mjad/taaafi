@@ -285,6 +285,34 @@ class GroupScreen extends ConsumerWidget {
                   context: context,
                   theme: theme,
                   l10n: l10n,
+                  title: l10n.translate('shared-challenges'),
+                  subtitle: l10n.translate('join-exciting-challenges'),
+                  icon: LucideIcons.heart,
+                  features: [
+                    ComingSoonFeature(
+                      icon: LucideIcons.trendingUp,
+                      title: l10n.translate('daily-goals'),
+                    ),
+                    ComingSoonFeature(
+                      icon: LucideIcons.flag,
+                      title: l10n.translate('community-support'),
+                    ),
+                    ComingSoonFeature(
+                      icon: LucideIcons.heart,
+                      title: l10n.translate('achievements-rewards'),
+                    ),
+                  ],
+                  cardColor: theme.primary[50]!,
+                  borderColor: theme.primary[200]!,
+                ),
+              ),
+              horizontalSpace(Spacing.points8),
+
+              Expanded(
+                child: _buildComingSoonCard(
+                  context: context,
+                  theme: theme,
+                  l10n: l10n,
                   title: l10n.translate('shared-updates'),
                   subtitle: l10n.translate('share-updates-with-members'),
                   icon: LucideIcons.heart,
@@ -672,27 +700,12 @@ class GroupScreen extends ConsumerWidget {
       title: l10n.translate('share-group'),
       actions: [
         ActionItem(
-          icon: LucideIcons.users,
-          title: l10n.translate('share-as-post'),
-          subtitle: l10n.translate('share-as-post-subtitle'),
-          onTap: () => _shareAsPost(context, l10n, membership),
-        ),
-        ActionItem(
           icon: LucideIcons.share2,
           title: l10n.translate('share-to-social'),
           subtitle: l10n.translate('share-to-social-subtitle'),
           onTap: () => _shareToSocial(context, l10n, joinCode),
         ),
       ],
-    );
-  }
-
-  void _shareAsPost(
-      BuildContext context, AppLocalizations l10n, GroupMembership membership) {
-    // TODO: Implement community post sharing
-    // For now, show a message that this feature is coming soon
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(l10n.translate('share_coming_soon'))),
     );
   }
 

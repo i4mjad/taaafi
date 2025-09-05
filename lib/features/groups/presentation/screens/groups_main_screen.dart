@@ -23,6 +23,10 @@ import 'package:reboot_app_3/features/shared/models/group_invitation_entity.dart
 import 'package:reboot_app_3/features/groups/presentation/screens/group_screen.dart';
 import 'package:reboot_app_3/features/groups/presentation/widgets/join_cooldown_timer.dart';
 
+// Feature access guard imports
+import '../../../account/presentation/widgets/feature_access_guard.dart';
+import '../../../account/data/app_features_config.dart';
+
 class GroupsMainScreen extends ConsumerWidget {
   const GroupsMainScreen({super.key});
 
@@ -570,21 +574,55 @@ class GroupsMainScreen extends ConsumerWidget {
   }
 
   void _showJoinGroupModal(BuildContext context, WidgetRef ref) {
+    // Use FeatureAccessGuard for group joining
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => const JoinGroupModal(),
+      useSafeArea: true,
+      builder: (context) => FeatureAccessGuard(
+        featureUniqueName: AppFeaturesConfig.createOrJoinGroups,
+        onTap: () {
+          Navigator.of(context).pop(); // Close the guard modal
+          // Show the actual join group modal
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
+            builder: (context) => const JoinGroupModal(),
+          );
+        },
+        customBanMessage:
+            AppLocalizations.of(context).translate('group-joining-restricted'),
+        child: Container(), // Empty container since we're using onTap
+      ),
     );
   }
 
   void _showCreateGroupModal(BuildContext context, WidgetRef ref) {
+    // Use FeatureAccessGuard for group creation
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      useSafeArea: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => const CreateGroupModal(),
+      useSafeArea: true,
+      builder: (context) => FeatureAccessGuard(
+        featureUniqueName: AppFeaturesConfig.createOrJoinGroups,
+        onTap: () {
+          Navigator.of(context).pop(); // Close the guard modal
+          // Show the actual create group modal
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            useSafeArea: true,
+            backgroundColor: Colors.transparent,
+            builder: (context) => const CreateGroupModal(),
+          );
+        },
+        customBanMessage:
+            AppLocalizations.of(context).translate('group-creation-restricted'),
+        child: Container(), // Empty container since we're using onTap
+      ),
     );
   }
 
