@@ -75,15 +75,6 @@ workflows:
           curl --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/shorebirdtech/install/main/install.sh -sSf | bash
           echo PATH="$HOME/.shorebird/bin:$PATH" >> $CM_ENV
 
-      - name: Prepare signing (fetch/create profiles + install certs)
-        script: |
-          set -euo pipefail
-          keychain initialize
-          # Import any uploaded P12s (with private keys) before fetching signing files
-          keychain add-certificates
-          app-store-connect fetch-signing-files "com.amjadkhalfan.RebootApp" --type IOS_APP_STORE --create
-          xcode-project use-profiles
-
       - name: Get Flutter packages
         script: |
           flutter packages pub get
@@ -100,16 +91,6 @@ workflows:
           /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" "$PLIST_PATH"
           /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" "$PLIST_PATH"
 
-      # - name: Remove Device Activity Extension from build
-      #   script: |
-      #     # Create backup of project file
-      #     cp ios/Runner.xcodeproj/project.pbxproj ios/Runner.xcodeproj/project.pbxproj.backup
-      #     
-      #     # Remove the extension from Embed Foundation Extensions build phase (two lines)
-      #     sed -i '' '/6DB3DF102E507DAD0063474F.*FocusDeviceActivityMonitor\.appex.*Embed Foundation Extensions/d' ios/Runner.xcodeproj/project.pbxproj
-      #     sed -i '' '/6DB3DF102E507DAD0063474F.*FocusDeviceActivityMonitor\.appex in Embed Foundation Extensions/d' ios/Runner.xcodeproj/project.pbxproj
-      #     
-      #     echo "✅ Device Activity Extension removed from build process"
 
       - name: Flutter build ipa (Shorebird release)
         script: |
@@ -151,14 +132,6 @@ workflows:
         script: |
           curl --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/shorebirdtech/install/main/install.sh -sSf | bash
           echo PATH="$HOME/.shorebird/bin:$PATH" >> $CM_ENV
-
-      - name: Prepare signing (fetch/create profiles + install certs)
-        script: |
-          set -euo pipefail
-          keychain initialize
-          keychain add-certificates
-          app-store-connect fetch-signing-files "com.amjadkhalfan.RebootApp" --type IOS_APP_STORE --create
-          xcode-project use-profiles
 
       - name: Get Flutter packages
         script: |
@@ -280,14 +253,6 @@ workflows:
           curl --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/shorebirdtech/install/main/install.sh -sSf | bash
           echo PATH="$HOME/.shorebird/bin:$PATH" >> $CM_ENV
 
-      - name: Prepare signing (fetch/create profiles + install certs)
-        script: |
-          set -euo pipefail
-          keychain initialize
-          keychain add-certificates
-          app-store-connect fetch-signing-files "com.amjadkhalfan.RebootApp" --type IOS_APP_STORE --create
-          xcode-project use-profiles
-
       - name: Set up local.properties
         script: |
           echo "flutter.sdk=$HOME/programs/flutter" > "$CM_BUILD_DIR/android/local.properties"
@@ -375,14 +340,6 @@ workflows:
         script: |
           curl --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/shorebirdtech/install/main/install.sh -sSf | bash
           echo PATH="$HOME/.shorebird/bin:$PATH" >> $CM_ENV
-
-      - name: Prepare signing (fetch/create profiles + install certs)
-        script: |
-          set -euo pipefail
-          keychain initialize
-          keychain add-certificates
-          app-store-connect fetch-signing-files "com.amjadkhalfan.RebootApp" --type IOS_APP_STORE --create
-          xcode-project use-profiles
 
       - name: Set up local.properties
         script: |
