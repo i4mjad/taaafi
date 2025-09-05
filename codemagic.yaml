@@ -75,6 +75,10 @@ workflows:
           curl --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/shorebirdtech/install/main/install.sh -sSf | bash
           echo PATH="$HOME/.shorebird/bin:$PATH" >> $CM_ENV
 
+      - name: Set up code signing settings on Xcode project
+        script: |
+          xcode-project use-profiles
+
       - name: Get Flutter packages
         script: |
           flutter packages pub get
@@ -132,6 +136,10 @@ workflows:
         script: |
           curl --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/shorebirdtech/install/main/install.sh -sSf | bash
           echo PATH="$HOME/.shorebird/bin:$PATH" >> $CM_ENV
+
+      - name: Set up code signing settings on Xcode project
+        script: |
+          xcode-project use-profiles
 
       - name: Get Flutter packages
         script: |
@@ -253,6 +261,10 @@ workflows:
           curl --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/shorebirdtech/install/main/install.sh -sSf | bash
           echo PATH="$HOME/.shorebird/bin:$PATH" >> $CM_ENV
 
+      - name: Set up code signing settings on Xcode project
+        script: |
+          xcode-project use-profiles
+
       - name: Set up local.properties
         script: |
           echo "flutter.sdk=$HOME/programs/flutter" > "$CM_BUILD_DIR/android/local.properties"
@@ -340,6 +352,10 @@ workflows:
         script: |
           curl --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/shorebirdtech/install/main/install.sh -sSf | bash
           echo PATH="$HOME/.shorebird/bin:$PATH" >> $CM_ENV
+
+      - name: Set up code signing settings on Xcode project
+        script: |
+          xcode-project use-profiles
 
       - name: Set up local.properties
         script: |

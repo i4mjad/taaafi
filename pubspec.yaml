@@ -36,7 +36,7 @@ dependencies:
   firebase_messaging: ^15.1.2
   firebase_remote_config: ^5.4.7
   firebase_storage: ^12.4.9
-  fl_chart: ^1.0.0
+  fl_chart: 1.0.0
   flutter:
     sdk: flutter
   flutter_accessibility_service: ^1.0.0
