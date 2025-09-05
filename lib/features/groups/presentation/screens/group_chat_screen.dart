@@ -22,10 +22,10 @@ import '../../../community/presentation/providers/community_providers_new.dart';
 import '../../../../core/shared_widgets/snackbar.dart';
 import '../../../../core/shared_widgets/action_modal.dart';
 import '../widgets/group_chat_profile_modal.dart';
-
-// Feature access guard imports
-import '../../../account/presentation/widgets/feature_access_guard.dart';
-import '../../../account/data/app_features_config.dart';
+import '../widgets/message_report_modal.dart';
+import '../../../shared/data/notifiers/user_reports_notifier.dart';
+import 'package:go_router/go_router.dart';
+import '../../../../core/routing/route_names.dart';
 
 /// Model for chat message
 class ChatMessage {
@@ -796,7 +796,7 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
       isScrollControlled: true,
       builder: (context) => GroupChatProfileModal(
         communityProfileId: message.senderCpId,
-        groupId: widget.groupId ?? '',
+        groupId: widget.groupId ?? 'unknown-group',
         displayName: message.senderName,
         isAnonymous: isAnonymous,
         isPlusUser: isPlusUser,
@@ -957,8 +957,10 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
       backgroundColor: Colors.transparent,
       builder: (context) => Consumer(
         builder: (context, ref, child) {
-          final isAdminAsyncWatch =
-              ref.watch(isCurrentUserGroupAdminProvider(widget.groupId ?? ''));
+          final groupId = widget.groupId;
+          final isAdminAsyncWatch = groupId != null
+              ? ref.watch(isCurrentUserGroupAdminProvider(groupId))
+              : const AsyncValue.data(false);
           final isAdminFromWatch = isAdminAsyncWatch.valueOrNull ?? false;
 
           return Container(
@@ -1163,40 +1165,43 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
 
   /// Show report options modal (expandable)
   void _showReportOptionsModal(
-      BuildContext context, CustomThemeData theme, ChatMessage message) {
+      BuildContext context, CustomThemeData theme, ChatMessage message,
+      {bool showingForOther = false}) {
     final l10n = AppLocalizations.of(context);
 
     final reportActions = <ActionItem>[
       ActionItem(
         icon: LucideIcons.alertTriangle,
         title: l10n.translate('report-inappropriate-content'),
-        onTap: () => _submitReport(context, l10n, 'inappropriate-content'),
+        onTap: () => _submitReport('inappropriate-content', message),
         isDestructive: true,
       ),
       ActionItem(
         icon: LucideIcons.userMinus,
         title: l10n.translate('report-harassment'),
-        onTap: () => _submitReport(context, l10n, 'harassment'),
+        onTap: () => _submitReport('harassment', message),
         isDestructive: true,
       ),
       ActionItem(
         icon: LucideIcons.shield,
         title: l10n.translate('report-spam'),
-        onTap: () => _submitReport(context, l10n, 'spam'),
+        onTap: () => _submitReport('spam', message),
         isDestructive: true,
       ),
       ActionItem(
         icon: LucideIcons.frown,
         title: l10n.translate('report-hate-speech'),
-        onTap: () => _submitReport(context, l10n, 'hate-speech'),
+        onTap: () => _submitReport('hate-speech', message),
         isDestructive: true,
       ),
-      ActionItem(
-        icon: LucideIcons.moreHorizontal,
-        title: l10n.translate('report-other-reason'),
-        onTap: () => _submitReport(context, l10n, 'other'),
-        isDestructive: true,
-      ),
+      // Only show "other" option if not already showing for other
+      if (!showingForOther)
+        ActionItem(
+          icon: LucideIcons.moreHorizontal,
+          title: l10n.translate('report-other-reason'),
+          onTap: () => _submitReport('other', message),
+          isDestructive: true,
+        ),
     ];
 
     showModalBottomSheet(
@@ -1258,13 +1263,90 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
     }
   }
 
-  void _submitReport(
-      BuildContext context, AppLocalizations l10n, String reason) {
-    // TODO: Implement actual reporting functionality
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(l10n.translate('report-submitted')),
-        backgroundColor: Colors.green,
+  void _submitReport(String reason, ChatMessage message) {
+    if (reason == 'other') {
+      // For "other" reason, show the options modal again and then the input modal on top
+      Future.microtask(() {
+        _showReportOptionsModal(context, AppTheme.of(context), message,
+            showingForOther: true);
+        // Then show the message report modal on top
+        Future.delayed(const Duration(milliseconds: 100), () {
+          _showMessageReportModal(reason, message, dismissMultipleModals: true);
+        });
+      });
+    } else {
+      // For predefined reasons, submit directly with preset message
+      _submitDirectReport(reason, message);
+    }
+  }
+
+  Future<void> _submitDirectReport(String reason, ChatMessage message) async {
+    final l10n = AppLocalizations.of(context);
+
+    // Create preset message based on reason
+    final reasonText = l10n.translate('report-$reason');
+    final messagePreview = message.content.length > 100
+        ? '${message.content.substring(0, 100)}...'
+        : message.content;
+
+    final presetMessage = '''
+$reasonText
+
+${l10n.translate('reported-message')}:
+"$messagePreview"
+    '''
+        .trim();
+
+    try {
+      final reportsNotifier = ref.read(userReportsNotifierProvider.notifier);
+
+      final reportId = await reportsNotifier.submitMessageReport(
+        messageId: message.id,
+        groupId: widget.groupId ?? 'unknown-group',
+        userMessage: presetMessage,
+        messageSender: message.senderCpId,
+        messageContent: message.content,
+      );
+
+      if (mounted) {
+        context.pushNamed(
+          RouteNames.reportConversation.name,
+          pathParameters: {'reportId': reportId},
+        );
+
+        getSuccessSnackBar(context, 'message-report-submitted');
+      }
+    } catch (e) {
+      if (mounted) {
+        // Extract the localization key from the exception message
+        String errorKey = 'report-submission-failed';
+        if (e.toString().contains('Exception: ')) {
+          final extractedKey = e.toString().replaceFirst('Exception: ', '');
+          // Check if it's one of our known error keys
+          if ([
+            'max-active-reports-reached',
+            'message-cannot-be-empty',
+            'message-exceeds-character-limit'
+          ].contains(extractedKey)) {
+            errorKey = extractedKey;
+          }
+        }
+        getErrorSnackBar(context, errorKey);
+      }
+    }
+  }
+
+  void _showMessageReportModal(String reason, ChatMessage message,
+      {bool dismissMultipleModals = false}) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => MessageReportModal(
+        reason: reason,
+        message: message,
+        groupId: widget.groupId ?? 'unknown-group',
+        dismissMultipleModals: dismissMultipleModals,
       ),
     );
   }
@@ -1593,81 +1675,81 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
     if (text.trim().isEmpty || _isSubmitting || widget.groupId == null) return;
 
     // Use QuickActionGuard to check sendMessage feature access
-    await checkFeatureAccessAndShowBanSnackbar(
-      context,
-      ref,
-      AppFeaturesConfig.sendMessage,
-      customMessage:
-          AppLocalizations.of(context).translate('send-message-restricted'),
-    ).then((canAccess) async {
-      if (!canAccess) return;
+    // await checkFeatureAccessAndShowBanSnackbar(
+    //   context,
+    //   ref,
+    //   AppFeaturesConfig.sendMessage,
+    //   customMessage:
+    //       AppLocalizations.of(context).translate('send-message-restricted'),
+    // ).then((canAccess) async {
+    //   if (!canAccess) return;
 
-      // Show loader immediately so the user gets instant feedback
-      setState(() {
-        _isSubmitting = true;
-      });
+    // Show loader immediately so the user gets instant feedback
+    setState(() {
+      _isSubmitting = true;
+    });
 
-      // Give the UI a chance to rebuild before heavy async work starts
-      await Future.delayed(Duration.zero);
+    // Give the UI a chance to rebuild before heavy async work starts
+    await Future.delayed(Duration.zero);
 
-      try {
-        final groupChatService = ref.read(groupChatServiceProvider.notifier);
+    try {
+      final groupChatService = ref.read(groupChatServiceProvider.notifier);
 
-        // Prepare reply information if replying
-        String? quotedPreview;
-        if (_replyState.isReplying && _replyState.replyToMessage != null) {
-          quotedPreview = ref.read(generateQuotedPreviewProvider(
-              _replyState.replyToMessage!.content));
-        }
+      // Prepare reply information if replying
+      String? quotedPreview;
+      if (_replyState.isReplying && _replyState.replyToMessage != null) {
+        quotedPreview = ref.read(
+            generateQuotedPreviewProvider(_replyState.replyToMessage!.content));
+      }
 
-        // Send message via service
-        await groupChatService.sendMessage(
-          groupId: widget.groupId!,
-          body: text.trim(),
-          replyToMessageId: _replyState.replyToMessageId,
-          quotedPreview: quotedPreview,
-        );
+      // Send message via service
+      await groupChatService.sendMessage(
+        groupId: widget.groupId!,
+        body: text.trim(),
+        replyToMessageId: _replyState.replyToMessageId,
+        quotedPreview: quotedPreview,
+      );
 
-        // Clear the input and reply state
-        _messageController.clear();
-        if (_replyState.isReplying) {
-          setState(() {
-            _replyState = const ChatReplyState();
-          });
-          _replyPreviewController.value = 1.0; // Reset animation for next reply
-        }
-
-        // Scroll to bottom after a short delay to allow messages to load
-        // For reversed list, scroll to position 0 (which is the bottom/latest)
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          Future.delayed(const Duration(milliseconds: 100), () {
-            if (_scrollController.hasClients) {
-              _scrollController.animateTo(
-                0, // For reversed list, 0 is the bottom (latest messages)
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeOut,
-              );
-            }
-          });
+      // Clear the input and reply state
+      _messageController.clear();
+      if (_replyState.isReplying) {
+        setState(() {
+          _replyState = const ChatReplyState();
         });
-      } catch (error) {
-        // Show error using the proper snackbar system
-        if (mounted) {
-          if (error.toString().contains('already in progress')) {
-            getSystemSnackBar(context, 'يتم إرسال رسالة أخرى، يرجى الانتظار');
-          } else {
-            getSystemSnackBar(context,
-                AppLocalizations.of(context).translate('message-send-failed'));
+        _replyPreviewController.value = 1.0; // Reset animation for next reply
+      }
+
+      // Scroll to bottom after a short delay to allow messages to load
+      // For reversed list, scroll to position 0 (which is the bottom/latest)
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Future.delayed(const Duration(milliseconds: 100), () {
+          if (_scrollController.hasClients) {
+            _scrollController.animateTo(
+              0, // For reversed list, 0 is the bottom (latest messages)
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeOut,
+            );
           }
-        }
-      } finally {
-        if (mounted) {
-          setState(() {
-            _isSubmitting = false;
-          });
+        });
+      });
+    } catch (error) {
+      // Show error using the proper snackbar system
+      if (mounted) {
+        if (error.toString().contains('already in progress')) {
+          getSystemSnackBar(context, 'يتم إرسال رسالة أخرى، يرجى الانتظار');
+        } else {
+          getSystemSnackBar(context,
+              AppLocalizations.of(context).translate('message-send-failed'));
         }
       }
-    });
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
+      }
+    }
+    // });
   }
 
   // Demo messages method removed - now using real-time Firestore data

@@ -37,14 +37,8 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
   @override
   void initState() {
     super.initState();
-    // Initialize anonymity state based on user's profile setting
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(currentCommunityProfileProvider).whenData((profile) {
-        if (profile != null) {
-          ref.read(anonymousPostProvider.notifier).state = profile.isAnonymous;
-        }
-      });
-    });
+    // Note: Removed automatic anonymity state initialization
+    // Let users choose per-post anonymity independent of their profile setting
   }
 
   @override

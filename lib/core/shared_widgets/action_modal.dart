@@ -44,7 +44,7 @@ class ActionModal extends StatelessWidget {
           // Optional title
           if (title != null) ...[
             Text(
-              title!,
+              title ?? '',
               style: TextStyles.h6.copyWith(
                 color: theme.grey[900],
                 fontWeight: FontWeight.w600,
@@ -114,7 +114,7 @@ class ActionModal extends StatelessWidget {
                       if (action.subtitle != null) ...[
                         const SizedBox(height: 2),
                         Text(
-                          action.subtitle!,
+                          action.subtitle ?? '',
                           style: TextStyles.caption.copyWith(
                             color: action.isDestructive
                                 ? theme.error[600]

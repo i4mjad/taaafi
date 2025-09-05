@@ -573,57 +573,168 @@ class GroupsMainScreen extends ConsumerWidget {
     );
   }
 
-  void _showJoinGroupModal(BuildContext context, WidgetRef ref) {
-    // Use FeatureAccessGuard for group joining
+  void _showJoinGroupModal(BuildContext context, WidgetRef ref) async {
+    // Show loading modal first
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      useSafeArea: true,
-      builder: (context) => FeatureAccessGuard(
-        featureUniqueName: AppFeaturesConfig.createOrJoinGroups,
-        onTap: () {
-          Navigator.of(context).pop(); // Close the guard modal
-          // Show the actual join group modal
-          showModalBottomSheet(
-            context: context,
-            isScrollControlled: true,
-            backgroundColor: Colors.transparent,
-            builder: (context) => const JoinGroupModal(),
-          );
-        },
-        customBanMessage:
-            AppLocalizations.of(context).translate('group-joining-restricted'),
-        child: Container(), // Empty container since we're using onTap
-      ),
+      isDismissible: false,
+      enableDrag: false,
+      builder: (BuildContext modalContext) {
+        return DraggableScrollableSheet(
+          initialChildSize: 0.25,
+          minChildSize: 0.2,
+          maxChildSize: 0.3,
+          builder: (context, scrollController) {
+            return Container(
+              decoration: BoxDecoration(
+                color: AppTheme.of(context).backgroundColor,
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Handle bar
+                      Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: AppTheme.of(context).grey[300],
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                      const SizedBox(height: 40),
+                      // Loading spinner
+                      Spinner(
+                        strokeWidth: 3,
+                        valueColor: AppTheme.of(context).primary[600],
+                      ),
+                      const SizedBox(height: 40),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
     );
+
+    // Check feature access
+    final canAccess =
+        await checkFeatureAccess(ref, AppFeaturesConfig.createOrJoinGroups);
+
+    if (!context.mounted) return;
+
+    // Close loading modal
+    Navigator.of(context).pop();
+
+    if (!canAccess) {
+      // Show ban message
+      await checkFeatureAccessAndShowBanSnackbar(
+        context,
+        ref,
+        AppFeaturesConfig.createOrJoinGroups,
+        customMessage:
+            AppLocalizations.of(context).translate('group-joining-restricted'),
+      );
+    } else {
+      // Show the actual join group modal
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (context) => const JoinGroupModal(),
+      );
+    }
   }
 
-  void _showCreateGroupModal(BuildContext context, WidgetRef ref) {
-    // Use FeatureAccessGuard for group creation
+  void _showCreateGroupModal(BuildContext context, WidgetRef ref) async {
+    // Show loading modal first
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
+      isDismissible: false,
+      enableDrag: false,
       useSafeArea: true,
-      builder: (context) => FeatureAccessGuard(
-        featureUniqueName: AppFeaturesConfig.createOrJoinGroups,
-        onTap: () {
-          Navigator.of(context).pop(); // Close the guard modal
-          // Show the actual create group modal
-          showModalBottomSheet(
-            context: context,
-            isScrollControlled: true,
-            useSafeArea: true,
-            backgroundColor: Colors.transparent,
-            builder: (context) => const CreateGroupModal(),
-          );
-        },
-        customBanMessage:
-            AppLocalizations.of(context).translate('group-creation-restricted'),
-        child: Container(), // Empty container since we're using onTap
-      ),
+      builder: (BuildContext modalContext) {
+        return DraggableScrollableSheet(
+          initialChildSize: 0.25,
+          minChildSize: 0.2,
+          maxChildSize: 0.3,
+          builder: (context, scrollController) {
+            return Container(
+              decoration: BoxDecoration(
+                color: AppTheme.of(context).backgroundColor,
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Handle bar
+                      Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: AppTheme.of(context).grey[300],
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                      const SizedBox(height: 40),
+                      // Loading spinner
+                      Spinner(
+                        strokeWidth: 3,
+                        valueColor: AppTheme.of(context).primary[600],
+                      ),
+                      const SizedBox(height: 40),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
     );
+
+    // Check feature access
+    final canAccess =
+        await checkFeatureAccess(ref, AppFeaturesConfig.createOrJoinGroups);
+
+    if (!context.mounted) return;
+
+    // Close loading modal
+    Navigator.of(context).pop();
+
+    if (!canAccess) {
+      // Show ban message
+      await checkFeatureAccessAndShowBanSnackbar(
+        context,
+        ref,
+        AppFeaturesConfig.createOrJoinGroups,
+        customMessage:
+            AppLocalizations.of(context).translate('group-creation-restricted'),
+      );
+    } else {
+      // Show the actual create group modal
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        useSafeArea: true,
+        backgroundColor: Colors.transparent,
+        builder: (context) => const CreateGroupModal(),
+      );
+    }
   }
 
   void _showInvitationsModal(

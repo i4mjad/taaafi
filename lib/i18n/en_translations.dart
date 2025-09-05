@@ -641,6 +641,19 @@ const Map<String, String> kEn = {
   "group-invite-join": "Join Group",
   "group-invite-plus-only": "This is a Plus-only group",
   "group-invite-member-left": "Inviter is no longer a member",
+  "poll-edit": "Edit Poll",
+  "poll-options-preview": "Options",
+  "tap-to-edit-poll": "Tap to edit",
+  "more-options": "more options",
+  "images": "Images",
+  "images-selected": "images selected",
+  "image-selected": "image selected",
+  "image-preview": "Preview",
+  "tap-to-change-images": "Tap to change",
+  "invite-to-join-group": "Invite members to join this group",
+  "instant-join": "Instant join",
+  "requires-approval": "Requires approval",
+  "tap-to-change-group": "Tap to change",
 
   // Join rejections
   "join-blocked-gender": "This group is for a different gender",
@@ -3120,6 +3133,18 @@ const Map<String, String> kEn = {
   "report-spam": "Spam or Unwanted Content",
   "report-hate-speech": "Hate Speech",
   "report-other-reason": "Other Reason",
+  "report-reason-message":
+      "Reporting message for: {reason}\n\nMessage preview: \"{messagePreview}\"",
+  "selected-reason": "Selected Reason",
+  "additional-details": "Additional Details",
+  "reported-message": "Reported Message",
+  "message-report-description":
+      "Please provide additional details about why you're reporting this message. This information helps our moderation team review the content more effectively.",
+  "message-report-placeholder":
+      "Describe why you believe this message violates our community guidelines...",
+  "message-report-note": "Your report will be reviewed by our moderation team",
+  "message-report-submitted": "Message report submitted successfully",
+  "submitting": "Submitting...",
   "report-submitted": "Report submitted successfully",
   "confirm-report": "Confirm Report",
   "confirm-report-message":
