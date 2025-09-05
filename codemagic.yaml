@@ -25,6 +25,8 @@ workflows:
           echo "flutter.sdk=$HOME/programs/flutter" > "$CM_BUILD_DIR/android/local.properties"
       - name: Get Flutter packages
         script: |
+          flutter --version
+          flutter pub cache clean fl_chart
           flutter packages pub get
       - name: Build AAB file (Shorebird)
         script: |
@@ -81,6 +83,8 @@ workflows:
 
       - name: Get Flutter packages
         script: |
+          flutter --version
+          flutter pub cache clean fl_chart
           flutter packages pub get
 
       - name: Install pods
@@ -144,6 +148,8 @@ workflows:
 
       - name: Get Flutter packages
         script: |
+          flutter --version
+          flutter pub cache clean fl_chart
           flutter packages pub get
 
       - name: Install pods
@@ -213,6 +219,8 @@ workflows:
           echo "flutter.sdk=$HOME/programs/flutter" > "$CM_BUILD_DIR/android/local.properties"
       - name: Get Flutter packages
         script: |
+          flutter --version
+          flutter pub cache clean fl_chart
           flutter packages pub get
       - name: Determine Release Version
         script: |
@@ -272,6 +280,8 @@ workflows:
 
       - name: Get Flutter packages
         script: |
+          flutter --version
+          flutter pub cache clean fl_chart
           flutter packages pub get
 
       - name: Install pods
@@ -364,6 +374,8 @@ workflows:
 
       - name: Get Flutter packages
         script: |
+          flutter --version
+          flutter pub cache clean fl_chart
           flutter packages pub get
 
       - name: Install pods
