@@ -396,6 +396,19 @@ class MessagingService with WidgetsBindingObserver {
     }
   }
 
+  /// Maps screen parameter string to RouteNames enum value
+  RouteNames? _getRouteFromScreenParameter(String screen) {
+    try {
+      // Convert screen string to RouteNames enum
+      return RouteNames.values.firstWhere(
+        (route) => route.name == screen,
+        orElse: () => throw StateError('Route not found'),
+      );
+    } catch (e) {
+      return null;
+    }
+  }
+
   /// Handles navigation based on notification data
   Future<void> _handleNotificationNavigation(RemoteMessage message) async {
     // Try to obtain a BuildContext from the rootNavigatorKey
@@ -443,6 +456,17 @@ class MessagingService with WidgetsBindingObserver {
         return;
       }
 
+      // Handle special cases with parameters first
+      await _handleSpecialRouteNavigation(ctx, screen, data);
+    } catch (e) {
+      // Silent error handling
+    }
+  }
+
+  /// Handles special route navigation with parameters and fallbacks
+  Future<void> _handleSpecialRouteNavigation(
+      BuildContext ctx, String screen, Map<String, dynamic> data) async {
+    try {
       // Handle special cases with parameters
       if (screen == 'reportConversation' || screen == 'reportDetails') {
         final reportId = data['reportId'];
@@ -456,25 +480,26 @@ class MessagingService with WidgetsBindingObserver {
       }
 
       // Handle community post navigation
-      if (screen == 'postDetails') {
+      if (screen == 'postDetail' || screen == 'postDetails') {
         final postId = data['postId'];
         if (postId != null) {
-          // Navigate to post detail, fallback to community if navigation fails
           try {
             GoRouter.of(ctx).goNamed(
               RouteNames.postDetail.name,
               pathParameters: {'postId': postId},
             );
+            return;
           } catch (e) {
             // If post detail route doesn't exist or navigation fails, go to community
             try {
               GoRouter.of(ctx).goNamed(RouteNames.community.name);
+              return;
             } catch (e2) {
               // Last fallback to notifications
               GoRouter.of(ctx).goNamed(RouteNames.notifications.name);
+              return;
             }
           }
-          return;
         }
       }
 
@@ -486,25 +511,41 @@ class MessagingService with WidgetsBindingObserver {
                 notificationType == 'member_demoted' ||
                 notificationType == 'member_removed')) {
           try {
-            // For member management notifications, navigate to groups main screen
             GoRouter.of(ctx).goNamed(RouteNames.groups.name);
+            return;
           } catch (e) {
-            // Fallback to notifications if groups route doesn't exist
             GoRouter.of(ctx).goNamed(RouteNames.notifications.name);
+            return;
           }
-          return;
         }
       }
 
-      // Direct navigation - screen parameter should match route name
+      // Handle general route navigation - try to map screen parameter to RouteNames
+      final routeName = _getRouteFromScreenParameter(screen);
+      if (routeName != null) {
+        try {
+          GoRouter.of(ctx).goNamed(routeName.name);
+          return;
+        } catch (e) {
+          // Navigation failed, continue to fallback
+        }
+      }
+
+      // Final fallback: try direct navigation with screen parameter
       try {
         GoRouter.of(ctx).goNamed(screen);
+        return;
       } catch (e) {
-        // Fallback to notifications if route not found
+        // All navigation attempts failed, go to notifications
         GoRouter.of(ctx).goNamed(RouteNames.notifications.name);
       }
     } catch (e) {
-      // Silent error handling
+      // Silent error handling - fallback to notifications
+      try {
+        GoRouter.of(ctx).goNamed(RouteNames.notifications.name);
+      } catch (e2) {
+        // Silent error - don't clutter logs
+      }
     }
   }
 

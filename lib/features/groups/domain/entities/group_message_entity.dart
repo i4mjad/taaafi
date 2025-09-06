@@ -142,7 +142,8 @@ class ModerationStatus {
 enum ModerationStatusType {
   pending('pending'),
   approved('approved'),
-  blocked('blocked');
+  blocked('blocked'),
+  manual_review('manual_review');
 
   const ModerationStatusType(this.value);
 
@@ -156,6 +157,8 @@ enum ModerationStatusType {
         return ModerationStatusType.approved;
       case 'blocked':
         return ModerationStatusType.blocked;
+      case 'manual_review':
+        return ModerationStatusType.manual_review;
       default:
         return ModerationStatusType.pending;
     }

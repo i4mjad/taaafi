@@ -42,6 +42,8 @@ class ChatMessage {
   final ChatMessage? replyToMessage; // The message being replied to
   final String? replyToMessageId; // ID of the message being replied to
   final bool isHidden; // Whether this message was hidden by admin
+  final ModerationStatusType? moderationStatus; // Moderation status
+  final String? moderationReason; // Moderation reason if blocked
 
   const ChatMessage({
     required this.id,
@@ -57,6 +59,8 @@ class ChatMessage {
     this.replyToMessage,
     this.replyToMessageId,
     this.isHidden = false,
+    this.moderationStatus,
+    this.moderationReason,
   });
 
   ChatMessage copyWith({
@@ -73,6 +77,8 @@ class ChatMessage {
     ChatMessage? replyToMessage,
     String? replyToMessageId,
     bool? isHidden,
+    ModerationStatusType? moderationStatus,
+    String? moderationReason,
   }) {
     return ChatMessage(
       id: id ?? this.id,
@@ -88,6 +94,8 @@ class ChatMessage {
       replyToMessage: replyToMessage ?? this.replyToMessage,
       replyToMessageId: replyToMessageId ?? this.replyToMessageId,
       isHidden: isHidden ?? this.isHidden,
+      moderationStatus: moderationStatus ?? this.moderationStatus,
+      moderationReason: moderationReason ?? this.moderationReason,
     );
   }
 }
@@ -381,7 +389,16 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
     // Remove duplicates by ID first (keep all messages including hidden ones)
     final uniqueEntities = <String, GroupMessageEntity>{};
     for (final entity in entities.where((entity) => !entity.isDeleted)) {
-      uniqueEntities[entity.id] = entity;
+      // Hide blocked messages from OTHER users only
+      if (entity.moderation.status == ModerationStatusType.blocked) {
+        // Only show blocked messages to the sender
+        if (currentCpId != null && entity.senderCpId == currentCpId) {
+          uniqueEntities[entity.id] = entity;
+        }
+      } else {
+        // Show all other messages (pending, approved, manual_review)
+        uniqueEntities[entity.id] = entity;
+      }
     }
 
     return uniqueEntities.values.map((entity) {
@@ -434,6 +451,8 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
             isAnonymous: replyTargetIsAnonymous,
             avatarUrl: replyTargetAvatarUrl,
             isHidden: replyTarget.isHidden,
+            moderationStatus: replyTarget.moderation.status,
+            moderationReason: replyTarget.moderation.reason,
           );
         }
       }
@@ -452,6 +471,8 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
         replyToMessage: replyToMessage,
         replyToMessageId: entity.replyToMessageId,
         isHidden: entity.isHidden,
+        moderationStatus: entity.moderation.status,
+        moderationReason: entity.moderation.reason,
       );
     }).toList();
   }
@@ -634,18 +655,23 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
                       vertical: screenHeight * 0.01, // 1% of screen height
                     ),
                     decoration: BoxDecoration(
-                      color: isHighlighted
-                          ? Color.lerp(
+                      color: message.moderationStatus ==
+                                  ModerationStatusType.blocked &&
                               message.isCurrentUser
+                          ? Colors.red
+                              .shade50 // Red background for blocked messages
+                          : isHighlighted
+                              ? Color.lerp(
+                                  message.isCurrentUser
+                                      ? theme.primary[50]
+                                      : theme.grey[50],
+                                  theme.primary[100],
+                                  highlightIntensity *
+                                      0.6, // Fade between normal and highlight color
+                                )
+                              : (message.isCurrentUser
                                   ? theme.primary[50]
-                                  : theme.grey[50],
-                              theme.primary[100],
-                              highlightIntensity *
-                                  0.6, // Fade between normal and highlight color
-                            )
-                          : (message.isCurrentUser
-                              ? theme.primary[50]
-                              : theme.grey[50]),
+                                  : theme.grey[50]),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
                         color: isHighlighted
@@ -717,28 +743,39 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
                           _buildMessageReplyPreview(
                               context, theme, message.replyToMessage!),
 
-                        // Message content with proper text wrapping and dynamic text size
-                        Text(
-                          message.isHidden
-                              ? AppLocalizations.of(context)
-                                  .translate('message-hidden-by-admin')
-                              : message.content,
-                          style: chatTextSize.textStyle.copyWith(
-                            color: message.isHidden
-                                ? theme.grey[500]
-                                : theme.grey[800],
-                            height: 1.5,
-                            fontStyle: message.isHidden
-                                ? FontStyle.italic
-                                : FontStyle.normal,
+                        // Check for blocked message and show special UI to sender
+                        if (message.moderationStatus ==
+                                ModerationStatusType.blocked &&
+                            message.isCurrentUser)
+                          _buildBlockedMessageContent(context, theme, message)
+                        else if (message.moderationStatus ==
+                                ModerationStatusType.manual_review &&
+                            message.isCurrentUser)
+                          _buildMessageWithReviewIndicator(
+                              context, theme, message, chatTextSize)
+                        else
+                          // Regular message content
+                          Text(
+                            message.isHidden
+                                ? AppLocalizations.of(context)
+                                    .translate('message-hidden-by-admin')
+                                : message.content,
+                            style: chatTextSize.textStyle.copyWith(
+                              color: message.isHidden
+                                  ? theme.grey[500]
+                                  : theme.grey[800],
+                              height: 1.5,
+                              fontStyle: message.isHidden
+                                  ? FontStyle.italic
+                                  : FontStyle.normal,
+                            ),
+                            textAlign:
+                                Directionality.of(context) == TextDirection.rtl
+                                    ? TextAlign.right
+                                    : TextAlign.left,
+                            softWrap: true,
+                            overflow: TextOverflow.visible,
                           ),
-                          textAlign:
-                              Directionality.of(context) == TextDirection.rtl
-                                  ? TextAlign.right
-                                  : TextAlign.left,
-                          softWrap: true,
-                          overflow: TextOverflow.visible,
-                        ),
                       ],
                     ),
                   );
@@ -1750,6 +1787,92 @@ ${l10n.translate('reported-message')}:
       }
     }
     // });
+  }
+
+  /// Blocked message UI (only visible to sender)
+  Widget _buildBlockedMessageContent(
+      BuildContext context, CustomThemeData theme, ChatMessage message) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(Icons.block, color: Colors.red, size: 18),
+            const SizedBox(width: 8),
+            Text(
+              'رسالة محظورة', // 'Message Blocked' in Arabic
+              style: TextStyles.footnote.copyWith(
+                color: Colors.red,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        if (message.moderationReason != null) ...[
+          const SizedBox(height: 8),
+          Text(
+            message.moderationReason!,
+            style: TextStyles.small.copyWith(
+              color: Colors.red.shade700,
+            ),
+          ),
+        ],
+        const SizedBox(height: 8),
+        Text(
+          'هذه الرسالة تنتهك إرشادات المجتمع وهي مرئية لك فقط.', // 'This message violates community guidelines and is only visible to you.' in Arabic
+          style: TextStyles.caption.copyWith(
+            color: Colors.grey.shade600,
+            fontStyle: FontStyle.italic,
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Manual review indicator (subtle)
+  Widget _buildMessageWithReviewIndicator(BuildContext context,
+      CustomThemeData theme, ChatMessage message, ChatTextSize chatTextSize) {
+    return Stack(
+      children: [
+        // Regular message content
+        Text(
+          message.isHidden
+              ? AppLocalizations.of(context)
+                  .translate('message-hidden-by-admin')
+              : message.content,
+          style: chatTextSize.textStyle.copyWith(
+            color: message.isHidden ? theme.grey[500] : theme.grey[800],
+            height: 1.5,
+            fontStyle: message.isHidden ? FontStyle.italic : FontStyle.normal,
+          ),
+          textAlign: Directionality.of(context) == TextDirection.rtl
+              ? TextAlign.right
+              : TextAlign.left,
+          softWrap: true,
+          overflow: TextOverflow.visible,
+        ),
+        // Review indicator overlay
+        Positioned(
+          top: 0,
+          right: Directionality.of(context) == TextDirection.rtl ? 0 : null,
+          left: Directionality.of(context) == TextDirection.ltr ? 0 : null,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            decoration: BoxDecoration(
+              color: Colors.orange.shade100,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              'قيد المراجعة', // 'Under Review' in Arabic
+              style: TextStyles.tiny.copyWith(
+                color: Colors.orange.shade700,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   // Demo messages method removed - now using real-time Firestore data
