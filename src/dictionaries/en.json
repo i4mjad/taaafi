@@ -2748,6 +2748,35 @@
           "title": "Content Moderation",
           "messageModerated": "Message moderated successfully",
           "moderationError": "Failed to moderate message",
+          "moderateMessage": "Moderate Message",
+          "moderationActions": "Moderation Actions",
+          "approveMessage": "Approve Message",
+          "blockMessage": "Block Message",
+          "hideMessage": "Hide Message",
+          "deleteMessage": "Delete Message",
+          "approveConfirm": "Are you sure you want to approve this message?",
+          "blockConfirm": "Are you sure you want to block this message?",
+          "hideConfirm": "Are you sure you want to hide this message?",
+          "deleteConfirm": "Are you sure you want to delete this message?",
+          "moderationReason": "Moderation Reason",
+          "moderationReasonPlaceholder": "Explain why you're taking this action...",
+          "violationType": "Violation Type",
+          "selectViolationType": "Select violation type",
+          "violationTypes": {
+            "social_media_sharing": "Sharing social media accounts",
+            "sexual_content": "Sexual content",
+            "cuckoldry_content": "Cuckoldry content",
+            "homosexuality_content": "Homosexuality content",
+            "inappropriate_content": "Inappropriate content",
+            "spam": "Spam",
+            "harassment": "Harassment",
+            "other": "Other"
+          },
+          "messageApproved": "Message approved successfully",
+          "messageBlocked": "Message blocked successfully",
+          "messageHidden": "Message hidden successfully",
+          "messageDeleted": "Message deleted successfully",
+          "processing": "Processing...",
           "filters": {
             "title": "Filter Content"
           },
@@ -2755,7 +2784,8 @@
             "pending": "Pending",
             "approved": "Approved",
             "blocked": "Blocked",
-            "reported": "Reported"
+            "reported": "Reported",
+            "manual_review": "Manual Review"
           },
           "messages": {
             "title": "Messages"
@@ -2763,9 +2793,9 @@
           "messageDetails": {
             "title": "Message Details",
             "description": "View detailed information about this message",
-            "sender": "Sender",
+            "sender": "Sender", 
             "content": "Content",
-            "status": "Status", 
+            "status": "Status",
             "created": "Created"
           },
           "actions": {

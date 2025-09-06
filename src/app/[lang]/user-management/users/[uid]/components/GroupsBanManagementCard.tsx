@@ -99,7 +99,7 @@ const formatTimeRemaining = (targetDate: Date): string => {
 
 export default function GroupsBanManagementCard({ userId, userDisplayName }: GroupsBanManagementProps) {
   const { t } = useTranslation();
-  const { currentUser } = useAuth();
+  const { user: currentUser } = useAuth();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isOverrideDialogOpen, setIsOverrideDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -257,7 +257,7 @@ export default function GroupsBanManagementCard({ userId, userDisplayName }: Gro
           {t('modules.userManagement.groups-ban.title') || 'Groups Management'}
         </CardTitle>
         <CardDescription>
-          {t('modules.userManagement.groups-ban.description', { name: userDisplayName }) || `Manage ${userDisplayName}'s groups participation and cooldown periods`}
+          {t('modules.userManagement.groups-ban.description', { name: userDisplayName || 'User' }) || `Manage ${userDisplayName || 'User'}'s groups participation and cooldown periods`}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">

@@ -75,6 +75,8 @@ interface MessagesTableProps {
   groups: Array<{ id: string; name: string; }>;
   reports: Array<{ relatedContent?: { contentId: string; }; }>;
   onBulkAction?: (selectedIds: string[], action: 'approve' | 'hide' | 'delete', reason?: string) => Promise<void>;
+  onMessageModeration?: (messageId: string, action: 'approve' | 'block' | 'hide' | 'delete', reason?: string, violationType?: string) => Promise<boolean>;
+  locale?: string;
 }
 
 const PAGE_SIZE = 20;
@@ -85,7 +87,9 @@ export function MessagesTable({
   searchQuery = '',
   groups = [],
   reports = [],
-  onBulkAction 
+  onBulkAction,
+  onMessageModeration,
+  locale = 'en'
 }: MessagesTableProps) {
   const { t } = useTranslation();
   const [messages, setMessages] = useState<GroupMessage[]>([]);
@@ -107,6 +111,13 @@ export function MessagesTable({
   // Message detail dialog state
   const [selectedMessage, setSelectedMessage] = useState<GroupMessage | null>(null);
   const [showMessageDialog, setShowMessageDialog] = useState(false);
+  
+  // Individual moderation dialog state
+  const [showModerationDialog, setShowModerationDialog] = useState(false);
+  const [moderationAction, setModerationAction] = useState<'approve' | 'block' | 'hide' | 'delete'>('block');
+  const [moderationReason, setModerationReason] = useState('');
+  const [violationType, setViolationType] = useState('');
+  const [isProcessingModeration, setIsProcessingModeration] = useState(false);
 
   const groupsLookup = useMemo(() => {
     return groups.reduce((acc, group) => {
@@ -273,6 +284,46 @@ export function MessagesTable({
         {t(`modules.admin.content.status.${status}`)}
       </Badge>
     );
+  };
+
+  // Handle individual message moderation
+  const handleIndividualModeration = (message: GroupMessage, action: 'approve' | 'block' | 'hide' | 'delete') => {
+    setSelectedMessage(message);
+    setModerationAction(action);
+    setModerationReason('');
+    setViolationType('');
+    setShowModerationDialog(true);
+  };
+
+  const confirmIndividualModeration = async () => {
+    if (!selectedMessage || !onMessageModeration) return;
+
+    setIsProcessingModeration(true);
+    try {
+      const success = await onMessageModeration(
+        selectedMessage.id,
+        moderationAction,
+        moderationReason || undefined,
+        violationType || undefined
+      );
+
+      if (success) {
+        const actionKey = `message${moderationAction.charAt(0).toUpperCase() + moderationAction.slice(1)}ed`;
+        toast.success(t(`modules.admin.content.${actionKey}`));
+        setShowModerationDialog(false);
+        setModerationReason('');
+        setViolationType('');
+        // Refresh messages
+        fetchMessages('first');
+      } else {
+        toast.error(t('modules.admin.content.moderationError'));
+      }
+    } catch (error) {
+      console.error('Error moderating message:', error);
+      toast.error(t('modules.admin.content.moderationError'));
+    } finally {
+      setIsProcessingModeration(false);
+    }
   };
 
   // Handle bulk actions
@@ -476,6 +527,31 @@ export function MessagesTable({
                                 <Eye className="mr-2 h-4 w-4" />
                                 {t('modules.admin.content.actions.viewDetails')}
                               </DropdownMenuItem>
+                              
+                              {/* Individual Moderation Actions */}
+                              {onMessageModeration && (
+                                <>
+                                  <DropdownMenuItem onClick={() => handleIndividualModeration(message, 'approve')}>
+                                    <CheckCircle className="mr-2 h-4 w-4" />
+                                    {t('modules.admin.content.approveMessage')}
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => handleIndividualModeration(message, 'block')}>
+                                    <Flag className="mr-2 h-4 w-4" />
+                                    {t('modules.admin.content.blockMessage')}
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => handleIndividualModeration(message, 'hide')}>
+                                    <EyeOff className="mr-2 h-4 w-4" />
+                                    {t('modules.admin.content.hideMessage')}
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem 
+                                    onClick={() => handleIndividualModeration(message, 'delete')}
+                                    className="text-destructive"
+                                  >
+                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    {t('modules.admin.content.deleteMessage')}
+                                  </DropdownMenuItem>
+                                </>
+                              )}
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </TableCell>
@@ -616,6 +692,107 @@ export function MessagesTable({
             <DialogFooter>
               <Button variant="outline" onClick={() => setShowMessageDialog(false)}>
                 {t('common.close')}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Individual Message Moderation Dialog */}
+      {selectedMessage && (
+        <Dialog open={showModerationDialog} onOpenChange={setShowModerationDialog}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>
+                {t('modules.admin.content.moderateMessage')}
+              </DialogTitle>
+              <DialogDescription>
+                {t(`modules.admin.content.${moderationAction}Confirm`)}
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="space-y-4">
+              {/* Message Content */}
+              <div>
+                <Label className="text-sm font-medium">
+                  {t('modules.admin.content.messageDetails.content')}
+                </Label>
+                <div className="mt-1 p-3 bg-muted rounded-md">
+                  <p className="text-sm whitespace-pre-wrap">{selectedMessage.body}</p>
+                </div>
+              </div>
+
+              {/* Violation Type Selection (for block action) */}
+              {moderationAction === 'block' && (
+                <div className="space-y-2">
+                  <Label htmlFor="violation-type">
+                    {t('modules.admin.content.violationType')}
+                  </Label>
+                  <Select value={violationType} onValueChange={setViolationType}>
+                    <SelectTrigger>
+                      <SelectValue placeholder={t('modules.admin.content.selectViolationType')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="social_media_sharing">
+                        {t('modules.admin.content.violationTypes.social_media_sharing')}
+                      </SelectItem>
+                      <SelectItem value="sexual_content">
+                        {t('modules.admin.content.violationTypes.sexual_content')}
+                      </SelectItem>
+                      <SelectItem value="cuckoldry_content">
+                        {t('modules.admin.content.violationTypes.cuckoldry_content')}
+                      </SelectItem>
+                      <SelectItem value="homosexuality_content">
+                        {t('modules.admin.content.violationTypes.homosexuality_content')}
+                      </SelectItem>
+                      <SelectItem value="inappropriate_content">
+                        {t('modules.admin.content.violationTypes.inappropriate_content')}
+                      </SelectItem>
+                      <SelectItem value="spam">
+                        {t('modules.admin.content.violationTypes.spam')}
+                      </SelectItem>
+                      <SelectItem value="harassment">
+                        {t('modules.admin.content.violationTypes.harassment')}
+                      </SelectItem>
+                      <SelectItem value="other">
+                        {t('modules.admin.content.violationTypes.other')}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+              {/* Moderation Reason */}
+              <div className="space-y-2">
+                <Label htmlFor="moderation-reason">
+                  {t('modules.admin.content.moderationReason')}
+                </Label>
+                <Textarea
+                  id="moderation-reason"
+                  placeholder={t('modules.admin.content.moderationReasonPlaceholder')}
+                  value={moderationReason}
+                  onChange={(e) => setModerationReason(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowModerationDialog(false)}>
+                {t('common.cancel')}
+              </Button>
+              <Button 
+                onClick={confirmIndividualModeration}
+                disabled={isProcessingModeration}
+                variant={moderationAction === 'delete' ? 'destructive' : 'default'}
+              >
+                {isProcessingModeration ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    {t('modules.admin.content.processing')}
+                  </>
+                ) : (
+                  t(`modules.admin.content.${moderationAction}Message`)
+                )}
               </Button>
             </DialogFooter>
           </DialogContent>

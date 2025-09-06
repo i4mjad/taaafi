@@ -31,6 +31,77 @@ import {
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { Group, GroupMember } from '@/types/community';
+
+// Comprehensive type definitions for this component
+interface Ban {
+  id: string;
+  userId: string;
+  type: 'user_ban' | 'device_ban' | 'feature_ban';
+  scope: 'app_wide' | 'feature_specific';
+  reason: string;
+  description?: string;
+  severity: 'temporary' | 'permanent';
+  issuedBy: string;
+  issuedAt: Date;
+  expiresAt?: Date | null;
+  isActive: boolean;
+  restrictedFeatures?: string[];
+  restrictedDevices?: string[];
+  deviceIds?: string[];
+}
+
+interface Warning {
+  id: string;
+  userId: string;
+  type: string;
+  reason: string;
+  description?: string;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  issuedBy: string;
+  issuedAt: Date;
+  isActive: boolean;
+  deviceIds?: string[];
+}
+
+// Extended GroupMember interface with additional fields used in this component
+interface ExtendedGroupMember extends GroupMember {
+  removalReason?: string;
+  removalNote?: string;
+  removedBy?: string;
+}
+
+// Community Profile from Firestore
+interface CommunityProfile {
+  cpId: string;
+  displayName?: string;
+  userUID?: string;
+  gender?: string;
+  isAnonymous?: boolean;
+  createdAt: Date;
+  nextJoinAllowedAt?: Date | null;
+  rejoinCooldownOverrideUntil?: Date | null;
+  lastGroupViolationAt?: Date | null;
+  customCooldownDuration?: number;
+  cooldownReason?: string;
+  [key: string]: any; // Allow additional properties
+}
+
+// Enhanced profile with membership data
+interface EnhancedProfile extends CommunityProfile {
+  currentMembership: {
+    id: string;
+    role: 'admin' | 'member';
+    joinedAt: Date;
+    pointsTotal: number;
+    leftAt?: Date;
+    removalReason?: string;
+    removalNote?: string;
+    removedBy?: string;
+  };
+  allMemberships: Array<ExtendedGroupMember & { groupName: string }>;
+  activeBans: Ban[];
+  activeWarnings: Warning[];
+}
 import { toast } from 'sonner';
 import { SiteHeader } from '@/components/site-header';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -47,7 +118,7 @@ export default function GroupMembersPage() {
   const [search, setSearch] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showRemovalModal, setShowRemovalModal] = useState(false);
-  const [memberToRemove, setMemberToRemove] = useState<GroupMember | null>(null);
+  const [memberToRemove, setMemberToRemove] = useState<ExtendedGroupMember | null>(null);
   const [removalForm, setRemovalForm] = useState({
     cooldownDuration: 24,
     reason: '',
@@ -117,7 +188,7 @@ export default function GroupMembersPage() {
       ...doc.data(),
       joinedAt: doc.data().joinedAt?.toDate() || new Date(),
       leftAt: doc.data().leftAt?.toDate()
-    }));
+    })) as ExtendedGroupMember[];
 
     const allProfiles = profilesSnapshot.docs.map(doc => ({
       cpId: doc.id,
@@ -126,32 +197,32 @@ export default function GroupMembersPage() {
       nextJoinAllowedAt: doc.data().nextJoinAllowedAt?.toDate() || null,
       rejoinCooldownOverrideUntil: doc.data().rejoinCooldownOverrideUntil?.toDate() || null,
       lastGroupViolationAt: doc.data().lastGroupViolationAt?.toDate() || null,
-    }));
+    })) as CommunityProfile[];
 
     const allGroups = groupsSnapshot?.docs.map(doc => ({ 
       id: doc.id, 
       ...doc.data() 
-    })) || [];
+    })) as Group[] || [];
 
     const allMemberships = allMembershipsSnapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),
       joinedAt: doc.data().joinedAt?.toDate() || new Date(),
       leftAt: doc.data().leftAt?.toDate()
-    }));
+    })) as ExtendedGroupMember[];
 
     const allBans = bansSnapshot?.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),
       issuedAt: doc.data().issuedAt?.toDate() || new Date(),
       expiresAt: doc.data().expiresAt?.toDate()
-    })) || [];
+    })) as Ban[] || [];
 
     const allWarnings = warningsSnapshot?.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),
       issuedAt: doc.data().issuedAt?.toDate() || new Date()
-    })) || [];
+    })) as Warning[] || [];
 
     return currentMemberships.map(membership => {
       const profile = allProfiles.find(p => p.cpId === membership.cpId);
@@ -196,8 +267,8 @@ export default function GroupMembersPage() {
         allMemberships: profileMemberships,
         activeBans: profileBans,
         activeWarnings: profileWarnings
-      };
-    }).filter(Boolean);
+      } as EnhancedProfile;
+    }).filter((profile): profile is EnhancedProfile => profile !== null);
   }, [membershipsSnapshot, profilesSnapshot, allMembershipsSnapshot, groupsSnapshot, bansSnapshot, warningsSnapshot]);
 
   // Filter profiles based on search
@@ -205,8 +276,8 @@ export default function GroupMembersPage() {
     return communityProfiles.filter(profile => {
       const matchesSearch = !search || 
         profile.cpId.toLowerCase().includes(search.toLowerCase()) ||
-        profile.displayName.toLowerCase().includes(search.toLowerCase()) ||
-        profile.userUID.toLowerCase().includes(search.toLowerCase());
+        (profile.displayName && profile.displayName.toLowerCase().includes(search.toLowerCase())) ||
+        (profile.userUID && profile.userUID.toLowerCase().includes(search.toLowerCase()));
       return matchesSearch;
     });
   }, [communityProfiles, search]);
@@ -228,8 +299,8 @@ export default function GroupMembersPage() {
     const admins = communityProfiles.filter(p => p.currentMembership?.role === 'admin').length;
     const totalPoints = communityProfiles.reduce((sum, p) => sum + (p.currentMembership?.pointsTotal || 0), 0);
     const withCooldowns = communityProfiles.filter(p => p.nextJoinAllowedAt && p.nextJoinAllowedAt > new Date()).length;
-    const withBans = communityProfiles.filter(p => p.activeBans.length > 0).length;
-    const withWarnings = communityProfiles.filter(p => p.activeWarnings.length > 0).length;
+    const withBans = communityProfiles.filter(p => p.activeBans && p.activeBans.length > 0).length;
+    const withWarnings = communityProfiles.filter(p => p.activeWarnings && p.activeWarnings.length > 0).length;
     
     return {
       total,
@@ -247,10 +318,10 @@ export default function GroupMembersPage() {
     documents: `${group?.name} - ${t('modules.groupsManagement.groupDetail.members')}` || 'Group Members',
   };
 
-  const handleRemoveMember = (profile: any) => {
+  const handleRemoveMember = (profile: EnhancedProfile) => {
     if (!profile.currentMembership) return;
     
-    const memberData: GroupMember = {
+    const memberData: ExtendedGroupMember = {
       id: profile.currentMembership.id,
       cpId: profile.cpId,
       groupId,

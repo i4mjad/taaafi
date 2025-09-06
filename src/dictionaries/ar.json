@@ -2590,89 +2590,6 @@
             "of": "من"
           }
         },
-        "content": {
-          "title": "إدارة المحتوى",
-          "messageModerated": "تمت إدارة الرسالة بنجاح",
-          "moderationError": "فشل في إدارة الرسالة",
-          "filters": {
-            "title": "تصفية المحتوى"
-          },
-          "status": {
-            "pending": "في انتظار المراجعة",
-            "approved": "موافق عليها",
-            "blocked": "محظورة",
-            "reported": "مُبلّغ عنها"
-          },
-          "bulk": {
-            "title": "الإجراءات المجمعة",
-            "clearSelection": "مسح التحديد",
-            "selectAll": "اختر جميع الـ {count} رسائل",
-            "deselectAll": "إلغاء تحديد الكل",
-            "selected": "{count} رسالة مختارة",
-            "selectPending": "اختر المعلقة",
-            "selectReported": "اختر المبلغ عنها",
-            "success": "تم مراجعة {count} رسالة بنجاح",
-            "error": "فشل في مراجعة الرسائل",
-            "processing": "جاري المعالجة...",
-            "approveTitle": "الموافقة على الرسائل",
-            "hideTitle": "إخفاء الرسائل",
-            "deleteTitle": "حذف الرسائل",
-            "confirmAction": "هل أنت متأكد من أنك تريد {action} الـ {count} رسالة المحددة؟",
-            "confirm": "{action} المختارة"
-          }
-        },
-        "content": {
-          "title": "إدارة المحتوى",
-          "messageModerated": "تم إجراء المراجعة على الرسالة بنجاح",
-          "moderationError": "فشل في مراجعة الرسالة",
-          "filters": {
-            "title": "تصفية المحتوى"
-          },
-          "status": {
-            "pending": "معلق",
-            "approved": "موافق عليه",
-            "blocked": "محظور",
-            "reported": "مبلّغ عنه"
-          },
-          "messages": {
-            "title": "الرسائل"
-          },
-          "messageDetails": {
-            "title": "تفاصيل الرسالة",
-            "description": "عرض معلومات مفصلة حول هذه الرسالة",
-            "sender": "المرسل",
-            "content": "المحتوى",
-            "status": "الحالة",
-            "created": "تاريخ الإنشاء"
-          },
-          "actions": {
-            "viewDetails": "عرض التفاصيل",
-            "approve": "موافقة",
-            "hide": "إخفاء",
-            "delete": "حذف"
-          },
-          "moderation": {
-            "reason": "السبب (اختياري)",
-            "reasonPlaceholder": "اشرح سبب اتخاذ هذا الإجراء..."
-          },
-          "bulk": {
-            "title": "الإجراءات المجمعة",
-            "clearSelection": "مسح التحديد",
-            "selectAll": "اختر جميع الـ {count} رسائل",
-            "deselectAll": "إلغاء تحديد الكل",
-            "selected": "{count} رسالة مختارة",
-            "selectPending": "اختر المعلقة",
-            "selectReported": "اختر المبلغ عنها",
-            "success": "تم مراجعة {count} رسالة بنجاح",
-            "error": "فشل في مراجعة الرسائل",
-            "processing": "جاري المعالجة...",
-            "approveTitle": "الموافقة على الرسائل",
-            "hideTitle": "إخفاء الرسائل",
-            "deleteTitle": "حذف الرسائل",
-            "confirmAction": "هل أنت متأكد من أنك تريد {action} الـ {count} رسالة المحددة؟",
-            "confirm": "{action} المختارة"
-          }
-        },
         "reports": {
           "title": "إدارة البلاغات"
         },
@@ -2796,6 +2713,85 @@
             "rows-per-page": "صفوف لكل صفحة",
             "page": "صفحة",
             "of": "من"
+          }
+        },
+        "content": {
+          "title": "إدارة المحتوى",
+          "messageModerated": "تمت إدارة الرسالة بنجاح",
+          "moderationError": "فشل في إدارة الرسالة",
+          "moderateMessage": "إدارة الرسالة",
+          "moderationActions": "إجراءات الإدارة",
+          "approveMessage": "الموافقة على الرسالة",
+          "blockMessage": "حظر الرسالة",
+          "hideMessage": "إخفاء الرسالة",
+          "deleteMessage": "حذف الرسالة",
+          "approveConfirm": "هل أنت متأكد من الموافقة على هذه الرسالة؟",
+          "blockConfirm": "هل أنت متأكد من حظر هذه الرسالة؟",
+          "hideConfirm": "هل أنت متأكد من إخفاء هذه الرسالة؟",
+          "deleteConfirm": "هل أنت متأكد من حذف هذه الرسالة؟",
+          "moderationReason": "سبب الإدارة",
+          "moderationReasonPlaceholder": "اشرح سبب اتخاذ هذا الإجراء...",
+          "violationType": "نوع المخالفة",
+          "selectViolationType": "اختر نوع المخالفة",
+          "violationTypes": {
+            "social_media_sharing": "مشاركة حسابات وسائل التواصل الاجتماعي",
+            "sexual_content": "المحتوى الجنسي",
+            "cuckoldry_content": "محتوى الديوثة",
+            "homosexuality_content": "المحتوى المثلي",
+            "inappropriate_content": "محتوى غير مناسب",
+            "spam": "رسائل مزعجة",
+            "harassment": "مضايقة",
+            "other": "أخرى"
+          },
+          "messageApproved": "تمت الموافقة على الرسالة",
+          "messageBlocked": "تم حظر الرسالة",
+          "messageHidden": "تم إخفاء الرسالة",
+          "messageDeleted": "تم حذف الرسالة",
+          "processing": "جاري المعالجة...",
+          "filters": {
+            "title": "تصفية المحتوى"
+          },
+          "status": {
+            "pending": "في انتظار المراجعة",
+            "approved": "موافق عليها",
+            "blocked": "محظورة",
+            "reported": "مُبلّغ عنها",
+            "manual_review": "مراجعة يدوية"
+          },
+          "messageDetails": {
+            "title": "تفاصيل الرسالة",
+            "description": "عرض معلومات مفصلة حول هذه الرسالة",
+            "sender": "المرسل",
+            "content": "المحتوى",
+            "status": "الحالة",
+            "created": "تاريخ الإنشاء"
+          },
+          "actions": {
+            "viewDetails": "عرض التفاصيل",
+            "approve": "موافقة",
+            "hide": "إخفاء",
+            "delete": "حذف"
+          },
+          "moderation": {
+            "reason": "السبب (اختياري)",
+            "reasonPlaceholder": "اشرح سبب اتخاذ هذا الإجراء..."
+          },
+          "bulk": {
+            "title": "الإجراءات المجمعة",
+            "clearSelection": "مسح التحديد",
+            "selectAll": "اختر جميع الـ {count} رسائل",
+            "deselectAll": "إلغاء تحديد الكل",
+            "selected": "{count} رسالة مختارة",
+            "selectPending": "اختر المعلقة",
+            "selectReported": "اختر المبلغ عنها",
+            "success": "تم مراجعة {count} رسالة بنجاح",
+            "error": "فشل في مراجعة الرسائل",
+            "processing": "جاري المعالجة...",
+            "approveTitle": "الموافقة على الرسائل",
+            "hideTitle": "إخفاء الرسائل",
+            "deleteTitle": "حذف الرسائل",
+            "confirmAction": "هل أنت متأكد من أنك تريد {action} الـ {count} رسالة المحددة؟",
+            "confirm": "{action} المختارة"
           }
         }
       }

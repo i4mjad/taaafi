@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import { useTranslation } from '@/contexts/TranslationContext';
 import { SiteHeader } from '@/components/site-header';
 import { useCollection } from 'react-firebase-hooks/firestore';
-import { collection, query, orderBy, doc, writeBatch } from 'firebase/firestore';
+import { collection, query, orderBy, doc, writeBatch, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -56,6 +56,50 @@ export default function SystemAdminContentPage() {
     ).map(doc => doc.data());
   }, [reportsSnapshot]);
 
+  // Handle individual message moderation
+  const handleMessageModeration = async (
+    messageId: string, 
+    action: 'approve' | 'block' | 'hide' | 'delete', 
+    reason?: string,
+    violationType?: string
+  ) => {
+    try {
+      const messageRef = doc(db, 'group_messages', messageId);
+      const updates: any = {
+        moderation: {
+          status: action === 'approve' ? 'approved' : 'blocked',
+          reason: reason || getLocalizedViolationMessage(violationType),
+          moderatedBy: 'admin', // TODO: Get actual admin ID
+          moderatedAt: new Date(),
+        }
+      };
+
+      // Apply the same logic as cloud function
+      if (action === 'block') {
+        updates.isHidden = true; // Hide from other users like cloud function does
+      } else if (action === 'hide') {
+        updates.isHidden = true;
+      } else if (action === 'delete') {
+        updates.isDeleted = true;
+      }
+
+      await updateDoc(messageRef, updates);
+      return true;
+    } catch (error) {
+      console.error('Error moderating message:', error);
+      return false;
+    }
+  };
+
+  // Get localized violation message using translation system
+  const getLocalizedViolationMessage = (violationType?: string): string => {
+    if (!violationType) {
+      return t('modules.admin.content.violationTypes.other');
+    }
+    
+    return t(`modules.admin.content.violationTypes.${violationType}`) || t('modules.admin.content.violationTypes.other');
+  };
+
   // Handle bulk moderation actions
   const handleBulkModeration = async (selectedIds: string[], action: 'approve' | 'hide' | 'delete', reason?: string) => {
     const batch = writeBatch(db);
@@ -66,7 +110,7 @@ export default function SystemAdminContentPage() {
         moderation: {
           status: action === 'approve' ? 'approved' : 'blocked',
           reason: reason || undefined,
-          moderatedBy: 'system-admin', // TODO: Get actual admin ID
+          moderatedBy: 'admin', // TODO: Get actual admin ID
           moderatedAt: new Date(),
         }
       };
@@ -222,6 +266,8 @@ export default function SystemAdminContentPage() {
               groups={groups}
               reports={reports}
               onBulkAction={handleBulkModeration}
+              onMessageModeration={handleMessageModeration}
+              locale={lang}
             />
           </div>
         </div>
