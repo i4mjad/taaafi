@@ -368,9 +368,6 @@ class _CreateGroupModalState extends ConsumerState<CreateGroupModal> {
         case GroupJoiningMethod.any:
           joinMethod = 'any';
           break;
-        case GroupJoiningMethod.adminInviteOnly:
-          joinMethod = 'admin_only';
-          break;
         case GroupJoiningMethod.groupCodeOnly:
           joinMethod = 'code_only';
           break;
@@ -465,8 +462,6 @@ class _CreateGroupModalState extends ConsumerState<CreateGroupModal> {
     switch (method) {
       case GroupJoiningMethod.any:
         return l10n.translate('joining-method-any');
-      case GroupJoiningMethod.adminInviteOnly:
-        return l10n.translate('joining-method-admin-only');
       case GroupJoiningMethod.groupCodeOnly:
         return l10n.translate('joining-method-code-only');
     }
@@ -477,8 +472,6 @@ class _CreateGroupModalState extends ConsumerState<CreateGroupModal> {
     switch (method) {
       case GroupJoiningMethod.any:
         return l10n.translate('joining-method-any-description');
-      case GroupJoiningMethod.adminInviteOnly:
-        return l10n.translate('joining-method-admin-only-description');
       case GroupJoiningMethod.groupCodeOnly:
         return l10n.translate('joining-method-code-only-description');
     }

@@ -8,7 +8,6 @@ import 'package:reboot_app_3/core/theming/text_styles.dart';
 
 enum GroupJoiningMethod {
   any,
-  adminInviteOnly,
   groupCodeOnly,
 }
 
@@ -88,19 +87,6 @@ class _GroupJoiningMethodsModalState
             title: l10n.translate('joining-method-any'),
             description: l10n.translate('joining-method-any-description'),
             icon: LucideIcons.users,
-            theme: theme,
-            l10n: l10n,
-          ),
-
-          const SizedBox(height: 16),
-
-          // Admin Invite Only Option
-          _buildMethodOption(
-            method: GroupJoiningMethod.adminInviteOnly,
-            title: l10n.translate('joining-method-admin-only'),
-            description:
-                l10n.translate('joining-method-admin-only-description'),
-            icon: LucideIcons.userCheck,
             theme: theme,
             l10n: l10n,
           ),
