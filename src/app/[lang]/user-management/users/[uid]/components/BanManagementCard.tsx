@@ -895,28 +895,117 @@ export default function BanManagementCard({ userId, userDisplayName, userDevices
 
                 {/* Feature-specific restrictions */}
                 {(formData.type === 'feature_ban' || formData.scope === 'feature_specific') && (
-                  <div className="bg-blue-50 p-4 rounded-lg space-y-3">
+                  <div className="bg-blue-50 p-4 rounded-lg space-y-4">
                     <div className="flex items-center gap-2 mb-2">
                       <Settings className="h-4 w-4 text-blue-600" />
                       <Label className="font-medium text-sm">{t('modules.userManagement.bans.restrictedFeatures')}</Label>
                     </div>
-                    <div className="grid grid-cols-3 gap-2 max-h-32 overflow-y-auto p-2 border rounded bg-white">
-                      {appFeatures.filter(f => f.isBannable).map((feature) => (
-                        <div key={feature.uniqueName} className="flex items-center space-x-2 p-1.5 hover:bg-gray-50 rounded">
-                          <Checkbox
-                            id={`feature-${feature.uniqueName}`}
-                            checked={formData.restrictedFeatures.includes(feature.uniqueName)}
-                            onCheckedChange={() => handleFeatureToggle(feature.uniqueName)}
-                            className="h-3 w-3"
-                          />
-                          <Label 
-                            htmlFor={`feature-${feature.uniqueName}`}
-                            className="text-xs font-normal cursor-pointer flex-1"
-                          >
-                            {locale === 'ar' ? feature.nameAr : feature.nameEn}
+                    
+                    {/* Groups Features Section */}
+                    {appFeatures.filter(f => f.isBannable && (f.uniqueName === 'sending_in_groups' || f.uniqueName === 'create_or_join_a_group')).length > 0 && (
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2">
+                          <Users className="h-4 w-4 text-orange-600" />
+                          <Label className="font-medium text-sm text-orange-800">
+                            {t('modules.userManagement.groups-ban.groups-features') || 'Groups Features'}
                           </Label>
                         </div>
-                      ))}
+                        <div className="grid grid-cols-1 gap-2 p-3 border rounded bg-orange-50 border-orange-200">
+                          {appFeatures
+                            .filter(f => f.isBannable && (f.uniqueName === 'sending_in_groups' || f.uniqueName === 'create_or_join_a_group'))
+                            .map((feature) => (
+                              <div key={feature.uniqueName} className="flex items-center space-x-3 p-2 hover:bg-orange-100 rounded">
+                                <Checkbox
+                                  id={`feature-${feature.uniqueName}`}
+                                  checked={formData.restrictedFeatures.includes(feature.uniqueName)}
+                                  onCheckedChange={() => handleFeatureToggle(feature.uniqueName)}
+                                  className="h-4 w-4"
+                                />
+                                <div className="flex items-center gap-2 flex-1">
+                                  {feature.uniqueName === 'sending_in_groups' && <MessageSquare className="h-4 w-4 text-orange-600" />}
+                                  {feature.uniqueName === 'create_or_join_a_group' && <Users className="h-4 w-4 text-orange-600" />}
+                                  <Label 
+                                    htmlFor={`feature-${feature.uniqueName}`}
+                                    className="text-sm font-medium cursor-pointer text-orange-800"
+                                  >
+                                    {locale === 'ar' ? feature.nameAr : feature.nameEn}
+                                  </Label>
+                                </div>
+                              </div>
+                            ))}
+                        </div>
+                        
+                        {/* Quick Groups Ban Buttons */}
+                        <div className="flex flex-wrap gap-2 mt-3">
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                            className="text-xs border-orange-300 text-orange-700 hover:bg-orange-100"
+                            onClick={() => {
+                              setFormData({ ...formData, restrictedFeatures: [...new Set([...formData.restrictedFeatures, 'sending_in_groups'])] });
+                            }}
+                          >
+                            <MessageSquare className="h-3 w-3 mr-1" />
+                            {t('modules.userManagement.groups-ban.ban-chat-only') || 'Ban Chat Only'}
+                          </Button>
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                            className="text-xs border-orange-300 text-orange-700 hover:bg-orange-100"
+                            onClick={() => {
+                              setFormData({ ...formData, restrictedFeatures: [...new Set([...formData.restrictedFeatures, 'create_or_join_a_group'])] });
+                            }}
+                          >
+                            <Users className="h-3 w-3 mr-1" />
+                            {t('modules.userManagement.groups-ban.ban-create-join') || 'Ban Create/Join'}
+                          </Button>
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                            className="text-xs border-orange-300 text-orange-700 hover:bg-orange-100"
+                            onClick={() => {
+                              const groupsFeatures = ['sending_in_groups', 'create_or_join_a_group'];
+                              setFormData({ ...formData, restrictedFeatures: [...new Set([...formData.restrictedFeatures, ...groupsFeatures])] });
+                            }}
+                          >
+                            <Users className="h-3 w-3 mr-1" />
+                            {t('modules.userManagement.groups-ban.ban-all-groups') || 'Ban All Groups'}
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Other Features Section */}
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <Settings className="h-4 w-4 text-blue-600" />
+                        <Label className="font-medium text-sm">
+                          {t('modules.userManagement.bans.otherFeatures') || 'Other Features'}
+                        </Label>
+                      </div>
+                      <div className="grid grid-cols-3 gap-2 max-h-32 overflow-y-auto p-2 border rounded bg-white">
+                        {appFeatures
+                          .filter(f => f.isBannable && f.uniqueName !== 'sending_in_groups' && f.uniqueName !== 'create_or_join_a_group')
+                          .map((feature) => (
+                            <div key={feature.uniqueName} className="flex items-center space-x-2 p-1.5 hover:bg-gray-50 rounded">
+                              <Checkbox
+                                id={`feature-${feature.uniqueName}`}
+                                checked={formData.restrictedFeatures.includes(feature.uniqueName)}
+                                onCheckedChange={() => handleFeatureToggle(feature.uniqueName)}
+                                className="h-3 w-3"
+                              />
+                              <Label 
+                                htmlFor={`feature-${feature.uniqueName}`}
+                                className="text-xs font-normal cursor-pointer flex-1"
+                              >
+                                {locale === 'ar' ? feature.nameAr : feature.nameEn}
+                              </Label>
+                            </div>
+                          ))}
+                      </div>
                     </div>
                   </div>
                 )}

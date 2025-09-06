@@ -23,7 +23,9 @@ import {
   FileText,
   Clock,
   CheckCircle,
-  XCircle
+  XCircle,
+  UserMinus,
+  Shield
 } from "lucide-react"
 
 interface MembershipDetailsModalProps {
@@ -40,6 +42,7 @@ export function MembershipDetailsModal({
   onOpenChange 
 }: MembershipDetailsModalProps) {
   const { t } = useTranslation()
+  const [showRemovalModal, setShowRemovalModal] = React.useState(false)
 
   // Fetch user reports related to this membership
   const [reportsSnapshot, reportsLoading] = useCollection(
@@ -304,17 +307,31 @@ export function MembershipDetailsModal({
 
         <Separator />
 
-        <div className="flex justify-end gap-2">
-          <Button 
-            variant="outline" 
-            onClick={() => window.location.href = `/community/groups/${group.id}/admin`}
-          >
-            {t('modules.admin.memberships.manageGroup')}
-          </Button>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            {t('common.close')}
-          </Button>
+        <div className="flex justify-between gap-2">
+          <div className="flex gap-2">
+            <Button 
+              variant="destructive"
+              onClick={() => setShowRemovalModal(true)}
+              className="flex items-center gap-2"
+            >
+              <UserMinus className="h-4 w-4" />
+              {t('modules.userManagement.groups-removal.title') || 'Remove Member'}
+            </Button>
+          </div>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              onClick={() => window.location.href = `/community/groups/${group.id}/admin`}
+            >
+              <Shield className="h-4 w-4 mr-2" />
+              {t('modules.admin.memberships.manageGroup')}
+            </Button>
+            <Button variant="outline" onClick={() => onOpenChange(false)}>
+              {t('common.close')}
+            </Button>
+          </div>
         </div>
+
       </DialogContent>
     </Dialog>
   )

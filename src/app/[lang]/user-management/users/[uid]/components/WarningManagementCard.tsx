@@ -23,6 +23,7 @@ import {
   Eye,
   FileText,
   User,
+  Users,
   Clock,
   Loader2,
   ExternalLink,
@@ -421,12 +422,20 @@ export default function WarningManagementCard({ userId, userDisplayName, userDev
   });
 
   const warningTypes = [
-    { value: 'content_violation', labelKey: 'contentViolation' },
-    { value: 'inappropriate_behavior', labelKey: 'inappropriateBehavior' },
-    { value: 'spam', labelKey: 'spam' },
-    { value: 'harassment', labelKey: 'harassment' },
-    { value: 'other', labelKey: 'other' },
+    { value: 'content_violation', labelKey: 'contentViolation', category: 'general' },
+    { value: 'inappropriate_behavior', labelKey: 'inappropriateBehavior', category: 'general' },
+    { value: 'spam', labelKey: 'spam', category: 'general' },
+    { value: 'harassment', labelKey: 'harassment', category: 'general' },
+    { value: 'other', labelKey: 'other', category: 'general' },
+    // Groups-specific warning types
+    { value: 'group_harassment', labelKey: 'groupHarassment', category: 'groups' },
+    { value: 'group_spam', labelKey: 'groupSpam', category: 'groups' },
+    { value: 'group_inappropriate_content', labelKey: 'groupInappropriateContent', category: 'groups' },
+    { value: 'group_disruption', labelKey: 'groupDisruption', category: 'groups' },
   ];
+
+  const groupsWarningTypes = warningTypes.filter(type => type.category === 'groups');
+  const generalWarningTypes = warningTypes.filter(type => type.category === 'general');
 
   const severityLevels = [
     { value: 'low', labelKey: 'low', color: 'text-blue-600' },
@@ -705,7 +714,24 @@ export default function WarningManagementCard({ userId, userDisplayName, userDev
                         <SelectValue placeholder={t('modules.userManagement.warnings.type.selectType')} />
                       </SelectTrigger>
                       <SelectContent>
-                        {warningTypes.map((type) => (
+                        {/* Groups Warning Types */}
+                        <div className="px-2 py-1.5 text-xs font-semibold text-orange-700 bg-orange-50">
+                          {t('modules.userManagement.groups-ban.groups-warnings') || 'Groups Warnings'}
+                        </div>
+                        {groupsWarningTypes.map((type) => (
+                          <SelectItem key={type.value} value={type.value}>
+                            <div className="flex items-center gap-2">
+                              <Users className="h-3 w-3 text-orange-600" />
+                              {t(`modules.userManagement.warnings.type.${type.labelKey}`) || type.value}
+                            </div>
+                          </SelectItem>
+                        ))}
+                        
+                        {/* General Warning Types */}
+                        <div className="px-2 py-1.5 text-xs font-semibold text-blue-700 bg-blue-50 mt-1">
+                          {t('modules.userManagement.warnings.generalWarnings') || 'General Warnings'}
+                        </div>
+                        {generalWarningTypes.map((type) => (
                           <SelectItem key={type.value} value={type.value}>
                             {t(`modules.userManagement.warnings.type.${type.labelKey}`)}
                           </SelectItem>

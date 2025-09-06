@@ -37,6 +37,7 @@ import UserGroupsCard from './UserGroupsCard';
 import MigrationManagementCard from './MigrationManagementCard';
 import WarningManagementCard from './components/WarningManagementCard';
 import BanManagementCard from './components/BanManagementCard';
+import GroupsBanManagementCard from './components/GroupsBanManagementCard';
 import DeletionManagementCard from './components/DeletionManagementCard';
 // Firebase imports
 import { useDocument } from 'react-firebase-hooks/firestore';
@@ -707,11 +708,17 @@ export default function UserDetailsPage() {
 
               {/* Bans Tab */}
               <TabsContent value="bans">
-                <BanManagementCard 
-                  userId={user.uid} 
-                  userDisplayName={user.displayName}
-                  userDevices={user.devicesIds || []}
-                />
+                <div className="space-y-6">
+                  <BanManagementCard 
+                    userId={user.uid} 
+                    userDisplayName={user.displayName}
+                    userDevices={user.devicesIds || []}
+                  />
+                  <GroupsBanManagementCard 
+                    userId={user.uid} 
+                    userDisplayName={user.displayName}
+                  />
+                </div>
               </TabsContent>
 
               {/* Account Deletion Tab */}

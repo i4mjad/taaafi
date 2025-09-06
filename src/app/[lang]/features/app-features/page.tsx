@@ -39,7 +39,11 @@ import {
   Camera,
   Share,
   Heart,
-  Loader2
+  Loader2,
+  Copy,
+  Eye,
+  CalendarDays,
+  Tag
 } from 'lucide-react';
 import { useTranslation } from '@/contexts/TranslationContext';
 import { SiteHeader } from '@/components/site-header';
@@ -85,6 +89,7 @@ export default function AppFeaturesPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingFeature, setEditingFeature] = useState<AppFeature | null>(null);
+  const [viewingFeature, setViewingFeature] = useState<AppFeature | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Firestore hooks
@@ -273,6 +278,20 @@ export default function AppFeaturesPage() {
     } catch (error) {
       console.error('Error updating feature status:', error);
       toast.error(t('modules.features.appFeatures.statusUpdateError'));
+    }
+  };
+
+  const handleViewDetails = (feature: AppFeature) => {
+    setViewingFeature(feature);
+  };
+
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success(t('modules.features.appFeatures.copySuccess') || 'Copied to clipboard');
+    } catch (error) {
+      console.error('Error copying to clipboard:', error);
+      toast.error(t('modules.features.appFeatures.copyError') || 'Failed to copy');
     }
   };
 
@@ -549,7 +568,11 @@ export default function AppFeaturesPage() {
                       </TableHeader>
                       <TableBody>
                         {filteredFeatures.map((feature) => (
-                          <TableRow key={feature.id}>
+                          <TableRow 
+                            key={feature.id} 
+                            className="cursor-pointer hover:bg-muted/50" 
+                            onClick={() => handleViewDetails(feature)}
+                          >
                             <TableCell>
                               <div className="space-y-1">
                                 <p className="text-sm font-medium">
@@ -567,7 +590,7 @@ export default function AppFeaturesPage() {
                               </Badge>
                             </TableCell>
                             <TableCell>
-                              <div className="flex items-center space-x-2">
+                              <div className="flex items-center space-x-2" onClick={(e) => e.stopPropagation()}>
                                 <Switch
                                   checked={feature.isActive}
                                   onCheckedChange={() => toggleFeatureStatus(feature)}
@@ -589,19 +612,28 @@ export default function AppFeaturesPage() {
                             <TableCell className="text-right">
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" className="h-8 w-8 p-0" disabled={isSubmitting}>
+                                  <Button 
+                                    variant="ghost" 
+                                    className="h-8 w-8 p-0" 
+                                    disabled={isSubmitting}
+                                    onClick={(e) => e.stopPropagation()}
+                                  >
                                     <MoreHorizontal className="h-4 w-4" />
                                   </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
-                                  <DropdownMenuItem onClick={() => handleEdit(feature)} disabled={isSubmitting}>
+                                  <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleViewDetails(feature); }} disabled={isSubmitting}>
+                                    <Eye className="h-4 w-4 mr-2" />
+                                    {t('common.viewDetails') || 'View Details'}
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleEdit(feature); }} disabled={isSubmitting}>
                                     <Edit className="h-4 w-4 mr-2" />
                                     {t('common.edit')}
                                   </DropdownMenuItem>
                                   <DropdownMenuSeparator />
                                   <DropdownMenuItem 
                                     className="text-red-600"
-                                    onClick={() => handleDelete(feature)}
+                                    onClick={(e) => { e.stopPropagation(); handleDelete(feature); }}
                                     disabled={isSubmitting}
                                   >
                                     <Trash2 className="h-4 w-4 mr-2" />
@@ -739,6 +771,203 @@ export default function AppFeaturesPage() {
                 t('common.update')
               )}
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* View Details Dialog */}
+      <Dialog open={!!viewingFeature} onOpenChange={() => setViewingFeature(null)}>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Eye className="h-5 w-5" />
+              {t('modules.features.appFeatures.viewDetails') || 'Feature Details'}
+            </DialogTitle>
+            <DialogDescription>
+              {t('modules.features.appFeatures.viewDetailsDescription') || 'Complete information about this feature'}
+            </DialogDescription>
+          </DialogHeader>
+          
+          {viewingFeature && (
+            <div className="grid gap-6 py-4">
+              {/* Basic Information */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold flex items-center gap-2">
+                  <Tag className="h-4 w-4" />
+                  {t('modules.features.appFeatures.basicInfo') || 'Basic Information'}
+                </h3>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-muted-foreground">
+                      {t('modules.features.appFeatures.nameEn')}
+                    </Label>
+                    <div className="p-3 bg-muted rounded-md">
+                      <p className="font-medium">{viewingFeature.nameEn}</p>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-muted-foreground">
+                      {t('modules.features.appFeatures.nameAr')}
+                    </Label>
+                    <div className="p-3 bg-muted rounded-md">
+                      <p className="font-medium">{viewingFeature.nameAr}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-muted-foreground">
+                    {t('modules.features.appFeatures.uniqueName')}
+                  </Label>
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 p-3 bg-muted rounded-md font-mono text-sm">
+                      {viewingFeature.uniqueName}
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => copyToClipboard(viewingFeature.uniqueName)}
+                      className="flex items-center gap-1"
+                    >
+                      <Copy className="h-3 w-3" />
+                      {t('common.copy') || 'Copy'}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Descriptions */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  {t('modules.features.appFeatures.descriptions') || 'Descriptions'}
+                </h3>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-muted-foreground">
+                      {t('modules.features.appFeatures.descriptionEn')}
+                    </Label>
+                    <div className="p-3 bg-muted rounded-md min-h-[60px]">
+                      <p className="text-sm">{viewingFeature.descriptionEn || t('common.notProvided') || 'Not provided'}</p>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-muted-foreground">
+                      {t('modules.features.appFeatures.descriptionAr')}
+                    </Label>
+                    <div className="p-3 bg-muted rounded-md min-h-[60px]">
+                      <p className="text-sm">{viewingFeature.descriptionAr || t('common.notProvided') || 'Not provided'}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Configuration */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold flex items-center gap-2">
+                  <Settings className="h-4 w-4" />
+                  {t('modules.features.appFeatures.configuration') || 'Configuration'}
+                </h3>
+                <div className="grid gap-4 md:grid-cols-3">
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-muted-foreground">
+                      {t('modules.features.appFeatures.category.label')}
+                    </Label>
+                    <div className="p-3 bg-muted rounded-md">
+                      {getCategoryBadge(viewingFeature.category)}
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-muted-foreground">
+                      {t('modules.features.appFeatures.iconName')}
+                    </Label>
+                    <div className="p-3 bg-muted rounded-md font-mono text-sm">
+                      {viewingFeature.iconName || t('common.notProvided') || 'Not provided'}
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-muted-foreground">
+                      {t('common.status')}
+                    </Label>
+                    <div className="p-3 bg-muted rounded-md">
+                      <Badge variant={viewingFeature.isActive ? 'default' : 'secondary'}>
+                        {viewingFeature.isActive ? t('common.active') : t('common.inactive')}
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-muted-foreground">
+                    {t('modules.features.appFeatures.bannable')}
+                  </Label>
+                  <div className="p-3 bg-muted rounded-md">
+                    <Badge variant={viewingFeature.isBannable ? 'default' : 'secondary'}>
+                      {viewingFeature.isBannable ? t('common.yes') : t('common.no')}
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+
+              {/* Timestamps */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold flex items-center gap-2">
+                  <CalendarDays className="h-4 w-4" />
+                  {t('modules.features.appFeatures.timestamps') || 'Timestamps'}
+                </h3>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-muted-foreground">
+                      {t('modules.features.appFeatures.createdAt') || 'Created At'}
+                    </Label>
+                    <div className="p-3 bg-muted rounded-md">
+                      <p className="text-sm">
+                        {new Intl.DateTimeFormat(locale === 'ar' ? 'ar-SA' : 'en-US', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          timeZoneName: 'short',
+                          calendar: 'gregory',
+                        }).format(convertTimestamp(viewingFeature.createdAt))}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-muted-foreground">
+                      {t('modules.features.appFeatures.updatedAt') || 'Last Updated'}
+                    </Label>
+                    <div className="p-3 bg-muted rounded-md">
+                      <p className="text-sm">
+                        {new Intl.DateTimeFormat(locale === 'ar' ? 'ar-SA' : 'en-US', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          timeZoneName: 'short',
+                          calendar: 'gregory',
+                        }).format(convertTimestamp(viewingFeature.updatedAt))}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setViewingFeature(null)}>
+              {t('common.close') || 'Close'}
+            </Button>
+            {viewingFeature && (
+              <Button onClick={() => {
+                setViewingFeature(null);
+                handleEdit(viewingFeature);
+              }}>
+                <Edit className="h-4 w-4 mr-2" />
+                {t('common.edit')}
+              </Button>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>

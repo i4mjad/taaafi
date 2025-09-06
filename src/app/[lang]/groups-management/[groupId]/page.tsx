@@ -3,7 +3,7 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useTranslation } from '@/contexts/TranslationContext';
-import { doc, getDoc, collection, query, where, orderBy, limit as queryLimit, startAfter, endBefore, updateDoc, deleteDoc, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, orderBy, limit as queryLimit, startAfter, endBefore, updateDoc, deleteDoc, QueryDocumentSnapshot, DocumentData, writeBatch } from 'firebase/firestore';
 import { useDocument, useCollection } from 'react-firebase-hooks/firestore';
 import { db } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
@@ -13,7 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { 
@@ -45,6 +45,10 @@ import { format, isToday, isYesterday } from 'date-fns';
 import { Group, GroupMember, GroupMessage } from '@/types/community';
 import { toast } from 'sonner';
 import { SiteHeader } from '@/components/site-header';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 
 const MESSAGES_PER_PAGE = 25;
 
@@ -62,6 +66,14 @@ export default function GroupDetailPage() {
   const [selectedMember, setSelectedMember] = useState<GroupMember | null>(null);
   const [selectedMessage, setSelectedMessage] = useState<GroupMessage | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showRemovalModal, setShowRemovalModal] = useState(false);
+  const [memberToRemove, setMemberToRemove] = useState<GroupMember | null>(null);
+  const [removalForm, setRemovalForm] = useState({
+    cooldownDuration: 24,
+    reason: '',
+    adminNote: '',
+    removeFromAllGroups: false
+  });
   
   // Messages filtering state - simplified
   const [search, setSearch] = useState('');
@@ -216,20 +228,77 @@ export default function GroupDetailPage() {
 
   // Removed send message functionality - this is for moderation only
 
-  const handleRemoveMember = async (member: GroupMember) => {
+  const handleRemoveMember = (member: GroupMember) => {
+    setMemberToRemove(member);
+    setShowRemovalModal(true);
+    // Reset form
+    setRemovalForm({
+      cooldownDuration: 24,
+      reason: '',
+      adminNote: '',
+      removeFromAllGroups: false
+    });
+  };
+
+  const handleConfirmRemoval = async () => {
+    if (!memberToRemove || !removalForm.reason) {
+      toast.error('Please select a removal reason');
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      await updateDoc(doc(db, 'group_memberships', member.id), {
+      const batch = writeBatch(db);
+      const now = new Date();
+      
+      // 1. Update membership to inactive
+      const membershipRef = doc(db, 'group_memberships', memberToRemove.id);
+      batch.update(membershipRef, {
         isActive: false,
-        leftAt: new Date(),
+        leftAt: now,
+        removalReason: removalForm.reason,
+        removalNote: removalForm.adminNote,
+        removedAt: now,
       });
 
-      toast.success(t('modules.groupsManagement.groupDetail.memberRemoved') || 'Member removed successfully');
-      // setShowMemberActions // Removed unused state(false);
+      // 2. Set cooldown on community profile
+      const cooldownEnd = new Date(now);
+      cooldownEnd.setHours(cooldownEnd.getHours() + removalForm.cooldownDuration);
+      
+      const profileRef = doc(db, 'communityProfiles', memberToRemove.cpId);
+      batch.update(profileRef, {
+        nextJoinAllowedAt: cooldownEnd,
+        customCooldownDuration: removalForm.cooldownDuration,
+        cooldownReason: `Removed from group: ${removalForm.reason}`,
+        updatedAt: now
+      });
+
+      // 3. Optionally ban from all groups
+      if (removalForm.removeFromAllGroups) {
+        const banRef = doc(db, 'bans', `${memberToRemove.cpId}_groups_ban_${Date.now()}`);
+        batch.set(banRef, {
+          userId: memberToRemove.cpId,
+          type: 'feature_ban',
+          scope: 'feature_specific',
+          reason: `Removed from group with ban: ${removalForm.reason}`,
+          description: removalForm.adminNote,
+          severity: 'temporary',
+          issuedAt: now,
+          isActive: true,
+          restrictedFeatures: ['create_or_join_a_group'],
+        });
+      }
+
+      await batch.commit();
+
+      toast.success(`Member ${memberToRemove.displayName || memberToRemove.cpId} removed successfully`);
+      setShowRemovalModal(false);
+      setMemberToRemove(null);
       setSelectedMember(null);
+      
     } catch (error) {
       console.error('Error removing member:', error);
-      toast.error(t('modules.groupsManagement.groupDetail.memberRemoveError') || 'Error removing member');
+      toast.error('Failed to remove member');
     } finally {
       setIsSubmitting(false);
     }
@@ -923,6 +992,138 @@ export default function GroupDetailPage() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* System Admin Member Removal Dialog */}
+      <Dialog open={showRemovalModal} onOpenChange={setShowRemovalModal}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <UserMinus className="h-5 w-5 text-red-600" />
+              Remove Member from Group
+            </DialogTitle>
+            <DialogDescription>
+              Remove {memberToRemove?.displayName || memberToRemove?.cpId} from {group?.name}?
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            {/* Member Info */}
+            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div>
+                <p className="font-medium">{memberToRemove?.displayName || memberToRemove?.cpId}</p>
+                <Badge variant={memberToRemove?.role === 'admin' ? 'default' : 'secondary'}>
+                  {memberToRemove?.role === 'admin' ? 'Admin' : 'Member'}
+                </Badge>
+              </div>
+              <div className="text-right text-sm text-gray-600">
+                <p>Points: {memberToRemove?.pointsTotal || 0}</p>
+              </div>
+            </div>
+
+            {/* Cooldown Duration */}
+            <div className="space-y-2">
+              <Label className="font-medium">Cooldown Duration</Label>
+              <Select 
+                value={removalForm.cooldownDuration.toString()}
+                onValueChange={(value) => setRemovalForm(prev => ({ 
+                  ...prev, 
+                  cooldownDuration: parseInt(value) 
+                }))}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="24">24 hours (Default)</SelectItem>
+                  <SelectItem value="48">48 hours</SelectItem>
+                  <SelectItem value="72">72 hours</SelectItem>
+                  <SelectItem value="168">1 week</SelectItem>
+                  <SelectItem value="720">1 month</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-gray-600">
+                Member will not be able to join another group for this duration
+              </p>
+            </div>
+
+            {/* Removal Reason */}
+            <div className="space-y-2">
+              <Label className="font-medium">Removal Reason *</Label>
+              <Select 
+                value={removalForm.reason}
+                onValueChange={(value) => setRemovalForm(prev => ({ 
+                  ...prev, 
+                  reason: value 
+                }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select reason for removal" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="inappropriate_behavior">Inappropriate Behavior</SelectItem>
+                  <SelectItem value="harassment">Harassment of Members</SelectItem>
+                  <SelectItem value="spam">Spam or Excessive Messages</SelectItem>
+                  <SelectItem value="rule_violation">Group Rules Violation</SelectItem>
+                  <SelectItem value="disruption">Group Disruption</SelectItem>
+                  <SelectItem value="admin_decision">Admin Decision</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Admin Notes */}
+            <div className="space-y-2">
+              <Label className="font-medium">Admin Notes (Optional)</Label>
+              <Textarea
+                value={removalForm.adminNote}
+                onChange={(e) => setRemovalForm(prev => ({ 
+                  ...prev, 
+                  adminNote: e.target.value 
+                }))}
+                placeholder="Additional details about the removal..."
+                rows={3}
+              />
+            </div>
+
+            {/* Ban from all groups option */}
+            <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+              <div className="flex items-start space-x-3">
+                <input
+                  type="checkbox"
+                  id="banFromAllGroups"
+                  className="mt-1"
+                  checked={removalForm.removeFromAllGroups}
+                  onChange={(e) => setRemovalForm(prev => ({ 
+                    ...prev, 
+                    removeFromAllGroups: e.target.checked 
+                  }))}
+                />
+                <div className="flex-1">
+                  <Label htmlFor="banFromAllGroups" className="font-medium text-orange-800">
+                    Ban from All Groups
+                  </Label>
+                  <p className="text-xs text-orange-700 mt-1">
+                    Prevents user from creating or joining any group indefinitely
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowRemovalModal(false)} disabled={isSubmitting}>
+              Cancel
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={handleConfirmRemoval} 
+              disabled={isSubmitting || !removalForm.reason}
+            >
+              {isSubmitting ? 'Removing...' : 'Remove Member'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

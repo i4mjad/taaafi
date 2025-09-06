@@ -1234,7 +1234,15 @@
             "inappropriate_behavior": "Inappropriate Behavior",
             "spam": "Spam",
             "harassment": "Harassment",
-            "other": "Other"
+            "other": "Other",
+            "groupHarassment": "Group Harassment",
+            "group_harassment": "Group Harassment",
+            "groupSpam": "Group Spam",
+            "group_spam": "Group Spam",
+            "groupInappropriateContent": "Group Inappropriate Content",
+            "group_inappropriate_content": "Group Inappropriate Content",
+            "groupDisruption": "Group Disruption",
+            "group_disruption": "Group Disruption"
           },
           "severity": {
             "label": "Severity",
@@ -1357,7 +1365,8 @@
             "content": "Content",
             "support": "Support",
             "other": "Other"
-          }
+          },
+          "generalWarnings": "General Warnings"
         },
         "bans": {
           "title": "User Bans",
@@ -1399,6 +1408,7 @@
             "relatedContentTitle": "Description",
             "relatedContentTitlePlaceholder": "Enter description (optional)",
           "restrictedFeatures": "Restricted Features",
+          "otherFeatures": "Other Features",
           "restrictedDevices": "Restricted Devices",
           "issued": "Issued",
           "expires": "Expires",
@@ -1471,6 +1481,75 @@
           },
           "deviceBanNote": "Device bans are automatically app-wide",
           "userBanNote": "User bans are automatically app-wide"
+        },
+        "groups-ban": {
+          "title": "Groups Management",
+          "description": "Manage {name}'s groups participation and cooldown periods",
+          "ban-status": "Ban Status",
+          "no-bans": "No Active Bans",
+          "cooldown-status": "Cooldown Status", 
+          "no-cooldown": "No Cooldown",
+          "warnings": "Warnings",
+          "active-bans": "Active Groups Bans",
+          "cooldown-management": "Cooldown Management",
+          "extend-cooldown": "Extend Cooldown",
+          "extend-cooldown-desc": "Set a custom cooldown duration for this user",
+          "override-cooldown": "Override Cooldown",
+          "override-cooldown-desc": "Grant temporary access by overriding the current cooldown for 1 hour",
+          "cooldown-duration": "Cooldown Duration",
+          "cooldown-reason": "Reason for Extended Cooldown",
+          "cooldown-reason-placeholder": "Reason for cooldown extension...",
+          "apply-cooldown": "Apply Cooldown",
+          "activate-override": "Activate Override",
+          "cooldown-extended": "Cooldown extended successfully",
+          "cooldown-extend-failed": "Failed to extend cooldown",
+          "cooldown-override-activated": "Cooldown override activated for 1 hour",
+          "cooldown-override-failed": "Failed to activate override",
+          "quick-actions": "Quick Actions",
+          "ban-chat-only": "Ban Chat Only",
+          "ban-create-join": "Ban Create/Join",
+          "ban-all-groups": "Ban All Groups",
+          "quick-ban-applied": "Quick ban applied successfully",
+          "quick-ban-failed": "Failed to apply quick ban",
+          "groups-features": "Groups Features",
+          "groups-warnings": "Groups Warnings"
+        },
+        "groups-removal": {
+          "title": "Remove Group Member",
+          "description": "Remove {member} from {group}?",
+          "joined": "Joined",
+          "cooldown-duration": "Cooldown Duration",
+          "cooldown-24h": "24 hours (Default)",
+          "cooldown-48h": "48 hours",
+          "cooldown-72h": "72 hours",
+          "cooldown-1w": "1 week",
+          "cooldown-1m": "1 month",
+          "cooldown-explanation": "Member will not be able to join another group for this duration",
+          "removal-reason": "Removal Reason",
+          "select-reason": "Select reason for removal",
+          "admin-notes": "Admin Notes (Optional)",
+          "admin-notes-placeholder": "Additional details about the removal...",
+          "advanced-options": "Advanced Options",
+          "ban-from-all-groups": "Ban from All Groups",
+          "ban-explanation": "Prevents user from creating or joining any group indefinitely",
+          "removal-summary": "Removal Summary",
+          "membership-status": "Membership Status",
+          "will-be-inactive": "Will be Inactive",
+          "cooldown-period": "Cooldown Period",
+          "groups-access": "Groups Access",
+          "banned": "Banned",
+          "confirm-remove": "Remove Member",
+          "removal-success": "Member {member} removed successfully",
+          "removal-failed": "Failed to remove member",
+          "reason": {
+            "inappropriate-behavior": "Inappropriate Behavior",
+            "harassment": "Harassment of Members",
+            "spam": "Spam or Excessive Messages",
+            "rule-violation": "Group Rules Violation",
+            "disruption": "Group Disruption",
+            "admin-decision": "Admin Decision",
+            "other": "Other"
+          }
         }
       },
       "content": {
@@ -2650,7 +2729,18 @@
             "content": "Content",
             "communication": "Communication",
             "settings": "Settings"
-          }
+          },
+          "viewDetails": "Feature Details",
+          "viewDetailsDescription": "Complete information about this feature",
+          "basicInfo": "Basic Information",
+          "uniqueName": "Unique Name",
+          "descriptions": "Descriptions",
+          "configuration": "Configuration",
+          "timestamps": "Timestamps",
+          "createdAt": "Created At",
+          "updatedAt": "Last Updated",
+          "copySuccess": "Copied to clipboard",
+          "copyError": "Failed to copy"
         }
       },
       "admin": {
@@ -2840,6 +2930,7 @@
           "pts": "pts",
           "manageGroup": "Manage Group",
           "viewDetails": "View Details",
+          "removeMember": "Remove Member",
           "columns": "Columns",
           "noData": "No memberships found.",
           "pagination": {
@@ -2922,6 +3013,98 @@
           "removeDialog": {
             "title": "Remove Member"
           }
+        },
+        "profiles": {
+          "title": "Community Profiles",
+          "description": "Comprehensive view of member community profiles with membership history, cooldowns, and ban status",
+          "stats": {
+            "total-profiles": "Total Profiles",
+            "admins": "admins",
+            "average-points": "Average Points", 
+            "per-member": "per member",
+            "with-cooldowns": "With Cooldowns",
+            "active-cooldowns": "active cooldowns",
+            "with-bans": "With Bans",
+            "groups-bans": "groups bans",
+            "with-warnings": "With Warnings",
+            "active-warnings": "active warnings",
+            "capacity-usage": "Capacity",
+            "used": "used",
+            "community-profiles": "community profiles",
+            "total-memberships": "Total Memberships",
+            "active-members": "active members",
+            "unique-groups": "Unique Groups",
+            "groups-represented": "groups represented",
+            "filtered-results": "Filtered Results",
+            "of-total": "of {total} total",
+            "admin-actions": "Admin Actions",
+            "total-actions": "total actions",
+            "represented": "represented",
+            "matching": "matching"
+          },
+          "basic-info": "Basic Information",
+          "cp-id": "CP ID",
+          "user-id": "User ID",
+          "gender": "Gender",
+          "anonymous": "Anonymous",
+          "current-membership": "Current Membership",
+          "restrictions": "Restrictions & Status",
+          "cooldown-active": "Cooldown",
+          "banned": "Banned",
+          "warnings": "warnings",
+          "cooldown-until": "Cooldown until",
+          "duration": "duration", 
+          "no-restrictions": "No restrictions",
+          "active-bans": "active bans",
+          "active-warnings": "active warnings",
+          "total-groups": "total groups",
+          "view-user-profile": "View User Profile",
+          "remove-from-group": "Remove from Group",
+          "no-profiles": "No community profiles found",
+          "try-different-filters": "Try adjusting your search or filter criteria",
+          "active-memberships": "Active Memberships",
+          "joined": "Joined",
+          "membership-history": "Membership History",
+          "more-memberships": "more memberships",
+          "removing": "Removing...",
+          "active-ban": "Active Ban",
+          "search-placeholder": "Search community profiles...",
+          "profile-info": "Profile Info",
+          "status-restrictions": "Status & Restrictions", 
+          "membership-stats": "Membership Stats",
+          "headers": {
+            "profileInfo": "Profile Info",
+            "activeMemberships": "Active Memberships",
+            "status": "Status & Restrictions",
+            "membershipStats": "Membership Stats"
+          },
+          "memberships": {
+            "noActiveMemberships": "No active memberships",
+            "groups": "groups",
+            "totalPoints": "total points"
+          },
+          "status": {
+            "cooldownUntil": "Cooldown until",
+            "noRestrictions": "No restrictions",
+            "bans": "bans",
+            "warnings": "warnings",
+            "unknownDate": "Unknown date"
+          },
+          "roles": {
+            "admin": "admin",
+            "member": "member"
+          },
+          "actions": {
+            "openMenu": "Open menu",
+            "viewUserProfile": "View User Profile",
+            "removeFromGroup": "Remove from Group"
+          },
+          "pagination": {
+            "selected": "row(s) selected.",
+            "rows-per-page": "Rows per page",
+            "page": "Page",
+            "of": "of"
+          }
         }
       }
     },
@@ -2941,6 +3124,9 @@
       "inactive": "Inactive",
       "status": "Status",
       "actions": "Actions",
+      "admin": "Admin",
+      "member": "Member",
+      "points": "points",
       "noData": "No data",
       "loading": "Loading...",
       "error": "Error loading data",
@@ -2965,6 +3151,10 @@
       "yes": "Yes",
       "no": "No",
       "close": "Close",
+      "copy": "Copy",
+      "viewDetails": "View Details",
+      "columns": "Columns",
+      "notProvided": "Not provided",
       "last7Days": "Last 7 days",
       "last30Days": "Last 30 days",
       "last90Days": "Last 90 days",

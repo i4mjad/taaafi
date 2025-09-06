@@ -166,6 +166,7 @@ export default function GroupMembershipsPage() {
     actions: {
       viewDetails: t('modules.admin.memberships.viewDetails') || 'View Details',
       manageGroup: t('modules.admin.memberships.manageGroup') || 'Manage Group',
+      removeMember: t('modules.admin.memberships.removeMember') || 'Remove Member',
     },
     columnsText: t('modules.admin.memberships.columns') || 'Columns',
     noDataText: t('modules.admin.memberships.noData') || 'No memberships found.',
