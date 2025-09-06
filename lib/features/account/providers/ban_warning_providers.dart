@@ -75,6 +75,20 @@ Future<Map<String, bool>> featureAccess(Ref ref) async {
   return await facade.generateFeatureAccessMap();
 }
 
+/// 🚀 LAZY LOADING: Check access for a specific feature only (much faster)
+@riverpod
+Future<bool> specificFeatureAccess(Ref ref, String featureUniqueName) async {
+  final facade = ref.watch(banWarningFacadeProvider);
+  return await facade.canUserAccessFeature(featureUniqueName);
+}
+
+/// Get ban details for a specific feature (lazy loaded)
+@riverpod
+Future<Ban?> currentUserFeatureBan(Ref ref, String featureUniqueName) async {
+  final facade = ref.watch(banWarningFacadeProvider);
+  return await facade.getCurrentUserFeatureBan(featureUniqueName);
+}
+
 // ==================== DEVICE TRACKING ====================
 
 @riverpod

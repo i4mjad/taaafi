@@ -22,6 +22,15 @@ import 'package:reboot_app_3/features/community/presentation/community_onboardin
 import 'package:reboot_app_3/features/plus/data/notifiers/subscription_notifier.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+// Shorebird update imports
+import 'package:reboot_app_3/features/home/presentation/home/widgets/shorebird_update_widget.dart';
+import 'package:reboot_app_3/features/authentication/providers/account_status_provider.dart';
+import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
+import 'package:reboot_app_3/core/shared_widgets/account_action_banner.dart';
+import 'package:reboot_app_3/core/shared_widgets/complete_registration_banner.dart';
+import 'package:reboot_app_3/core/shared_widgets/confirm_details_banner.dart';
+import 'package:reboot_app_3/core/shared_widgets/confirm_email_banner.dart';
+
 class CommunityMainScreen extends ConsumerStatefulWidget {
   /// Optional initial tab to select when the screen opens
   final String? initialTab;
@@ -155,27 +164,82 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
+    final accountStatus = ref.watch(accountStatusProvider);
+    final userDocAsync = ref.watch(userDocumentsNotifierProvider);
+    final shorebirdUpdateState = ref.watch(shorebirdUpdateProvider);
     final communityProfileAsync = ref.watch(currentCommunityProfileProvider);
+
+    // Check if Shorebird update requires blocking the entire screen
+    final shouldBlockForShorebird =
+        _shouldBlockForShorebirdUpdate(shorebirdUpdateState.status);
 
     return Scaffold(
       backgroundColor: theme.backgroundColor,
-      body: communityProfileAsync.when(
-        loading: () => Container(
-          width: double.infinity,
-          height: double.infinity,
-          child: const Center(child: Spinner()),
-        ),
-        error: (error, stackTrace) {
-          print('❌ Community Main Screen: Profile error: $error');
-          print("stackTrace: $stackTrace");
-          return const Center(child: Text('Error loading profile'));
-        },
-        data: (profile) {
-          // Simple logic: if user has active profile, show main content; otherwise show onboarding
-          if (profile != null && !profile.isDeleted) {
-            return _buildMainCommunityContent();
-          } else {
-            return const CommunityOnboardingScreen();
+      body: userDocAsync.when(
+        loading: () => const Center(child: Spinner()),
+        error: (err, _) => Center(child: Text(err.toString())),
+        data: (_) {
+          // Priority 1: Check if Shorebird update requires blocking (highest priority)
+          if (shouldBlockForShorebird) {
+            return const ShorebirdUpdateBlockingWidget();
+          }
+
+          // Priority 2: Check account status
+          switch (accountStatus) {
+            case AccountStatus.loading:
+              return Center(
+                child: Spinner(),
+              );
+            case AccountStatus.needCompleteRegistration:
+              return const Center(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.0),
+                  child: CompleteRegistrationBanner(isFullScreen: true),
+                ),
+              );
+            case AccountStatus.needConfirmDetails:
+              return const Center(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.0),
+                  child: ConfirmDetailsBanner(isFullScreen: true),
+                ),
+              );
+            case AccountStatus.needEmailVerification:
+              return const Center(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.0),
+                  child: ConfirmEmailBanner(isFullScreen: true),
+                ),
+              );
+            case AccountStatus.pendingDeletion:
+              return const Center(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.0),
+                  child: AccountActionBanner(isFullScreen: true),
+                ),
+              );
+            case AccountStatus.ok:
+              // Priority 3: Check community profile status
+              return communityProfileAsync.when(
+                loading: () => Container(
+                  width: double.infinity,
+                  height: double.infinity,
+                  child: const Center(child: Spinner()),
+                ),
+                error: (error, stackTrace) {
+                  print('❌ Community Main Screen: Profile error: $error');
+                  print("stackTrace: $stackTrace");
+                  return const Center(child: Text('Error loading profile'));
+                },
+                data: (profile) {
+                  // Simple logic: if user has active profile, show main content; otherwise show onboarding
+                  if (profile != null && !profile.isDeleted) {
+                    return _buildMainCommunityContent();
+                  } else {
+                    return const CommunityOnboardingScreen();
+                  }
+                },
+              );
           }
         },
       ),
@@ -184,6 +248,9 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
 
   Widget _buildMainCommunityContent() {
     final theme = AppTheme.of(context);
+    final shorebirdUpdateState = ref.watch(shorebirdUpdateProvider);
+    final shouldBlockForShorebird =
+        _shouldBlockForShorebirdUpdate(shorebirdUpdateState.status);
 
     return Scaffold(
       appBar: appBar(
@@ -258,21 +325,23 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
       ),
       backgroundColor: theme.backgroundColor,
       body: _buildForumTab(),
-      floatingActionButton: CommunityPostGuard(
-        onAccessGranted: () {
-          showModalBottomSheet(
-            context: context,
-            isScrollControlled: true,
-            useSafeArea: true,
-            builder: (context) => NewPostScreen(),
-          );
-        },
-        child: FloatingActionButton(
-          onPressed: null, // Handled by CommunityPostGuard
-          backgroundColor: theme.primary[500],
-          child: const Icon(LucideIcons.plus, color: Colors.white),
-        ),
-      ),
+      floatingActionButton: !shouldBlockForShorebird
+          ? CommunityPostGuard(
+              onAccessGranted: () {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  useSafeArea: true,
+                  builder: (context) => NewPostScreen(),
+                );
+              },
+              child: FloatingActionButton(
+                onPressed: null, // Handled by CommunityPostGuard
+                backgroundColor: theme.primary[500],
+                child: const Icon(LucideIcons.plus, color: Colors.white),
+              ),
+            )
+          : null,
     );
   }
 
@@ -1029,6 +1098,13 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
         ),
       ),
     );
+  }
+
+  /// Determines if Shorebird update status should block the entire screen
+  bool _shouldBlockForShorebirdUpdate(AppUpdateStatus status) {
+    return status == AppUpdateStatus.available ||
+        status == AppUpdateStatus.downloading ||
+        status == AppUpdateStatus.completed;
   }
 }
 

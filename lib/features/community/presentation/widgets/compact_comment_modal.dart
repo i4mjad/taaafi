@@ -47,78 +47,81 @@ class _CompactCommentModalState extends ConsumerState<CompactCommentModal> {
     final localizations = AppLocalizations.of(context);
     final repliesAsync = ref.watch(commentRepliesProvider(widget.comment.id));
 
-    return DraggableScrollableSheet(
-      initialChildSize: 0.7,
-      minChildSize: 0.3,
-      maxChildSize: 0.9,
-      expand: false,
-      builder: (context, scrollController) {
-        return Container(
-          decoration: BoxDecoration(
-            color: theme.backgroundColor,
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(16),
-              topRight: Radius.circular(16),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: theme.grey[300]!.withValues(alpha: 0.3),
-                blurRadius: 8,
-                offset: const Offset(0, -2),
-              ),
-            ],
+    final mediaQuery = MediaQuery.of(context);
+    final safeHeight = mediaQuery.size.height -
+        mediaQuery.padding.top -
+        mediaQuery.padding.bottom;
+    final targetHeight = safeHeight * 0.8;
+
+    return SizedBox(
+      height: targetHeight,
+      child: Container(
+        decoration: BoxDecoration(
+          color: theme.backgroundColor,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(16),
+            topRight: Radius.circular(16),
           ),
-          child: Column(
-            children: [
-              // Drag handle
-              Container(
-                margin: const EdgeInsets.only(top: 12),
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: theme.grey[300],
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-
-              // Header with close button
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        localizations.translate('replies'),
-                        style: TextStyles.h6.copyWith(
-                          color: theme.grey[900],
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () => Navigator.of(context).pop(),
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: theme.grey[100],
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(
-                          LucideIcons.x,
-                          size: 20,
-                          color: theme.grey[600],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              // Content area
-              Expanded(
+          boxShadow: [
+            BoxShadow(
+              color: theme.grey[300]!.withValues(alpha: 0.3),
+              blurRadius: 8,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                controller: _scrollController,
                 child: Column(
                   children: [
+                    // Drag handle
+                    Container(
+                      margin: const EdgeInsets.only(top: 12),
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: theme.grey[300],
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+
+                    // Header with close button
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              localizations.translate('replies'),
+                              style: TextStyles.h6.copyWith(
+                                color: theme.grey[900],
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () => Navigator.of(context).pop(),
+                            child: Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: theme.grey[100],
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Icon(
+                                LucideIcons.x,
+                                size: 20,
+                                color: theme.grey[600],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
                     // Original comment (compact view)
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -126,44 +129,43 @@ class _CompactCommentModalState extends ConsumerState<CompactCommentModal> {
                         child: ResponsedCommentTileWidget(
                           comment: widget.comment,
                           isCondensed: true,
-                          onMoreTap: null, // Disable more options in modal
-                          onCommentTap: null, // Disable tap in condensed view
-                          onReplyTap:
-                              null, // Disable nested replies for original comment
+                          onMoreTap: null,
+                          onCommentTap: null,
+                          onReplyTap: null,
                         ),
                       ),
                     ),
 
-                    // Replies list
-                    Expanded(
-                      child: _buildRepliesList(
-                          theme, localizations, repliesAsync, scrollController),
+                    // Replies list (non-scrollable inside primary scroll)
+                    _buildRepliesList(
+                      theme,
+                      localizations,
+                      repliesAsync,
                     ),
                   ],
                 ),
               ),
+            ),
 
-              // Simple reply input (no context display)
-              SafeArea(
-                child: Container(
-                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-                  child: ReplyInputWidget(
-                    postId: widget.comment.postId,
-                    parentFor: 'comment',
-                    parentId: widget.comment.id,
-                    hideReplyContext: true, // Don't show parent comment preview
-                    onReplySubmitted: () {
-                      // Refresh replies
-                      ref.refresh(commentRepliesProvider(widget.comment.id));
-                      widget.onReplySubmitted?.call();
-                    },
-                  ),
+            // Simple reply input (no context display)
+            SafeArea(
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+                child: ReplyInputWidget(
+                  postId: widget.comment.postId,
+                  parentFor: 'comment',
+                  parentId: widget.comment.id,
+                  hideReplyContext: true,
+                  onReplySubmitted: () {
+                    ref.refresh(commentRepliesProvider(widget.comment.id));
+                    widget.onReplySubmitted?.call();
+                  },
                 ),
               ),
-            ],
-          ),
-        );
-      },
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -171,7 +173,6 @@ class _CompactCommentModalState extends ConsumerState<CompactCommentModal> {
     dynamic theme,
     AppLocalizations localizations,
     AsyncValue<List<Comment>> repliesAsync,
-    ScrollController scrollController,
   ) {
     return repliesAsync.when(
       data: (replies) {
@@ -180,7 +181,8 @@ class _CompactCommentModalState extends ConsumerState<CompactCommentModal> {
         }
 
         return ListView.builder(
-          controller: scrollController,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
           padding: const EdgeInsets.symmetric(vertical: 8),
           itemCount: replies.length,
           itemBuilder: (context, index) {

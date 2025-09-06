@@ -2073,8 +2073,20 @@ const Map<String, String> kEn = {
       "Your ability to create posts has been restricted",
   "comment-creation-restricted":
       "Your ability to add comments has been restricted",
+  "group-joining-restricted":
+      "Your ability to join or create groups has been restricted",
   "community-interaction-restricted":
       "Your ability to interact with content has been restricted",
+
+  // Feature names for restricted features display
+  "share_a_media": "Share Media",
+  "create_a_poll": "Create Polls",
+  "create_or_join_a_group": "Create or Join Groups",
+
+  // Feature restriction messages for snackbar
+  "media-sharing-restricted": "Your ability to share media has been restricted",
+  "poll-creation-restricted":
+      "Your ability to create polls has been restricted",
   "post_creation_banned": "You are {type} banned from creating posts",
   "comment_creation_banned": "You are {type} banned from adding comments",
   "interaction_banned": "You are {type} banned from interacting with content",

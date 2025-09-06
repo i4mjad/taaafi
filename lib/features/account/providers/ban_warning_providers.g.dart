@@ -431,6 +431,298 @@ final featureAccessProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef FeatureAccessRef = AutoDisposeFutureProviderRef<Map<String, bool>>;
+String _$specificFeatureAccessHash() =>
+    r'23e3328cc0a4055526a2882ee21d8580ff5df16b';
+
+/// 🚀 LAZY LOADING: Check access for a specific feature only (much faster)
+///
+/// Copied from [specificFeatureAccess].
+@ProviderFor(specificFeatureAccess)
+const specificFeatureAccessProvider = SpecificFeatureAccessFamily();
+
+/// 🚀 LAZY LOADING: Check access for a specific feature only (much faster)
+///
+/// Copied from [specificFeatureAccess].
+class SpecificFeatureAccessFamily extends Family<AsyncValue<bool>> {
+  /// 🚀 LAZY LOADING: Check access for a specific feature only (much faster)
+  ///
+  /// Copied from [specificFeatureAccess].
+  const SpecificFeatureAccessFamily();
+
+  /// 🚀 LAZY LOADING: Check access for a specific feature only (much faster)
+  ///
+  /// Copied from [specificFeatureAccess].
+  SpecificFeatureAccessProvider call(
+    String featureUniqueName,
+  ) {
+    return SpecificFeatureAccessProvider(
+      featureUniqueName,
+    );
+  }
+
+  @override
+  SpecificFeatureAccessProvider getProviderOverride(
+    covariant SpecificFeatureAccessProvider provider,
+  ) {
+    return call(
+      provider.featureUniqueName,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'specificFeatureAccessProvider';
+}
+
+/// 🚀 LAZY LOADING: Check access for a specific feature only (much faster)
+///
+/// Copied from [specificFeatureAccess].
+class SpecificFeatureAccessProvider extends AutoDisposeFutureProvider<bool> {
+  /// 🚀 LAZY LOADING: Check access for a specific feature only (much faster)
+  ///
+  /// Copied from [specificFeatureAccess].
+  SpecificFeatureAccessProvider(
+    String featureUniqueName,
+  ) : this._internal(
+          (ref) => specificFeatureAccess(
+            ref as SpecificFeatureAccessRef,
+            featureUniqueName,
+          ),
+          from: specificFeatureAccessProvider,
+          name: r'specificFeatureAccessProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$specificFeatureAccessHash,
+          dependencies: SpecificFeatureAccessFamily._dependencies,
+          allTransitiveDependencies:
+              SpecificFeatureAccessFamily._allTransitiveDependencies,
+          featureUniqueName: featureUniqueName,
+        );
+
+  SpecificFeatureAccessProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.featureUniqueName,
+  }) : super.internal();
+
+  final String featureUniqueName;
+
+  @override
+  Override overrideWith(
+    FutureOr<bool> Function(SpecificFeatureAccessRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: SpecificFeatureAccessProvider._internal(
+        (ref) => create(ref as SpecificFeatureAccessRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        featureUniqueName: featureUniqueName,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<bool> createElement() {
+    return _SpecificFeatureAccessProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is SpecificFeatureAccessProvider &&
+        other.featureUniqueName == featureUniqueName;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, featureUniqueName.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin SpecificFeatureAccessRef on AutoDisposeFutureProviderRef<bool> {
+  /// The parameter `featureUniqueName` of this provider.
+  String get featureUniqueName;
+}
+
+class _SpecificFeatureAccessProviderElement
+    extends AutoDisposeFutureProviderElement<bool>
+    with SpecificFeatureAccessRef {
+  _SpecificFeatureAccessProviderElement(super.provider);
+
+  @override
+  String get featureUniqueName =>
+      (origin as SpecificFeatureAccessProvider).featureUniqueName;
+}
+
+String _$currentUserFeatureBanHash() =>
+    r'30a06eb3c65d097ecc5a8c53947510b33323503f';
+
+/// Get ban details for a specific feature (lazy loaded)
+///
+/// Copied from [currentUserFeatureBan].
+@ProviderFor(currentUserFeatureBan)
+const currentUserFeatureBanProvider = CurrentUserFeatureBanFamily();
+
+/// Get ban details for a specific feature (lazy loaded)
+///
+/// Copied from [currentUserFeatureBan].
+class CurrentUserFeatureBanFamily extends Family<AsyncValue<Ban?>> {
+  /// Get ban details for a specific feature (lazy loaded)
+  ///
+  /// Copied from [currentUserFeatureBan].
+  const CurrentUserFeatureBanFamily();
+
+  /// Get ban details for a specific feature (lazy loaded)
+  ///
+  /// Copied from [currentUserFeatureBan].
+  CurrentUserFeatureBanProvider call(
+    String featureUniqueName,
+  ) {
+    return CurrentUserFeatureBanProvider(
+      featureUniqueName,
+    );
+  }
+
+  @override
+  CurrentUserFeatureBanProvider getProviderOverride(
+    covariant CurrentUserFeatureBanProvider provider,
+  ) {
+    return call(
+      provider.featureUniqueName,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'currentUserFeatureBanProvider';
+}
+
+/// Get ban details for a specific feature (lazy loaded)
+///
+/// Copied from [currentUserFeatureBan].
+class CurrentUserFeatureBanProvider extends AutoDisposeFutureProvider<Ban?> {
+  /// Get ban details for a specific feature (lazy loaded)
+  ///
+  /// Copied from [currentUserFeatureBan].
+  CurrentUserFeatureBanProvider(
+    String featureUniqueName,
+  ) : this._internal(
+          (ref) => currentUserFeatureBan(
+            ref as CurrentUserFeatureBanRef,
+            featureUniqueName,
+          ),
+          from: currentUserFeatureBanProvider,
+          name: r'currentUserFeatureBanProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$currentUserFeatureBanHash,
+          dependencies: CurrentUserFeatureBanFamily._dependencies,
+          allTransitiveDependencies:
+              CurrentUserFeatureBanFamily._allTransitiveDependencies,
+          featureUniqueName: featureUniqueName,
+        );
+
+  CurrentUserFeatureBanProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.featureUniqueName,
+  }) : super.internal();
+
+  final String featureUniqueName;
+
+  @override
+  Override overrideWith(
+    FutureOr<Ban?> Function(CurrentUserFeatureBanRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: CurrentUserFeatureBanProvider._internal(
+        (ref) => create(ref as CurrentUserFeatureBanRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        featureUniqueName: featureUniqueName,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<Ban?> createElement() {
+    return _CurrentUserFeatureBanProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is CurrentUserFeatureBanProvider &&
+        other.featureUniqueName == featureUniqueName;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, featureUniqueName.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin CurrentUserFeatureBanRef on AutoDisposeFutureProviderRef<Ban?> {
+  /// The parameter `featureUniqueName` of this provider.
+  String get featureUniqueName;
+}
+
+class _CurrentUserFeatureBanProviderElement
+    extends AutoDisposeFutureProviderElement<Ban?>
+    with CurrentUserFeatureBanRef {
+  _CurrentUserFeatureBanProviderElement(super.provider);
+
+  @override
+  String get featureUniqueName =>
+      (origin as CurrentUserFeatureBanProvider).featureUniqueName;
+}
+
 String _$currentDeviceIdHash() => r'7ed24078a1d7356374ad25f20954e24d89c1ccfe';
 
 /// See also [currentDeviceId].

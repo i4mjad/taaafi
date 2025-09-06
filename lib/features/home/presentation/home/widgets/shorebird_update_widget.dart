@@ -62,6 +62,10 @@ class ShorebirdUpdateNotifier extends StateNotifier<ShorebirdUpdateState> {
     checkForUpdate();
   }
 
+  void forceRefresh() {
+    checkForUpdate();
+  }
+
   Future<void> checkForUpdate() async {
     state = state.copyWith(status: AppUpdateStatus.checking);
 
@@ -153,17 +157,56 @@ class ShorebirdUpdateWidget extends ConsumerWidget {
     final theme = AppTheme.of(context);
     final localization = AppLocalizations.of(context);
 
-    // Only show widget if update is available, downloading, or completed
-    if (updateState.status == AppUpdateStatus.none ||
-        updateState.status == AppUpdateStatus.checking) {
+    // Show refresh option for checking state, hide for none state
+    if (updateState.status == AppUpdateStatus.none) {
       return const SizedBox.shrink();
+    }
+
+    // Show refresh button for checking state
+    if (updateState.status == AppUpdateStatus.checking) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: WidgetsContainer(
+          padding: const EdgeInsets.all(16),
+          backgroundColor: theme.grey[50],
+          borderSide: BorderSide(color: theme.grey[200]!, width: 1),
+          borderRadius: BorderRadius.circular(12),
+          child: Row(
+            children: [
+              SizedBox(
+                width: 20,
+                height: 20,
+                child: Spinner(strokeWidth: 2),
+              ),
+              horizontalSpace(Spacing.points12),
+              Expanded(
+                child: Text(
+                  localization.translate('checking-for-updates'),
+                  style: TextStyles.footnote.copyWith(
+                    color: theme.grey[700],
+                  ),
+                ),
+              ),
+              IconButton(
+                onPressed: () {
+                  HapticFeedback.lightImpact();
+                  ref.read(shorebirdUpdateProvider.notifier).forceRefresh();
+                },
+                icon: Icon(LucideIcons.refreshCw,
+                    size: 18, color: theme.grey[600]),
+                tooltip: localization.translate('check-for-updates'),
+              ),
+            ],
+          ),
+        ),
+      );
     }
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: WidgetsContainer(
         padding: const EdgeInsets.all(16),
-        backgroundColor: theme.primary[50],
+        backgroundColor: theme.backgroundColor,
         borderSide: BorderSide(color: theme.primary[200]!, width: 1),
         borderRadius: BorderRadius.circular(12),
         child: _buildContent(context, ref, updateState, theme, localization),
@@ -186,7 +229,7 @@ class ShorebirdUpdateWidget extends ConsumerWidget {
       case AppUpdateStatus.completed:
         return _buildCompleted(context, ref, theme, localization);
       case AppUpdateStatus.error:
-        return _buildError(context, theme, localization, state.error);
+        return _buildError(context, ref, theme, localization, state.error);
       default:
         return const SizedBox.shrink();
     }
@@ -383,23 +426,61 @@ class ShorebirdUpdateWidget extends ConsumerWidget {
 
   Widget _buildError(
     BuildContext context,
+    WidgetRef ref,
     CustomThemeData theme,
     AppLocalizations localization,
     String? error,
   ) {
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(
-          LucideIcons.alertCircle,
-          size: 20,
-          color: theme.error[600],
+        Row(
+          children: [
+            Icon(
+              LucideIcons.alertCircle,
+              size: 20,
+              color: theme.error[600],
+            ),
+            horizontalSpace(Spacing.points8),
+            Expanded(
+              child: Text(
+                error ?? localization.translate('something-went-wrong'),
+                style: TextStyles.small.copyWith(
+                  color: theme.error[700],
+                ),
+              ),
+            ),
+          ],
         ),
-        horizontalSpace(Spacing.points8),
-        Expanded(
-          child: Text(
-            error ?? localization.translate('something-went-wrong'),
-            style: TextStyles.small.copyWith(
-              color: theme.error[700],
+        verticalSpace(Spacing.points12),
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: () {
+              HapticFeedback.lightImpact();
+              ref.read(shorebirdUpdateProvider.notifier).checkForUpdate();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: theme.primary[600],
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(6),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(LucideIcons.refreshCw, size: 16),
+                horizontalSpace(Spacing.points8),
+                Text(
+                  localization.translate('check-for-updates'),
+                  style: TextStyles.small.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -420,7 +501,7 @@ class ShorebirdUpdateBlockingWidget extends ConsumerWidget {
     final localization = AppLocalizations.of(context);
 
     return Scaffold(
-      backgroundColor: theme.primary[50],
+      backgroundColor: theme.backgroundColor,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
@@ -571,36 +652,61 @@ class ShorebirdUpdateBlockingWidget extends ConsumerWidget {
           ),
         ),
         verticalSpace(Spacing.points24),
-        SizedBox(
-          width: double.infinity,
-          height: 56,
-          child: ElevatedButton(
-            onPressed: () {
-              HapticFeedback.lightImpact();
-              ref.read(shorebirdUpdateProvider.notifier).downloadUpdate();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: theme.primary[600],
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(LucideIcons.download, size: 20),
-                horizontalSpace(Spacing.points8),
-                Text(
-                  localization.translate('download-update'),
-                  style: TextStyles.body.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
+        Row(
+          children: [
+            Expanded(
+              child: SizedBox(
+                height: 56,
+                child: ElevatedButton(
+                  onPressed: () {
+                    HapticFeedback.lightImpact();
+                    ref.read(shorebirdUpdateProvider.notifier).downloadUpdate();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: theme.primary[600],
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(LucideIcons.download, size: 20),
+                      horizontalSpace(Spacing.points8),
+                      Text(
+                        localization.translate('download-update'),
+                        style: TextStyles.body.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
+              ),
             ),
-          ),
+            horizontalSpace(Spacing.points8),
+            SizedBox(
+              width: 48,
+              height: 56,
+              child: ElevatedButton(
+                onPressed: () {
+                  HapticFeedback.lightImpact();
+                  ref.read(shorebirdUpdateProvider.notifier).checkForUpdate();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: theme.primary[100],
+                  foregroundColor: theme.primary[700],
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: EdgeInsets.zero,
+                ),
+                child: Icon(LucideIcons.refreshCw, size: 18),
+              ),
+            ),
+          ],
         ),
       ],
     );
@@ -687,36 +793,63 @@ class ShorebirdUpdateBlockingWidget extends ConsumerWidget {
           ),
         ),
         verticalSpace(Spacing.points24),
-        SizedBox(
-          width: double.infinity,
-          height: 56,
-          child: ElevatedButton(
-            onPressed: () {
-              HapticFeedback.mediumImpact();
-              ref.read(shorebirdUpdateProvider.notifier).restartApp(context);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: theme.success[600],
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(LucideIcons.refreshCw, size: 20),
-                horizontalSpace(Spacing.points8),
-                Text(
-                  localization.translate('restart-now'),
-                  style: TextStyles.body.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
+        Row(
+          children: [
+            Expanded(
+              child: SizedBox(
+                height: 56,
+                child: ElevatedButton(
+                  onPressed: () {
+                    HapticFeedback.mediumImpact();
+                    ref
+                        .read(shorebirdUpdateProvider.notifier)
+                        .restartApp(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: theme.success[600],
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(LucideIcons.refreshCw, size: 20),
+                      horizontalSpace(Spacing.points8),
+                      Text(
+                        localization.translate('restart-now'),
+                        style: TextStyles.body.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
+              ),
             ),
-          ),
+            horizontalSpace(Spacing.points8),
+            SizedBox(
+              width: 48,
+              height: 56,
+              child: ElevatedButton(
+                onPressed: () {
+                  HapticFeedback.lightImpact();
+                  ref.read(shorebirdUpdateProvider.notifier).forceRefresh();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: theme.success[100],
+                  foregroundColor: theme.success[700],
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: EdgeInsets.zero,
+                ),
+                child: Icon(LucideIcons.refreshCw, size: 18),
+              ),
+            ),
+          ],
         ),
       ],
     );

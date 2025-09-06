@@ -480,7 +480,7 @@ class _NextJoinAllowedAtProviderElement
   String get cpId => (origin as NextJoinAllowedAtProvider).cpId;
 }
 
-String _$groupsControllerHash() => r'cade3101a9efecea7fc1506fdbf154c72ed6940b';
+String _$groupsControllerHash() => r'a93051d03bbe61d0a2658d8edab90b6bbcacc5f4';
 
 /// Controller for handling group actions (join, create, leave)
 ///

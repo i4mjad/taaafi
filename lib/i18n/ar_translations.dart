@@ -2029,7 +2029,18 @@ const Map<String, String> kAr = {
   // Feature access guard translations
   "post-creation-restricted": "تم تقييد قدرتك على إنشاء المنشورات",
   "comment-creation-restricted": "تم تقييد قدرتك على إضافة التعليقات",
+  "group-joining-restricted":
+      "تم تقييد قدرتك على الانضمام إلى المجموعات أو إنشاؤها",
   "community-interaction-restricted": "تم تقييد قدرتك على التفاعل مع المحتوى",
+
+  // Feature names for restricted features display
+  "share_a_media": "مشاركة الوسائط",
+  "create_a_poll": "إنشاء استطلاعات الرأي",
+  "create_or_join_a_group": "إنشاء المجموعات أو الانضمام إليها",
+
+  // Feature restriction messages for snackbar
+  "media-sharing-restricted": "تم تقييد قدرتك على مشاركة الوسائط",
+  "poll-creation-restricted": "تم تقييد قدرتك على إنشاء استطلاعات الرأي",
   "post_creation_banned": "أنت محظور {type} من إنشاء المنشورات",
   "comment_creation_banned": "أنت محظور {type} من إضافة التعليقات",
   "interaction_banned": "أنت محظور {type} من التفاعل مع المحتوى",

@@ -46,90 +46,91 @@ class _CommentReplyModalState extends ConsumerState<CommentReplyModal> {
     final repliesAsync =
         ref.watch(commentRepliesProvider(widget.parentComment.id));
 
-    return DraggableScrollableSheet(
-      initialChildSize: 0.7,
-      minChildSize: 0.3,
-      maxChildSize: 0.95,
-      expand: false,
-      builder: (context, scrollController) {
-        return Container(
-          decoration: BoxDecoration(
-            color: theme.backgroundColor,
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(16),
-              topRight: Radius.circular(16),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: theme.grey[300]!.withValues(alpha: 0.3),
-                blurRadius: 8,
-                offset: const Offset(0, -2),
-              ),
-            ],
+    final mediaQuery = MediaQuery.of(context);
+    final safeHeight = mediaQuery.size.height -
+        mediaQuery.padding.top -
+        mediaQuery.padding.bottom;
+    final targetHeight = safeHeight * 0.8;
+
+    return SizedBox(
+      height: targetHeight,
+      child: Container(
+        decoration: BoxDecoration(
+          color: theme.backgroundColor,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(16),
+            topRight: Radius.circular(16),
           ),
-          child: Column(
-            children: [
-              // Drag handle
-              Container(
-                margin: const EdgeInsets.only(top: 12),
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: theme.grey[300],
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-
-              // Header
-              _buildHeader(theme, localizations),
-
-              // Content area
-              Expanded(
+          boxShadow: [
+            BoxShadow(
+              color: theme.grey[300]!.withValues(alpha: 0.3),
+              blurRadius: 8,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            // Scrollable content
+            Expanded(
+              child: SingleChildScrollView(
+                controller: _scrollController,
                 child: Column(
                   children: [
-                    // Parent comment (condensed view) - Flexible to handle tight spaces
-                    Flexible(
-                      flex: 0,
-                      child: _buildParentCommentView(theme, localizations),
+                    // Drag handle
+                    Container(
+                      margin: const EdgeInsets.only(top: 12),
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: theme.grey[300],
+                        borderRadius: BorderRadius.circular(2),
+                      ),
                     ),
 
-                    // Replies list
-                    Expanded(
-                      child: _buildRepliesList(
-                          theme, localizations, repliesAsync, scrollController),
+                    // Header
+                    _buildHeader(theme, localizations),
+
+                    // Parent comment (condensed view)
+                    _buildParentCommentView(theme, localizations),
+
+                    // Replies list (non-scrollable inside primary scroll)
+                    _buildRepliesList(
+                      theme,
+                      localizations,
+                      repliesAsync,
                     ),
                   ],
                 ),
               ),
+            ),
 
-              // Reply input
-              SafeArea(
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    border: Border(
-                      top: BorderSide(color: theme.grey[200]!),
-                    ),
-                  ),
-                  child: ReplyInputWidget(
-                    postId: widget.parentComment.postId,
-                    parentFor: 'comment',
-                    parentId: widget.parentComment.id,
-                    hideReplyContext:
-                        true, // Hide comment preview since parent is already visible above
-                    onReplySubmitted: () {
-                      // Refresh replies and notify parent
-                      ref.refresh(
-                          commentRepliesProvider(widget.parentComment.id));
-                      widget.onReplySubmitted?.call();
-                    },
+            // Reply input docked at the bottom, outside the scroll area
+            SafeArea(
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  border: Border(
+                    top: BorderSide(color: theme.grey[200]!),
                   ),
                 ),
+                child: ReplyInputWidget(
+                  postId: widget.parentComment.postId,
+                  parentFor: 'comment',
+                  parentId: widget.parentComment.id,
+                  hideReplyContext: true,
+                  onReplySubmitted: () {
+                    ref.refresh(
+                      commentRepliesProvider(widget.parentComment.id),
+                    );
+                    widget.onReplySubmitted?.call();
+                  },
+                ),
               ),
-            ],
-          ),
-        );
-      },
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -344,7 +345,6 @@ class _CommentReplyModalState extends ConsumerState<CommentReplyModal> {
     dynamic theme,
     AppLocalizations localizations,
     AsyncValue<List<Comment>> repliesAsync,
-    ScrollController scrollController,
   ) {
     return repliesAsync.when(
       data: (replies) {
@@ -353,7 +353,8 @@ class _CommentReplyModalState extends ConsumerState<CommentReplyModal> {
         }
 
         return ListView.builder(
-          controller: scrollController,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
           padding: const EdgeInsets.symmetric(horizontal: 16),
           itemCount: replies.length,
           itemBuilder: (context, index) {

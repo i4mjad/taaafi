@@ -166,7 +166,7 @@ class VaultScreen extends ConsumerWidget {
           }
         },
       ),
-      floatingActionButton: showMainContent
+      floatingActionButton: showMainContent && !shouldBlockForShorebird
           ? FloatingActionButton.extended(
               backgroundColor: theme.primary[600],
               onPressed: () {

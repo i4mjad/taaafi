@@ -28,6 +28,9 @@ import 'package:reboot_app_3/features/authentication/providers/account_status_pr
 import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
 import 'package:reboot_app_3/core/shared_widgets/account_action_banner.dart';
 import 'package:reboot_app_3/core/shared_widgets/complete_registration_banner.dart';
+
+// Shorebird update imports
+import 'package:reboot_app_3/features/home/presentation/home/widgets/shorebird_update_widget.dart';
 import 'package:reboot_app_3/core/shared_widgets/confirm_details_banner.dart';
 import 'package:reboot_app_3/core/shared_widgets/confirm_email_banner.dart';
 import 'package:reboot_app_3/features/account/presentation/contact_us_modal.dart';
@@ -49,10 +52,15 @@ class AccountScreen extends ConsumerWidget {
     final AuthService authService = ref.watch(authServiceProvider);
     final userProfileState = ref.watch(userProfileNotifierProvider);
     final accountStatus = ref.watch(accountStatusProvider);
+    final shorebirdUpdateState = ref.watch(shorebirdUpdateProvider);
     final showMainContent = accountStatus == AccountStatus.ok;
     final userDocAsync = ref.watch(userDocumentsNotifierProvider);
     final theme = AppTheme.of(context);
     final customTheme = ref.watch(customThemeProvider);
+
+    // Check if Shorebird update requires blocking the entire screen
+    final shouldBlockForShorebird =
+        _shouldBlockForShorebirdUpdate(shorebirdUpdateState.status);
     return Scaffold(
         backgroundColor: theme.backgroundColor,
         appBar: appBar(context, ref, 'account', false, true, actions: [
@@ -64,375 +72,377 @@ class AccountScreen extends ConsumerWidget {
         body: userDocAsync.when(
             loading: () => const Center(child: Spinner()),
             error: (e, _) => Center(child: Text(e.toString())),
-            data: (_) => userProfileState.when(
-                  data: (userProfile) {
-                    // Handle case where userProfile is null (e.g., during account deletion)
-                    if (userProfile == null) {
-                      return const CompleteRegistrationBanner();
-                    }
+            data: (_) {
+              // Priority 1: Check if Shorebird update requires blocking (highest priority)
+              if (shouldBlockForShorebird) {
+                return const ShorebirdUpdateBlockingWidget();
+              }
 
-                    return Container(
-                      width: MediaQuery.of(context).size.width,
-                      child: SingleChildScrollView(
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              if (accountStatus == AccountStatus.loading)
-                                Center(
-                                  child: Spinner(),
+              // Priority 2: Check account status and profile data
+              return userProfileState.when(
+                data: (userProfile) {
+                  // Handle case where userProfile is null (e.g., during account deletion)
+                  if (userProfile == null) {
+                    return const CompleteRegistrationBanner();
+                  }
+
+                  return Container(
+                    width: MediaQuery.of(context).size.width,
+                    child: SingleChildScrollView(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            if (accountStatus == AccountStatus.loading)
+                              Center(
+                                child: Spinner(),
+                              ),
+
+                            // If account deletion is pending, show only the banner
+                            if (accountStatus == AccountStatus.pendingDeletion)
+                              const AccountActionBanner(isFullScreen: true),
+
+                            // Show other banners and content only if not pending deletion
+                            if (accountStatus !=
+                                AccountStatus.pendingDeletion) ...[
+                              if (!showMainContent &&
+                                  accountStatus ==
+                                      AccountStatus.needCompleteRegistration)
+                                const CompleteRegistrationBanner(),
+                              if (!showMainContent &&
+                                  accountStatus ==
+                                      AccountStatus.needConfirmDetails)
+                                const ConfirmDetailsBanner(),
+                              if (!showMainContent &&
+                                  accountStatus ==
+                                      AccountStatus.needEmailVerification)
+                                const ConfirmEmailBanner(),
+
+                              GestureDetector(
+                                onTap: () {
+                                  HapticFeedback.mediumImpact();
+                                  context
+                                      .pushNamed(RouteNames.userProfile.name);
+                                },
+                                child: UserDetailsWidget(
+                                  userProfile,
+                                  // onAvatarTap: (hasProfileImage) =>
+                                  //     _showProfileImageOptions(
+                                  //         context, ref, hasProfileImage),
                                 ),
+                              ),
+                              verticalSpace(Spacing.points24),
+                              Text(
+                                AppLocalizations.of(context)
+                                    .translate('appearance'),
+                                style: TextStyles.h6,
+                              ),
+                              verticalSpace(Spacing.points8),
+                              Consumer(
+                                builder: (context, ref, child) {
+                                  final themeNotifier =
+                                      ref.watch(customThemeProvider.notifier);
+                                  final isDarkMode =
+                                      themeNotifier.darkTheme == true;
 
-                              // If account deletion is pending, show only the banner
-                              if (accountStatus ==
-                                  AccountStatus.pendingDeletion)
-                                const AccountActionBanner(isFullScreen: true),
-
-                              // Show other banners and content only if not pending deletion
-                              if (accountStatus !=
-                                  AccountStatus.pendingDeletion) ...[
-                                if (!showMainContent &&
-                                    accountStatus ==
-                                        AccountStatus.needCompleteRegistration)
-                                  const CompleteRegistrationBanner(),
-                                if (!showMainContent &&
-                                    accountStatus ==
-                                        AccountStatus.needConfirmDetails)
-                                  const ConfirmDetailsBanner(),
-                                if (!showMainContent &&
-                                    accountStatus ==
-                                        AccountStatus.needEmailVerification)
-                                  const ConfirmEmailBanner(),
-
+                                  return Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      // Light Mode Card
+                                      GestureDetector(
+                                        onTap: () {
+                                          HapticFeedback.mediumImpact();
+                                          if (isDarkMode) {
+                                            themeNotifier.toggleTheme();
+                                          }
+                                        },
+                                        child: WidgetsContainer(
+                                          width: 80,
+                                          height: 80,
+                                          padding: const EdgeInsets.all(12),
+                                          backgroundColor: Colors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          borderSide: BorderSide(
+                                            color: !isDarkMode
+                                                ? theme.primary[600]!
+                                                : theme.grey[300]!,
+                                            width: !isDarkMode ? 2 : 1,
+                                          ),
+                                          cornerSmoothing: 1,
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Icon(
+                                                LucideIcons.sun,
+                                                size: 20,
+                                                color: !isDarkMode
+                                                    ? theme.primary[600]
+                                                    : Colors.grey[600],
+                                              ),
+                                              verticalSpace(Spacing.points4),
+                                              Text(
+                                                AppLocalizations.of(context)
+                                                    .translate('light'),
+                                                style:
+                                                    TextStyles.small.copyWith(
+                                                  color: !isDarkMode
+                                                      ? theme.primary[700]
+                                                      : Colors.grey[700],
+                                                  fontWeight: !isDarkMode
+                                                      ? FontWeight.w600
+                                                      : FontWeight.normal,
+                                                  fontSize: 11,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      horizontalSpace(Spacing.points12),
+                                      // Dark Mode Card
+                                      GestureDetector(
+                                        onTap: () {
+                                          HapticFeedback.mediumImpact();
+                                          if (!isDarkMode) {
+                                            themeNotifier.toggleTheme();
+                                          }
+                                        },
+                                        child: WidgetsContainer(
+                                          width: 80,
+                                          height: 80,
+                                          padding: const EdgeInsets.all(12),
+                                          backgroundColor: Color(0xFF1A1A1A),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          borderSide: BorderSide(
+                                            color: isDarkMode
+                                                ? theme.primary[600]!
+                                                : Colors.grey[300]!,
+                                            width: isDarkMode ? 2 : 1,
+                                          ),
+                                          cornerSmoothing: 1,
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Icon(
+                                                LucideIcons.moon,
+                                                size: 20,
+                                                color: isDarkMode
+                                                    ? theme.primary[400]
+                                                    : Colors.grey[400],
+                                              ),
+                                              verticalSpace(Spacing.points4),
+                                              Text(
+                                                AppLocalizations.of(context)
+                                                    .translate('dark'),
+                                                style:
+                                                    TextStyles.small.copyWith(
+                                                  color: isDarkMode
+                                                      ? theme.primary[300]
+                                                      : Colors.grey[400],
+                                                  fontWeight: isDarkMode
+                                                      ? FontWeight.w600
+                                                      : FontWeight.normal,
+                                                  fontSize: 11,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              ),
+                              verticalSpace(Spacing.points8),
+                              // Language Section
+                              Text(
+                                AppLocalizations.of(context)
+                                    .translate('change-lang'),
+                                style: TextStyles.body.copyWith(
+                                  color: theme.grey[700],
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              verticalSpace(Spacing.points8),
+                              CustomSegmentedButton(
+                                options: [
+                                  SegmentedButtonOption(
+                                      value: 'arabic',
+                                      translationKey: 'arabic'),
+                                  SegmentedButtonOption(
+                                      value: 'english',
+                                      translationKey: 'english'),
+                                ],
+                                selectedOption:
+                                    _getSelectedLocale(context, ref),
+                                onChanged: (value) {
+                                  _updateThelocale(value, ref);
+                                },
+                              ),
+                              verticalSpace(Spacing.points24),
+                              Text(
+                                AppLocalizations.of(context).translate('user'),
+                                style: TextStyles.h6,
+                              ),
+                              verticalSpace(Spacing.points8),
+                              if (showMainContent)
                                 GestureDetector(
                                   onTap: () {
-                                    HapticFeedback.mediumImpact();
                                     context
-                                        .pushNamed(RouteNames.userProfile.name);
+                                        .pushNamed(RouteNames.userReports.name);
                                   },
-                                  child: UserDetailsWidget(
-                                    userProfile,
-                                    // onAvatarTap: (hasProfileImage) =>
-                                    //     _showProfileImageOptions(
-                                    //         context, ref, hasProfileImage),
+                                  child: SettingsButton(
+                                    icon: LucideIcons.fileText,
+                                    textKey: 'my-reports',
                                   ),
                                 ),
-                                verticalSpace(Spacing.points24),
-                                Text(
-                                  AppLocalizations.of(context)
-                                      .translate('appearance'),
-                                  style: TextStyles.h6,
+                              verticalSpace(Spacing.points8),
+                              FeatureAccessGuard(
+                                featureUniqueName:
+                                    AppFeaturesConfig.contactAdmin,
+                                onTap: () => _showContactUsModal(context, ref),
+                                customBanMessage: AppLocalizations.of(context)
+                                    .translate('contact-support-restricted'),
+                                child: SettingsButton(
+                                  icon: LucideIcons.helpCircle,
+                                  textKey: 'contact-support-team',
                                 ),
-                                verticalSpace(Spacing.points8),
+                              ),
+                              verticalSpace(Spacing.points8),
+                              if (showMainContent)
                                 Consumer(
                                   builder: (context, ref, child) {
-                                    final themeNotifier =
-                                        ref.watch(customThemeProvider.notifier);
-                                    final isDarkMode =
-                                        themeNotifier.darkTheme == true;
+                                    final hasActiveSubscription = ref
+                                        .watch(hasActiveSubscriptionProvider);
 
-                                    return Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        // Light Mode Card
-                                        GestureDetector(
-                                          onTap: () {
-                                            HapticFeedback.mediumImpact();
-                                            if (isDarkMode) {
-                                              themeNotifier.toggleTheme();
-                                            }
-                                          },
-                                          child: WidgetsContainer(
-                                            width: 80,
-                                            height: 80,
-                                            padding: const EdgeInsets.all(12),
-                                            backgroundColor: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(12),
-                                            borderSide: BorderSide(
-                                              color: !isDarkMode
-                                                  ? theme.primary[600]!
-                                                  : theme.grey[300]!,
-                                              width: !isDarkMode ? 2 : 1,
-                                            ),
-                                            cornerSmoothing: 1,
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Icon(
-                                                  LucideIcons.sun,
-                                                  size: 20,
-                                                  color: !isDarkMode
-                                                      ? theme.primary[600]
-                                                      : Colors.grey[600],
-                                                ),
-                                                verticalSpace(Spacing.points4),
-                                                Text(
-                                                  AppLocalizations.of(context)
-                                                      .translate('light'),
-                                                  style:
-                                                      TextStyles.small.copyWith(
-                                                    color: !isDarkMode
-                                                        ? theme.primary[700]
-                                                        : Colors.grey[700],
-                                                    fontWeight: !isDarkMode
-                                                        ? FontWeight.w600
-                                                        : FontWeight.normal,
-                                                    fontSize: 11,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
+                                    if (hasActiveSubscription) {
+                                      // Show feature suggestion for Plus users
+                                      return GestureDetector(
+                                        onTap: () =>
+                                            _showFeatureSuggestionModal(
+                                                context, ref),
+                                        child: SettingsButton(
+                                          icon: LucideIcons.lightbulb,
+                                          textKey: 'suggest-feature',
                                         ),
-                                        horizontalSpace(Spacing.points12),
-                                        // Dark Mode Card
-                                        GestureDetector(
-                                          onTap: () {
-                                            HapticFeedback.mediumImpact();
-                                            if (!isDarkMode) {
-                                              themeNotifier.toggleTheme();
-                                            }
-                                          },
-                                          child: WidgetsContainer(
-                                            width: 80,
-                                            height: 80,
-                                            padding: const EdgeInsets.all(12),
-                                            backgroundColor: Color(0xFF1A1A1A),
-                                            borderRadius:
-                                                BorderRadius.circular(12),
-                                            borderSide: BorderSide(
-                                              color: isDarkMode
-                                                  ? theme.primary[600]!
-                                                  : Colors.grey[300]!,
-                                              width: isDarkMode ? 2 : 1,
-                                            ),
-                                            cornerSmoothing: 1,
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Icon(
-                                                  LucideIcons.moon,
-                                                  size: 20,
-                                                  color: isDarkMode
-                                                      ? theme.primary[400]
-                                                      : Colors.grey[400],
-                                                ),
-                                                verticalSpace(Spacing.points4),
-                                                Text(
-                                                  AppLocalizations.of(context)
-                                                      .translate('dark'),
-                                                  style:
-                                                      TextStyles.small.copyWith(
-                                                    color: isDarkMode
-                                                        ? theme.primary[300]
-                                                        : Colors.grey[400],
-                                                    fontWeight: isDarkMode
-                                                        ? FontWeight.w600
-                                                        : FontWeight.normal,
-                                                    fontSize: 11,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
+                                      );
+                                    } else {
+                                      // Show premium upgrade modal for free users
+                                      return GestureDetector(
+                                        onTap: () => _showSubscriptionModal(
+                                            context, ref),
+                                        child: SettingsButton(
+                                          icon: LucideIcons.star,
+                                          textKey: 'suggest-feature-plus-only',
+                                          type: 'app',
                                         ),
-                                      ],
-                                    );
+                                      );
+                                    }
                                   },
                                 ),
-                                verticalSpace(Spacing.points8),
-                                // Language Section
-                                Text(
-                                  AppLocalizations.of(context)
-                                      .translate('change-lang'),
-                                  style: TextStyles.body.copyWith(
-                                    color: theme.grey[700],
-                                    fontWeight: FontWeight.w500,
-                                  ),
+                              verticalSpace(Spacing.points8),
+                              SettingsButton(
+                                icon: LucideIcons.logOut,
+                                textKey: 'log-out',
+                                action: () async {
+                                  await authService.signOut(context, ref);
+                                  getSuccessSnackBar(
+                                      context, 'logged-out-successfully');
+                                },
+                              ),
+                              verticalSpace(Spacing.points8),
+                              GestureDetector(
+                                onTap: () async {
+                                  unawaited(ref
+                                      .read(analyticsFacadeProvider)
+                                      .trackUserDeleteAccount());
+
+                                  context
+                                      .goNamed(RouteNames.accountDelete.name);
+                                },
+                                child: SettingsButton(
+                                  icon: LucideIcons.userX,
+                                  textKey: 'delete-my-account',
+                                  type: 'error',
                                 ),
-                                verticalSpace(Spacing.points8),
-                                CustomSegmentedButton(
-                                  options: [
-                                    SegmentedButtonOption(
-                                        value: 'arabic',
-                                        translationKey: 'arabic'),
-                                    SegmentedButtonOption(
-                                        value: 'english',
-                                        translationKey: 'english'),
-                                  ],
-                                  selectedOption:
-                                      _getSelectedLocale(context, ref),
-                                  onChanged: (value) {
-                                    _updateThelocale(value, ref);
-                                  },
-                                ),
-                                verticalSpace(Spacing.points24),
-                                Text(
-                                  AppLocalizations.of(context)
-                                      .translate('user'),
-                                  style: TextStyles.h6,
-                                ),
-                                verticalSpace(Spacing.points8),
-                                if (showMainContent)
-                                  GestureDetector(
-                                    onTap: () {
-                                      context.pushNamed(
-                                          RouteNames.userReports.name);
-                                    },
+                              ),
+                              verticalSpace(Spacing.points8),
+                              // Manual Update Check
+                              SettingsButton(
+                                icon: LucideIcons.download,
+                                textKey: 'check-for-updates',
+                                type: 'app',
+                                action: () {
+                                  _showUpdateCheckModal(context, ref);
+                                },
+                              ),
+                              verticalSpace(Spacing.points8),
+                              // Contact Us and Rate App in one row
+                              Row(
+                                children: [
+                                  Expanded(
                                     child: SettingsButton(
-                                      icon: LucideIcons.fileText,
-                                      textKey: 'my-reports',
+                                      icon: LucideIcons.messageCircle,
+                                      textKey:
+                                          'contact-us-through-this-channels',
+                                      action: () async {
+                                        await ref
+                                            .read(urlLauncherProvider)
+                                            .launch(Uri.parse(
+                                                'https://wa.me/96876691799'));
+                                      },
                                     ),
                                   ),
-                                verticalSpace(Spacing.points8),
-                                FeatureAccessGuard(
-                                  featureUniqueName:
-                                      AppFeaturesConfig.contactAdmin,
-                                  onTap: () =>
-                                      _showContactUsModal(context, ref),
-                                  customBanMessage: AppLocalizations.of(context)
-                                      .translate('contact-support-restricted'),
-                                  child: SettingsButton(
-                                    icon: LucideIcons.helpCircle,
-                                    textKey: 'contact-support-team',
+                                  horizontalSpace(Spacing.points8),
+                                  Expanded(
+                                    child: SettingsButton(
+                                      icon: LucideIcons.star,
+                                      textKey: 'rate-app',
+                                      action: () async {
+                                        await ref
+                                            .read(inAppRatingServiceProvider)
+                                            .requestReview(context);
+                                      },
+                                    ),
                                   ),
-                                ),
-                                verticalSpace(Spacing.points8),
-                                if (showMainContent)
-                                  Consumer(
-                                    builder: (context, ref, child) {
-                                      final hasActiveSubscription = ref
-                                          .watch(hasActiveSubscriptionProvider);
-
-                                      if (hasActiveSubscription) {
-                                        // Show feature suggestion for Plus users
-                                        return GestureDetector(
-                                          onTap: () =>
-                                              _showFeatureSuggestionModal(
-                                                  context, ref),
-                                          child: SettingsButton(
-                                            icon: LucideIcons.lightbulb,
-                                            textKey: 'suggest-feature',
-                                          ),
-                                        );
-                                      } else {
-                                        // Show premium upgrade modal for free users
-                                        return GestureDetector(
-                                          onTap: () => _showSubscriptionModal(
-                                              context, ref),
-                                          child: SettingsButton(
-                                            icon: LucideIcons.star,
-                                            textKey:
-                                                'suggest-feature-plus-only',
-                                            type: 'app',
-                                          ),
-                                        );
-                                      }
-                                    },
-                                  ),
-                                verticalSpace(Spacing.points8),
-                                SettingsButton(
-                                  icon: LucideIcons.logOut,
-                                  textKey: 'log-out',
-                                  action: () async {
-                                    await authService.signOut(context, ref);
-                                    getSuccessSnackBar(
-                                        context, 'logged-out-successfully');
+                                ],
+                              ),
+                              verticalSpace(Spacing.points24),
+                              // Version at the bottom without container
+                              Center(
+                                child: GestureDetector(
+                                  onTap: () {
+                                    launchUrl(Uri.parse('https://ta3afi.app'));
                                   },
-                                ),
-                                verticalSpace(Spacing.points8),
-                                GestureDetector(
-                                  onTap: () async {
-                                    unawaited(ref
-                                        .read(analyticsFacadeProvider)
-                                        .trackUserDeleteAccount());
-
-                                    context
-                                        .goNamed(RouteNames.accountDelete.name);
-                                  },
-                                  child: SettingsButton(
-                                    icon: LucideIcons.userX,
-                                    textKey: 'delete-my-account',
-                                    type: 'error',
-                                  ),
-                                ),
-                                verticalSpace(Spacing.points8),
-                                // Manual Update Check
-                                SettingsButton(
-                                  icon: LucideIcons.download,
-                                  textKey: 'check-for-updates',
-                                  type: 'app',
-                                  action: () {
-                                    _showUpdateCheckModal(context, ref);
-                                  },
-                                ),
-                                verticalSpace(Spacing.points8),
-                                // Contact Us and Rate App in one row
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: SettingsButton(
-                                        icon: LucideIcons.messageCircle,
-                                        textKey:
-                                            'contact-us-through-this-channels',
-                                        action: () async {
-                                          await ref
-                                              .read(urlLauncherProvider)
-                                              .launch(Uri.parse(
-                                                  'https://wa.me/96876691799'));
-                                        },
-                                      ),
-                                    ),
-                                    horizontalSpace(Spacing.points8),
-                                    Expanded(
-                                      child: SettingsButton(
-                                        icon: LucideIcons.star,
-                                        textKey: 'rate-app',
-                                        action: () async {
-                                          await ref
-                                              .read(inAppRatingServiceProvider)
-                                              .requestReview(context);
-                                        },
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                verticalSpace(Spacing.points24),
-                                // Version at the bottom without container
-                                Center(
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      launchUrl(
-                                          Uri.parse('https://ta3afi.app'));
-                                    },
-                                    child: Text(
-                                      AppLocalizations.of(context)
-                                          .translate('version-number'),
-                                      style: TextStyles.caption.copyWith(
-                                        color: theme.grey[600],
-                                      ),
+                                  child: Text(
+                                    AppLocalizations.of(context)
+                                        .translate('version-number'),
+                                    style: TextStyles.caption.copyWith(
+                                      color: theme.grey[600],
                                     ),
                                   ),
                                 ),
+                              ),
 
-                                verticalSpace(Spacing.points12),
-                              ],
+                              verticalSpace(Spacing.points12),
                             ],
-                          ),
+                          ],
                         ),
                       ),
-                    );
-                  },
-                  error: (error, stackTrace) =>
-                      Center(child: Text('Error: $error')),
-                  loading: () => Center(child: Spinner()),
-                )));
+                    ),
+                  );
+                },
+                error: (error, stackTrace) =>
+                    Center(child: Text('Error: $error')),
+                loading: () => Center(child: Spinner()),
+              );
+            }));
   }
 
   void _showContactUsModal(BuildContext context, WidgetRef ref) {
@@ -1450,4 +1460,11 @@ class _UpdateCheckModalState extends ConsumerState<UpdateCheckModal> {
       ],
     );
   }
+}
+
+/// Determines if Shorebird update status should block the entire screen
+bool _shouldBlockForShorebirdUpdate(AppUpdateStatus status) {
+  return status == AppUpdateStatus.available ||
+      status == AppUpdateStatus.downloading ||
+      status == AppUpdateStatus.completed;
 }
