@@ -19,6 +19,7 @@ import 'package:reboot_app_3/features/authentication/providers/user_document_pro
 import 'package:reboot_app_3/features/notifications/data/repositories/notifications_repository.dart';
 
 import 'package:reboot_app_3/features/home/presentation/home/widgets/main_home_view.dart';
+import 'package:reboot_app_3/features/home/presentation/home/widgets/shorebird_update_widget.dart';
 
 class HomeScreen extends ConsumerWidget {
   HomeScreen({super.key});
@@ -29,7 +30,12 @@ class HomeScreen extends ConsumerWidget {
     final notificationsEnabled = ref.watch(notificationsEnabledProvider);
     final accountStatus = ref.watch(accountStatusProvider);
     final userDocAsync = ref.watch(userDocumentsNotifierProvider);
+    final shorebirdUpdateState = ref.watch(shorebirdUpdateProvider);
     final showMainContent = accountStatus == AccountStatus.ok;
+
+    // Check if Shorebird update requires blocking the entire screen
+    final shouldBlockForShorebird =
+        _shouldBlockForShorebirdUpdate(shorebirdUpdateState.status);
 
     final localization = AppLocalizations.of(context);
 
@@ -103,6 +109,12 @@ class HomeScreen extends ConsumerWidget {
         loading: () => const Center(child: Spinner()),
         error: (err, _) => Center(child: Text(err.toString())),
         data: (_) {
+          // Priority 1: Check if Shorebird update requires blocking (highest priority)
+          if (shouldBlockForShorebird) {
+            return const ShorebirdUpdateBlockingWidget();
+          }
+
+          // Priority 2: Check account status
           switch (accountStatus) {
             case AccountStatus.loading:
               return Center(
@@ -142,5 +154,12 @@ class HomeScreen extends ConsumerWidget {
         },
       ),
     );
+  }
+
+  /// Determines if Shorebird update status should block the entire screen
+  bool _shouldBlockForShorebirdUpdate(AppUpdateStatus status) {
+    return status == AppUpdateStatus.available ||
+        status == AppUpdateStatus.downloading ||
+        status == AppUpdateStatus.completed;
   }
 }

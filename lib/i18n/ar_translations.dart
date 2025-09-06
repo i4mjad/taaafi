@@ -1078,6 +1078,26 @@ const Map<String, String> kAr = {
   "update-complete-message":
       "تم تحميل التحديث بنجاح. يرجى إعادة تشغيل التطبيق لتطبيق التغييرات.",
   "restart-app": "إعادة تشغيل التطبيق",
+
+  // Full-screen Shorebird update blocking messages
+  "update-required": "تحديث مطلوب",
+  "updating-app": "جاري تحديث التطبيق",
+  "update-failed": "فشل التحديث",
+  "critical-update-message":
+      "تحديث حاسم مطلوب لمتابعة استخدام التطبيق. يرجى تحميل وتثبيت التحديث.",
+  "please-wait-updating": "يرجى الانتظار",
+  "restart-required-message":
+      "تم تثبيت التحديث بنجاح. يحتاج التطبيق إلى إعادة التشغيل لتطبيق التغييرات.",
+  "update-error-message": "حدث خطأ أثناء تحديث التطبيق.",
+  "blocking-update-message":
+      "هذا التحديث مطلوب لمتابعة استخدام التطبيق. سيتم تحميل وتثبيت التحديث تلقائياً.",
+  "download-update": "تحميل التحديث",
+  "download-in-progress-message":
+      "يرجى عدم إغلاق التطبيق أثناء تحميل وتثبيت التحديث.",
+  "update-success-restart-message":
+      "اكتمل التحديث بنجاح! سيتم إعادة تشغيل التطبيق لتطبيق التغييرات.",
+  "restart-now": "إعادة التشغيل الآن",
+  "update-error-generic": "فشل في تحميل التحديث. يرجى المحاولة مرة أخرى.",
   "personal-data": "المجتمع",
   "relapses-number": "عدد الانتكاسات: ",
   "day": "يوم",

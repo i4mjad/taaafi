@@ -83,8 +83,13 @@ class VaultScreen extends ConsumerWidget {
     final theme = AppTheme.of(context);
     final themeController = ref.watch(customThemeProvider);
     final accountStatus = ref.watch(accountStatusProvider);
+    final shorebirdUpdateState = ref.watch(shorebirdUpdateProvider);
     final showMainContent = accountStatus == AccountStatus.ok;
     final userDocAsync = ref.watch(userDocumentsNotifierProvider);
+
+    // Check if Shorebird update requires blocking the entire screen
+    final shouldBlockForShorebird =
+        _shouldBlockForShorebirdUpdate(shorebirdUpdateState.status);
     return Scaffold(
       backgroundColor: theme.backgroundColor,
       appBar: appBar(
@@ -119,6 +124,12 @@ class VaultScreen extends ConsumerWidget {
         loading: () => const Center(child: Spinner()),
         error: (err, _) => Center(child: Text(err.toString())),
         data: (_) {
+          // Priority 1: Check if Shorebird update requires blocking (highest priority)
+          if (shouldBlockForShorebird) {
+            return const ShorebirdUpdateBlockingWidget();
+          }
+
+          // Priority 2: Check account status
           switch (accountStatus) {
             case AccountStatus.loading:
               return Center(child: Spinner());
@@ -292,10 +303,6 @@ class VaultScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Shorebird update widget
-                const ShorebirdUpdateWidget(),
-                verticalSpace(Spacing.points16),
-
                 // Data restoration button (for eligible users)
                 const DataRestorationButton(),
 
@@ -696,5 +703,12 @@ class VaultScreen extends ConsumerWidget {
         VaultHelpSheets.showPremiumFeatureHelp(context, sectionKey);
         break;
     }
+  }
+
+  /// Determines if Shorebird update status should block the entire screen
+  bool _shouldBlockForShorebirdUpdate(AppUpdateStatus status) {
+    return status == AppUpdateStatus.available ||
+        status == AppUpdateStatus.downloading ||
+        status == AppUpdateStatus.completed;
   }
 }

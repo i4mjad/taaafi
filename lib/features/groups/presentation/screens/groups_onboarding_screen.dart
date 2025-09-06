@@ -10,6 +10,9 @@ import 'package:reboot_app_3/core/shared_widgets/confirm_details_banner.dart';
 import 'package:reboot_app_3/core/shared_widgets/confirm_email_banner.dart';
 import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 
+// Shorebird update imports
+import 'package:reboot_app_3/features/home/presentation/home/widgets/shorebird_update_widget.dart';
+
 class GroupsOnboardingScreen extends ConsumerWidget {
   const GroupsOnboardingScreen({super.key});
 
@@ -18,6 +21,11 @@ class GroupsOnboardingScreen extends ConsumerWidget {
     final theme = AppTheme.of(context);
     final accountStatus = ref.watch(accountStatusProvider);
     final userDocAsync = ref.watch(userDocumentsNotifierProvider);
+    final shorebirdUpdateState = ref.watch(shorebirdUpdateProvider);
+
+    // Check if Shorebird update requires blocking the entire screen
+    final shouldBlockForShorebird =
+        _shouldBlockForShorebirdUpdate(shorebirdUpdateState.status);
 
     return Scaffold(
       backgroundColor: theme.backgroundColor,
@@ -25,6 +33,12 @@ class GroupsOnboardingScreen extends ConsumerWidget {
         loading: () => const Center(child: Spinner()),
         error: (err, _) => Center(child: Text(err.toString())),
         data: (_) {
+          // Priority 1: Check if Shorebird update requires blocking (highest priority)
+          if (shouldBlockForShorebird) {
+            return const ShorebirdUpdateBlockingWidget();
+          }
+
+          // Priority 2: Check account status
           switch (accountStatus) {
             case AccountStatus.loading:
               return const Center(child: Spinner());
@@ -63,5 +77,12 @@ class GroupsOnboardingScreen extends ConsumerWidget {
         },
       ),
     );
+  }
+
+  /// Determines if Shorebird update status should block the entire screen
+  bool _shouldBlockForShorebirdUpdate(AppUpdateStatus status) {
+    return status == AppUpdateStatus.available ||
+        status == AppUpdateStatus.downloading ||
+        status == AppUpdateStatus.completed;
   }
 }

@@ -125,26 +125,7 @@ class AccountScreen extends ConsumerWidget {
                                       .translate('appearance'),
                                   style: TextStyles.h6,
                                 ),
-                                verticalSpace(Spacing.points16),
-                                // Color Scheme Section
-                                Text(
-                                  AppLocalizations.of(context)
-                                      .translate('color-scheme'),
-                                  style: TextStyles.body.copyWith(
-                                    color: theme.grey[700],
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                verticalSpace(Spacing.points4),
-                                Text(
-                                  AppLocalizations.of(context)
-                                      .translate('color-scheme-description'),
-                                  style: TextStyles.small.copyWith(
-                                    color: theme.grey[500],
-                                    height: 1.4,
-                                  ),
-                                ),
-                                verticalSpace(Spacing.points12),
+                                verticalSpace(Spacing.points8),
                                 Consumer(
                                   builder: (context, ref, child) {
                                     final themeNotifier =
@@ -265,7 +246,7 @@ class AccountScreen extends ConsumerWidget {
                                     );
                                   },
                                 ),
-                                verticalSpace(Spacing.points16),
+                                verticalSpace(Spacing.points8),
                                 // Language Section
                                 Text(
                                   AppLocalizations.of(context)

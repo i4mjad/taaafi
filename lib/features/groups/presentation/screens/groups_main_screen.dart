@@ -27,6 +27,9 @@ import 'package:reboot_app_3/features/groups/presentation/widgets/join_cooldown_
 import '../../../account/presentation/widgets/feature_access_guard.dart';
 import '../../../account/data/app_features_config.dart';
 
+// Shorebird update imports
+import 'package:reboot_app_3/features/home/presentation/home/widgets/shorebird_update_widget.dart';
+
 class GroupsMainScreen extends ConsumerWidget {
   const GroupsMainScreen({super.key});
 
@@ -37,6 +40,11 @@ class GroupsMainScreen extends ConsumerWidget {
     final accountStatus = ref.watch(accountStatusProvider);
     final userDocAsync = ref.watch(userDocumentsNotifierProvider);
     final groupsStatusAsync = ref.watch(groupsStatusProvider);
+    final shorebirdUpdateState = ref.watch(shorebirdUpdateProvider);
+
+    // Check if Shorebird update requires blocking the entire screen
+    final shouldBlockForShorebird =
+        _shouldBlockForShorebirdUpdate(shorebirdUpdateState.status);
 
     return Scaffold(
       backgroundColor: theme.backgroundColor,
@@ -44,6 +52,12 @@ class GroupsMainScreen extends ConsumerWidget {
         loading: () => const Center(child: Spinner()),
         error: (err, _) => Center(child: Text(err.toString())),
         data: (_) {
+          // Priority 1: Check if Shorebird update requires blocking (highest priority)
+          if (shouldBlockForShorebird) {
+            return const ShorebirdUpdateBlockingWidget();
+          }
+
+          // Priority 2: Check account status
           switch (accountStatus) {
             case AccountStatus.loading:
               return const Center(child: Spinner());
@@ -835,5 +849,12 @@ class GroupsMainScreen extends ConsumerWidget {
         groupType: 'private',
       ),
     ];
+  }
+
+  /// Determines if Shorebird update status should block the entire screen
+  bool _shouldBlockForShorebirdUpdate(AppUpdateStatus status) {
+    return status == AppUpdateStatus.available ||
+        status == AppUpdateStatus.downloading ||
+        status == AppUpdateStatus.completed;
   }
 }

@@ -40,6 +40,26 @@ const Map<String, String> kEn = {
   "update-complete-message":
       "The update has been downloaded successfully. Please restart the app to apply the changes.",
   "restart-app": "Restart App",
+
+  // Full-screen Shorebird update blocking messages
+  "update-required": "Update Required",
+  "updating-app": "Updating App",
+  "update-failed": "Update Failed",
+  "critical-update-message":
+      "A critical update is required to continue using the app. Please download and install the update.",
+  "please-wait-updating": "Please Wait",
+  "restart-required-message":
+      "The update has been installed successfully. The app needs to restart to apply the changes.",
+  "update-error-message": "An error occurred while updating the app.",
+  "blocking-update-message":
+      "This update is required to continue using the app. The update will be downloaded and installed automatically.",
+  "download-update": "Download Update",
+  "download-in-progress-message":
+      "Please do not close the app while the update is being downloaded and installed.",
+  "update-success-restart-message":
+      "Update completed successfully! The app will restart to apply the changes.",
+  "restart-now": "Restart Now",
+  "update-error-generic": "Failed to download the update. Please try again.",
   "welcome": "Welcome!",
   "welcome-back": "Welcome Back",
   "dashboard-subtitle": "Your recovery journey at a glance",
