@@ -75,8 +75,22 @@ interface MessagesTableProps {
   groups: Array<{ id: string; name: string; }>;
   reports: Array<{ relatedContent?: { contentId: string; }; }>;
   onBulkAction?: (selectedIds: string[], action: 'approve' | 'hide' | 'delete', reason?: string) => Promise<void>;
-  onMessageModeration?: (messageId: string, action: 'approve' | 'block' | 'hide' | 'delete', reason?: string, violationType?: string) => Promise<boolean>;
+  onMessageModeration?: (messageId: string, action: 'approve' | 'block' | 'hide' | 'delete' | 'unhide', reason?: string, violationType?: string) => Promise<boolean>;
+  onStatsUpdate?: (stats: MessageStats) => void;
   locale?: string;
+}
+
+export interface MessageStats {
+  total: number;
+  pending: number;
+  approved: number;
+  blocked: number;
+  reported: number;
+  hidden: number;
+  deleted: number;
+  currentPage: number;
+  totalPages: number;
+  itemsShown: number;
 }
 
 const PAGE_SIZE = 20;
@@ -89,10 +103,12 @@ export function MessagesTable({
   reports = [],
   onBulkAction,
   onMessageModeration,
+  onStatsUpdate,
   locale = 'en'
 }: MessagesTableProps) {
   const { t } = useTranslation();
   const [messages, setMessages] = useState<GroupMessage[]>([]);
+  const [allMessages, setAllMessages] = useState<GroupMessage[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -101,6 +117,7 @@ export function MessagesTable({
   const [hasNext, setHasNext] = useState(false);
   const [hasPrev, setHasPrev] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   
   // Bulk action dialog state
   const [showBulkDialog, setShowBulkDialog] = useState(false);
@@ -114,7 +131,7 @@ export function MessagesTable({
   
   // Individual moderation dialog state
   const [showModerationDialog, setShowModerationDialog] = useState(false);
-  const [moderationAction, setModerationAction] = useState<'approve' | 'block' | 'hide' | 'delete'>('block');
+  const [moderationAction, setModerationAction] = useState<'approve' | 'block' | 'hide' | 'delete' | 'unhide'>('block');
   const [moderationReason, setModerationReason] = useState('');
   const [violationType, setViolationType] = useState('');
   const [isProcessingModeration, setIsProcessingModeration] = useState(false);
@@ -135,7 +152,7 @@ export function MessagesTable({
   }, [reports]);
 
   // Build query constraints
-  const buildQueryConstraints = (): QueryConstraint[] => {
+  const buildQueryConstraints = (includePagination: boolean = true): QueryConstraint[] => {
     const constraints: QueryConstraint[] = [orderBy('createdAt', 'desc')];
     
     if (groupFilter && groupFilter !== 'all') {
@@ -150,16 +167,81 @@ export function MessagesTable({
       }
     }
     
-    constraints.push(limit(PAGE_SIZE + 1)); // +1 to check if there's a next page
+    if (includePagination) {
+      constraints.push(limit(PAGE_SIZE + 1)); // +1 to check if there's a next page
+    }
     
     return constraints;
+  };
+
+  // Fetch all messages for statistics calculation
+  const fetchAllMessagesForStats = async () => {
+    try {
+      const constraints = buildQueryConstraints(false); // No pagination for stats
+      const messagesQuery = query(collection(db, 'group_messages'), ...constraints);
+      const snapshot = await getDocs(messagesQuery);
+      
+      let fetchedMessages = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data().createdAt?.toDate() || new Date(),
+      })) as GroupMessage[];
+
+      // Apply client-side filtering
+      if (searchQuery) {
+        fetchedMessages = fetchedMessages.filter(message => 
+          message.body?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          message.senderCpId?.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+      }
+
+      if (statusFilter === 'reported') {
+        fetchedMessages = fetchedMessages.filter(message => 
+          reportedMessageIds.has(message.id)
+        );
+      }
+
+      setAllMessages(fetchedMessages);
+      calculateAndReportStats(fetchedMessages);
+      
+      return fetchedMessages;
+    } catch (error) {
+      console.error('Error fetching all messages for stats:', error);
+      return [];
+    }
+  };
+
+  // Calculate and report statistics to parent
+  const calculateAndReportStats = (allMsgs: GroupMessage[]) => {
+    if (!onStatsUpdate) return;
+
+    const stats: MessageStats = {
+      total: allMsgs.length,
+      pending: allMsgs.filter(m => m.moderation?.status === 'pending' || !m.moderation?.status).length,
+      approved: allMsgs.filter(m => m.moderation?.status === 'approved').length,
+      blocked: allMsgs.filter(m => m.moderation?.status === 'blocked').length,
+      reported: allMsgs.filter(m => reportedMessageIds.has(m.id)).length,
+      hidden: allMsgs.filter(m => m.isHidden && !m.isDeleted).length,
+      deleted: allMsgs.filter(m => m.isDeleted).length,
+      currentPage,
+      totalPages: Math.max(1, Math.ceil(allMsgs.length / PAGE_SIZE)),
+      itemsShown: messages.length
+    };
+
+    setTotalPages(stats.totalPages);
+    onStatsUpdate(stats);
   };
 
   // Fetch messages
   const fetchMessages = async (direction: 'first' | 'next' | 'prev' = 'first', cursor?: DocumentSnapshot) => {
     setLoading(true);
     try {
-      let constraints = buildQueryConstraints();
+      // Fetch all messages for statistics on first load or filter changes
+      if (direction === 'first') {
+        await fetchAllMessagesForStats();
+      }
+
+      let constraints = buildQueryConstraints(true);
       
       if (direction === 'next' && cursor) {
         constraints = constraints.map(c => c.type === 'limit' ? limit(PAGE_SIZE + 1) : c);
@@ -217,6 +299,11 @@ export function MessagesTable({
       
       setHasNext(hasNextPage);
       setHasPrev(currentPage > 1);
+
+      // Update stats with current messages shown
+      if (direction !== 'first' && allMessages.length > 0) {
+        calculateAndReportStats(allMessages);
+      }
       
     } catch (error) {
       console.error('Error fetching messages:', error);
@@ -287,7 +374,7 @@ export function MessagesTable({
   };
 
   // Handle individual message moderation
-  const handleIndividualModeration = (message: GroupMessage, action: 'approve' | 'block' | 'hide' | 'delete') => {
+  const handleIndividualModeration = (message: GroupMessage, action: 'approve' | 'block' | 'hide' | 'delete' | 'unhide') => {
     setSelectedMessage(message);
     setModerationAction(action);
     setModerationReason('');
@@ -539,10 +626,17 @@ export function MessagesTable({
                                     <Flag className="mr-2 h-4 w-4" />
                                     {t('modules.admin.content.blockMessage')}
                                   </DropdownMenuItem>
-                                  <DropdownMenuItem onClick={() => handleIndividualModeration(message, 'hide')}>
-                                    <EyeOff className="mr-2 h-4 w-4" />
-                                    {t('modules.admin.content.hideMessage')}
-                                  </DropdownMenuItem>
+                                  {message.isHidden ? (
+                                    <DropdownMenuItem onClick={() => handleIndividualModeration(message, 'unhide')}>
+                                      <Eye className="mr-2 h-4 w-4" />
+                                      {t('modules.admin.content.unhideMessage')}
+                                    </DropdownMenuItem>
+                                  ) : (
+                                    <DropdownMenuItem onClick={() => handleIndividualModeration(message, 'hide')}>
+                                      <EyeOff className="mr-2 h-4 w-4" />
+                                      {t('modules.admin.content.hideMessage')}
+                                    </DropdownMenuItem>
+                                  )}
                                   <DropdownMenuItem 
                                     onClick={() => handleIndividualModeration(message, 'delete')}
                                     className="text-destructive"
@@ -564,9 +658,18 @@ export function MessagesTable({
               {/* Pagination */}
               <div className="flex items-center justify-between pt-4">
                 <div className="text-sm text-muted-foreground">
-                  {t('common.page')} {currentPage}
+                  {allMessages.length > 0 ? (
+                    <>
+                      {t('common.showing')} {((currentPage - 1) * PAGE_SIZE) + 1} - {Math.min(currentPage * PAGE_SIZE, allMessages.length)} {t('common.of')} {allMessages.length} {t('common.items')}
+                    </>
+                  ) : (
+                    t('common.noItemsFound')
+                  )}
                 </div>
                 <div className="flex items-center gap-2">
+                  <div className="text-sm text-muted-foreground mr-4">
+                    {t('common.page')} {currentPage} {t('common.of')} {totalPages}
+                  </div>
                   <Button
                     variant="outline"
                     size="sm"

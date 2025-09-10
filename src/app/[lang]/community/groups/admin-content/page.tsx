@@ -10,7 +10,7 @@ import { db } from '@/lib/firebase';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MessagesTable } from '@/components/MessagesTable';
+import { MessagesTable, MessageStats } from '@/components/MessagesTable';
 import { 
   MessageSquare, 
   Search, 
@@ -26,6 +26,18 @@ export default function SystemAdminContentPage() {
   const [search, setSearch] = useState('');
   const [groupFilter, setGroupFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [messageStats, setMessageStats] = useState<MessageStats>({
+    total: 0,
+    pending: 0,
+    approved: 0,
+    blocked: 0,
+    reported: 0,
+    hidden: 0,
+    deleted: 0,
+    currentPage: 1,
+    totalPages: 1,
+    itemsShown: 0,
+  });
 
   const headerDictionary = {
     documents: t('modules.admin.content.title') || 'Content Moderation',
@@ -59,7 +71,7 @@ export default function SystemAdminContentPage() {
   // Handle individual message moderation
   const handleMessageModeration = async (
     messageId: string, 
-    action: 'approve' | 'block' | 'hide' | 'delete', 
+    action: 'approve' | 'block' | 'hide' | 'delete' | 'unhide', 
     reason?: string,
     violationType?: string
   ) => {
@@ -67,7 +79,7 @@ export default function SystemAdminContentPage() {
       const messageRef = doc(db, 'group_messages', messageId);
       const updates: any = {
         moderation: {
-          status: action === 'approve' ? 'approved' : 'blocked',
+          status: action === 'approve' || action === 'unhide' ? 'approved' : 'blocked',
           reason: reason || getLocalizedViolationMessage(violationType),
           moderatedBy: 'admin', // TODO: Get actual admin ID
           moderatedAt: new Date(),
@@ -81,6 +93,8 @@ export default function SystemAdminContentPage() {
         updates.isHidden = true;
       } else if (action === 'delete') {
         updates.isDeleted = true;
+      } else if (action === 'unhide') {
+        updates.isHidden = false; // Unhide the message
       }
 
       await updateDoc(messageRef, updates);
@@ -127,18 +141,10 @@ export default function SystemAdminContentPage() {
     await batch.commit();
   };
 
-  // Calculate basic statistics for display
-  const stats = useMemo(() => {
-    return {
-      total: 0, // Will be updated when table loads data
-      pending: 0,
-      approved: 0,
-      blocked: 0,
-      reported: reports.length,
-      hidden: 0,
-      deleted: 0,
-    };
-  }, [reports]);
+  // Handle statistics updates from MessagesTable
+  const handleStatsUpdate = (stats: MessageStats) => {
+    setMessageStats(stats);
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -163,7 +169,7 @@ export default function SystemAdminContentPage() {
                   <MessageSquare className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.total}</div>
+                  <div className="text-2xl font-bold">{messageStats.total}</div>
                   <p className="text-xs text-muted-foreground">{t('modules.admin.systemAdmin.allTime')}</p>
                 </CardContent>
               </Card>
@@ -174,7 +180,7 @@ export default function SystemAdminContentPage() {
                   <AlertTriangle className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.pending}</div>
+                  <div className="text-2xl font-bold">{messageStats.pending}</div>
                   <p className="text-xs text-muted-foreground">{t('modules.admin.systemAdmin.needAttention')}</p>
                 </CardContent>
               </Card>
@@ -185,7 +191,7 @@ export default function SystemAdminContentPage() {
                   <Flag className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.reported}</div>
+                  <div className="text-2xl font-bold">{messageStats.reported}</div>
                   <p className="text-xs text-muted-foreground">{t('modules.admin.systemAdmin.openReports')}</p>
                 </CardContent>
               </Card>
@@ -196,7 +202,7 @@ export default function SystemAdminContentPage() {
                   <CheckCircle className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.blocked + stats.hidden + stats.deleted}</div>
+                  <div className="text-2xl font-bold">{messageStats.blocked + messageStats.hidden + messageStats.deleted}</div>
                   <p className="text-xs text-muted-foreground">{t('modules.admin.systemAdmin.actionsTaken')}</p>
                 </CardContent>
               </Card>
@@ -267,6 +273,7 @@ export default function SystemAdminContentPage() {
               reports={reports}
               onBulkAction={handleBulkModeration}
               onMessageModeration={handleMessageModeration}
+              onStatsUpdate={handleStatsUpdate}
               locale={lang}
             />
           </div>
