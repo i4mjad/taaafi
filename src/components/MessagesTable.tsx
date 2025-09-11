@@ -93,7 +93,6 @@ export interface MessageStats {
   itemsShown: number;
 }
 
-const PAGE_SIZE = 20;
 
 export function MessagesTable({ 
   groupFilter = 'all',
@@ -118,6 +117,7 @@ export function MessagesTable({
   const [hasPrev, setHasPrev] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [pageSize, setPageSize] = useState(20);
   
   // Bulk action dialog state
   const [showBulkDialog, setShowBulkDialog] = useState(false);
@@ -168,7 +168,7 @@ export function MessagesTable({
     }
     
     if (includePagination) {
-      constraints.push(limit(PAGE_SIZE + 1)); // +1 to check if there's a next page
+      constraints.push(limit(pageSize + 1)); // +1 to check if there's a next page
     }
     
     return constraints;
@@ -224,7 +224,7 @@ export function MessagesTable({
       hidden: allMsgs.filter(m => m.isHidden && !m.isDeleted).length,
       deleted: allMsgs.filter(m => m.isDeleted).length,
       currentPage,
-      totalPages: Math.max(1, Math.ceil(allMsgs.length / PAGE_SIZE)),
+      totalPages: Math.max(1, Math.ceil(allMsgs.length / pageSize)),
       itemsShown: messages.length
     };
 
@@ -234,6 +234,7 @@ export function MessagesTable({
 
   // Fetch messages
   const fetchMessages = async (direction: 'first' | 'next' | 'prev' = 'first', cursor?: DocumentSnapshot) => {
+    console.log('fetchMessages called with direction:', direction, 'cursor:', cursor?.id, 'currentPage:', currentPage);
     setLoading(true);
     try {
       // Fetch all messages for statistics on first load or filter changes
@@ -244,19 +245,16 @@ export function MessagesTable({
       let constraints = buildQueryConstraints(true);
       
       if (direction === 'next' && cursor) {
-        constraints = constraints.map(c => c.type === 'limit' ? limit(PAGE_SIZE + 1) : c);
+        constraints = constraints.map(c => c.type === 'limit' ? limit(pageSize + 1) : c);
         constraints.push(startAfter(cursor));
       } else if (direction === 'prev' && cursor) {
-        constraints = [
-          ...constraints.filter(c => c.type !== 'orderBy'),
-          orderBy('createdAt', 'asc'),
-          startAfter(cursor),
-          limitToLast(PAGE_SIZE + 1)
-        ];
+        constraints = constraints.map(c => c.type === 'limit' ? limit(pageSize + 1) : c);
+        constraints.push(endBefore(cursor));
       }
 
       const messagesQuery = query(collection(db, 'group_messages'), ...constraints);
       const snapshot = await getDocs(messagesQuery);
+      console.log('Query returned', snapshot.docs.length, 'documents for direction:', direction);
       
       let fetchedMessages = snapshot.docs.map(doc => ({
         id: doc.id,
@@ -264,14 +262,11 @@ export function MessagesTable({
         createdAt: doc.data().createdAt?.toDate() || new Date(),
       })) as GroupMessage[];
 
-      // Handle pagination logic
-      if (direction === 'prev') {
-        fetchedMessages = fetchedMessages.reverse();
-      }
+      // Handle pagination logic  
+      const hasMoreDocs = fetchedMessages.length > pageSize;
       
-      const hasNextPage = fetchedMessages.length > PAGE_SIZE;
-      if (hasNextPage) {
-        fetchedMessages = fetchedMessages.slice(0, PAGE_SIZE);
+      if (hasMoreDocs) {
+        fetchedMessages = fetchedMessages.slice(0, pageSize);
       }
 
       // Client-side filtering for search and reported status
@@ -293,11 +288,14 @@ export function MessagesTable({
       setMessages(filteredMessages);
       
       if (snapshot.docs.length > 0) {
-        setFirstDoc(snapshot.docs[0]);
-        setLastDoc(snapshot.docs[Math.min(snapshot.docs.length - 1, PAGE_SIZE - 1)]);
+        // Set document cursors for pagination
+        const docsToUse = hasMoreDocs ? snapshot.docs.slice(0, pageSize) : snapshot.docs;
+        setFirstDoc(docsToUse[0]);
+        setLastDoc(docsToUse[docsToUse.length - 1]);
       }
       
-      setHasNext(hasNextPage);
+      // Update pagination state
+      setHasNext(hasMoreDocs);
       setHasPrev(currentPage > 1);
 
       // Update stats with current messages shown
@@ -331,9 +329,12 @@ export function MessagesTable({
 
   const handlePrevPage = () => {
     if (hasPrev && firstDoc) {
+      console.log('Going to prev page, currentPage:', currentPage, 'firstDoc:', firstDoc.id);
       setCurrentPage(prev => prev - 1);
       fetchMessages('prev', firstDoc);
       setSelectedIds([]);
+    } else {
+      console.log('Cannot go to prev page, hasPrev:', hasPrev, 'firstDoc:', !!firstDoc);
     }
   };
 
@@ -341,7 +342,7 @@ export function MessagesTable({
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
       const moderatableIds = messages
-        .filter(m => !m.isDeleted && !m.isHidden)
+        .filter(m => !m.isDeleted) // Allow hidden messages to be selected
         .map(m => m.id);
       setSelectedIds(moderatableIds);
     } else {
@@ -443,7 +444,7 @@ export function MessagesTable({
     }
   };
 
-  const moderatableCount = messages.filter(m => !m.isDeleted && !m.isHidden).length;
+  const moderatableCount = messages.filter(m => !m.isDeleted).length; // Allow hidden messages to be moderated
   const allModeratable = selectedIds.length > 0 && selectedIds.length === moderatableCount;
   const someSelected = selectedIds.length > 0 && selectedIds.length < moderatableCount;
 
@@ -547,7 +548,7 @@ export function MessagesTable({
                   {messages.map((message) => {
                     const group = groupsLookup[message.groupId];
                     const isReported = reportedMessageIds.has(message.id);
-                    const canModerate = !message.isDeleted && !message.isHidden;
+                    const canModerate = !message.isDeleted; // Allow hidden messages to be moderated
                     
                     return (
                       <TableRow key={message.id}>
@@ -569,13 +570,16 @@ export function MessagesTable({
                             <span className="text-muted-foreground italic">
                               {t('modules.admin.content.messageDeleted')}
                             </span>
-                          ) : message.isHidden ? (
-                            <span className="text-muted-foreground italic">
-                              {t('modules.admin.content.messageHidden')}
-                            </span>
                           ) : (
-                            <div className="truncate" title={message.body}>
-                              {message.body}
+                            <div className="space-y-1">
+                              {message.isHidden && (
+                                <Badge variant="outline" className="text-xs text-orange-600 border-orange-600">
+                                  {t('modules.admin.content.messageHidden')}
+                                </Badge>
+                              )}
+                              <div className={`truncate ${message.isHidden ? 'text-muted-foreground' : ''}`} title={message.body}>
+                                {message.body}
+                              </div>
                             </div>
                           )}
                         </TableCell>
@@ -660,34 +664,61 @@ export function MessagesTable({
                 <div className="text-sm text-muted-foreground">
                   {allMessages.length > 0 ? (
                     <>
-                      {t('common.showing')} {((currentPage - 1) * PAGE_SIZE) + 1} - {Math.min(currentPage * PAGE_SIZE, allMessages.length)} {t('common.of')} {allMessages.length} {t('common.items')}
+                      {t('common.showing')} {((currentPage - 1) * pageSize) + 1} - {Math.min(currentPage * pageSize, allMessages.length)} {t('common.of')} {allMessages.length} {t('common.items')}
                     </>
                   ) : (
                     t('common.noItemsFound')
                   )}
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="text-sm text-muted-foreground mr-4">
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium">{t('common.rowsPerPage') || 'Rows per page'}</span>
+                    <Select
+                      value={`${pageSize}`}
+                      onValueChange={(value) => {
+                        const newPageSize = Number(value);
+                        setPageSize(newPageSize);
+                        setCurrentPage(1);
+                        setFirstDoc(null);
+                        setLastDoc(null);
+                        fetchMessages('first');
+                      }}
+                    >
+                      <SelectTrigger className="h-8 w-[70px]">
+                        <SelectValue placeholder={pageSize} />
+                      </SelectTrigger>
+                      <SelectContent side="top">
+                        {[10, 20, 30, 50, 100].map((size) => (
+                          <SelectItem key={size} value={`${size}`}>
+                            {size}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="text-sm text-muted-foreground">
                     {t('common.page')} {currentPage} {t('common.of')} {totalPages}
                   </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handlePrevPage}
-                    disabled={!hasPrev || loading}
-                  >
-                    <ChevronLeft className="h-4 w-4 mr-2" />
-                    {t('common.previous')}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleNextPage}
-                    disabled={!hasNext || loading}
-                  >
-                    {t('common.next')}
-                    <ChevronRight className="h-4 w-4 ml-2" />
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handlePrevPage}
+                      disabled={!hasPrev || loading}
+                    >
+                      <ChevronLeft className="h-4 w-4 mr-2" />
+                      {t('common.previous')}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleNextPage}
+                      disabled={!hasNext || loading}
+                    >
+                      {t('common.next')}
+                      <ChevronRight className="h-4 w-4 ml-2" />
+                    </Button>
+                  </div>
                 </div>
               </div>
             </>

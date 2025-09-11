@@ -93,8 +93,8 @@ export default function SystemAdminContentPage() {
         updates.isHidden = true;
       } else if (action === 'delete') {
         updates.isDeleted = true;
-      } else if (action === 'unhide') {
-        updates.isHidden = false; // Unhide the message
+      } else if (action === 'unhide' || action === 'approve') {
+        updates.isHidden = false; // Unhide the message when approving or explicitly unhiding
       }
 
       await updateDoc(messageRef, updates);
@@ -133,6 +133,8 @@ export default function SystemAdminContentPage() {
         updates.isHidden = true;
       } else if (action === 'delete') {
         updates.isDeleted = true;
+      } else if (action === 'approve') {
+        updates.isHidden = false; // Unhide the message when approving
       }
 
       batch.update(messageRef, updates);

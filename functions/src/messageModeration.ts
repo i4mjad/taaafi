@@ -297,15 +297,18 @@ const CUSTOM_RULE_PATTERNS = {
   },
   sexual: {
     explicit: [
-      'جنس', 'عري', 'إباحي', 'sex', 'porn', 'nude',
-      'زب', 'كس', 'نيك', 'طيز', 'سالب', 'موجب'
+      // VERY SELECTIVE - Only block direct solicitation, not recovery discussion
+      // These terms are only flagged when used in solicitation context, not educational
+      // Note: Most sexual terms are ALLOWED in recovery context and handled by AI
     ]
   },
   cuckoldry: {
-    terms: ['ديوث', 'قواد', 'يشارك زوجته', 'تبادل زوجات']
+    // Only direct solicitation terms - discussion about these topics in recovery context is allowed
+    directSolicitation: ['تعال أديثك', 'بدي قواد', 'come cuckold me']
   },
   homosexuality: {
-    terms: ['شاذ', 'شذوذ', 'مثلي', 'لوطي', 'خنيث', 'gay', 'lesbian']
+    // Only direct solicitation terms - discussion about these topics in recovery context is allowed  
+    directSolicitation: ['بحث عن شاب مثلي', 'looking for gay partner']
   }
 };
 
@@ -349,38 +352,47 @@ function detectMessageLanguage(text: string): 'arabic' | 'english' {
  * Moderation prompts for different languages
  */
 const MODERATION_PROMPTS = {
-  arabic: `أنت نظام مراقبة محتوى متخصص في تحليل الرسائل العربية. مهمتك تحليل النص المرفق والكشف عن المخالفات التالية فقط:
+  arabic: `أنت نظام مراقبة محتوى متخصص في مجموعات الدعم للتعافي من إدمان المواد الإباحية. هذه مساحة آمنة للمتعافين لمشاركة تجاربهم وطلب المساعدة.
 
-**المخالفات المطلوب رصدها:**
+**السياق المهم:**
+هذه مجموعة دعم للأشخاص الذين يتعافون من إدمان الأفلام الإباحية. الأعضاء يشاركون:
+- رحلات التعافي والتحديات
+- الانتكاسات والنجاحات  
+- طلب النصائح والدعم
+- مشاعرهم وتجاربهم الشخصية
 
-1. **مشاركة حسابات وسائل التواصل الاجتماعي** 
-   - البحث عن عبارات مثل: "تابعوني على"، "ضيفوني على"، "حسابي في"، "اكاونتي على"
-   - ذكر منصات مثل: انستقرام، فيسبوك، تيك توك، سناب شات، واتساب، تليجرام
-   - محاولات التواصل الخارجي مثل: "ممكن نتواصل بطريقة أخرى"، "نتكلم في مكان آخر"
-   - أسماء المستخدمين أو الروابط أو العبارات المشبوهة
+**المحتوى المسموح (لا تحجبه):**
+✅ مشاركة رحلات التعافي: "بديت رحلة التعافي من ٨ أشهر"
+✅ الحديث عن الانتكاسات: "دخلت في سلسلة انتكاسات" 
+✅ طلب الدعم والنصائح: "محتاج مساعدتكم"
+✅ مشاركة المشاعر والتقدم: "رجعت لي مشاعري"
+✅ ذكر الألفاظ الجنسية في سياق تعليمي أو علاجي
+✅ النقاش الأكاديمي أو الطبي حول الإدمان
+✅ تشجيع الآخرين ودعمهم
 
-2. **المحتوى الجنسي أو الإباحي**
-   - الكلمات الصريحة والألفاظ الجنسية المباشرة
-   - الإيحاءات الجنسية والعبارات المثيرة
-   - طلب صور أو لقاءات خاصة
-   - أي محتوى جنسي غير لائق
+**المخالفات المطلوب رصدها فقط:**
 
-3. **محتوى الديوثة وتبادل الأزواج**
-   - كلمات مثل: "ديوث"، "قواد"، "يشارك زوجته"، "تبادل زوجات"
-   - أي محتوى يتعلق بالديوثة أو القيادة الجنسية
-   - عبارات تدل على تبادل الشركاء
+1. **الطلبات الجنسية المباشرة**
+   - طلبات فعلية مثل: "تعال أديثك"، "بدي أنيكك"
+   - طلب لقاءات جنسية حقيقية
+   - عروض جنسية مباشرة (ليس مجرد ذكر كلمات في سياق التعافي)
 
-4. **المحتوى المثلي أو الشاذ جنسياً**
-   - كلمات مثل: "شاذ"، "مثلي"، "لوطي"، "خنيث" 
-   - البحث عن شركاء من نفس الجنس
-   - أي محتوى يروج للشذوذ الجنسي
+2. **مشاركة وسائل التواصل للأغراض غير العلاجية**
+   - "تابعوني على انستقرام" (للترفيه أو التجارة)
+   - محاولات نقل المحادثة خارج المجموعة لأغراض شخصية
+   - طلب التواصل الخاص بدون مبرر علاجي واضح
 
-**إرشادات مهمة للتحليل:**
-- انتبه للسياق الثقافي العربي والإسلامي
-- فرق بين النقاش الأكاديمي المحترم (مسموح) والبحث الشخصي المخالف (ممنوع)
-- راعي استخدام الحروف البديلة أو المتشابهة لتجنب الرقابة
-- انتبه للكلمات المقسمة بمسافات أو رموز
-- اعتبر شدة المخالفة (خفيفة، متوسطة، عالية)
+3. **إساءة استخدام المنصة**
+   - استخدام المجموعة للتجارة أو الإعلانات
+   - نشر محتوى لا علاقة له بالتعافي
+   - السب والشتائم المباشرة للأعضاء
+
+**إرشادات حاسمة:**
+- السياق هو الأهم: نفس الكلمة قد تكون مقبولة في سياق التعافي ومرفوضة في سياق الطلب
+- عند الشك، لا تحجب المحتوى - أرسله للمراجعة اليدوية
+- ركز على النية وليس فقط الكلمات
+- هذه مساحة آمنة للمتعافين - احترم رحلتهم
+- الهدف حماية المجموعة من سوء الاستخدام وليس منع النقاش الصحي
 
 **النص المطلوب تحليله:**
 "{{MESSAGE_TEXT}}"
@@ -398,38 +410,47 @@ const MODERATION_PROMPTS = {
   "culturalContext": "ملاحظة عن السياق الثقافي إن وجد"
 }`,
 
-  english: `You are a content moderation system specialized in analyzing messages. Your task is to analyze the provided text and detect the following violations only:
+  english: `You are a content moderation system specialized in SUPPORT GROUPS for people recovering from pornography addiction. This is a safe space for recovering individuals to share their experiences and seek help.
 
-**Required Violation Detection:**
+**Important Context:**
+This is a support group for people recovering from pornography addiction. Members share:
+- Recovery journeys and challenges
+- Relapses and successes
+- Requests for advice and support  
+- Their feelings and personal experiences
 
-1. **Social Media Account Sharing**
-   - Look for phrases like: "follow me on", "add me on", "my account on", "find me on"
-   - Platform mentions: Instagram, Facebook, TikTok, Snapchat, WhatsApp, Telegram
-   - External communication attempts: "let's talk elsewhere", "contact me privately"
-   - Usernames, links, or suspicious sharing patterns
+**ALLOWED Content (DO NOT block):**
+✅ Recovery journey sharing: "Started my recovery 8 months ago"
+✅ Discussing relapses: "I've been struggling with relapses"
+✅ Asking for support: "I need your help"
+✅ Sharing emotions and progress: "My feelings are returning"
+✅ Mentioning sexual terms in educational or therapeutic context
+✅ Academic or medical discussion about addiction
+✅ Encouraging and supporting others
 
-2. **Sexual or Pornographic Content**
-   - Explicit sexual words and direct sexual language
-   - Sexual innuendos and suggestive phrases
-   - Requests for photos or private meetings
-   - Any inappropriate sexual content
+**VIOLATIONS to Detect ONLY:**
 
-3. **Cuckoldry and Partner Swapping Content**
-   - Words like: "cuckold", "hotwife", "wife sharing", "partner swapping"
-   - Any content related to cuckoldry or sexual pimping
-   - Expressions indicating partner exchange
+1. **Direct Sexual Requests**
+   - Actual requests like: "come cuckold me", "let's have sex"
+   - Requests for real sexual encounters
+   - Direct sexual propositions (not just mentioning words in recovery context)
 
-4. **Homosexual or LGBTQ+ Content**
-   - Words like: "gay", "lesbian", "queer", seeking same-sex partners
-   - Looking for same-gender partners
-   - Any content promoting LGBTQ+ relationships
+2. **Social Media Sharing for Non-Therapeutic Purposes**
+   - "Follow me on Instagram" (for entertainment or business)
+   - Attempts to move conversation outside group for personal reasons
+   - Requesting private contact without clear therapeutic justification
 
-**Important Analysis Guidelines:**
-- Consider cultural and religious context (Islamic/Arab culture)
-- Distinguish between respectful academic discussion (allowed) vs. personal seeking (forbidden)
-- Watch for character substitution to avoid detection
-- Pay attention to words separated by spaces or symbols
-- Consider violation severity (low, medium, high)
+3. **Platform Misuse**
+   - Using the group for commerce or advertisements
+   - Posting content unrelated to recovery
+   - Direct insults and profanity toward members
+
+**Critical Guidelines:**
+- Context is everything: same word might be acceptable in recovery context but inappropriate in solicitation context
+- When in doubt, DO NOT block - send for manual review
+- Focus on intent, not just words
+- This is a safe space for recovering individuals - respect their journey
+- Goal is protecting group from misuse, not preventing healthy discussion
 
 **Text to Analyze:**
 "{{MESSAGE_TEXT}}"
@@ -509,7 +530,8 @@ function getLocalizedMessage(violationType: string, locale: 'arabic' | 'english'
  * Step 5: For each rule, detect → check intent → assign severity/confidence
  */
 function evaluateCustomRules(normalizedText: string): CustomRuleResult[] {
-  console.log('🔍 Evaluating custom rules on normalized text...');
+  console.log('🔍 Evaluating custom rules on normalized text for SUPPORT GROUP context...');
+  console.log('⚠️ Note: This is a recovery support group - being conservative with rule enforcement');
   
   const results: CustomRuleResult[] = [];
   const lowerText = normalizedText.toLowerCase();
@@ -575,40 +597,17 @@ function evaluateCustomRules(normalizedText: string): CustomRuleResult[] {
     });
   }
 
-  // Sexual Content Rules
-  console.log('🔞 Checking sexual content rules...');
-  const sexualSpans: Array<{start: number; end: number; content: string}> = [];
-  let sexualConfidence = 0;
-
-  for (const term of CUSTOM_RULE_PATTERNS.sexual.explicit) {
-    const termIndex = lowerText.indexOf(term.toLowerCase());
-    if (termIndex !== -1) {
-      sexualSpans.push({
-        start: termIndex,
-        end: termIndex + term.length,
-        content: term
-      });
-      sexualConfidence = Math.max(sexualConfidence, 0.95);
-    }
-  }
-
-  if (sexualSpans.length > 0) {
-    results.push({
-      detected: true,
-      type: 'sexual_content',
-      severity: 'high',
-      confidence: sexualConfidence,
-      reason: `Detected explicit sexual content: ${sexualSpans.map(s => s.content).join(', ')}`,
-      detectedSpans: sexualSpans
-    });
-  }
-
-  // Cuckoldry Content Rules
-  console.log('🚫 Checking cuckoldry content rules...');
+  // Sexual Content Rules - SUPPORT GROUP CONTEXT: Only direct solicitation
+  console.log('🔞 Checking for direct sexual solicitation (not recovery discussion)...');
+  // NOTE: Most sexual terms are ALLOWED in recovery context - AI handles context
+  // Custom rules only catch obvious solicitation patterns
+  
+  // Cuckoldry Content Rules - Only Direct Solicitation
+  console.log('🚫 Checking for direct cuckoldry solicitation...');
   const cuckoldrySpans: Array<{start: number; end: number; content: string}> = [];
   let cuckoldryConfidence = 0;
 
-  for (const term of CUSTOM_RULE_PATTERNS.cuckoldry.terms) {
+  for (const term of CUSTOM_RULE_PATTERNS.cuckoldry.directSolicitation) {
     const termIndex = lowerText.indexOf(term.toLowerCase());
     if (termIndex !== -1) {
       cuckoldrySpans.push({
@@ -616,7 +615,8 @@ function evaluateCustomRules(normalizedText: string): CustomRuleResult[] {
         end: termIndex + term.length,
         content: term
       });
-      cuckoldryConfidence = Math.max(cuckoldryConfidence, 0.9);
+      cuckoldryConfidence = Math.max(cuckoldryConfidence, 0.95);
+      console.log('🚨 DIRECT CUCKOLDRY SOLICITATION detected:', term);
     }
   }
 
@@ -626,17 +626,17 @@ function evaluateCustomRules(normalizedText: string): CustomRuleResult[] {
       type: 'cuckoldry_content',
       severity: 'high',
       confidence: cuckoldryConfidence,
-      reason: `Detected cuckoldry content: ${cuckoldrySpans.map(s => s.content).join(', ')}`,
+      reason: `Direct cuckoldry solicitation detected: ${cuckoldrySpans.map(s => s.content).join(', ')}`,
       detectedSpans: cuckoldrySpans
     });
   }
 
-  // Homosexuality Content Rules
-  console.log('🏳️‍🌈 Checking homosexuality content rules...');
+  // Homosexuality Content Rules - Only Direct Solicitation
+  console.log('🏳️‍🌈 Checking for direct homosexual solicitation...');
   const homosexualitySpans: Array<{start: number; end: number; content: string}> = [];
   let homosexualityConfidence = 0;
 
-  for (const term of CUSTOM_RULE_PATTERNS.homosexuality.terms) {
+  for (const term of CUSTOM_RULE_PATTERNS.homosexuality.directSolicitation) {
     const termIndex = lowerText.indexOf(term.toLowerCase());
     if (termIndex !== -1) {
       homosexualitySpans.push({
@@ -644,7 +644,8 @@ function evaluateCustomRules(normalizedText: string): CustomRuleResult[] {
         end: termIndex + term.length,
         content: term
       });
-      homosexualityConfidence = Math.max(homosexualityConfidence, 0.9);
+      homosexualityConfidence = Math.max(homosexualityConfidence, 0.95);
+      console.log('🚨 DIRECT HOMOSEXUAL SOLICITATION detected:', term);
     }
   }
 
@@ -654,7 +655,7 @@ function evaluateCustomRules(normalizedText: string): CustomRuleResult[] {
       type: 'homosexuality_content',
       severity: 'high',
       confidence: homosexualityConfidence,
-      reason: `Detected inappropriate content: ${homosexualitySpans.map(s => s.content).join(', ')}`,
+      reason: `Direct homosexual solicitation detected: ${homosexualitySpans.map(s => s.content).join(', ')}`,
       detectedSpans: homosexualitySpans
     });
   }
@@ -703,12 +704,13 @@ function synthesizeDecision(
 ): FinalModerationDecision {
   console.log('⚖️ Synthesizing final moderation decision...');
   
-  // Hard-stop policy: Check OpenAI high-confidence violations first
-  if (openaiResult.shouldBlock && (openaiResult.confidence >= 0.8 || openaiResult.severity === 'high')) {
-    console.log('🚫 HARD STOP: High-confidence/severity OpenAI violation');
+  // Conservative hard-stop policy: Only block with very high confidence AND severity
+  // This is a support group - err on the side of allowing recovery discussions
+  if (openaiResult.shouldBlock && openaiResult.confidence >= 0.9 && openaiResult.severity === 'high') {
+    console.log('🚫 HARD STOP: Very high-confidence/severity violation in support group context');
     return {
       action: 'block',
-      reason: `OpenAI detected: ${openaiResult.reason}`,
+      reason: `Clear violation detected: ${openaiResult.reason}`,
       violationType: openaiResult.violationType,
       confidence: openaiResult.confidence,
       processingDetails: {
@@ -726,8 +728,8 @@ function synthesizeDecision(
       rule.confidence > max.confidence ? rule : max
     );
 
-    if (highestConfidenceRule.confidence >= 0.9) {
-      console.log('🚫 BLOCK: High-severity custom rule violation');
+    if (highestConfidenceRule.confidence >= 0.95) {
+      console.log('🚫 BLOCK: Very high-severity custom rule violation in support group');
       return {
         action: 'block',
         reason: highestConfidenceRule.reason,
@@ -950,7 +952,9 @@ export const moderateMessage = onDocumentCreated(
       console.log('🔍 Message content preview:', message.body.substring(0, 100) + '...');
 
       // ============================================
-      // ENHANCED MODERATION PIPELINE (8 Steps)
+      // SUPPORT GROUP MODERATION PIPELINE (8 Steps)
+      // Specialized for porn addiction recovery support groups
+      // Prioritizes allowing recovery discussions over blocking
       // ============================================
       
       try {
