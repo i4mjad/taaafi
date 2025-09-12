@@ -369,6 +369,7 @@ const MODERATION_PROMPTS = {
 ✅ ذكر الألفاظ الجنسية في سياق تعليمي أو علاجي
 ✅ النقاش الأكاديمي أو الطبي حول الإدمان
 ✅ تشجيع الآخرين ودعمهم
+✅ رسائل إدارية/تنظيمية: "هو مفيش مكان"، "قوانين المعسكر قالت ممنوع برا"، "ممكن تعمل زمالة جديدة" — لا تعتبر مخالفة
 
 **المخالفات المطلوب رصدها فقط:**
 
@@ -389,10 +390,11 @@ const MODERATION_PROMPTS = {
 
 **إرشادات حاسمة:**
 - السياق هو الأهم: نفس الكلمة قد تكون مقبولة في سياق التعافي ومرفوضة في سياق الطلب
-- عند الشك، لا تحجب المحتوى - أرسله للمراجعة اليدوية
+- عند الشك أو عند كون الرسالة إدارية/تنظيمية، لا تحجب المحتوى — اجعل shouldBlock = false
 - ركز على النية وليس فقط الكلمات
 - هذه مساحة آمنة للمتعافين - احترم رحلتهم
 - الهدف حماية المجموعة من سوء الاستخدام وليس منع النقاش الصحي
+- لا تعتبر الرسائل التي تذكر القوانين أو المنع (مثل: "ممنوع برا"، "لا يسمح") كمخالفة؛ هذه رسائل إدارية
 
 **النص المطلوب تحليله:**
 "{{MESSAGE_TEXT}}"
@@ -408,7 +410,9 @@ const MODERATION_PROMPTS = {
   "reason": "شرح مختصر بالعربية لسبب القرار",
   "detectedContent": ["قائمة بالعبارات أو الكلمات المخالفة المكتشفة"],
   "culturalContext": "ملاحظة عن السياق الثقافي إن وجد"
-}`,
+}
+
+مهم: اجعل shouldBlock = true فقط عند (1) وجود طلب جنسي مباشر صريح، أو (2) مشاركة وسيلة تواصل خارجية مع نية شخصية غير علاجية واضحة (مثل "تابعوني على انستقرام" + اسم حساب). عند عدم وضوح النية أو عندما تكون الرسالة إدارية/تنظيمية أو تشير إلى القوانين ("ممنوع برا")، اجعل shouldBlock = false.`,
 
   english: `You are a content moderation system specialized in SUPPORT GROUPS for people recovering from pornography addiction. This is a safe space for recovering individuals to share their experiences and seek help.
 
@@ -427,6 +431,7 @@ This is a support group for people recovering from pornography addiction. Member
 ✅ Mentioning sexual terms in educational or therapeutic context
 ✅ Academic or medical discussion about addiction
 ✅ Encouraging and supporting others
+✅ Administrative/organizational messages: "no space available", "rules say not allowed outside", "you can create a new fellowship" — do NOT treat as violations
 
 **VIOLATIONS to Detect ONLY:**
 
@@ -447,10 +452,11 @@ This is a support group for people recovering from pornography addiction. Member
 
 **Critical Guidelines:**
 - Context is everything: same word might be acceptable in recovery context but inappropriate in solicitation context
-- When in doubt, DO NOT block - send for manual review
+- When in doubt or when the message is administrative/organizational, do NOT block — set shouldBlock = false
 - Focus on intent, not just words
 - This is a safe space for recovering individuals - respect their journey
 - Goal is protecting group from misuse, not preventing healthy discussion
+ - Do not treat messages mentioning rules or prohibitions (e.g., "not allowed outside", "rules say no") as violations; these are administrative
 
 **Text to Analyze:**
 "{{MESSAGE_TEXT}}"
@@ -466,7 +472,9 @@ Respond with JSON only, no additional text:
   "reason": "Brief explanation in English for the decision",
   "detectedContent": ["List of detected violating phrases or words"],
   "culturalContext": "Note about cultural context if applicable"
-}`
+}
+
+Important: Set shouldBlock = true only when (1) there is a direct, explicit sexual request, OR (2) explicit sharing of external contact (handles/links) with clear non-therapeutic intent to move the conversation outside the group. If intent is unclear or the message is administrative/organizational, set shouldBlock = false.`
 };
 
 /**
@@ -539,61 +547,55 @@ function evaluateCustomRules(normalizedText: string): CustomRuleResult[] {
   // Social Media Sharing Rules
   console.log('📱 Checking social media sharing rules...');
   const socialMediaSpans: Array<{start: number; end: number; content: string}> = [];
-  let socialMediaSeverity: 'low' | 'medium' | 'high' = 'low';
-  let socialMediaConfidence = 0;
+  const followSpans: Array<{start: number; end: number; content: string}> = [];
+  const platformSpans: Array<{start: number; end: number; content: string}> = [];
+  const handleSpans: Array<{start: number; end: number; content: string}> = [];
 
-  // Check for follow phrases
+  // Administrative context keywords to avoid false positives
+  const adminContextRegex = /(ممنوع|قوانين|غير مسموح|محظور|تعليمات|لوائح|not allowed|rules?)/i;
+  const outsideContextRegex = /(برا|خارج|outside)/i;
+  const isAdministrativeContext = adminContextRegex.test(normalizedText) && outsideContextRegex.test(normalizedText);
+
+  // Check for follow/contact intent phrases
   for (const phrase of CUSTOM_RULE_PATTERNS.socialMedia.followPhrases) {
-    const phraseIndex = lowerText.indexOf(phrase.toLowerCase());
-    if (phraseIndex !== -1) {
-      socialMediaSpans.push({
-        start: phraseIndex,
-        end: phraseIndex + phrase.length,
-        content: phrase
-      });
-      socialMediaSeverity = 'high';
-      socialMediaConfidence = Math.max(socialMediaConfidence, 0.9);
+    const idx = lowerText.indexOf(phrase.toLowerCase());
+    if (idx !== -1) {
+      followSpans.push({ start: idx, end: idx + phrase.length, content: phrase });
     }
   }
 
   // Check for platform mentions
   for (const platform of CUSTOM_RULE_PATTERNS.socialMedia.platforms) {
-    const platformIndex = lowerText.indexOf(platform.toLowerCase());
-    if (platformIndex !== -1) {
-      socialMediaSpans.push({
-        start: platformIndex,
-        end: platformIndex + platform.length,
-        content: platform
-      });
-      socialMediaSeverity = socialMediaSeverity === 'high' ? 'high' : 'medium';
-      socialMediaConfidence = Math.max(socialMediaConfidence, 0.7);
+    const idx = lowerText.indexOf(platform.toLowerCase());
+    if (idx !== -1) {
+      platformSpans.push({ start: idx, end: idx + platform.length, content: platform });
     }
   }
 
-  // Check for username patterns
+  // Check for usernames/links
   for (const pattern of CUSTOM_RULE_PATTERNS.socialMedia.usernamePatterns) {
     const matches = normalizedText.matchAll(new RegExp(pattern, 'gi'));
     for (const match of matches) {
       if (match.index !== undefined) {
-        socialMediaSpans.push({
-          start: match.index,
-          end: match.index + match[0].length,
-          content: match[0]
-        });
-        socialMediaSeverity = socialMediaSeverity === 'high' ? 'high' : 'medium';
-        socialMediaConfidence = Math.max(socialMediaConfidence, 0.6);
+        handleSpans.push({ start: match.index, end: match.index + match[0].length, content: match[0] });
       }
     }
   }
 
-  if (socialMediaSpans.length > 0) {
+  const hasIntent = followSpans.length > 0;
+  const hasContactToken = platformSpans.length > 0 || handleSpans.length > 0;
+
+  if (!isAdministrativeContext && hasIntent && hasContactToken) {
+    // Only consider as violation when intent + contact token are both present
+    const combinedSpans = [...followSpans, ...platformSpans, ...handleSpans];
+    socialMediaSpans.push(...combinedSpans);
     results.push({
       detected: true,
       type: 'social_media_sharing',
-      severity: socialMediaSeverity,
-      confidence: socialMediaConfidence,
-      reason: `Detected social media sharing indicators: ${socialMediaSpans.map(s => s.content).join(', ')}`,
-      detectedSpans: socialMediaSpans
+      severity: 'high',
+      confidence: 0.9,
+      reason: `Detected non-therapeutic contact intent with platform/handle: ${combinedSpans.map(s => s.content).join(', ')}`,
+      detectedSpans: combinedSpans
     });
   }
 
@@ -704,97 +706,26 @@ function synthesizeDecision(
 ): FinalModerationDecision {
   console.log('⚖️ Synthesizing final moderation decision...');
   
-  // Conservative hard-stop policy: Only block with very high confidence AND severity
-  // This is a support group - err on the side of allowing recovery discussions
-  if (openaiResult.shouldBlock && openaiResult.confidence >= 0.9 && openaiResult.severity === 'high') {
-    console.log('🚫 HARD STOP: Very high-confidence/severity violation in support group context');
-    return {
-      action: 'block',
-      reason: `Clear violation detected: ${openaiResult.reason}`,
-      violationType: openaiResult.violationType,
-      confidence: openaiResult.confidence,
-      processingDetails: {
-        openaiUsed: true,
-        customRulesUsed: true,
-        processingTime
-      }
-    };
-  }
-
-  // Check custom rules for high-severity violations
-  const highSeverityRules = customRuleResults.filter(r => r.detected && r.severity === 'high');
-  if (highSeverityRules.length > 0) {
-    const highestConfidenceRule = highSeverityRules.reduce((max, rule) => 
-      rule.confidence > max.confidence ? rule : max
+  // New policy: never auto-block. If any detection occurs, route to manual review.
+  const anyCustomDetection = customRuleResults.some(r => r.detected);
+  if (openaiResult.shouldBlock || anyCustomDetection) {
+    console.log('⚠️ REVIEW: Detection present (OpenAI or custom rules). Routing to manual review.');
+    const reason = openaiResult.shouldBlock
+      ? `Requires review: ${openaiResult.reason}`
+      : customRuleResults.find(r => r.detected)?.reason || 'Requires review based on custom rules';
+    const violationType = openaiResult.shouldBlock
+      ? openaiResult.violationType
+      : customRuleResults.find(r => r.detected)?.type;
+    const confidence = Math.max(
+      openaiResult.confidence || 0,
+      ...customRuleResults.filter(r => r.detected).map(r => r.confidence || 0),
+      0.6
     );
-
-    if (highestConfidenceRule.confidence >= 0.95) {
-      console.log('🚫 BLOCK: Very high-severity custom rule violation in support group');
-      return {
-        action: 'block',
-        reason: highestConfidenceRule.reason,
-        violationType: highestConfidenceRule.type,
-        confidence: highestConfidenceRule.confidence,
-        processingDetails: {
-          openaiUsed: true,
-          customRulesUsed: true,
-          processingTime
-        }
-      };
-    }
-  }
-
-  // Check for review-worthy violations
-  if (openaiResult.shouldBlock && (openaiResult.confidence >= 0.5 || openaiResult.severity === 'medium')) {
-    console.log('⚠️ REVIEW: Medium-confidence/severity OpenAI violation');
     return {
       action: 'review',
-      reason: `Requires review: ${openaiResult.reason}`,
-      violationType: openaiResult.violationType,
-      confidence: openaiResult.confidence,
-      processingDetails: {
-        openaiUsed: true,
-        customRulesUsed: true,
-        processingTime
-      }
-    };
-  }
-
-  const mediumSeverityRules = customRuleResults.filter(r => r.detected && (r.severity === 'medium' || r.severity === 'high'));
-  if (mediumSeverityRules.length > 0) {
-    const highestConfidenceRule = mediumSeverityRules.reduce((max, rule) => 
-      rule.confidence > max.confidence ? rule : max
-    );
-
-    if (highestConfidenceRule.confidence >= 0.6) {
-      console.log('⚠️ REVIEW: Custom rule requires review');
-      return {
-        action: 'review',
-        reason: highestConfidenceRule.reason,
-        violationType: highestConfidenceRule.type,
-        confidence: highestConfidenceRule.confidence,
-        processingDetails: {
-          openaiUsed: true,
-          customRulesUsed: true,
-          processingTime
-        }
-      };
-    }
-  }
-
-  // Check for redaction-worthy violations
-  const lowSeverityRules = customRuleResults.filter(r => r.detected && r.severity === 'low');
-  if (lowSeverityRules.length > 0) {
-    console.log('✏️ ALLOW WITH REDACTION: Low-severity violations detected');
-    
-    const allSpans = lowSeverityRules.flatMap(rule => rule.detectedSpans);
-    const redactionSpans = allSpans.map(span => ({ start: span.start, end: span.end }));
-
-    return {
-      action: 'allow_with_redaction',
-      reason: `Content allowed with redaction of: ${lowSeverityRules.map(r => r.type).join(', ')}`,
-      confidence: 0.7,
-      redactionSpans,
+      reason,
+      violationType,
+      confidence,
       processingDetails: {
         openaiUsed: true,
         customRulesUsed: true,
@@ -808,7 +739,7 @@ function synthesizeDecision(
   return {
     action: 'allow',
     reason: 'Content appears acceptable',
-    confidence: 1.0 - Math.max(openaiResult.confidence || 0, 0.3),
+    confidence: 1.0,
     processingDetails: {
       openaiUsed: true,
       customRulesUsed: true,
@@ -980,24 +911,8 @@ export const moderateMessage = onDocumentCreated(
           confidence: openaiResult.confidence
         });
 
-        // Step 4: Apply hard-stop policy using OpenAI scores
-        console.log('\n=== STEP 4: HARD-STOP POLICY CHECK ===');
-        if (openaiResult.shouldBlock && openaiResult.confidence >= 0.8) {
-          console.log('🚫 HARD STOP TRIGGERED - Blocking immediately');
-          
-          const localizedReason = getLocalizedMessage(openaiResult.violationType, userLocale);
-          await snap.ref.update({ 
-            moderation: {
-              status: 'blocked',
-              reason: localizedReason
-            } as ModerationStatus,
-            isHidden: true
-          });
-
-          const processingTime = Date.now() - functionStartTime;
-          console.log(`🏁 MODERATION COMPLETED (Hard Stop) in ${processingTime}ms`);
-          return;
-        }
+        // Step 4: Review policy (no auto blocking/hiding)
+        console.log('\n=== STEP 4: REVIEW POLICY (NO AUTO-BLOCK) ===');
 
         // Step 5: Evaluate custom rules on NORMALIZED text
         console.log('\n=== STEP 5: CUSTOM RULE EVALUATION ===');
@@ -1031,25 +946,16 @@ export const moderateMessage = onDocumentCreated(
         // Map decision actions to existing status system
         let finalStatus: ModerationStatus['status'] = 'approved';
         let localizedReason: string;
-        let shouldHide = false;
 
         switch (finalDecision.action) {
-          case 'block':
-            finalStatus = 'blocked';
-            shouldHide = true;
-            localizedReason = getLocalizedMessage(finalDecision.violationType || 'system_error', userLocale);
-            break;
-          
           case 'review':
             finalStatus = 'manual_review';
             localizedReason = getLocalizedMessage('manual_review', userLocale);
             break;
-          
           case 'allow_with_redaction':
-            finalStatus = 'approved'; // Allow but with redaction info
+            finalStatus = 'approved';
             localizedReason = 'Content approved with redaction';
             break;
-          
           case 'allow':
           default:
             finalStatus = 'approved';
@@ -1065,9 +971,35 @@ export const moderateMessage = onDocumentCreated(
           } as ModerationStatus
         };
 
-        if (shouldHide) {
-          updateData.isHidden = true;
-        }
+        // Never hide automatically
+
+        // Attach AI analysis details for admin UI justification
+        (updateData.moderation as any).ai = {
+          reason: openaiResult.reason,
+          violationType: openaiResult.violationType,
+          severity: openaiResult.severity,
+          confidence: openaiResult.confidence,
+          detectedContent: openaiResult.detectedContent,
+          culturalContext: openaiResult.culturalContext || null
+        };
+
+        (updateData.moderation as any).finalDecision = {
+          action: finalDecision.action,
+          reason: finalDecision.reason,
+          violationType: finalDecision.violationType || null,
+          confidence: finalDecision.confidence
+        };
+
+        (updateData.moderation as any).customRules = customRuleResults
+          .filter(r => r.detected)
+          .map(r => ({
+            type: r.type,
+            severity: r.severity,
+            confidence: r.confidence,
+            reason: r.reason
+          }));
+
+        (updateData.moderation as any).analysisAt = admin.firestore.FieldValue.serverTimestamp();
 
         // Add redaction data if available (for future use)
         if (originalRedactionSpans.length > 0) {
@@ -1126,7 +1058,7 @@ export const moderateMessage = onDocumentCreated(
         messageId,
         totalTime: totalProcessingTime,
         pipelineUsed: 'enhanced-8-step',
-        openaiModel: 'omni-moderation-2024-09-26',
+        openaiModel: 'gpt-4o-mini',
         stepsCompleted: ['normalization', 'deobfuscation', 'openai_analysis', 'custom_rules', 'decision_synthesis']
       });
 
