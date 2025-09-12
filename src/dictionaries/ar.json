@@ -2768,7 +2768,10 @@
             "sender": "المرسل",
             "content": "المحتوى",
             "status": "الحالة",
-            "created": "تاريخ الإنشاء"
+            "created": "تاريخ الإنشاء",
+            "aiJustification": "مبرر الذكاء الاصطناعي",
+            "detectedContent": "المحتوى المكتشف",
+            "culturalContext": "السياق الثقافي"
           },
           "actions": {
             "viewDetails": "عرض التفاصيل",
@@ -2796,7 +2799,11 @@
             "deleteTitle": "حذف الرسائل",
             "confirmAction": "هل أنت متأكد من أنك تريد {action} الـ {count} رسالة المحددة؟",
             "confirm": "{action} المختارة"
-          }
+          },
+          "updateStatus": "تحديث الحالة",
+          "selectStatus": "اختر الحالة",
+          "statusUpdated": "تم تحديث الحالة",
+          "statusUpdateFailed": "فشل في تحديث الحالة"
         }
       }
     },

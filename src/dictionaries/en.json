@@ -2476,10 +2476,9 @@
             "sender": "Sender",
             "status": "Status",
             "created": "Created",
-            "moderated": "Moderated",
-            "content": "Message Content",
-            "moderationReason": "Moderation Reason",
-            "replyTo": "Reply To"
+            "aiJustification": "AI Justification",
+            "detectedContent": "Detected Content",
+            "culturalContext": "Cultural Context"
           },
           "moderation": {
             "approveTitle": "Approve Message",

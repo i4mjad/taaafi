@@ -13,6 +13,7 @@ import {
   getDocs,
   doc,
   getDoc,
+  updateDoc,
   DocumentSnapshot,
   QueryConstraint,
   where
@@ -62,8 +63,22 @@ interface GroupMessage {
   isDeleted: boolean;
   isHidden: boolean;
   moderation: {
-    status: 'pending' | 'approved' | 'blocked';
+    status: 'pending' | 'approved' | 'blocked' | 'manual_review';
     reason?: string;
+    ai?: {
+      reason: string;
+      violationType?: string;
+      severity?: 'low' | 'medium' | 'high';
+      confidence?: number;
+      detectedContent?: string[];
+      culturalContext?: string | null;
+    };
+    finalDecision?: {
+      action: string;
+      reason: string;
+      violationType?: string | null;
+      confidence: number;
+    };
   };
   createdAt: any;
 }
@@ -128,6 +143,8 @@ export function MessagesTable({
   // Message detail dialog state
   const [selectedMessage, setSelectedMessage] = useState<GroupMessage | null>(null);
   const [showMessageDialog, setShowMessageDialog] = useState(false);
+  const [statusToSet, setStatusToSet] = useState<'pending' | 'approved' | 'blocked' | 'manual_review'>('pending');
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   
   // Individual moderation dialog state
   const [showModerationDialog, setShowModerationDialog] = useState(false);
@@ -318,6 +335,13 @@ export function MessagesTable({
     fetchMessages('first');
   }, [groupFilter, statusFilter, searchQuery]);
 
+  // Sync status selector when message changes
+  useEffect(() => {
+    if (selectedMessage?.moderation?.status) {
+      setStatusToSet(selectedMessage.moderation.status);
+    }
+  }, [selectedMessage]);
+
   // Handle pagination
   const handleNextPage = () => {
     if (hasNext && lastDoc) {
@@ -365,6 +389,7 @@ export function MessagesTable({
       pending: 'secondary' as const,
       approved: 'default' as const,
       blocked: 'destructive' as const,
+      manual_review: 'secondary' as const,
     };
     
     return (
@@ -551,7 +576,10 @@ export function MessagesTable({
                     const canModerate = !message.isDeleted; // Allow hidden messages to be moderated
                     
                     return (
-                      <TableRow key={message.id}>
+                      <TableRow key={message.id} className="cursor-pointer" onClick={() => {
+                        setSelectedMessage(message);
+                        setShowMessageDialog(true);
+                      }}>
                         <TableCell>
                           {canModerate && (
                             <Checkbox
@@ -559,6 +587,7 @@ export function MessagesTable({
                               onCheckedChange={(checked) => 
                                 handleSelectMessage(message.id, checked as boolean)
                               }
+                              onClick={(e) => e.stopPropagation()}
                             />
                           )}
                         </TableCell>
@@ -606,11 +635,11 @@ export function MessagesTable({
                         <TableCell>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" className="h-8 w-8 p-0">
+                              <Button variant="ghost" className="h-8 w-8 p-0" onClick={(e) => e.stopPropagation()}>
                                 <MoreHorizontal className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
+                            <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
                               <DropdownMenuItem onClick={() => {
                                 setSelectedMessage(message);
                                 setShowMessageDialog(true);
@@ -819,6 +848,82 @@ export function MessagesTable({
                 </Label>
                 <div className="mt-1">
                   {getModerationBadge(selectedMessage)}
+                </div>
+              </div>
+
+              {/* AI Justification */}
+              {selectedMessage.moderation?.ai && (
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">
+                    {t('modules.admin.content.messageDetails.aiJustification') || 'AI Justification'}
+                  </Label>
+                  <div className="p-3 bg-muted rounded-md text-sm space-y-1">
+                    <p><strong>{t('common.reason') || 'Reason'}:</strong> {selectedMessage.moderation.ai.reason}</p>
+                    {selectedMessage.moderation.ai.violationType && (
+                      <p><strong>{t('modules.admin.content.violationType') || 'Violation'}:</strong> {selectedMessage.moderation.ai.violationType}</p>
+                    )}
+                    {typeof selectedMessage.moderation.ai.confidence === 'number' && (
+                      <p><strong>{t('common.confidence') || 'Confidence'}:</strong> {Math.round((selectedMessage.moderation.ai.confidence || 0) * 100)}%</p>
+                    )}
+                    {selectedMessage.moderation.ai.severity && (
+                      <p><strong>{t('common.severity') || 'Severity'}:</strong> {selectedMessage.moderation.ai.severity}</p>
+                    )}
+                    {selectedMessage.moderation.ai.detectedContent && selectedMessage.moderation.ai.detectedContent.length > 0 && (
+                      <div>
+                        <p><strong>{t('modules.admin.content.detectedContent') || 'Detected Content'}:</strong></p>
+                        <ul className="list-disc list-inside">
+                          {selectedMessage.moderation.ai.detectedContent.map((c, idx) => (
+                            <li key={idx}>{c}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {selectedMessage.moderation.ai.culturalContext && (
+                      <p><strong>{t('modules.admin.content.culturalContext') || 'Cultural Context'}:</strong> {selectedMessage.moderation.ai.culturalContext}</p>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Change Status */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">
+                  {t('modules.admin.content.updateStatus') || 'Update Status'}
+                </Label>
+                <div className="flex gap-2 items-center">
+                  <Select value={statusToSet} onValueChange={(v) => setStatusToSet(v as any)}>
+                    <SelectTrigger className="w-56">
+                      <SelectValue placeholder={t('modules.admin.content.selectStatus') || 'Select status'} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="pending">{t('modules.admin.content.status.pending')}</SelectItem>
+                      <SelectItem value="approved">{t('modules.admin.content.status.approved')}</SelectItem>
+                      <SelectItem value="manual_review">{t('modules.admin.content.status.manual_review')}</SelectItem>
+                      <SelectItem value="blocked">{t('modules.admin.content.status.blocked')}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Button
+                    onClick={async () => {
+                      if (!selectedMessage) return;
+                      setIsUpdatingStatus(true);
+                      try {
+                        const ref = doc(db, 'group_messages', selectedMessage.id);
+                        await updateDoc(ref, { 'moderation.status': statusToSet });
+                        toast.success(t('modules.admin.content.statusUpdated') || 'Status updated');
+                        setSelectedMessage({ ...selectedMessage, moderation: { ...selectedMessage.moderation, status: statusToSet } });
+                        // refresh list
+                        fetchMessages('first');
+                      } catch (e) {
+                        console.error('Failed to update status', e);
+                        toast.error(t('modules.admin.content.statusUpdateFailed') || 'Failed to update status');
+                      } finally {
+                        setIsUpdatingStatus(false);
+                      }
+                    }}
+                    disabled={isUpdatingStatus}
+                  >
+                    {isUpdatingStatus ? t('common.updating') : t('modules.admin.content.updateStatus')}
+                  </Button>
                 </div>
               </div>
             </div>
