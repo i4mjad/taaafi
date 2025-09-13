@@ -100,6 +100,7 @@ export interface MessageStats {
   pending: number;
   approved: number;
   blocked: number;
+  manual_review: number;
   reported: number;
   hidden: number;
   deleted: number;
@@ -237,6 +238,7 @@ export function MessagesTable({
       pending: allMsgs.filter(m => m.moderation?.status === 'pending' || !m.moderation?.status).length,
       approved: allMsgs.filter(m => m.moderation?.status === 'approved').length,
       blocked: allMsgs.filter(m => m.moderation?.status === 'blocked').length,
+      manual_review: allMsgs.filter(m => m.moderation?.status === 'manual_review').length,
       reported: allMsgs.filter(m => reportedMessageIds.has(m.id)).length,
       hidden: allMsgs.filter(m => m.isHidden && !m.isDeleted).length,
       deleted: allMsgs.filter(m => m.isDeleted).length,
@@ -251,7 +253,6 @@ export function MessagesTable({
 
   // Fetch messages
   const fetchMessages = async (direction: 'first' | 'next' | 'prev' = 'first', cursor?: DocumentSnapshot) => {
-    console.log('fetchMessages called with direction:', direction, 'cursor:', cursor?.id, 'currentPage:', currentPage);
     setLoading(true);
     try {
       // Fetch all messages for statistics on first load or filter changes
@@ -271,7 +272,6 @@ export function MessagesTable({
 
       const messagesQuery = query(collection(db, 'group_messages'), ...constraints);
       const snapshot = await getDocs(messagesQuery);
-      console.log('Query returned', snapshot.docs.length, 'documents for direction:', direction);
       
       let fetchedMessages = snapshot.docs.map(doc => ({
         id: doc.id,
@@ -353,12 +353,9 @@ export function MessagesTable({
 
   const handlePrevPage = () => {
     if (hasPrev && firstDoc) {
-      console.log('Going to prev page, currentPage:', currentPage, 'firstDoc:', firstDoc.id);
       setCurrentPage(prev => prev - 1);
       fetchMessages('prev', firstDoc);
       setSelectedIds([]);
-    } else {
-      console.log('Cannot go to prev page, hasPrev:', hasPrev, 'firstDoc:', !!firstDoc);
     }
   };
 

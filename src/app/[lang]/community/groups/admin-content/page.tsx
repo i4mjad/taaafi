@@ -31,6 +31,7 @@ export default function SystemAdminContentPage() {
     pending: 0,
     approved: 0,
     blocked: 0,
+    manual_review: 0,
     reported: 0,
     hidden: 0,
     deleted: 0,
@@ -164,7 +165,7 @@ export default function SystemAdminContentPage() {
         <div className="flex-1 overflow-auto">
           <div className="p-6 space-y-6 max-w-none">
             {/* Statistics */}
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">{t('modules.admin.systemAdmin.totalMessages')}</CardTitle>
@@ -183,6 +184,17 @@ export default function SystemAdminContentPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{messageStats.pending}</div>
+                  <p className="text-xs text-muted-foreground">{t('modules.admin.systemAdmin.needAttention')}</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">{t('modules.admin.content.status.manual_review') || 'Manual Review'}</CardTitle>
+                  <AlertTriangle className="h-4 w-4 text-orange-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-orange-600">{messageStats.manual_review}</div>
                   <p className="text-xs text-muted-foreground">{t('modules.admin.systemAdmin.needAttention')}</p>
                 </CardContent>
               </Card>
@@ -257,6 +269,7 @@ export default function SystemAdminContentPage() {
                         <SelectItem value="all">{t('modules.admin.systemAdmin.allStatus')}</SelectItem>
                         <SelectItem value="pending">{t('modules.admin.content.status.pending')}</SelectItem>
                         <SelectItem value="approved">{t('modules.admin.content.status.approved')}</SelectItem>
+                        <SelectItem value="manual_review">{t('modules.admin.content.status.manual_review')}</SelectItem>
                         <SelectItem value="blocked">{t('modules.admin.content.status.blocked')}</SelectItem>
                         <SelectItem value="reported">{t('modules.admin.content.status.reported')}</SelectItem>
                       </SelectContent>
