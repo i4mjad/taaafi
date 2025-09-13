@@ -355,12 +355,58 @@ async function getUserGender(communityProfileId: string): Promise<string | null>
   }
 }
 
+// Helper function to check if user has founder or admin role
+async function isUserFounderOrAdmin(communityProfileId: string): Promise<boolean> {
+  try {
+    console.log(`🔍 Checking if user ${communityProfileId} has founder or admin role`);
+    
+    // Get community profile to find userUID
+    const communityProfileDoc = await admin.firestore().collection('communityProfiles').doc(communityProfileId).get();
+    if (!communityProfileDoc.exists) {
+      console.log(`⚠️ Community profile not found: ${communityProfileId}`);
+      return false;
+    }
+    
+    const communityProfileData = communityProfileDoc.data()!;
+    const userUID = communityProfileData.userUID;
+    
+    if (!userUID) {
+      console.log(`⚠️ Community profile ${communityProfileId} missing userUID`);
+      return false;
+    }
+    
+    // Get user document to check roles
+    const userDoc = await admin.firestore().collection('users').doc(userUID).get();
+    if (!userDoc.exists) {
+      console.log(`⚠️ User document not found: ${userUID}`);
+      return false;
+    }
+    
+    const userData = userDoc.data()!;
+    const userRole = userData.role;
+    
+    console.log(`👑 User ${communityProfileId} role: ${userRole}`);
+    
+    return userRole === 'admin' || userRole === 'founder';
+  } catch (error) {
+    console.error(`❌ Error checking user roles for ${communityProfileId}:`, error);
+    return false;
+  }
+}
+
 // Helper function to check gender compatibility and mark comment as deleted if needed
 async function checkGenderCompatibilityAndMarkDeleted(commentData: any, commentId: string): Promise<void> {
   try {
     const { authorCPId: commenterCPId, parentFor, parentId } = commentData;
     
     console.log(`🔍 Checking gender compatibility for comment ${commentId} by ${commenterCPId} (parentFor: ${parentFor}, parentId: ${parentId})`);
+    
+    // Check if commenter is founder or admin - if so, skip gender check
+    const isCommenterFounderOrAdmin = await isUserFounderOrAdmin(commenterCPId);
+    if (isCommenterFounderOrAdmin) {
+      console.log(`👑 Commenter ${commenterCPId} has founder/admin role, skipping gender check`);
+      return;
+    }
     
     // Get commenter's gender
     const commenterGender = await getUserGender(commenterCPId);
