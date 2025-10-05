@@ -74,7 +74,7 @@ import Link from 'next/link';
 import { toast } from 'sonner';
 import { SiteHeader } from '@/components/site-header';
 import { useTranslation } from "@/contexts/TranslationContext";
-import { useDeletionRequests, useDeletionRequestStats, useUserDeletion } from '@/hooks/useDeletionRequests';
+import { useDeletionRequests, useDeletionRequestsByStatus, useDeletionRequestStats, useUserDeletion } from '@/hooks/useDeletionRequests';
 
 interface UserProfile {
   uid: string;
@@ -139,16 +139,73 @@ interface UserStats {
 export default function UsersRoute() {
   const { t, locale } = useTranslation();
   
-  // Fetch deletion requests and stats
+  // Deletion requests tab state - for database-level filtering
+  const [activeDeletionTab, setActiveDeletionTab] = useState<'all' | 'pending' | 'processed' | 'canceled'>('all');
+  
+  // Pagination cursors for each tab
+  const [pendingCursor, setPendingCursor] = useState<any>(null);
+  const [processedCursor, setProcessedCursor] = useState<any>(null);
+  const [canceledCursor, setCanceledCursor] = useState<any>(null);
+  
+  // Page size for deletion requests
+  const deletionRequestsPageSize = 50;
+  
+  // Fetch deletion requests based on active tab (database-level filtering)
   const { 
-    deletionRequests, 
-    loading: deletionRequestsLoading,
+    deletionRequests: allDeletionRequests, 
+    loading: allDeletionRequestsLoading,
     processing: requestProcessing,
     approveRequest,
-    refetch: refetchDeletionRequests
+    refetch: refetchAllDeletionRequests
   } = useDeletionRequests();
+  
+  const { 
+    deletionRequests: pendingDeletionRequests, 
+    loading: pendingDeletionRequestsLoading,
+    lastVisible: pendingLastVisible,
+    hasMore: pendingHasMore
+  } = useDeletionRequestsByStatus('pending', deletionRequestsPageSize, pendingCursor);
+  
+  const { 
+    deletionRequests: processedDeletionRequests, 
+    loading: processedDeletionRequestsLoading,
+    lastVisible: processedLastVisible,
+    hasMore: processedHasMore
+  } = useDeletionRequestsByStatus('processed', deletionRequestsPageSize, processedCursor);
+  
+  const { 
+    deletionRequests: canceledDeletionRequests, 
+    loading: canceledDeletionRequestsLoading,
+    lastVisible: canceledLastVisible,
+    hasMore: canceledHasMore
+  } = useDeletionRequestsByStatus('canceled', deletionRequestsPageSize, canceledCursor);
+  
   const { executeUserDeletion, processing: deletionProcessing, progress } = useUserDeletion();
   const { stats: deletionStats, loading: statsLoading } = useDeletionRequestStats();
+  
+  // Get active deletion requests based on selected tab
+  const deletionRequests = activeDeletionTab === 'all' ? allDeletionRequests :
+    activeDeletionTab === 'pending' ? pendingDeletionRequests :
+    activeDeletionTab === 'processed' ? processedDeletionRequests :
+    canceledDeletionRequests;
+  
+  const deletionRequestsLoading = activeDeletionTab === 'all' ? allDeletionRequestsLoading :
+    activeDeletionTab === 'pending' ? pendingDeletionRequestsLoading :
+    activeDeletionTab === 'processed' ? processedDeletionRequestsLoading :
+    canceledDeletionRequestsLoading;
+  
+  const hasMoreDeletionRequests = activeDeletionTab === 'pending' ? pendingHasMore :
+    activeDeletionTab === 'processed' ? processedHasMore :
+    activeDeletionTab === 'canceled' ? canceledHasMore :
+    false;
+  
+  const refetchDeletionRequests = async () => {
+    await refetchAllDeletionRequests();
+    // Reset cursors
+    setPendingCursor(null);
+    setProcessedCursor(null);
+    setCanceledCursor(null);
+  };
   
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
@@ -187,14 +244,6 @@ export default function UsersRoute() {
   const [providerFilter, setProviderFilter] = useState('all');
   const [deletionStatusFilter, setDeletionStatusFilter] = useState('all');
   
-  // Deletion requests filters
-  const [deletionRequestStatusFilter, setDeletionRequestStatusFilter] = useState('all');
-  
-  // Deletion requests pagination
-  const [deletionRequestsPagination, setDeletionRequestsPagination] = useState({
-    pageIndex: 0,
-    pageSize: 20,
-  });
 
   // Deletion requests actions state
   const [showApproveDeletionDialog, setShowApproveDeletionDialog] = useState(false);
@@ -206,6 +255,13 @@ export default function UsersRoute() {
   const [bulkApproveOpen, setBulkApproveOpen] = useState(false);
   const [bulkAdminNotes, setBulkAdminNotes] = useState('');
   const [bulkProcessing, setBulkProcessing] = useState(false);
+
+  // Reset pagination cursors when deletion request tab changes
+  useEffect(() => {
+    setPendingCursor(null);
+    setProcessedCursor(null);
+    setCanceledCursor(null);
+  }, [activeDeletionTab]);
 
   const headerDictionary = {
     documents: t('appSidebar.users') || 'Users',
@@ -359,13 +415,6 @@ export default function UsersRoute() {
     // This will trigger loadUsers due to the filter changes
   };
 
-  const handleClearDeletionFilters = () => {
-    setDeletionRequestStatusFilter('all');
-    setDeletionRequestsPagination({
-      pageIndex: 0,
-      pageSize: 20
-    });
-  };
 
   const formatDeletionDate = (date: Date | string | null | undefined) => {
     if (!date) return t('common.never') || 'Never';
@@ -416,36 +465,33 @@ export default function UsersRoute() {
     );
   };
 
-  // Filter deletion requests based on status
-  const filteredDeletionRequests = deletionRequests.filter(request => {
-    if (deletionRequestStatusFilter === 'all') return true;
-    if (deletionRequestStatusFilter === 'pending') return !request.isProcessed && !request.isCanceled;
-    if (deletionRequestStatusFilter === 'processed') return request.isProcessed;
-    if (deletionRequestStatusFilter === 'canceled') return request.isCanceled;
-    return true;
-  });
+  // Deletion requests pagination handlers (cursor-based)
+  const handleDeletionNextPage = () => {
+    if (activeDeletionTab === 'pending' && pendingLastVisible) {
+      setPendingCursor(pendingLastVisible);
+    } else if (activeDeletionTab === 'processed' && processedLastVisible) {
+      setProcessedCursor(processedLastVisible);
+    } else if (activeDeletionTab === 'canceled' && canceledLastVisible) {
+      setCanceledCursor(canceledLastVisible);
+    }
+  };
 
-  // Paginate deletion requests
-  const totalDeletionRequests = filteredDeletionRequests.length;
-  const totalDeletionPages = Math.ceil(totalDeletionRequests / deletionRequestsPagination.pageSize);
-  const paginatedDeletionRequests = filteredDeletionRequests.slice(
-    deletionRequestsPagination.pageIndex * deletionRequestsPagination.pageSize,
-    (deletionRequestsPagination.pageIndex + 1) * deletionRequestsPagination.pageSize
+  const handleDeletionResetPagination = () => {
+    if (activeDeletionTab === 'pending') {
+      setPendingCursor(null);
+    } else if (activeDeletionTab === 'processed') {
+      setProcessedCursor(null);
+    } else if (activeDeletionTab === 'canceled') {
+      setCanceledCursor(null);
+    }
+  };
+
+  const isOnFirstPage = (
+    (activeDeletionTab === 'pending' && !pendingCursor) ||
+    (activeDeletionTab === 'processed' && !processedCursor) ||
+    (activeDeletionTab === 'canceled' && !canceledCursor) ||
+    activeDeletionTab === 'all'
   );
-
-  const handleDeletionPageChange = (newPageIndex: number) => {
-    setDeletionRequestsPagination(prev => ({
-      ...prev,
-      pageIndex: newPageIndex
-    }));
-  };
-
-  const handleDeletionPageSizeChange = (newPageSize: number) => {
-    setDeletionRequestsPagination({
-      pageIndex: 0, // Reset to first page
-      pageSize: newPageSize
-    });
-  };
 
   const openApproveDeletion = (request: AccountDeleteRequest) => {
     setSelectedDeletionRequest(request);
@@ -1179,27 +1225,43 @@ export default function UsersRoute() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    {/* Deletion Requests Filters */}
-                    <div className="flex flex-col gap-4 md:flex-row md:items-end mb-6">
-                      <Select value={deletionRequestStatusFilter} onValueChange={setDeletionRequestStatusFilter}>
-                        <SelectTrigger className="w-[200px]">
-                          <SelectValue placeholder={t('modules.userManagement.accountDeletion.filterByStatus') || 'Filter by status'} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">{t('common.all')} {t('modules.userManagement.accountDeletion.statuses') || 'Requests'}</SelectItem>
-                          <SelectItem value="pending">{t('modules.userManagement.accountDeletion.pendingDeletion') || 'Pending'}</SelectItem>
-                          <SelectItem value="processed">{t('modules.userManagement.accountDeletion.isProcessed') || 'Processed'}</SelectItem>
-                          <SelectItem value="canceled">{t('modules.userManagement.accountDeletion.isCanceled') || 'Canceled'}</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <div className="flex gap-2">
-                        {deletionRequestStatusFilter !== 'all' && (
-                          <Button variant="outline" onClick={handleClearDeletionFilters}>
-                            {t('modules.userManagement.clearFilters') || 'Clear Filters'}
-                          </Button>
-                        )}
-                      </div>
-                    </div>
+                    {/* Deletion Requests Status Tabs - Database-level filtering */}
+                    <Tabs value={activeDeletionTab} onValueChange={(value) => setActiveDeletionTab(value as typeof activeDeletionTab)} className="mb-6">
+                      <TabsList className="grid w-full grid-cols-4">
+                        <TabsTrigger value="all">
+                          {t('common.all')}
+                          {!statsLoading && (
+                            <Badge variant="secondary" className="ml-2 text-xs">
+                              {deletionStats.total}
+                            </Badge>
+                          )}
+                        </TabsTrigger>
+                        <TabsTrigger value="pending">
+                          {t('modules.userManagement.accountDeletion.pendingDeletion') || 'Pending'}
+                          {!statsLoading && deletionStats.pending > 0 && (
+                            <Badge variant="destructive" className="ml-2 text-xs">
+                              {deletionStats.pending}
+                            </Badge>
+                          )}
+                        </TabsTrigger>
+                        <TabsTrigger value="processed">
+                          {t('modules.userManagement.accountDeletion.isProcessed') || 'Processed'}
+                          {!statsLoading && deletionStats.processed > 0 && (
+                            <Badge variant="secondary" className="ml-2 text-xs">
+                              {deletionStats.processed}
+                            </Badge>
+                          )}
+                        </TabsTrigger>
+                        <TabsTrigger value="canceled">
+                          {t('modules.userManagement.accountDeletion.isCanceled') || 'Canceled'}
+                          {!statsLoading && deletionStats.canceled > 0 && (
+                            <Badge variant="secondary" className="ml-2 text-xs">
+                              {deletionStats.canceled}
+                            </Badge>
+                          )}
+                        </TabsTrigger>
+                      </TabsList>
+                    </Tabs>
 
                     {/* Deletion Requests Table */}
                     {deletionRequestsLoading ? (
@@ -1208,7 +1270,7 @@ export default function UsersRoute() {
                           <Skeleton key={i} className="h-16 w-full" />
                         ))}
                       </div>
-                    ) : paginatedDeletionRequests.length > 0 ? (
+                    ) : deletionRequests.length > 0 ? (
                       <div className="rounded-md border overflow-x-auto">
                         <Table>
                           <TableHeader>
@@ -1216,13 +1278,13 @@ export default function UsersRoute() {
                               <TableHead>
                                 <Checkbox
                                   checked={
-                                    paginatedDeletionRequests.length > 0 &&
-                                    selectedDeletionRequestIds.length === paginatedDeletionRequests.filter(r => !r.isProcessed && !r.isCanceled).length
+                                    deletionRequests.length > 0 &&
+                                    selectedDeletionRequestIds.length === deletionRequests.filter(r => !r.isProcessed && !r.isCanceled).length
                                   }
                                   onCheckedChange={(value) => {
                                     if (value) {
                                       setSelectedDeletionRequestIds(
-                                        paginatedDeletionRequests
+                                        deletionRequests
                                           .filter(r => !r.isProcessed && !r.isCanceled)
                                           .map(r => r.id)
                                       );
@@ -1243,7 +1305,7 @@ export default function UsersRoute() {
                             </TableRow>
                           </TableHeader>
                           <TableBody>
-                            {paginatedDeletionRequests.map((request) => (
+                            {deletionRequests.map((request) => (
                               <TableRow key={request.id}>
                                 <TableCell>
                                   {!request.isProcessed && !request.isCanceled ? (
@@ -1360,75 +1422,39 @@ export default function UsersRoute() {
                       </div>
                     )}
 
-                    {/* Deletion Requests Pagination */}
-                    {paginatedDeletionRequests.length > 0 && (
+                    {/* Deletion Requests Pagination - Cursor-based */}
+                    {(deletionRequests.length > 0 || !isOnFirstPage) && activeDeletionTab !== 'all' && (
                       <div className="flex items-center justify-between space-x-2 py-4">
                         <div className="text-sm text-muted-foreground">
                           {t('modules.userManagement.showingResults')
-                            ?.replace('{start}', (deletionRequestsPagination.pageIndex * deletionRequestsPagination.pageSize + 1).toString())
-                            ?.replace('{end}', Math.min((deletionRequestsPagination.pageIndex + 1) * deletionRequestsPagination.pageSize, totalDeletionRequests).toString())
-                            ?.replace('{total}', totalDeletionRequests.toString()) || 
-                            `Showing ${deletionRequestsPagination.pageIndex * deletionRequestsPagination.pageSize + 1} to ${Math.min((deletionRequestsPagination.pageIndex + 1) * deletionRequestsPagination.pageSize, totalDeletionRequests)} of ${totalDeletionRequests} results`}
+                            ?.replace('{start}', '1')
+                            ?.replace('{end}', deletionRequests.length.toString())
+                            ?.replace('{total}', 
+                              activeDeletionTab === 'pending' ? deletionStats.pending.toString() :
+                              activeDeletionTab === 'processed' ? deletionStats.processed.toString() :
+                              activeDeletionTab === 'canceled' ? deletionStats.canceled.toString() : '0'
+                            ) || 
+                            `Showing ${deletionRequests.length} records`}
                         </div>
-                        <div className="flex items-center space-x-4">
-                          <div className="flex items-center space-x-2">
-                            <p className="text-sm font-medium">{t('modules.userManagement.rowsPerPage') || 'Rows per page'}</p>
-                            <Select
-                              value={`${deletionRequestsPagination.pageSize}`}
-                              onValueChange={(value) => handleDeletionPageSizeChange(Number(value))}
-                            >
-                              <SelectTrigger className="w-20">
-                                <SelectValue placeholder={deletionRequestsPagination.pageSize} />
-                              </SelectTrigger>
-                              <SelectContent side="top">
-                                {[10, 20, 50, 100].map((pageSize) => (
-                                  <SelectItem key={pageSize} value={`${pageSize}`}>
-                                    {pageSize}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <p className="text-sm font-medium">{t('modules.userManagement.page') || 'Page'}</p>
-                            <span className="text-sm text-muted-foreground">
-                              {deletionRequestsPagination.pageIndex + 1} {t('modules.userManagement.of') || 'of'} {totalDeletionPages}
-                            </span>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleDeletionPageChange(0)}
-                              disabled={deletionRequestsPagination.pageIndex === 0}
-                            >
-                              <ChevronsLeftIcon className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleDeletionPageChange(deletionRequestsPagination.pageIndex - 1)}
-                              disabled={deletionRequestsPagination.pageIndex === 0}
-                            >
-                              <ChevronLeftIcon className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleDeletionPageChange(deletionRequestsPagination.pageIndex + 1)}
-                              disabled={deletionRequestsPagination.pageIndex >= totalDeletionPages - 1}
-                            >
-                              <ChevronRightIcon className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleDeletionPageChange(totalDeletionPages - 1)}
-                              disabled={deletionRequestsPagination.pageIndex >= totalDeletionPages - 1}
-                            >
-                              <ChevronsRightIcon className="h-4 w-4" />
-                            </Button>
-                          </div>
+                        <div className="flex items-center space-x-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleDeletionResetPagination}
+                            disabled={isOnFirstPage}
+                          >
+                            <ChevronsLeftIcon className="h-4 w-4 mr-2" />
+                            {t('common.firstPage') || 'First Page'}
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleDeletionNextPage}
+                            disabled={!hasMoreDeletionRequests || deletionRequestsLoading}
+                          >
+                            {t('common.nextPage') || 'Next Page'}
+                            <ChevronRightIcon className="h-4 w-4 ml-2" />
+                          </Button>
                         </div>
                       </div>
                     )}

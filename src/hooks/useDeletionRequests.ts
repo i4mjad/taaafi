@@ -53,12 +53,12 @@ export function useDeletionRequests(userId?: string) {
         ? query(
             collection(db, 'accountDeleteRequests'),
             where('userId', '==', userId),
-            orderBy('requestedAt', 'asc')
+            orderBy('requestedAt', 'asc') // Show oldest requests first
           )
         : query(
             collection(db, 'accountDeleteRequests'),
-            orderBy('requestedAt', 'asc'),
-            limit(500) // Fetch more requests to ensure we get all statuses
+            orderBy('requestedAt', 'asc'), // Show oldest requests first
+            limit(1000) // Fetch more requests to ensure we get all statuses
           );
 
       const snapshot = await getDocs(queryRef);
@@ -74,8 +74,8 @@ export function useDeletionRequests(userId?: string) {
           reasonId: data.reasonId,
           reasonDetails: data.reasonDetails,
           reasonCategory: data.reasonCategory,
-          isCanceled: data.isCanceled || false,
-          isProcessed: data.isProcessed || false,
+          isCanceled: Boolean(data.isCanceled || false),
+          isProcessed: Boolean(data.isProcessed || false),
           canceledAt: data.canceledAt?.toDate(),
           processedAt: data.processedAt?.toDate(),
           processedBy: data.processedBy,
@@ -98,7 +98,7 @@ export function useDeletionRequests(userId?: string) {
           return priorityA - priorityB;
         }
         
-        return a.requestedAt.getTime() - b.requestedAt.getTime();
+        return a.requestedAt.getTime() - b.requestedAt.getTime(); // Older requests first
       });
 
       setAllRequests(requests);
@@ -223,36 +223,78 @@ export function useDeletionRequests(userId?: string) {
   };
 }
 
-export function useDeletionRequestsByStatus(status: 'pending' | 'processed' | 'canceled') {
-  // Build query based on status with proper conditions
-  let queryConstraints;
-  if (status === 'pending') {
-    queryConstraints = [
-      where('isProcessed', '==', false),
-      where('isCanceled', '==', false),
-      orderBy('requestedAt', 'asc'),
-      limit(100)
-    ];
-  } else if (status === 'processed') {
-    queryConstraints = [
-      where('isProcessed', '==', true),
-      orderBy('requestedAt', 'asc'),
-      limit(100)
-    ];
-  } else { // canceled
-    queryConstraints = [
-      where('isCanceled', '==', true),
-      orderBy('requestedAt', 'asc'),
-      limit(100)
-    ];
-  }
+/**
+ * Fetches deletion requests by status with DATABASE-LEVEL pagination
+ * 
+ * This hook uses Firestore cursor-based pagination with:
+ * - Database-level filtering (where clauses)
+ * - Database-level ordering (orderBy)
+ * - Database-level pagination (startAfter + limit)
+ * 
+ * NO client-side filtering or pagination is performed.
+ * Only the requested page of data is fetched from Firestore.
+ */
+export function useDeletionRequestsByStatus(
+  status: 'pending' | 'processed' | 'canceled',
+  pageSize: number = 50,
+  lastDoc?: QueryDocumentSnapshot | null
+) {
+  const [snapshot, setSnapshot] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<Error | null>(null);
 
-  const [snapshot, loading, error] = useCollection(
-    query(collection(db, 'accountDeleteRequests'), ...queryConstraints)
-  );
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        setFetchError(null);
+
+        // Build query with DATABASE-LEVEL filtering based on status
+        let queryConstraints: any[];
+        if (status === 'pending') {
+          queryConstraints = [
+            where('isProcessed', '==', false),
+            where('isCanceled', '==', false),
+            orderBy('requestedAt', 'asc'),
+          ];
+        } else if (status === 'processed') {
+          queryConstraints = [
+            where('isProcessed', '==', true),
+            orderBy('requestedAt', 'asc'),
+          ];
+        } else { // canceled
+          queryConstraints = [
+            where('isCanceled', '==', true),
+            orderBy('requestedAt', 'asc'),
+          ];
+        }
+
+        // DATABASE-LEVEL PAGINATION: Add cursor to start after last document
+        if (lastDoc) {
+          queryConstraints.push(startAfter(lastDoc)); // Firestore handles this on the server
+        }
+
+        // DATABASE-LEVEL PAGINATION: Limit results to pageSize
+        queryConstraints.push(limit(pageSize)); // Firestore only returns this many records
+
+        // Execute query - Firestore server does ALL filtering, ordering, and pagination
+        const q = query(collection(db, 'accountDeleteRequests'), ...queryConstraints);
+        const querySnapshot = await getDocs(q); // Fetches ONLY the requested page from database
+        
+        setSnapshot(querySnapshot);
+      } catch (err) {
+        setFetchError(err as Error);
+        console.error('Error fetching deletion requests:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [status, pageSize, lastDoc]);
 
   const deletionRequests: AccountDeleteRequest[] = 
-    snapshot?.docs.map((doc) => {
+    snapshot?.docs.map((doc: any) => {
       const data = doc.data() as DocumentData;
       return {
         id: doc.id,
@@ -263,8 +305,8 @@ export function useDeletionRequestsByStatus(status: 'pending' | 'processed' | 'c
         reasonId: data.reasonId,
         reasonDetails: data.reasonDetails,
         reasonCategory: data.reasonCategory,
-        isCanceled: data.isCanceled || false,
-        isProcessed: data.isProcessed || false,
+        isCanceled: Boolean(data.isCanceled || false),
+        isProcessed: Boolean(data.isProcessed || false),
         canceledAt: data.canceledAt?.toDate(),
         processedAt: data.processedAt?.toDate(),
         processedBy: data.processedBy,
@@ -272,10 +314,16 @@ export function useDeletionRequestsByStatus(status: 'pending' | 'processed' | 'c
       };
     }) || [];
 
+  const lastVisible = snapshot?.docs[snapshot?.docs.length - 1] || null;
+  const firstVisible = snapshot?.docs[0] || null;
+
   return {
     deletionRequests,
-    loading,
-    error,
+    loading: isLoading,
+    error: fetchError,
+    lastVisible,
+    firstVisible,
+    hasMore: snapshot?.docs.length === pageSize,
   };
 }
 

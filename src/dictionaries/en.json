@@ -3179,6 +3179,8 @@
       "page": "Page",
       "previous": "Previous", 
       "next": "Next",
+      "firstPage": "First Page",
+      "nextPage": "Next Page",
       "group": "Group",
       "close": "Close",
       "activate": "Activate",
