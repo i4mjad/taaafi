@@ -17,6 +17,11 @@ final iosAuthStatusProvider = FutureProvider.autoDispose<bool>((ref) async {
 /// On non-iOS, returns {}.
 final iosSnapshotProvider =
     StreamProvider.autoDispose<Map<String, dynamic>>((ref) async* {
+  final isActive = ref.watch(guardStreamActiveProvider);
+  if (!isActive) {
+    yield const <String, dynamic>{};
+    return;
+  }
   if (!Platform.isIOS) {
     yield <String, dynamic>{};
     return;
@@ -79,6 +84,11 @@ final nativeLogsProvider =
 /// Streaming logs provider (polls periodically and emits only on change)
 final logsStreamProvider =
     StreamProvider.autoDispose<List<String>>((ref) async* {
+  final isActive = ref.watch(guardStreamActiveProvider);
+  if (!isActive) {
+    yield const <String>[];
+    return;
+  }
   // Also respond to manual refresh trigger
   ref.watch(manualRefreshProvider);
 
@@ -115,6 +125,11 @@ final logsStreamProvider =
 /// Android snapshot provider - polls every 30s
 final androidSnapshotProvider =
     StreamProvider.autoDispose<Map<String, dynamic>>((ref) async* {
+  final isActive = ref.watch(guardStreamActiveProvider);
+  if (!isActive) {
+    yield const <String, dynamic>{};
+    return;
+  }
   if (!Platform.isAndroid) {
     yield <String, dynamic>{};
     return;
@@ -151,6 +166,10 @@ final androidSnapshotProvider =
 /// Real-time snapshot that responds to manual refresh
 final realtimeSnapshotProvider =
     Provider.autoDispose<AsyncValue<Map<String, dynamic>>>((ref) {
+  final isActive = ref.watch(guardStreamActiveProvider);
+  if (!isActive) {
+    return const AsyncValue.data(<String, dynamic>{});
+  }
   // Watch manual refresh trigger to force re-fetch
   ref.watch(manualRefreshProvider);
 
@@ -163,3 +182,6 @@ final realtimeSnapshotProvider =
     return const AsyncValue.data(<String, dynamic>{});
   }
 });
+
+final guardStreamActiveProvider =
+    StateProvider.autoDispose<bool>((ref) => false);

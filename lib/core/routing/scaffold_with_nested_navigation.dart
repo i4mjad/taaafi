@@ -7,6 +7,7 @@ import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
+import 'package:reboot_app_3/features/guard/application/ios_focus_providers.dart';
 
 class ScaffoldWithNestedNavigation extends ConsumerWidget {
   const ScaffoldWithNestedNavigation({
@@ -17,7 +18,13 @@ class ScaffoldWithNestedNavigation extends ConsumerWidget {
 
   void _goBranch(int index, WidgetRef ref) {
     // Community tab index is 2 (home=0, vault=1, community=2, groups=3, account=4)
-    const int communityTabIndex = 2;
+    const int communityTabIndex = kDebugMode ? 3 : 2;
+
+    if (kDebugMode) {
+      const int guardTabIndex = 2;
+      final isGuardTab = index == guardTabIndex;
+      ref.read(guardStreamActiveProvider.notifier).state = isGuardTab;
+    }
 
     if (index == communityTabIndex) {
       // Refresh community status when community tab is clicked
@@ -40,6 +47,17 @@ class ScaffoldWithNestedNavigation extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
+    if (kDebugMode) {
+      const int guardTabIndex = 2;
+      final isGuardActive = navigationShell.currentIndex == guardTabIndex;
+      final guardState = ref.read(guardStreamActiveProvider.notifier);
+      if (guardState.state != isGuardActive) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!context.mounted) return;
+          guardState.state = isGuardActive;
+        });
+      }
+    }
     return Scaffold(
       body: navigationShell,
       bottomNavigationBar: NavigationBarTheme(
