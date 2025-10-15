@@ -17,11 +17,6 @@ final iosAuthStatusProvider = FutureProvider.autoDispose<bool>((ref) async {
 /// On non-iOS, returns {}.
 final iosSnapshotProvider =
     StreamProvider.autoDispose<Map<String, dynamic>>((ref) async* {
-  final isActive = ref.watch(guardStreamActiveProvider);
-  if (!isActive) {
-    yield const <String, dynamic>{};
-    return;
-  }
   if (!Platform.isIOS) {
     yield <String, dynamic>{};
     return;
@@ -43,24 +38,28 @@ final iosSnapshotProvider =
     yield <String, dynamic>{};
   }
 
-  // Poll every 10 seconds for real-time feel and emit only when changed
-  yield* Stream.periodic(const Duration(seconds: 10)).asyncMap((_) async {
+  // Poll every 10 seconds but only if guard is active
+  await for (final _ in Stream.periodic(const Duration(seconds: 10))) {
+    // Check if still active before fetching
+    final isActive = ref.read(guardStreamActiveProvider);
+    if (!isActive) continue;
+
     try {
       final snap = await iosGetSnapshot().timeout(
         const Duration(seconds: 3),
         onTimeout: () => lastSnapshot ?? <String, dynamic>{},
       );
-      return snap;
+
+      final changed =
+          lastSnapshot == null || snap.toString() != lastSnapshot.toString();
+      if (changed) {
+        lastSnapshot = snap;
+        yield snap;
+      }
     } catch (e) {
       focusLog('iosSnapshotProvider polling error', data: e);
-      return lastSnapshot ?? <String, dynamic>{};
     }
-  }).where((snap) {
-    final changed =
-        lastSnapshot == null || snap.toString() != lastSnapshot.toString();
-    if (changed) lastSnapshot = snap;
-    return changed;
-  });
+  }
 });
 
 /// Manual refresh provider for immediate updates
@@ -84,11 +83,6 @@ final nativeLogsProvider =
 /// Streaming logs provider (polls periodically and emits only on change)
 final logsStreamProvider =
     StreamProvider.autoDispose<List<String>>((ref) async* {
-  final isActive = ref.watch(guardStreamActiveProvider);
-  if (!isActive) {
-    yield const <String>[];
-    return;
-  }
   // Also respond to manual refresh trigger
   ref.watch(manualRefreshProvider);
 
@@ -104,32 +98,31 @@ final logsStreamProvider =
     yield const <String>[];
   }
 
-  // poll every second
-  yield* Stream.periodic(const Duration(seconds: 1)).asyncMap((_) async {
+  // poll every second but only if guard is active
+  await for (final _ in Stream.periodic(const Duration(seconds: 1))) {
+    // Check if still active before fetching
+    final isActive = ref.read(guardStreamActiveProvider);
+    if (!isActive) continue;
+
     try {
       await Future<void>.delayed(const Duration(milliseconds: 50));
       final current = await getNativeLogs();
-      return current;
+
+      final changed = current.length != last.length ||
+          current.join('\n') != last.join('\n');
+      if (changed) {
+        last = current;
+        yield current;
+      }
     } catch (e) {
       focusLog('logsStreamProvider poll error', data: e);
-      return last;
     }
-  }).where((current) {
-    final changed =
-        current.length != last.length || current.join('\n') != last.join('\n');
-    if (changed) last = current;
-    return changed;
-  });
+  }
 });
 
 /// Android snapshot provider - polls every 30s
 final androidSnapshotProvider =
     StreamProvider.autoDispose<Map<String, dynamic>>((ref) async* {
-  final isActive = ref.watch(guardStreamActiveProvider);
-  if (!isActive) {
-    yield const <String, dynamic>{};
-    return;
-  }
   if (!Platform.isAndroid) {
     yield <String, dynamic>{};
     return;
@@ -147,29 +140,30 @@ final androidSnapshotProvider =
     yield <String, dynamic>{};
   }
 
-  // Poll every 30 seconds for Android
-  yield* Stream.periodic(const Duration(seconds: 30)).asyncMap((_) async {
+  // Poll every 30 seconds for Android but only if guard is active
+  await for (final _ in Stream.periodic(const Duration(seconds: 30))) {
+    // Check if still active before fetching
+    final isActive = ref.read(guardStreamActiveProvider);
+    if (!isActive) continue;
+
     try {
-      return await androidGetSnapshot();
+      final snap = await androidGetSnapshot();
+
+      final changed =
+          lastSnapshot == null || snap.toString() != lastSnapshot.toString();
+      if (changed) {
+        lastSnapshot = snap;
+        yield snap;
+      }
     } catch (e) {
       focusLog('androidSnapshotProvider polling error', data: e);
-      return lastSnapshot ?? <String, dynamic>{};
     }
-  }).where((snap) {
-    final changed =
-        lastSnapshot == null || snap.toString() != lastSnapshot.toString();
-    if (changed) lastSnapshot = snap;
-    return changed;
-  });
+  }
 });
 
 /// Real-time snapshot that responds to manual refresh
 final realtimeSnapshotProvider =
     Provider.autoDispose<AsyncValue<Map<String, dynamic>>>((ref) {
-  final isActive = ref.watch(guardStreamActiveProvider);
-  if (!isActive) {
-    return const AsyncValue.data(<String, dynamic>{});
-  }
   // Watch manual refresh trigger to force re-fetch
   ref.watch(manualRefreshProvider);
 
@@ -183,5 +177,6 @@ final realtimeSnapshotProvider =
   }
 });
 
-final guardStreamActiveProvider =
-    StateProvider.autoDispose<bool>((ref) => false);
+/// Provider to control when guard streams should be active
+/// Not autoDisposed to maintain state across navigation
+final guardStreamActiveProvider = StateProvider<bool>((ref) => false);

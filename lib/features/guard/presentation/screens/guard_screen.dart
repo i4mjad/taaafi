@@ -27,6 +27,13 @@ class GuardScreen extends ConsumerWidget {
     final theme = AppTheme.of(context);
     final localizations = AppLocalizations.of(context);
 
+    // Activate guard streams when this screen is visible
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (context.mounted) {
+        ref.read(guardStreamActiveProvider.notifier).state = true;
+      }
+    });
+
     // Register lifecycle observer to handle app resume
     ref.watch(permissionLifecycleProvider);
 
