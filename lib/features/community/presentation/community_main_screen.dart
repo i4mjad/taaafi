@@ -30,6 +30,8 @@ import 'package:reboot_app_3/core/shared_widgets/account_action_banner.dart';
 import 'package:reboot_app_3/core/shared_widgets/complete_registration_banner.dart';
 import 'package:reboot_app_3/core/shared_widgets/confirm_details_banner.dart';
 import 'package:reboot_app_3/core/shared_widgets/confirm_email_banner.dart';
+import 'package:reboot_app_3/features/direct_messaging/presentation/screens/community_chats_screen.dart';
+import 'package:reboot_app_3/core/shared_widgets/custom_segmented_button.dart';
 
 class CommunityMainScreen extends ConsumerStatefulWidget {
   /// Optional initial tab to select when the screen opens
@@ -46,10 +48,19 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
     with WidgetsBindingObserver {
   late String _selectedFilter;
   final ScrollController _scrollController = ScrollController();
+  late SegmentedButtonOption _selectedSegment;
+  late List<SegmentedButtonOption> _segmentOptions;
 
   @override
   void initState() {
     super.initState();
+
+    // Initialize top-level segments
+    _segmentOptions = [
+      SegmentedButtonOption(value: 'community', translationKey: 'community'),
+      SegmentedButtonOption(value: 'chats', translationKey: 'community-chats'),
+    ];
+    _selectedSegment = _segmentOptions[0]; // Default to community
 
     // Set initial filter based on widget parameter or default to 'posts'
     _selectedFilter = widget.initialTab ?? 'posts';
@@ -324,24 +335,45 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
         ],
       ),
       backgroundColor: theme.backgroundColor,
-      body: _buildForumTab(),
-      floatingActionButton: !shouldBlockForShorebird
-          ? CommunityPostGuard(
-              onAccessGranted: () {
-                showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  useSafeArea: true,
-                  builder: (context) => NewPostScreen(),
-                );
+      body: Column(
+        children: [
+          // Top-level segmented control
+          Container(
+            padding: const EdgeInsets.all(16.0),
+            child: CustomSegmentedButton(
+              options: _segmentOptions,
+              selectedOption: _selectedSegment,
+              onChanged: (option) {
+                setState(() => _selectedSegment = option);
               },
-              child: FloatingActionButton(
-                onPressed: null, // Handled by CommunityPostGuard
-                backgroundColor: theme.primary[500],
-                child: const Icon(LucideIcons.plus, color: Colors.white),
-              ),
-            )
-          : null,
+            ),
+          ),
+          // Content based on selected segment
+          Expanded(
+            child: _selectedSegment.value == 'community'
+                ? _buildForumTab()
+                : const CommunityChatsScreen(showAppBar: false),
+          ),
+        ],
+      ),
+      floatingActionButton:
+          !shouldBlockForShorebird && _selectedSegment.value == 'community'
+              ? CommunityPostGuard(
+                  onAccessGranted: () {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      useSafeArea: true,
+                      builder: (context) => NewPostScreen(),
+                    );
+                  },
+                  child: FloatingActionButton(
+                    onPressed: null, // Handled by CommunityPostGuard
+                    backgroundColor: theme.primary[500],
+                    child: const Icon(LucideIcons.plus, color: Colors.white),
+                  ),
+                )
+              : null,
     );
   }
 

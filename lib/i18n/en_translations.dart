@@ -320,6 +320,38 @@ const Map<String, String> kEn = {
   "group-detail": "Group Detail",
   "group-chat": "Group Chat",
   "group-challenge": "Group Challenge",
+
+  // Direct Messaging (DMs)
+  "community-chats": "Chats",
+  "start-conversation": "Message",
+  "open-conversation": "Open chat",
+  "conversation-muted": "Muted",
+  "you-blocked-this-user": "You blocked this user",
+  "user-has-blocked-you": "This user has blocked you",
+  "cannot-message-user-blocked": "You can't send messages to this user",
+  "direct-messaging-restricted": "Direct messaging is restricted",
+  "message-sent": "Message sent",
+  "new-message": "New message",
+  "no-conversations": "No conversations yet",
+  "no-conversations-description":
+      "Start a conversation by messaging someone from the community",
+  "block-user": "Block User",
+  "unblock-user": "Unblock User",
+  "block-user-confirmation": "Are you sure you want to block this user?",
+  "unblock-user-confirmation": "Are you sure you want to unblock this user?",
+  "user-blocked-successfully": "User blocked successfully",
+  "user-unblocked-successfully": "User unblocked successfully",
+  "delete-conversation": "Delete Conversation",
+  "delete-conversation-confirmation":
+      "Are you sure you want to delete this conversation?",
+  "conversation-deleted": "Conversation deleted",
+  "mute-conversation": "Mute",
+  "unmute-conversation": "Unmute",
+  "conversation-muted-success": "Conversation muted",
+  "conversation-unmuted-success": "Conversation unmuted",
+  "send-message": "Send message",
+  "type-message": "Type a message...",
+
   "community-profile": "Community Profile",
   "search-groups": "Search groups",
   "community-recent": "Recent",
@@ -1546,9 +1578,7 @@ const Map<String, String> kEn = {
   "view-report": "View Report",
   "add-message": "Add Message",
   "type-your-message": "Type your message here...",
-  "send-message": "Send Message",
   "cannot-send-message": "Cannot send new messages to this report",
-  "message-sent": "Message sent",
   "admin": "Admin",
   "you": "You",
   "report-conversation": "Report Conversation",
@@ -1914,6 +1944,12 @@ const Map<String, String> kEn = {
   "unsaved_changes_message":
       "You have unsaved changes. Are you sure you want to leave?",
   "discard": "Discard",
+  "stay": "Stay",
+  "unsaved-message": "Unsaved Message",
+  "unsaved-message-warning":
+      "You have an unsaved message. Are you sure you want to leave?",
+  "word": "word",
+  "words": "words",
   "error_loading_categories": "Error loading categories",
 
   // Post validation translations
@@ -3183,6 +3219,8 @@ const Map<String, String> kEn = {
       "Are you sure you want to report this message? This action cannot be undone.",
   "confirm-submit-report": "Submit Report",
   "replying-to": "Replying to",
+  "original-message": "Original Message",
+  "deleted-message": "Deleted message",
 
   // Groups Exploration
   "already-in-group": "You're already in a group",
@@ -3354,6 +3392,8 @@ const Map<String, String> kEn = {
   // Hidden messages
   "message-hidden-by-admin": "This message was hidden by a group admin",
   "message-actions": "Message Actions",
+  "reply-to-message": "Reply to this message",
+  "delete-message": "Delete this message",
   "unhide-message": "Unhide Message",
   "unhide-message-description": "Show this message to all group members",
   "hiding-message": "Hiding message...",

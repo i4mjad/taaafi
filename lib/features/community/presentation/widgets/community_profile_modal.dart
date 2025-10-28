@@ -15,6 +15,9 @@ import 'package:reboot_app_3/features/community/presentation/providers/community
 import 'package:reboot_app_3/features/community/presentation/widgets/avatar_with_anonymity.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/role_chip.dart';
 import 'package:reboot_app_3/features/shared/data/notifiers/user_reports_notifier.dart';
+import 'package:reboot_app_3/features/direct_messaging/application/direct_messaging_providers.dart';
+import 'package:go_router/go_router.dart';
+import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -165,6 +168,139 @@ class _CommunityProfileModalState extends ConsumerState<CommunityProfileModal> {
     }
   }
 
+  /// Build message button to start or open conversation
+  Widget _buildMessageButton(BuildContext context) {
+    final theme = AppTheme.of(context);
+    final localizations = AppLocalizations.of(context);
+    final currentProfileAsync = ref.watch(currentCommunityProfileProvider);
+
+    return currentProfileAsync.when(
+      data: (currentProfile) {
+        if (currentProfile == null) {
+          return const SizedBox.shrink();
+        }
+
+        // Don't show message button for own profile
+        if (currentProfile.id == widget.communityProfileId) {
+          return const SizedBox.shrink();
+        }
+
+        // Check if conversation already exists
+        final conversationsAsync = ref.watch(userConversationsProvider);
+
+        return conversationsAsync.when(
+          data: (conversations) {
+            // Find if there's an existing conversation with this profile
+            final existingConversation = conversations
+                .where(
+                  (conv) =>
+                      conv.participantCpIds.contains(widget.communityProfileId),
+                )
+                .firstOrNull;
+
+            final bool hasExistingConversation = existingConversation != null;
+
+            return GestureDetector(
+              onTap: () async {
+                // Close the profile modal first and wait for it to dismiss
+                Navigator.of(context).pop();
+
+                // Wait a frame to ensure modal is dismissed and context is stable
+                await Future.delayed(const Duration(milliseconds: 100));
+
+                // Check context is still mounted after modal dismissal
+                if (!context.mounted) return;
+
+                if (hasExistingConversation) {
+                  // Open existing conversation - safe to navigate as context is mounted
+                  context.pushNamed(
+                    RouteNames.directChat.name,
+                    pathParameters: {'conversationId': existingConversation.id},
+                  );
+                } else {
+                  // Create new conversation and navigate to it
+                  try {
+                    final conversationsRepo =
+                        ref.read(conversationsRepositoryProvider);
+                    final conversation =
+                        await conversationsRepo.findOrCreateConversation(
+                      currentProfile.id,
+                      widget.communityProfileId,
+                    );
+
+                    // Check context is still mounted after async operation
+                    if (!context.mounted) return;
+
+                    context.pushNamed(
+                      RouteNames.directChat.name,
+                      pathParameters: {'conversationId': conversation.id},
+                    );
+                  } catch (e) {
+                    // Check context is still mounted before showing error
+                    if (!context.mounted) return;
+
+                    getErrorSnackBar(context, 'error-starting-conversation');
+                  }
+                }
+              },
+              child: WidgetsContainer(
+                padding: const EdgeInsets.all(16),
+                backgroundColor: theme.primary[50],
+                borderSide: BorderSide(color: theme.primary[300]!, width: 1),
+                borderRadius: BorderRadius.circular(12),
+                child: Row(
+                  children: [
+                    Icon(
+                      LucideIcons.messageCircle,
+                      size: 20,
+                      color: theme.primary[600],
+                    ),
+                    horizontalSpace(Spacing.points12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            localizations.translate(hasExistingConversation
+                                ? 'open-conversation'
+                                : 'start-conversation'),
+                            style: TextStyles.body.copyWith(
+                              color: theme.primary[700],
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Icon(
+                      localizations.locale.languageCode == 'ar'
+                          ? LucideIcons.chevronLeft
+                          : LucideIcons.chevronRight,
+                      size: 16,
+                      color: theme.primary[600],
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+          loading: () => Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: theme.grey[100],
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: theme.grey[300]!),
+            ),
+            child: const Center(child: Spinner()),
+          ),
+          error: (_, __) => const SizedBox.shrink(),
+        );
+      },
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
@@ -243,6 +379,11 @@ class _CommunityProfileModalState extends ConsumerState<CommunityProfileModal> {
               ),
 
               verticalSpace(Spacing.points24),
+
+              // Message User Section
+              _buildMessageButton(context),
+
+              verticalSpace(Spacing.points16),
 
               // Report User Section
               if (!_showReportForm) ...[

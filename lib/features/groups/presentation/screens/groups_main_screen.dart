@@ -22,6 +22,7 @@ import 'package:reboot_app_3/features/groups/presentation/screens/modals/group_i
 import 'package:reboot_app_3/features/shared/models/group_invitation_entity.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/group_screen.dart';
 import 'package:reboot_app_3/features/groups/presentation/widgets/join_cooldown_timer.dart';
+import 'package:reboot_app_3/features/direct_messaging/presentation/screens/groups_chats_tabbed_screen.dart';
 
 // Feature access guard imports
 import '../../../account/presentation/widgets/feature_access_guard.dart';
@@ -115,7 +116,7 @@ class GroupsMainScreen extends ConsumerWidget {
         return _buildCooldownActiveScreen(context, ref, theme, l10n);
 
       case GroupsStatus.alreadyInGroup:
-        return const GroupScreen();
+        return const GroupsChatsTabbedScreen();
 
       case GroupsStatus.hasInvitations:
         return _buildHasInvitationsScreen(context, ref, theme, l10n);

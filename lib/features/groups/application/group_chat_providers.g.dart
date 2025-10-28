@@ -808,7 +808,7 @@ class _GroupChatMessagesPaginatedProviderElement
   String get groupId => (origin as GroupChatMessagesPaginatedProvider).groupId;
 }
 
-String _$groupChatServiceHash() => r'35a175439788906793df196b85591adc1ac9e2f9';
+String _$groupChatServiceHash() => r'db50ae1e1534db71457201f75b24d53f35238ce5';
 
 /// Service for sending messages (stateless)
 ///

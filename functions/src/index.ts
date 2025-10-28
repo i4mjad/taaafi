@@ -1266,6 +1266,11 @@ import {
   sendMemberManagementNotification
 } from './groupMemberManagementNotifications';
 
+// Import direct message notification functions
+import { 
+  sendDirectMessageNotification 
+} from './directMessageNotifications';
+
 // Export group message notification functions
 export { 
   sendGroupMessageNotification,
@@ -1275,6 +1280,11 @@ export {
 // Export group member management notification functions
 export {
   sendMemberManagementNotification
+};
+
+// Export direct message notification functions
+export {
+  sendDirectMessageNotification
 };
 
 // Community Notification Triggers
