@@ -39,6 +39,7 @@ import { useCollection, useDocument } from 'react-firebase-hooks/firestore';
 import { collection, addDoc, query, where, orderBy, serverTimestamp, Timestamp, doc, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { toast } from 'sonner';
+import { createWarningNotificationPayload } from '@/utils/notificationPayloads';
 
 interface RelatedContent {
   type: 'user' | 'report' | 'post' | 'comment' | 'message' | 'group' | 'other';
@@ -542,6 +543,49 @@ export default function WarningManagementCard({ userId, userDisplayName, userDev
       };
 
       await addDoc(warningsCollection, warningData);
+      
+      // Send notification to user
+      try {
+        // Fetch user data for messaging token and locale
+        const userQuery = query(collection(db, 'users'), where('__name__', '==', userId));
+        const userSnapshot = await getDocs(userQuery);
+        
+        if (!userSnapshot.empty) {
+          const userData = userSnapshot.docs[0].data();
+          const userMessagingToken = userData.messagingToken;
+          const userLocale = userData.locale === 'arabic' ? 'ar' : 'en';
+          
+          if (userMessagingToken) {
+            // Get notification title and body from translations
+            const notificationTitle = t('modules.userManagement.warnings.notification.title');
+            const notificationBody = t(`modules.userManagement.warnings.notification.body.${formData.type}`);
+            
+            const payload = createWarningNotificationPayload(
+              notificationTitle,
+              notificationBody,
+              userId,
+              formData.type,
+              formData.severity,
+              userLocale
+            );
+            
+            await fetch('/api/admin/notifications/send', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                token: userMessagingToken,
+                ...payload
+              }),
+            });
+          }
+        }
+      } catch (notificationError) {
+        console.error('Error sending warning notification:', notificationError);
+        // Don't fail the warning creation if notification fails
+      }
+      
       toast.success(t('modules.userManagement.warnings.createSuccess'));
       setIsCreateDialogOpen(false);
       resetForm();

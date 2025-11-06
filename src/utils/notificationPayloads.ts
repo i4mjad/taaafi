@@ -196,4 +196,116 @@ export function createGenericNavigationPayload(
       },
     },
   };
+}
+
+/**
+ * Creates a payload for ban notifications
+ * Navigates user to their profile screen where they can see ban details
+ */
+export function createBanNotificationPayload(
+  title: string,
+  body: string,
+  userId: string,
+  banType: string,
+  severity: string,
+  locale: string = 'en'
+): NotificationPayload {
+  return {
+    notification: {
+      title,
+      body,
+    },
+    data: {
+      screen: 'userProfile',      // GoRouter named route to user profile
+      userId: userId,
+      type: 'ban_notification',
+      banType: banType,
+      severity: severity,
+      locale: locale,
+    },
+    android: {
+      priority: 'high',
+      ttl: 86400000, // 24 hours
+      notification: {
+        priority: 'high',
+        default_sound: true,
+        default_vibrate_timings: true,
+        click_action: 'FLUTTER_NOTIFICATION_CLICK',
+      },
+    },
+    apns: {
+      headers: {
+        'apns-priority': '10',
+        'apns-push-type': 'alert',
+      },
+      payload: {
+        aps: {
+          alert: {
+            title,
+            body,
+          },
+          badge: 1,
+          sound: 'default',
+          'content-available': 1,
+          'mutable-content': 1,
+        },
+      },
+    },
+  };
+}
+
+/**
+ * Creates a payload for warning notifications
+ * Navigates user to their profile screen where they can see warning details
+ */
+export function createWarningNotificationPayload(
+  title: string,
+  body: string,
+  userId: string,
+  warningType: string,
+  severity: string,
+  locale: string = 'en'
+): NotificationPayload {
+  return {
+    notification: {
+      title,
+      body,
+    },
+    data: {
+      screen: 'userProfile',      // GoRouter named route to user profile
+      userId: userId,
+      type: 'warning_notification',
+      warningType: warningType,
+      severity: severity,
+      locale: locale,
+    },
+    android: {
+      priority: 'high',
+      ttl: 86400000, // 24 hours
+      notification: {
+        priority: 'high',
+        default_sound: true,
+        default_vibrate_timings: true,
+        click_action: 'FLUTTER_NOTIFICATION_CLICK',
+      },
+    },
+    apns: {
+      headers: {
+        'apns-priority': '10',
+        'apns-push-type': 'alert',
+      },
+      payload: {
+        aps: {
+          alert: {
+            title,
+            body,
+          },
+          badge: 1,
+          sound: 'default',
+          'content-available': 1,
+          'mutable-content': 1,
+        },
+      },
+    },
+  };
 } 

@@ -862,6 +862,8 @@
           "lastUpdated": "Last Updated",
           "admin": "Admin",
           "user": "User",
+          "verified": "Verified",
+          "unverified": "Not Verified",
           "actions": "Actions",
           "noReportsFound": "No reports found",
           "searchPlaceholder": "Search by User ID...",
@@ -924,7 +926,8 @@
               "issueResolved": "Thank you for your report. The issue has been resolved. Please try again and let us know if you continue to experience problems.",
               "underInvestigation": "We have received your report and our team is currently investigating the issue. We will update you once we have more information.",
               "moreInfoNeeded": "Thank you for your report. Could you please provide more details about the issue you're experiencing?",
-              "contactSupport": "For faster assistance with this issue, please contact our support team directly through the app's help section."
+              "contactSupport": "For faster assistance with this issue, please contact our support team directly through the app's help section.",
+              "checkSpam": "If you haven't received our emails, please check your junk/spam folder. Make sure to mark our emails as 'Not Spam' to receive future communications."
             }
           },
           "selectStatus": "Select status",
@@ -1225,6 +1228,16 @@
           "createError": "Failed to create warning",
           "updateSuccess": "Warning updated successfully",
           "updateError": "Failed to update warning",
+          "notification": {
+            "title": "Warning Issued",
+            "body": {
+              "content_violation": "You have received a warning for content violation. Please review community guidelines.",
+              "inappropriate_behavior": "You have received a warning for inappropriate behavior. Please review community guidelines.",
+              "spam": "You have received a warning for spam. Please review community guidelines.",
+              "harassment": "You have received a warning for harassment. This behavior is not tolerated.",
+              "other": "You have received an official warning. Please review your recent activity."
+            }
+          },
           "type": {
             "label": "Warning Type",
             "selectType": "Select warning type",
@@ -1429,6 +1442,20 @@
           "updateError": "Failed to update ban",
           "revokeSuccess": "Ban revoked successfully",
           "revokeError": "Failed to revoke ban",
+          "notification": {
+            "title": {
+              "temporary": "Temporary Ban Issued",
+              "permanent": "Account Banned"
+            },
+            "body": {
+              "user_ban_temporary": "Your account has been temporarily banned. Please review community guidelines.",
+              "user_ban_permanent": "Your account has been permanently banned due to violations of community guidelines.",
+              "device_ban_temporary": "Your device has been temporarily banned from accessing the platform.",
+              "device_ban_permanent": "Your device has been permanently banned from accessing the platform.",
+              "feature_ban_temporary": "You have been temporarily restricted from using certain features. Check your profile for details.",
+              "feature_ban_permanent": "You have been permanently restricted from using certain features due to violations."
+            }
+          },
           "deviceHistory": {
             "title": "Device History Alert",
             "alertTitle": "Previous Violations Found on This Device",

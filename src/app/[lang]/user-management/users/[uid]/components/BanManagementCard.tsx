@@ -60,6 +60,7 @@ import { useCollection, useDocument } from 'react-firebase-hooks/firestore';
 import { collection, addDoc, query, where, orderBy, serverTimestamp, Timestamp, updateDoc, doc, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { toast } from 'sonner';
+import { createBanNotificationPayload } from '@/utils/notificationPayloads';
 
 interface RelatedContent {
   type: 'user' | 'report' | 'post' | 'comment' | 'message' | 'group' | 'other';
@@ -493,6 +494,53 @@ export default function BanManagementCard({ userId, userDisplayName, userDevices
       };
 
       await addDoc(bansCollection, banData);
+      
+      // Send notification to user
+      try {
+        // Fetch user data for messaging token and locale
+        const userQuery = query(collection(db, 'users'), where('__name__', '==', userId));
+        const userSnapshot = await getDocs(userQuery);
+        
+        if (!userSnapshot.empty) {
+          const userData = userSnapshot.docs[0].data();
+          const userMessagingToken = userData.messagingToken;
+          const userLocale = userData.locale === 'arabic' ? 'ar' : 'en';
+          
+          if (userMessagingToken) {
+            // Get notification title and body from translations
+            const notificationTitle = formData.severity === 'permanent'
+              ? t('modules.userManagement.bans.notification.title.permanent')
+              : t('modules.userManagement.bans.notification.title.temporary');
+            
+            const notificationKey = `${formData.type}_${formData.severity}`;
+            const notificationBody = t(`modules.userManagement.bans.notification.body.${notificationKey}`);
+            
+            const payload = createBanNotificationPayload(
+              notificationTitle,
+              notificationBody,
+              userId,
+              formData.type,
+              formData.severity,
+              userLocale
+            );
+            
+            await fetch('/api/admin/notifications/send', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                token: userMessagingToken,
+                ...payload
+              }),
+            });
+          }
+        }
+      } catch (notificationError) {
+        console.error('Error sending ban notification:', notificationError);
+        // Don't fail the ban creation if notification fails
+      }
+      
       toast.success(t('modules.userManagement.bans.createSuccess'));
       setIsCreateDialogOpen(false);
       resetForm();

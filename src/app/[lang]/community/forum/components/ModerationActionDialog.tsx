@@ -11,10 +11,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { useDocument } from 'react-firebase-hooks/firestore';
-import { addDoc, collection, doc, serverTimestamp, Timestamp, updateDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, serverTimestamp, Timestamp, updateDoc, getDocs, query, where } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { AlertTriangle, Ban, FileText, User } from 'lucide-react';
 import { toast } from 'sonner';
+import { createWarningNotificationPayload, createBanNotificationPayload } from '@/utils/notificationPayloads';
 
 type TargetType = 'post' | 'comment';
 
@@ -128,6 +129,43 @@ export default function ModerationActionDialog(props: ModerationActionDialogProp
       relatedContent,
       reportId: warningData.reportId.trim() || null,
     });
+    
+    // Send notification to user
+    try {
+      const userQuery = query(collection(db, 'users'), where('__name__', '==', userUid));
+      const userSnapshot = await getDocs(userQuery);
+      
+      if (!userSnapshot.empty) {
+        const userData = userSnapshot.docs[0].data();
+        const userMessagingToken = userData.messagingToken;
+        const userLocale = userData.locale === 'arabic' ? 'ar' : 'en';
+        
+        if (userMessagingToken) {
+          const notificationTitle = t('modules.userManagement.warnings.notification.title');
+          const notificationBody = t(`modules.userManagement.warnings.notification.body.${warningData.type}`);
+          
+          const payload = createWarningNotificationPayload(
+            notificationTitle,
+            notificationBody,
+            userUid,
+            warningData.type,
+            warningData.severity,
+            userLocale
+          );
+          
+          await fetch('/api/admin/notifications/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              token: userMessagingToken,
+              ...payload
+            }),
+          });
+        }
+      }
+    } catch (notificationError) {
+      console.error('Error sending warning notification:', notificationError);
+    }
   };
 
   const createBan = async () => {
@@ -168,6 +206,47 @@ export default function ModerationActionDialog(props: ModerationActionDialogProp
       isActive: true,
       relatedContent,
     });
+    
+    // Send notification to user
+    try {
+      const userQuery = query(collection(db, 'users'), where('__name__', '==', userUid));
+      const userSnapshot = await getDocs(userQuery);
+      
+      if (!userSnapshot.empty) {
+        const userData = userSnapshot.docs[0].data();
+        const userMessagingToken = userData.messagingToken;
+        const userLocale = userData.locale === 'arabic' ? 'ar' : 'en';
+        
+        if (userMessagingToken) {
+          const notificationTitle = banData.severity === 'permanent'
+            ? t('modules.userManagement.bans.notification.title.permanent')
+            : t('modules.userManagement.bans.notification.title.temporary');
+          
+          const notificationKey = `user_ban_${banData.severity}`;
+          const notificationBody = t(`modules.userManagement.bans.notification.body.${notificationKey}`);
+          
+          const payload = createBanNotificationPayload(
+            notificationTitle,
+            notificationBody,
+            userUid,
+            'user_ban',
+            banData.severity,
+            userLocale
+          );
+          
+          await fetch('/api/admin/notifications/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              token: userMessagingToken,
+              ...payload
+            }),
+          });
+        }
+      }
+    } catch (notificationError) {
+      console.error('Error sending ban notification:', notificationError);
+    }
   };
 
   const updateContent = async () => {
