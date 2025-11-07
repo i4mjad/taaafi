@@ -115,4 +115,21 @@ abstract class GroupsRepository {
     String? name,
     String? description,
   });
+
+  // ==================== ACTIVITY TRACKING (Sprint 2 - Feature 2.1) ====================
+  
+  /// Get members with activity data
+  Future<List<GroupMembershipEntity>> getMembersWithActivity(String groupId);
+
+  /// Get inactive members (not active for X days)
+  Future<List<GroupMembershipEntity>> getInactiveMembers(
+    String groupId,
+    int inactiveDays,
+  );
+
+  /// Update member last active timestamp
+  Future<void> updateMemberActivity({
+    required String groupId,
+    required String cpId,
+  });
 }
