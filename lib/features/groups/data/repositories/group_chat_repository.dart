@@ -71,6 +71,14 @@ abstract class GroupChatRepository {
 
   /// Get pinned messages for group
   Future<List<GroupMessageEntity>> getPinnedMessages(String groupId);
+
+  /// Toggle reaction on a message (add if not present, remove if present)
+  Future<void> toggleReaction({
+    required String groupId,
+    required String messageId,
+    required String cpId,
+    required String emoji,
+  });
 }
 
 /// Domain-level pagination parameters
@@ -338,6 +346,27 @@ class GroupChatRepositoryImpl implements GroupChatRepository {
     } catch (e, stackTrace) {
       log('Error getting pinned messages via repository: $e',
           stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> toggleReaction({
+    required String groupId,
+    required String messageId,
+    required String cpId,
+    required String emoji,
+  }) async {
+    try {
+      await _dataSource.toggleReaction(
+        groupId: groupId,
+        messageId: messageId,
+        cpId: cpId,
+        emoji: emoji,
+      );
+      log('Reaction toggled via repository: $emoji on $messageId');
+    } catch (e, stackTrace) {
+      log('Error toggling reaction via repository: $e', stackTrace: stackTrace);
       rethrow;
     }
   }

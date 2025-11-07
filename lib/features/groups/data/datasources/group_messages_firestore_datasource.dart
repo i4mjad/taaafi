@@ -126,6 +126,14 @@ abstract class GroupMessagesDataSource {
   /// Get pinned messages for a group
   Future<List<GroupMessageModel>> getPinnedMessages(String groupId);
 
+  /// Toggle reaction on a message (add if not present, remove if present)
+  Future<void> toggleReaction({
+    required String groupId,
+    required String messageId,
+    required String cpId,
+    required String emoji,
+  });
+
   /// Clear cache for a specific group
   void clearCache(String groupId);
 
@@ -480,6 +488,63 @@ class GroupMessagesFirestoreDataSource implements GroupMessagesDataSource {
       return pinnedMessages;
     } catch (e, stackTrace) {
       log('Error fetching pinned messages: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> toggleReaction({
+    required String groupId,
+    required String messageId,
+    required String cpId,
+    required String emoji,
+  }) async {
+    try {
+      log('Toggling reaction $emoji on message $messageId by $cpId');
+
+      // Get current message to check reactions
+      final messageDoc = await _messagesCollection.doc(messageId).get();
+      if (!messageDoc.exists) {
+        throw Exception('Message not found');
+      }
+
+      final messageData = messageDoc.data() as Map<String, dynamic>;
+      final currentReactions = GroupMessageModel._parseReactions(messageData['reactions']);
+
+      // Toggle logic: if user already reacted with this emoji, remove it; otherwise add it
+      final List<String> emojiReactions = List<String>.from(currentReactions[emoji] ?? []);
+      
+      if (emojiReactions.contains(cpId)) {
+        // Remove reaction
+        emojiReactions.remove(cpId);
+        log('Removing reaction $emoji from user $cpId');
+      } else {
+        // Add reaction
+        emojiReactions.add(cpId);
+        log('Adding reaction $emoji from user $cpId');
+      }
+
+      // Update reactions map
+      final updatedReactions = Map<String, List<String>>.from(currentReactions);
+      if (emojiReactions.isEmpty) {
+        // Remove emoji key if no reactions left
+        updatedReactions.remove(emoji);
+      } else {
+        updatedReactions[emoji] = emojiReactions;
+      }
+
+      // Update message document
+      await _messagesCollection.doc(messageId).update({
+        'reactions': updatedReactions,
+      });
+
+      // Invalidate cache
+      _messageCache.remove(groupId);
+      _streamCache.remove(groupId);
+
+      log('Reaction toggled successfully');
+    } catch (e, stackTrace) {
+      log('Error toggling reaction: $e', stackTrace: stackTrace);
       rethrow;
     }
   }
