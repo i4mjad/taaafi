@@ -3482,7 +3482,7 @@ const Map<String, String> kAr = {
   'save-profile': 'حفظ الملف',
   'bio-max-length': 'الحد الأقصى 200 حرف',
   'bio-char-count': '{count}/200',
-  
+
   // Achievement Types
   'first-message-achievement': 'الرسالة الأولى',
   'first-message-desc': 'أرسلت رسالتك الأولى للزمالة',
@@ -3496,7 +3496,7 @@ const Map<String, String> kAr = {
   'helpful-desc': 'حصلت على 10+ تفاعلات إيجابية',
   'top-contributor-achievement': 'أكثر مساهمة',
   'top-contributor-desc': 'العضو الأكثر نشاطاً هذا الشهر',
-  
+
   // Interest Tags
   'interest-fitness': 'اللياقة البدنية',
   'interest-wellness': 'الصحة',
@@ -3508,4 +3508,12 @@ const Map<String, String> kAr = {
   'interest-mindfulness': 'اليقظة الذهنية',
   'interest-recovery': 'التعافي',
   'interest-motivation': 'التحفيز',
+
+  // Mobile UX (Sprint 4 - Feature 4.2)
+  'swipe-to-reply': 'اسحب للرد',
+  'swipe-for-actions': 'اسحب للإجراءات',
+  'pull-to-refresh': 'اسحب للتحديث',
+  'refreshing': 'جاري التحديث...',
+  'reply-sent': 'تم إرسال الرد',
+  'quick-reply': 'رد سريع',
 };

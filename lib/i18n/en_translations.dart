@@ -3557,7 +3557,7 @@ const Map<String, String> kEn = {
   "save-profile": "Save Profile",
   "bio-max-length": "Maximum 200 characters",
   "bio-char-count": "{count}/200",
-  
+
   // Achievement Types
   "first-message-achievement": "First Message",
   "first-message-desc": "Sent your first message to the group",
@@ -3571,7 +3571,7 @@ const Map<String, String> kEn = {
   "helpful-desc": "Received 10+ supportive reactions",
   "top-contributor-achievement": "Top Contributor",
   "top-contributor-desc": "Most active member this month",
-  
+
   // Interest Tags
   "interest-fitness": "Fitness",
   "interest-wellness": "Wellness",
@@ -3583,4 +3583,12 @@ const Map<String, String> kEn = {
   "interest-mindfulness": "Mindfulness",
   "interest-recovery": "Recovery",
   "interest-motivation": "Motivation",
+
+  // Mobile UX (Sprint 4 - Feature 4.2)
+  "swipe-to-reply": "Swipe to reply",
+  "swipe-for-actions": "Swipe for actions",
+  "pull-to-refresh": "Pull to refresh",
+  "refreshing": "Refreshing...",
+  "reply-sent": "Reply sent",
+  "quick-reply": "Quick Reply",
 };
