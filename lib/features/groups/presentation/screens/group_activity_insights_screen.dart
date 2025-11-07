@@ -28,12 +28,13 @@ class GroupActivityInsightsScreen extends ConsumerWidget {
 
     final statsAsync = ref.watch(groupActivityStatsProvider(groupId));
     final membersAsync = ref.watch(membersSortedByActivityProvider(groupId));
-    final inactiveMembersAsync = ref.watch(inactiveGroupMembersProvider(groupId));
+    final inactiveMembersAsync =
+        ref.watch(inactiveGroupMembersProvider(groupId));
 
     return Scaffold(
       backgroundColor: theme.grey[50],
       appBar: AppBar(
-        backgroundColor: theme.background,
+        backgroundColor: theme.backgroundColor,
         elevation: 0,
         leading: IconButton(
           icon: Icon(LucideIcons.arrowLeft, color: theme.grey[900]),
@@ -546,4 +547,3 @@ class GroupActivityInsightsScreen extends ConsumerWidget {
     }
   }
 }
-
