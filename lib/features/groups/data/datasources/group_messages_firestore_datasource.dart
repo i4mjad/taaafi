@@ -587,6 +587,19 @@ class GroupMessagesFirestoreDataSource implements GroupMessagesDataSource {
       for (final doc in snapshot.docs) {
         final message = GroupMessageModel.fromFirestore(doc);
         
+        // Skip hidden messages
+        if (message.isHidden) {
+          continue;
+        }
+        
+        // Skip blocked messages (from moderation)
+        final moderationData = doc.data() as Map<String, dynamic>;
+        final moderation = moderationData['moderation'] as Map<String, dynamic>?;
+        final moderationStatus = moderation?['status'] as String?;
+        if (moderationStatus == 'blocked') {
+          continue;
+        }
+        
         // Search in message body (case-insensitive)
         if (message.body.toLowerCase().contains(normalizedQuery)) {
           matchingMessages.add(message);
