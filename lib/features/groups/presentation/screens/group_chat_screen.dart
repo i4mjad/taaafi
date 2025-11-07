@@ -24,6 +24,7 @@ import '../../../../core/shared_widgets/action_modal.dart';
 import '../widgets/group_chat_profile_modal.dart';
 import '../widgets/message_report_modal.dart';
 import '../../../shared/data/notifiers/user_reports_notifier.dart';
+import 'group_chat_settings_screen.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/routing/route_names.dart';
 
@@ -214,7 +215,24 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
 
     return Scaffold(
       backgroundColor: theme.backgroundColor,
-      appBar: appBar(context, ref, "group-chat", false, true),
+      appBar: appBar(
+        context,
+        ref,
+        "group-chat",
+        false,
+        true,
+        actions: [
+          IconButton(
+            icon: Icon(
+              LucideIcons.settings,
+              color: theme.grey[700],
+              size: 20,
+            ),
+            onPressed: () => _navigateToChatSettings(context),
+            tooltip: l10n.translate('chat-settings'),
+          ),
+        ],
+      ),
       body: Column(
         children: [
           // Messages list
@@ -1872,6 +1890,15 @@ ${l10n.translate('reported-message')}:
           ),
         ),
       ],
+    );
+  }
+
+  /// Navigate to chat settings screen
+  void _navigateToChatSettings(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const GroupChatSettingsScreen(),
+      ),
     );
   }
 

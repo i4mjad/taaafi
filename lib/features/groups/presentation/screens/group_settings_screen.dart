@@ -12,7 +12,6 @@ import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/group_notification_settings_screen.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/group_privacy_settings_screen.dart';
-import 'package:reboot_app_3/features/groups/presentation/screens/group_chat_settings_screen.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/group_activity_insights_screen.dart';
 import 'package:reboot_app_3/features/groups/presentation/widgets/leave_group_modal.dart';
 import 'package:reboot_app_3/features/groups/presentation/widgets/group_overview_card.dart';
@@ -118,18 +117,6 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
           ),
         );
 
-        // Chat
-        actions.add(
-          _buildActionCard(
-            context: context,
-            theme: theme,
-            l10n: l10n,
-            icon: LucideIcons.messageCircle,
-            title: l10n.translate('chat'),
-            onTap: () => _navigateToChatSettings(context),
-          ),
-        );
-
         // Privacy
         actions.add(
           _buildActionCard(
@@ -214,7 +201,7 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: isDestructive 
+                color: isDestructive
                     ? theme.error[100]!.withOpacity(0.5)
                     : theme.grey[50],
                 borderRadius: BorderRadius.circular(8),
@@ -270,15 +257,6 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => const GroupPrivacySettingsScreen(),
-      ),
-    );
-  }
-
-  void _navigateToChatSettings(BuildContext context) {
-    // TODO: Add GoRouter route for group chat settings
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const GroupChatSettingsScreen(),
       ),
     );
   }
