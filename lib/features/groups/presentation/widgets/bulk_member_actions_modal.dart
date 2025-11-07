@@ -217,9 +217,9 @@ class _BulkMemberActionsModalState extends ConsumerState<BulkMemberActionsModal>
           else if (_result != null) ...[
             WidgetsContainer(
               padding: const EdgeInsets.all(20),
-              backgroundColor: _result!.allSucceeded ? theme.success[50] : theme.warning[50],
+              backgroundColor: _result!.allSucceeded ? theme.success[50] : theme.warn[50],
               borderSide: BorderSide(
-                color: _result!.allSucceeded ? theme.success[300]! : theme.warning[300]!,
+                color: _result!.allSucceeded ? theme.success[300]! : theme.warn[300]!,
                 width: 1,
               ),
               child: Column(
@@ -230,14 +230,14 @@ class _BulkMemberActionsModalState extends ConsumerState<BulkMemberActionsModal>
                       Icon(
                         _result!.allSucceeded ? LucideIcons.checkCircle2 : LucideIcons.alertTriangle,
                         size: 24,
-                        color: _result!.allSucceeded ? theme.success[600] : theme.warning[600],
+                        color: _result!.allSucceeded ? theme.success[600] : theme.warn[600],
                       ),
                       horizontalSpace(Spacing.points12),
                       Expanded(
                         child: Text(
                           l10n.translate('bulk-operation-complete'),
                           style: TextStyles.h6.copyWith(
-                            color: _result!.allSucceeded ? theme.success[800] : theme.warning[800],
+                            color: _result!.allSucceeded ? theme.success[800] : theme.warn[800],
                           ),
                         ),
                       ),
@@ -250,7 +250,7 @@ class _BulkMemberActionsModalState extends ConsumerState<BulkMemberActionsModal>
                         .replaceAll('{successCount}', '${_result!.successCount}')
                         .replaceAll('{failureCount}', '${_result!.failureCount}'),
                     style: TextStyles.body.copyWith(
-                      color: _result!.allSucceeded ? theme.success[700] : theme.warning[700],
+                      color: _result!.allSucceeded ? theme.success[700] : theme.warn[700],
                     ),
                   ),
                   // Show failures if any
