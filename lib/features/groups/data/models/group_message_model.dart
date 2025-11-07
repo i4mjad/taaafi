@@ -151,6 +151,9 @@ class GroupMessageModel {
       isHidden: isHidden,
       moderation: ModerationStatus.fromMap(moderation),
       createdAt: createdAt,
+      isPinned: isPinned,
+      pinnedAt: pinnedAt,
+      pinnedBy: pinnedBy,
     );
   }
 

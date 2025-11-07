@@ -16,6 +16,9 @@ class GroupMessageEntity {
   final bool isHidden;
   final ModerationStatus moderation;
   final DateTime createdAt;
+  final bool isPinned;
+  final DateTime? pinnedAt;
+  final String? pinnedBy;
 
   const GroupMessageEntity({
     required this.id,
@@ -31,6 +34,9 @@ class GroupMessageEntity {
     this.isHidden = false,
     this.moderation = const ModerationStatus(),
     required this.createdAt,
+    this.isPinned = false,
+    this.pinnedAt,
+    this.pinnedBy,
   });
 
   GroupMessageEntity copyWith({
@@ -47,6 +53,9 @@ class GroupMessageEntity {
     bool? isHidden,
     ModerationStatus? moderation,
     DateTime? createdAt,
+    bool? isPinned,
+    DateTime? pinnedAt,
+    String? pinnedBy,
   }) {
     return GroupMessageEntity(
       id: id ?? this.id,
@@ -62,6 +71,9 @@ class GroupMessageEntity {
       isHidden: isHidden ?? this.isHidden,
       moderation: moderation ?? this.moderation,
       createdAt: createdAt ?? this.createdAt,
+      isPinned: isPinned ?? this.isPinned,
+      pinnedAt: pinnedAt ?? this.pinnedAt,
+      pinnedBy: pinnedBy ?? this.pinnedBy,
     );
   }
 
