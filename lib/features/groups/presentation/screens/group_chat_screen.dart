@@ -1167,8 +1167,9 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
                           ),
                         const SizedBox(height: 8),
                         // Pin/Unpin action (only for non-blocked, non-hidden, non-deleted messages)
-                        if (!message.isHidden && 
-                            message.moderationStatus != ModerationStatusType.blocked) ...[
+                        if (!message.isHidden &&
+                            message.moderationStatus !=
+                                ModerationStatusType.blocked) ...[
                           if (message.isPinned)
                             _buildActionItem(
                               context,

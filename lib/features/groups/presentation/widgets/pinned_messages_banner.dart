@@ -1,4 +1,3 @@
-import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -49,59 +48,82 @@ class PinnedMessagesBanner extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header
-              Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  16.0,
-                  8.0,
-                  16.0,
-                  4.0,
+              // Show only the newest pinned message
+              GestureDetector(
+                onTap: () => _showPinnedMessagesSheet(
+                  context,
+                  ref,
+                  groupId,
+                  pinnedMessages,
+                  isAdmin,
                 ),
-                child: Row(
-                  children: [
-                    Icon(
-                      LucideIcons.pin,
-                      size: 16,
-                      color: theme.tint[600],
-                    ),
-                    const SizedBox(width: 4.0),
-                    Text(
-                      AppLocalizations.of(context).translate('pinned-messages'),
-                      style: TextStyles.smallBold.copyWith(
-                        color: theme.tint[700],
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 12.0),
+                  child: Row(
+                    children: [
+                      // Pin icon with count badge
+                      Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          Icon(
+                            LucideIcons.pin,
+                            size: 18,
+                            color: theme.tint[600],
+                          ),
+                          // Count badge if more than 1 message
+                          if (pinnedMessages.length > 1)
+                            Positioned(
+                              right: -8,
+                              top: -4,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 4.0,
+                                  vertical: 2.0,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: theme.tint[600],
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                constraints: const BoxConstraints(
+                                  minWidth: 16,
+                                  minHeight: 16,
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    '${pinnedMessages.length}',
+                                    style: TextStyles.tinyBold.copyWith(
+                                      color: Colors.white,
+                                      fontSize: 9,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
-                    ),
-                  ],
-                ),
-              ),
 
-              // Horizontal scrollable list of pinned messages
-              SizedBox(
-                height: 52,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0,
-                    vertical: 4.0,
-                  ),
-                  itemCount: pinnedMessages.length,
-                  separatorBuilder: (context, index) =>
-                      const SizedBox(width: 8.0),
-                  itemBuilder: (context, index) {
-                    final message = pinnedMessages[index];
-                    return _PinnedMessageCard(
-                      message: message,
-                      groupId: groupId,
-                      isAdmin: isAdmin,
-                      onTap: () => _showPinnedMessagesSheet(
-                        context,
-                        ref,
-                        groupId,
-                        pinnedMessages,
-                        isAdmin,
+                      const SizedBox(width: 12.0),
+
+                      // Newest message preview
+                      Expanded(
+                        child: Text(
+                          pinnedMessages.first.body,
+                          style: TextStyles.footnote.copyWith(
+                            color: theme.grey[800],
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
-                    );
-                  },
+
+                      // Arrow indicator
+                      Icon(
+                        LucideIcons.chevronRight,
+                        size: 16,
+                        color: theme.grey[500],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -134,7 +156,7 @@ class PinnedMessagesBanner extends ConsumerWidget {
       builder: (context) => Container(
         height: MediaQuery.of(context).size.height * 0.7,
         decoration: BoxDecoration(
-          color: theme.backgroundColor[0],
+          color: theme.backgroundColor,
           borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(20),
             topRight: Radius.circular(20),
@@ -310,55 +332,6 @@ class PinnedMessagesBanner extends ConsumerWidget {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Individual pinned message card
-class _PinnedMessageCard extends ConsumerWidget {
-  final GroupMessageEntity message;
-  final String groupId;
-  final bool isAdmin;
-  final VoidCallback? onTap;
-
-  const _PinnedMessageCard({
-    required this.message,
-    required this.groupId,
-    required this.isAdmin,
-    this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final theme = AppTheme.of(context);
-
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        constraints: const BoxConstraints(maxWidth: 280),
-        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-        decoration: ShapeDecoration(
-          color: theme.backgroundColor[0],
-          shape: SmoothRectangleBorder(
-            borderRadius: SmoothBorderRadius(
-              cornerRadius: 8,
-              cornerSmoothing: 1,
-            ),
-            side: BorderSide(
-              color: theme.tint[200]!,
-              width: 1,
-            ),
-          ),
-        ),
-        child: Text(
-          message.body,
-          style: TextStyles.footnote.copyWith(
-            color: theme.grey[800],
-          ),
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
         ),
       ),
     );
