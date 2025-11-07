@@ -21,7 +21,6 @@ import 'package:reboot_app_3/features/groups/presentation/widgets/leave_group_mo
 import 'package:reboot_app_3/features/groups/presentation/widgets/group_overview_card.dart';
 import 'package:reboot_app_3/features/groups/presentation/widgets/group_members_list.dart';
 import 'package:reboot_app_3/features/groups/providers/group_membership_provider.dart';
-import 'package:reboot_app_3/features/groups/providers/group_activity_provider.dart';
 
 class GroupSettingsScreen extends ConsumerStatefulWidget {
   const GroupSettingsScreen({super.key});
@@ -173,71 +172,6 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
     );
   }
 
-  Widget _buildSettingsCard({
-    required BuildContext context,
-    required CustomThemeData theme,
-    required AppLocalizations l10n,
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: WidgetsContainer(
-        padding: const EdgeInsets.all(16),
-        backgroundColor: theme.backgroundColor,
-        borderRadius: BorderRadius.circular(15),
-        borderSide: BorderSide(color: theme.grey[100]!, width: 0.75),
-        cornerSmoothing: 1,
-        child: Row(
-          children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: theme.primary[50],
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(
-                icon,
-                size: 20,
-                color: theme.primary[600],
-              ),
-            ),
-            horizontalSpace(Spacing.points12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyles.body.copyWith(
-                      color: theme.grey[900],
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  verticalSpace(Spacing.points4),
-                  Text(
-                    subtitle,
-                    style: TextStyles.small.copyWith(
-                      color: theme.grey[600],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Icon(
-              LucideIcons.chevronRight,
-              size: 20,
-              color: theme.grey[400],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildActionCard({
     required BuildContext context,
     required CustomThemeData theme,
@@ -341,19 +275,4 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
     );
   }
 
-  void _navigateToCapacitySettings(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const GroupCapacitySettingsScreen(),
-      ),
-    );
-  }
-
-  void _navigateToEditDetails(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const EditGroupDetailsScreen(),
-      ),
-    );
-  }
 }
