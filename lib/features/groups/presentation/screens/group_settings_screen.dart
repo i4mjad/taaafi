@@ -11,11 +11,8 @@ import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/group_notification_settings_screen.dart';
-
 import 'package:reboot_app_3/features/groups/presentation/screens/group_privacy_settings_screen.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/group_chat_settings_screen.dart';
-import 'package:reboot_app_3/features/groups/presentation/screens/group_capacity_settings_screen.dart';
-import 'package:reboot_app_3/features/groups/presentation/screens/edit_group_details_screen.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/group_activity_insights_screen.dart';
 import 'package:reboot_app_3/features/groups/presentation/widgets/leave_group_modal.dart';
 import 'package:reboot_app_3/features/groups/presentation/widgets/group_overview_card.dart';
