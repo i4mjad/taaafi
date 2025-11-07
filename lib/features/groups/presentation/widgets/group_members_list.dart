@@ -417,6 +417,8 @@ class _GroupMembersListState extends ConsumerState<GroupMembersList> {
           ),
         ],
       ],
+        ),
+      ),
     );
   }
 
