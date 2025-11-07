@@ -165,7 +165,7 @@ class _EditMemberProfileModalState
                     ),
                   ),
                   const SizedBox(height: 8),
-                  CustomTextarea(
+                  CustomTextArea(
                     controller: _bioController,
                     hintText: l10n.translate('bio-placeholder'),
                     maxLines: 5,

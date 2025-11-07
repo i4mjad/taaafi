@@ -135,7 +135,7 @@ class MemberProfileModal extends ConsumerWidget {
   }
 
   Widget _buildProfileHeader(
-      BuildContext context, CustomThemeData theme, AppLocalizations l10n) {
+      BuildContext context, dynamic theme, AppLocalizations l10n) {
     return Column(
       children: [
         // Avatar
@@ -221,7 +221,7 @@ class MemberProfileModal extends ConsumerWidget {
     );
   }
 
-  Widget _buildDefaultAvatar(CustomThemeData theme) {
+  Widget _buildDefaultAvatar(dynamic theme) {
     return Center(
       child: Icon(
         LucideIcons.user,
@@ -232,7 +232,7 @@ class MemberProfileModal extends ConsumerWidget {
   }
 
   Widget _buildBioSection(
-      BuildContext context, CustomThemeData theme, AppLocalizations l10n) {
+      BuildContext context, dynamic theme, AppLocalizations l10n) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -266,7 +266,7 @@ class MemberProfileModal extends ConsumerWidget {
   }
 
   Widget _buildEmptyBioSection(
-      BuildContext context, CustomThemeData theme, AppLocalizations l10n) {
+      BuildContext context, dynamic theme, AppLocalizations l10n) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -299,7 +299,7 @@ class MemberProfileModal extends ConsumerWidget {
   }
 
   Widget _buildInterestsSection(
-      BuildContext context, CustomThemeData theme, AppLocalizations l10n) {
+      BuildContext context, dynamic theme, AppLocalizations l10n) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -338,7 +338,7 @@ class MemberProfileModal extends ConsumerWidget {
   }
 
   Widget _buildStatsSection(
-      BuildContext context, CustomThemeData theme, AppLocalizations l10n) {
+      BuildContext context, dynamic theme, AppLocalizations l10n) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -389,7 +389,7 @@ class MemberProfileModal extends ConsumerWidget {
 
   Widget _buildStatCard(
     BuildContext context,
-    CustomThemeData theme,
+    dynamic theme,
     AppLocalizations l10n,
     IconData icon,
     String value,
@@ -433,7 +433,7 @@ class MemberProfileModal extends ConsumerWidget {
   }
 
   Widget _buildAchievementsSection(
-      BuildContext context, CustomThemeData theme, AppLocalizations l10n) {
+      BuildContext context, dynamic theme, AppLocalizations l10n) {
     final earnedTypes = achievements.map((a) => a.achievementType).toSet();
     final allTypes = [
       'welcome',
@@ -518,7 +518,7 @@ class MemberProfileModal extends ConsumerWidget {
   }
 
   Widget _buildActionButtons(
-      BuildContext context, CustomThemeData theme, AppLocalizations l10n) {
+      BuildContext context, dynamic theme, AppLocalizations l10n) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -559,8 +559,7 @@ class MemberProfileModal extends ConsumerWidget {
                   onPressed: onMessage,
                   icon: Icon(LucideIcons.messageCircle, size: 18),
                   label: Text(
-                    l10n.translate('message-member',
-                        args: {'name': profile.displayName}),
+                    'Message ${profile.displayName}',
                     style: TextStyles.footnote,
                   ),
                   style: ElevatedButton.styleFrom(

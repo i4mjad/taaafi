@@ -397,20 +397,20 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
       onSave: (bio, interests) async {
         try {
           final repository = ref.read(communityRepositoryProvider);
-          
+
           // Update bio
           if (bio != profile.groupBio) {
             await repository.updateGroupBio(profile.id, bio);
           }
-          
+
           // Update interests
           if (interests.toString() != profile.interests.toString()) {
             await repository.updateInterests(profile.id, interests);
           }
-          
+
           // Refresh profile
           ref.invalidate(currentCommunityProfileProvider);
-          
+
           if (context.mounted) {
             showSuccessSnackBar(
               context,
