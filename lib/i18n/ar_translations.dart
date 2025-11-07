@@ -3374,6 +3374,7 @@ const Map<String, String> kAr = {
   'failed-to-unhide-message': 'فشل في إظهار الرسالة',
 
   // Activity insights (Sprint 2 - Feature 2.1)
+  'activity': 'النشاط',
   'activity-insights': 'رؤى النشاط',
   'member-activity': 'نشاط الأعضاء',
   'active-members': 'الأعضاء النشطون',

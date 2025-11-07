@@ -65,72 +65,7 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
               verticalSpace(Spacing.points16),
 
               // Settings actions row
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: Row(
-                  children: [
-                    // Notifications
-                    Expanded(
-                      child: _buildActionCard(
-                        context: context,
-                        theme: theme,
-                        l10n: l10n,
-                        icon: LucideIcons.bell,
-                        title: l10n.translate('notifications'),
-                        onTap: () => _navigateToNotificationSettings(context),
-                      ),
-                    ),
-
-                    horizontalSpace(Spacing.points8),
-
-                    // Chat
-                    Expanded(
-                      child: _buildActionCard(
-                        context: context,
-                        theme: theme,
-                        l10n: l10n,
-                        icon: LucideIcons.messageCircle,
-                        title: l10n.translate('chat'),
-                        onTap: () => _navigateToChatSettings(context),
-                      ),
-                    ),
-
-                    horizontalSpace(Spacing.points8),
-
-                    // Privacy
-                    Expanded(
-                      child: _buildActionCard(
-                        context: context,
-                        theme: theme,
-                        l10n: l10n,
-                        icon: LucideIcons.shield,
-                        title: l10n.translate('privacy'),
-                        onTap: () => _navigateToPrivacySettings(context),
-                      ),
-                    ),
-
-                    horizontalSpace(Spacing.points8),
-
-                    // Leave
-                    Expanded(
-                      child: _buildActionCard(
-                        context: context,
-                        theme: theme,
-                        l10n: l10n,
-                        icon: LucideIcons.logOut,
-                        title: l10n.translate('leave'),
-                        onTap: () => _showLeaveGroupDialog(context, l10n),
-                        isDestructive: true,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              verticalSpace(Spacing.points24),
-
-              // Admin Section (Sprint 1 & Sprint 2 Features)
-              _buildAdminSection(context, theme, l10n, ref),
+              _buildActionsRow(context, theme, l10n, ref),
 
               verticalSpace(Spacing.points24),
 
@@ -145,7 +80,7 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
     );
   }
 
-  Widget _buildAdminSection(
+  Widget _buildActionsRow(
     BuildContext context,
     CustomThemeData theme,
     AppLocalizations l10n,
@@ -155,58 +90,82 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
 
     return groupMembershipAsync.when(
       data: (groupMembership) {
-        if (groupMembership == null || groupMembership.memberRole != 'admin') {
-          return const SizedBox.shrink();
-        }
+        final isAdmin = groupMembership?.memberRole == 'admin';
 
-        final statsAsync = ref.watch(groupActivityStatsProvider(groupMembership.group.id));
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              l10n.translate('admin-settings'),
-              style: TextStyles.h5.copyWith(color: theme.grey[900]),
-            ),
-            verticalSpace(Spacing.points12),
-
-            // Activity Insights (Sprint 2 - Feature 2.1)
-            statsAsync.when(
-              data: (stats) => _buildSettingsCard(
-                context: context,
-                theme: theme,
-                l10n: l10n,
-                icon: LucideIcons.barChart2,
-                title: l10n.translate('activity-insights'),
-                subtitle: '${stats.activeMembers} ${l10n.translate('active-members')}, ${stats.inactiveMembers} ${l10n.translate('inactive-members')}',
-                onTap: () => _navigateToActivityInsights(context, groupMembership.group.id),
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              // Activity Insights (Admin only - Sprint 2)
+              if (isAdmin)
+                SizedBox(
+                  width: (MediaQuery.of(context).size.width - 48) / 4,
+                  child: _buildActionCard(
+                    context: context,
+                    theme: theme,
+                    l10n: l10n,
+                    icon: LucideIcons.barChart2,
+                    title: l10n.translate('activity'),
+                    onTap: () => _navigateToActivityInsights(context, groupMembership!.group.id),
+                  ),
+                ),
+              
+              // Notifications
+              SizedBox(
+                width: (MediaQuery.of(context).size.width - 48) / 4,
+                child: _buildActionCard(
+                  context: context,
+                  theme: theme,
+                  l10n: l10n,
+                  icon: LucideIcons.bell,
+                  title: l10n.translate('notifications'),
+                  onTap: () => _navigateToNotificationSettings(context),
+                ),
               ),
-              loading: () => const SizedBox.shrink(),
-              error: (_, __) => const SizedBox.shrink(),
-            ),
-            verticalSpace(Spacing.points8),
 
-            _buildSettingsCard(
-              context: context,
-              theme: theme,
-              l10n: l10n,
-              icon: LucideIcons.users,
-              title: l10n.translate('group-capacity'),
-              subtitle:
-                  '${groupMembership.group.capacity} ${l10n.translate('members')}',
-              onTap: () => _navigateToCapacitySettings(context),
-            ),
-            verticalSpace(Spacing.points8),
-            _buildSettingsCard(
-              context: context,
-              theme: theme,
-              l10n: l10n,
-              icon: LucideIcons.edit,
-              title: l10n.translate('edit-group-details'),
-              subtitle: l10n.translate('name-and-description'),
-              onTap: () => _navigateToEditDetails(context),
-            ),
-          ],
+              // Chat
+              SizedBox(
+                width: (MediaQuery.of(context).size.width - 48) / 4,
+                child: _buildActionCard(
+                  context: context,
+                  theme: theme,
+                  l10n: l10n,
+                  icon: LucideIcons.messageCircle,
+                  title: l10n.translate('chat'),
+                  onTap: () => _navigateToChatSettings(context),
+                ),
+              ),
+
+              // Privacy
+              SizedBox(
+                width: (MediaQuery.of(context).size.width - 48) / 4,
+                child: _buildActionCard(
+                  context: context,
+                  theme: theme,
+                  l10n: l10n,
+                  icon: LucideIcons.shield,
+                  title: l10n.translate('privacy'),
+                  onTap: () => _navigateToPrivacySettings(context),
+                ),
+              ),
+
+              // Leave
+              SizedBox(
+                width: (MediaQuery.of(context).size.width - 48) / 4,
+                child: _buildActionCard(
+                  context: context,
+                  theme: theme,
+                  l10n: l10n,
+                  icon: LucideIcons.logOut,
+                  title: l10n.translate('leave'),
+                  onTap: () => _showLeaveGroupDialog(context, l10n),
+                  isDestructive: true,
+                ),
+              ),
+            ],
+          ),
         );
       },
       loading: () => const SizedBox.shrink(),

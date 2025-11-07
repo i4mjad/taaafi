@@ -32,7 +32,7 @@ class GroupActivityInsightsScreen extends ConsumerWidget {
         ref.watch(inactiveGroupMembersProvider(groupId));
 
     return Scaffold(
-      backgroundColor: theme.grey[50],
+      backgroundColor: theme.backgroundColor,
       appBar: AppBar(
         backgroundColor: theme.backgroundColor,
         elevation: 0,
@@ -101,65 +101,62 @@ class GroupActivityInsightsScreen extends ConsumerWidget {
 
   Widget _buildOverviewCards(
       dynamic stats, dynamic theme, AppLocalizations l10n) {
-    return WidgetsContainer(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            l10n.translate('activity-overview'),
-            style: TextStyles.h6.copyWith(color: theme.grey[900]),
-          ),
-          verticalSpace(Spacing.points16),
-          Row(
-            children: [
-              Expanded(
-                child: _buildStatCard(
-                  icon: LucideIcons.users,
-                  value: '${stats.activeMembers}',
-                  label: l10n.translate('active-members'),
-                  color: theme.success[500]!,
-                  theme: theme,
-                ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          l10n.translate('activity-overview'),
+          style: TextStyles.h6.copyWith(color: theme.grey[900]),
+        ),
+        verticalSpace(Spacing.points16),
+        Row(
+          children: [
+            Expanded(
+              child: _buildStatCard(
+                icon: LucideIcons.users,
+                value: '${stats.activeMembers}',
+                label: l10n.translate('active-members'),
+                color: theme.success[500]!,
+                theme: theme,
               ),
-              horizontalSpace(Spacing.points12),
-              Expanded(
-                child: _buildStatCard(
-                  icon: LucideIcons.userX,
-                  value: '${stats.inactiveMembers}',
-                  label: l10n.translate('inactive-members'),
-                  color: theme.error[500]!,
-                  theme: theme,
-                ),
+            ),
+            horizontalSpace(Spacing.points12),
+            Expanded(
+              child: _buildStatCard(
+                icon: LucideIcons.userX,
+                value: '${stats.inactiveMembers}',
+                label: l10n.translate('inactive-members'),
+                color: theme.error[500]!,
+                theme: theme,
               ),
-            ],
-          ),
-          verticalSpace(Spacing.points12),
-          Row(
-            children: [
-              Expanded(
-                child: _buildStatCard(
-                  icon: LucideIcons.trendingUp,
-                  value: '${stats.averageEngagement}',
-                  label: l10n.translate('average-engagement'),
-                  color: theme.primary[500]!,
-                  theme: theme,
-                ),
+            ),
+          ],
+        ),
+        verticalSpace(Spacing.points12),
+        Row(
+          children: [
+            Expanded(
+              child: _buildStatCard(
+                icon: LucideIcons.trendingUp,
+                value: '${stats.averageEngagement}',
+                label: l10n.translate('average-engagement'),
+                color: theme.primary[500]!,
+                theme: theme,
               ),
-              horizontalSpace(Spacing.points12),
-              Expanded(
-                child: _buildStatCard(
-                  icon: LucideIcons.award,
-                  value: '${stats.mostActiveMemberScore}',
-                  label: l10n.translate('most-active-member'),
-                  color: theme.warn[500]!,
-                  theme: theme,
-                ),
+            ),
+            horizontalSpace(Spacing.points12),
+            Expanded(
+              child: _buildStatCard(
+                icon: LucideIcons.award,
+                value: '${stats.mostActiveMemberScore}',
+                label: l10n.translate('most-active-member'),
+                color: theme.warn[500]!,
+                theme: theme,
               ),
-            ],
-          ),
-        ],
-      ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 

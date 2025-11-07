@@ -3448,6 +3448,7 @@ const Map<String, String> kEn = {
   "failed-to-unhide-message": "Failed to unhide message",
 
   // Activity insights (Sprint 2 - Feature 2.1)
+  "activity": "Activity",
   "activity-insights": "Activity Insights",
   "member-activity": "Member Activity",
   "active-members": "Active Members",
