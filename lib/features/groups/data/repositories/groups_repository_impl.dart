@@ -1,6 +1,7 @@
 import '../../domain/entities/group_entity.dart';
 import '../../domain/entities/group_membership_entity.dart';
 import '../../domain/entities/join_result_entity.dart';
+import '../../domain/entities/bulk_operation_result.dart';
 import '../../domain/repositories/groups_repository.dart';
 import '../../utils/join_code_generator.dart';
 import '../datasources/groups_datasource.dart';

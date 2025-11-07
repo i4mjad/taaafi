@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
-import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
@@ -22,7 +21,6 @@ class GroupOverviewCard extends ConsumerWidget {
     final theme = AppTheme.of(context);
     final l10n = AppLocalizations.of(context);
     final groupMembershipAsync = ref.watch(groupMembershipNotifierProvider);
-    final locale = Localizations.localeOf(context);
 
     return groupMembershipAsync.when(
       loading: () => WidgetsContainer(
@@ -245,56 +243,14 @@ class GroupOverviewCard extends ConsumerWidget {
                         isHighlight: true,
                       ),
                     ],
-                  ],
-                ),
-
-                verticalSpace(Spacing.points12),
-
-                // Dates Section
-                Column(
-                  children: [
-                    // Joined date
-                    Row(
-                      children: [
-                        Icon(
-                          LucideIcons.calendar,
-                          size: 12,
-                          color: theme.grey[500],
-                        ),
-                        horizontalSpace(Spacing.points4),
-                        Flexible(
-                          child: Text(
-                            '${l10n.translate('joined')}: ${getDisplayDateTime(groupMembership.joinedAt, locale.languageCode)}',
-                            style: TextStyles.small.copyWith(
-                              color: theme.grey[500],
-                              fontSize: 11,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                    verticalSpace(Spacing.points12),
-                    // Created date
-                    Row(
-                      children: [
-                        Icon(
-                          LucideIcons.plus,
-                          size: 12,
-                          color: theme.grey[500],
-                        ),
-                        horizontalSpace(Spacing.points4),
-                        Flexible(
-                          child: Text(
-                            '${l10n.translate('created')}: ${getDisplayDateTime(group.createdAt, locale.languageCode)}',
-                            style: TextStyles.small.copyWith(
-                              color: theme.grey[500],
-                              fontSize: 11,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
+                    horizontalSpace(Spacing.points8),
+                    _buildStatChip(
+                      context: context,
+                      theme: theme,
+                      icon: LucideIcons.calendar,
+                      label: _formatCreatedTime(group.createdAt, l10n),
+                      tooltip: _formatCreatedTime(group.createdAt, l10n),
+                      isHighlight: false,
                     ),
                   ],
                 ),
@@ -302,45 +258,9 @@ class GroupOverviewCard extends ConsumerWidget {
                 verticalSpace(Spacing.points12),
 
                 // Sharing Section
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: theme.grey[50],
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: theme.grey[200]!, width: 0.5),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Sharing Header
-                      Row(
-                        children: [
-                          Icon(
-                            _getIconForJoinMethod(group.joinMethod),
-                            color: theme.primary[600],
-                            size: 16,
-                          ),
-                          horizontalSpace(Spacing.points4),
-                          Text(
-                            l10n.translate('group-sharing'),
-                            style: TextStyles.small.copyWith(
-                              color: theme.grey[700],
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      verticalSpace(Spacing.points4),
-
-                      // Join method specific content
-                      ..._buildJoinMethodContent(group.joinMethod, isAdmin,
-                          group, theme, l10n, context),
-                    ],
-                  ),
-                ),
-
+// Join method specific content
+                ..._buildJoinMethodContent(
+                    group.joinMethod, isAdmin, group, theme, l10n, context),
                 // Admin Settings CTA (only for admins)
                 if (isAdmin) ...[
                   verticalSpace(Spacing.points12),
@@ -642,6 +562,36 @@ class GroupOverviewCard extends ConsumerWidget {
         return theme.secondary[600]!;
       default:
         return theme.grey[600]!;
+    }
+  }
+
+  String _formatCreatedTime(dynamic createdAt, AppLocalizations l10n) {
+    DateTime dateTime;
+    if (createdAt is DateTime) {
+      dateTime = createdAt;
+    } else {
+      // Handle Firestore Timestamp
+      dateTime = createdAt.toDate();
+    }
+
+    final now = DateTime.now();
+    final difference = now.difference(dateTime);
+
+    if (difference.inDays > 30) {
+      final months = (difference.inDays / 30).floor();
+      return l10n
+          .translate('group-months-ago')
+          .replaceAll('{months}', months.toString());
+    } else if (difference.inDays > 0) {
+      return l10n
+          .translate('group-days-ago')
+          .replaceAll('{days}', difference.inDays.toString());
+    } else if (difference.inHours > 0) {
+      return l10n
+          .translate('group-hours-ago')
+          .replaceAll('{hours}', difference.inHours.toString());
+    } else {
+      return l10n.translate('just-created');
     }
   }
 }
