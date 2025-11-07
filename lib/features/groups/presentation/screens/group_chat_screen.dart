@@ -980,7 +980,6 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
 
           return InkWell(
             onTap: () async {
-              Navigator.of(context).pop(); // Close modal
               try {
                 // First, remove existing reaction if any
                 if (currentUserReaction != null &&
@@ -1002,8 +1001,14 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
                       messageId: message.id,
                       emoji: emoji,
                     );
+                
+                // Close modal after successful operation
+                if (context.mounted) {
+                  Navigator.of(context).pop();
+                }
               } catch (e) {
                 if (context.mounted) {
+                  Navigator.of(context).pop(); // Close modal even on error
                   getErrorSnackBar(context, 'error-toggling-reaction');
                 }
                 print('Error toggling reaction: $e');
