@@ -953,21 +953,23 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
   ) {
     // Default reaction emojis (same as in ReactionPicker)
     const emojis = ['👍', '❤️', '😂', '😮', '😢', '🙏', '🎉', '🔥', '👏', '💯'];
-    
+
     final currentProfile = ref.watch(currentCommunityProfileProvider).value;
-    
+
     return Wrap(
       spacing: 8,
       runSpacing: 8,
       children: emojis.map((emoji) {
-        final hasReacted = currentProfile != null && 
+        final hasReacted = currentProfile != null &&
             (message.reactions[emoji]?.contains(currentProfile.id) ?? false);
-        
+
         return InkWell(
           onTap: () async {
             Navigator.of(context).pop(); // Close modal
             try {
-              await ref.read(messageReactionsServiceProvider.notifier).toggleReaction(
+              await ref
+                  .read(messageReactionsServiceProvider.notifier)
+                  .toggleReaction(
                     groupId: widget.groupId ?? '',
                     messageId: message.id,
                     emoji: emoji,
@@ -989,9 +991,7 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
                   : theme.grey[100]!.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: hasReacted
-                    ? theme.primary[400]!
-                    : theme.grey[300]!,
+                color: hasReacted ? theme.primary[400]! : theme.grey[300]!,
                 width: hasReacted ? 2 : 1,
               ),
             ),
@@ -1296,23 +1296,7 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
                 const SizedBox(height: 12),
 
                 // Quick reactions section
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        l10n.translate('add-reaction'),
-                        style: TextStyles.smallBold.copyWith(
-                          color: theme.grey[700],
-                          fontSize: 12,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      _buildQuickReactions(context, ref, theme, message),
-                    ],
-                  ),
-                ),
+                _buildQuickReactions(context, ref, theme, message),
 
                 const SizedBox(height: 20),
 
