@@ -245,10 +245,11 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
             builder: (context, ref, child) {
               final groupId = widget.groupId;
               if (groupId == null) return const SizedBox.shrink();
-              
-              final isAdminAsync = ref.watch(isCurrentUserGroupAdminProvider(groupId));
+
+              final isAdminAsync =
+                  ref.watch(isCurrentUserGroupAdminProvider(groupId));
               final isAdmin = isAdminAsync.valueOrNull ?? false;
-              
+
               return PinnedMessagesBanner(
                 groupId: groupId,
                 isAdmin: isAdmin,
@@ -1165,28 +1166,32 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
                             isDestructive: false,
                           ),
                         const SizedBox(height: 8),
-                        // Pin/Unpin action
-                        if (message.isPinned)
-                          _buildActionItem(
-                            context,
-                            theme,
-                            icon: LucideIcons.pinOff,
-                            title: l10n.translate('unpin-message'),
-                            subtitle: l10n.translate('tap-to-view'),
-                            onTap: () => _unpinMessage(context, message),
-                            isDestructive: false,
-                          )
-                        else
-                          _buildActionItem(
-                            context,
-                            theme,
-                            icon: LucideIcons.pin,
-                            title: l10n.translate('pin-message'),
-                            subtitle: l10n.translate('max-pinned-messages'),
-                            onTap: () => _pinMessage(context, message),
-                            isDestructive: false,
-                          ),
-                        const SizedBox(height: 8),
+                        // Pin/Unpin action (only for non-blocked, non-hidden, non-deleted messages)
+                        if (!message.isHidden && 
+                            message.moderationStatus != ModerationStatusType.blocked) ...[
+                          if (message.isPinned)
+                            _buildActionItem(
+                              context,
+                              theme,
+                              icon: LucideIcons.pinOff,
+                              title: l10n.translate('unpin-message'),
+                              subtitle:
+                                  l10n.translate('tap-to-view-pinned-message'),
+                              onTap: () => _unpinMessage(context, message),
+                              isDestructive: false,
+                            )
+                          else
+                            _buildActionItem(
+                              context,
+                              theme,
+                              icon: LucideIcons.pin,
+                              title: l10n.translate('pin-message'),
+                              subtitle: l10n.translate('max-pinned-messages'),
+                              onTap: () => _pinMessage(context, message),
+                              isDestructive: false,
+                            ),
+                          const SizedBox(height: 8),
+                        ],
                       ],
 
                       // Report action

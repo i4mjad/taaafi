@@ -400,7 +400,7 @@ class GroupMessagesFirestoreDataSource implements GroupMessagesDataSource {
         throw Exception('Maximum 3 messages can be pinned per group');
       }
 
-      // Check if message exists and is not deleted/hidden
+      // Check if message exists and is not deleted/hidden/blocked
       final messageDoc = await _messagesCollection.doc(messageId).get();
       if (!messageDoc.exists) {
         throw Exception('Message not found');
@@ -409,6 +409,12 @@ class GroupMessagesFirestoreDataSource implements GroupMessagesDataSource {
       final messageData = messageDoc.data() as Map<String, dynamic>;
       if (messageData['isDeleted'] == true || messageData['isHidden'] == true) {
         throw Exception('Cannot pin deleted or hidden messages');
+      }
+
+      // Check if message is blocked
+      final moderation = messageData['moderation'] as Map<String, dynamic>?;
+      if (moderation != null && moderation['status'] == 'blocked') {
+        throw Exception('Cannot pin blocked messages');
       }
 
       // Pin the message

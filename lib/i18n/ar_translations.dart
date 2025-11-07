@@ -3435,11 +3435,10 @@ const Map<String, String> kAr = {
   'max-pinned-messages': 'الحد الأقصى 3 رسائل يمكن تثبيتها',
   'only-admins-can-pin': 'المشرفون فقط يمكنهم تثبيت الرسائل',
   'pinned-by': 'تم التثبيت بواسطة {name}',
-  'tap-to-view': 'اضغط لعرض الرسالة المثبتة',
+  'tap-to-view-pinned-message': 'اضغط لعرض الرسالة المثبتة',
   'no-pinned-messages': 'لا توجد رسائل مثبتة',
   'confirm-unpin-message': 'هل تريد إلغاء تثبيت هذه الرسالة؟',
   'unpin': 'إلغاء التثبيت',
   'error-pinning-message': 'خطأ في تثبيت الرسالة',
   'error-unpinning-message': 'خطأ في إلغاء تثبيت الرسالة',
-  'cancel': 'إلغاء',
 };

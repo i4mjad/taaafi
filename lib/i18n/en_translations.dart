@@ -3496,7 +3496,8 @@ const Map<String, String> kEn = {
   "export-format": "Export Format",
   "export-generating": "Generating export...",
   "export-ready": "Export ready to share",
-  "cannot-bulk-operate-creator": "Cannot perform bulk operations on group creator",
+  "cannot-bulk-operate-creator":
+      "Cannot perform bulk operations on group creator",
   "max-bulk-selection": "Maximum 20 members can be selected",
   "error-loading-activity-data": "Error loading activity data",
 
@@ -3509,11 +3510,10 @@ const Map<String, String> kEn = {
   "max-pinned-messages": "Maximum 3 messages can be pinned",
   "only-admins-can-pin": "Only admins can pin messages",
   "pinned-by": "Pinned by {name}",
-  "tap-to-view": "Tap to view pinned message",
+  "tap-to-view-pinned-message": "Tap to view pinned message",
   "no-pinned-messages": "No pinned messages",
   "confirm-unpin-message": "Are you sure you want to unpin this message?",
   "unpin": "Unpin",
   "error-pinning-message": "Error pinning message",
   "error-unpinning-message": "Error unpinning message",
-  "cancel": "Cancel",
 };
