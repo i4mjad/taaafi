@@ -21,6 +21,11 @@ class CommunityProfileEntity {
   final DateTime createdAt;
   final DateTime? updatedAt;
   final NotificationPreferences? notificationPreferences;
+  
+  // Group-specific fields (Sprint 4 - Feature 4.1)
+  final String? groupBio; // Max 200 chars
+  final List<String> interests; // Tags/categories
+  final List<String> groupAchievements; // Achievement IDs
 
   const CommunityProfileEntity({
     required this.id,
@@ -38,6 +43,9 @@ class CommunityProfileEntity {
     required this.createdAt,
     this.updatedAt,
     this.notificationPreferences,
+    this.groupBio,
+    this.interests = const [],
+    this.groupAchievements = const [],
   });
 
   /// Helper method to convert timestamp fields from Firestore or JSON
@@ -80,6 +88,13 @@ class CommunityProfileEntity {
           ? NotificationPreferences.fromJson(
               json['notificationPreferences'] as Map<String, dynamic>)
           : null,
+      groupBio: json['groupBio'] as String?,
+      interests: json['interests'] != null 
+          ? List<String>.from(json['interests'] as List)
+          : const [],
+      groupAchievements: json['groupAchievements'] != null
+          ? List<String>.from(json['groupAchievements'] as List)
+          : const [],
     );
   }
 
@@ -100,6 +115,9 @@ class CommunityProfileEntity {
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
       'notificationPreferences': notificationPreferences?.toJson(),
+      'groupBio': groupBio,
+      'interests': interests,
+      'groupAchievements': groupAchievements,
     };
   }
 
@@ -219,6 +237,9 @@ class CommunityProfileEntity {
     DateTime? createdAt,
     DateTime? updatedAt,
     NotificationPreferences? notificationPreferences,
+    String? groupBio,
+    List<String>? interests,
+    List<String>? groupAchievements,
   }) {
     return CommunityProfileEntity(
       id: id ?? this.id,
@@ -237,6 +258,9 @@ class CommunityProfileEntity {
       updatedAt: updatedAt ?? this.updatedAt,
       notificationPreferences:
           notificationPreferences ?? this.notificationPreferences,
+      groupBio: groupBio ?? this.groupBio,
+      interests: interests ?? this.interests,
+      groupAchievements: groupAchievements ?? this.groupAchievements,
     );
   }
 
@@ -258,7 +282,10 @@ class CommunityProfileEntity {
         other.role == role &&
         other.createdAt == createdAt &&
         other.updatedAt == updatedAt &&
-        other.notificationPreferences == notificationPreferences;
+        other.notificationPreferences == notificationPreferences &&
+        other.groupBio == groupBio &&
+        other.interests == interests &&
+        other.groupAchievements == groupAchievements;
   }
 
   @override
@@ -277,11 +304,34 @@ class CommunityProfileEntity {
         role.hashCode ^
         createdAt.hashCode ^
         updatedAt.hashCode ^
-        notificationPreferences.hashCode;
+        notificationPreferences.hashCode ^
+        groupBio.hashCode ^
+        interests.hashCode ^
+        groupAchievements.hashCode;
   }
 
   @override
   String toString() {
-    return 'CommunityProfileEntity(id: $id, userUID: $userUID, displayName: $displayName, gender: $gender, avatarUrl: $avatarUrl, isAnonymous: $isAnonymous, isDeleted: $isDeleted, isPlusUser: $isPlusUser, shareRelapseStreaks: $shareRelapseStreaks, currentStreakDays: $currentStreakDays, streakLastUpdated: $streakLastUpdated, role: $role, createdAt: $createdAt, updatedAt: $updatedAt, notificationPreferences: $notificationPreferences)';
+    return 'CommunityProfileEntity(id: $id, userUID: $userUID, displayName: $displayName, gender: $gender, avatarUrl: $avatarUrl, isAnonymous: $isAnonymous, isDeleted: $isDeleted, isPlusUser: $isPlusUser, shareRelapseStreaks: $shareRelapseStreaks, currentStreakDays: $currentStreakDays, streakLastUpdated: $streakLastUpdated, role: $role, createdAt: $createdAt, updatedAt: $updatedAt, notificationPreferences: $notificationPreferences, groupBio: $groupBio, interests: $interests, groupAchievements: $groupAchievements)';
+  }
+  
+  /// Business logic: Validate bio length
+  bool isValidBio() {
+    return groupBio == null || groupBio!.length <= 200;
+  }
+  
+  /// Business logic: Check if profile has bio
+  bool hasBio() {
+    return groupBio != null && groupBio!.isNotEmpty;
+  }
+  
+  /// Business logic: Check if profile has interests
+  bool hasInterests() {
+    return interests.isNotEmpty;
+  }
+  
+  /// Business logic: Check if profile has achievements
+  bool hasAchievements() {
+    return groupAchievements.isNotEmpty;
   }
 }
