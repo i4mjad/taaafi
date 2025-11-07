@@ -955,7 +955,7 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
     const emojis = ['👍', '❤️', '😂', '😮', '😢', '🙏', '🎉', '🔥', '👏', '💯'];
 
     final currentProfile = ref.watch(currentCommunityProfileProvider).value;
-    
+
     // Find current user's reaction (if any)
     String? currentUserReaction;
     if (currentProfile != null) {
@@ -983,7 +983,8 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
               Navigator.of(context).pop(); // Close modal
               try {
                 // First, remove existing reaction if any
-                if (currentUserReaction != null && currentUserReaction != emoji) {
+                if (currentUserReaction != null &&
+                    currentUserReaction != emoji) {
                   await ref
                       .read(messageReactionsServiceProvider.notifier)
                       .toggleReaction(
@@ -992,7 +993,7 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
                         emoji: currentUserReaction,
                       );
                 }
-                
+
                 // Then add/remove the selected emoji
                 await ref
                     .read(messageReactionsServiceProvider.notifier)
