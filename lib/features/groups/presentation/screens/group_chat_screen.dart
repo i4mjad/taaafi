@@ -23,6 +23,7 @@ import '../../../../core/shared_widgets/snackbar.dart';
 import '../../../../core/shared_widgets/action_modal.dart';
 import '../widgets/group_chat_profile_modal.dart';
 import '../widgets/message_report_modal.dart';
+import '../widgets/pinned_messages_banner.dart';
 import '../../../shared/data/notifiers/user_reports_notifier.dart';
 import 'group_chat_settings_screen.dart';
 import 'package:go_router/go_router.dart';
@@ -45,6 +46,7 @@ class ChatMessage {
   final bool isHidden; // Whether this message was hidden by admin
   final ModerationStatusType? moderationStatus; // Moderation status
   final String? moderationReason; // Moderation reason if blocked
+  final bool isPinned; // Whether this message is pinned
 
   const ChatMessage({
     required this.id,
@@ -62,6 +64,7 @@ class ChatMessage {
     this.isHidden = false,
     this.moderationStatus,
     this.moderationReason,
+    this.isPinned = false,
   });
 
   ChatMessage copyWith({
@@ -80,6 +83,7 @@ class ChatMessage {
     bool? isHidden,
     ModerationStatusType? moderationStatus,
     String? moderationReason,
+    bool? isPinned,
   }) {
     return ChatMessage(
       id: id ?? this.id,
@@ -97,6 +101,7 @@ class ChatMessage {
       isHidden: isHidden ?? this.isHidden,
       moderationStatus: moderationStatus ?? this.moderationStatus,
       moderationReason: moderationReason ?? this.moderationReason,
+      isPinned: isPinned ?? this.isPinned,
     );
   }
 }
@@ -235,6 +240,27 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
       ),
       body: Column(
         children: [
+          // Pinned messages banner
+          Consumer(
+            builder: (context, ref, child) {
+              final groupId = widget.groupId;
+              if (groupId == null) return const SizedBox.shrink();
+              
+              final isAdminAsync = ref.watch(isCurrentUserGroupAdminProvider(groupId));
+              final isAdmin = isAdminAsync.valueOrNull ?? false;
+              
+              return PinnedMessagesBanner(
+                groupId: groupId,
+                isAdmin: isAdmin,
+                onTapMessage: (messageId) {
+                  // TODO: Scroll to message in chat
+                  // This will be implemented when we add scroll-to-message functionality
+                  print('Tapped pinned message: $messageId');
+                },
+              );
+            },
+          ),
+
           // Messages list
           Expanded(
             child: _buildMessagesList(context, theme, l10n, chatTextSize),
@@ -491,6 +517,7 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
         isHidden: entity.isHidden,
         moderationStatus: entity.moderation.status,
         moderationReason: entity.moderation.reason,
+        isPinned: entity.isPinned,
       );
     }).toList();
   }
@@ -736,6 +763,16 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
+
+                            // Pin indicator
+                            if (message.isPinned) ...[
+                              const SizedBox(width: 4),
+                              Icon(
+                                LucideIcons.pin,
+                                size: 12,
+                                color: theme.tint[600],
+                              ),
+                            ],
 
                             Spacer(),
 
@@ -1128,6 +1165,28 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
                             isDestructive: false,
                           ),
                         const SizedBox(height: 8),
+                        // Pin/Unpin action
+                        if (message.isPinned)
+                          _buildActionItem(
+                            context,
+                            theme,
+                            icon: LucideIcons.pinOff,
+                            title: l10n.translate('unpin-message'),
+                            subtitle: l10n.translate('tap-to-view'),
+                            onTap: () => _unpinMessage(context, message),
+                            isDestructive: false,
+                          )
+                        else
+                          _buildActionItem(
+                            context,
+                            theme,
+                            icon: LucideIcons.pin,
+                            title: l10n.translate('pin-message'),
+                            subtitle: l10n.translate('max-pinned-messages'),
+                            onTap: () => _pinMessage(context, message),
+                            isDestructive: false,
+                          ),
+                        const SizedBox(height: 8),
                       ],
 
                       // Report action
@@ -1315,6 +1374,52 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
       // Show error message
       getSystemSnackBar(context, l10n.translate('failed-to-unhide-message'));
       print('Error unhiding message: $e');
+    }
+  }
+
+  /// Pin message (admin only)
+  Future<void> _pinMessage(BuildContext context, ChatMessage message) async {
+    final l10n = AppLocalizations.of(context);
+
+    try {
+      await ref.read(pinnedMessagesServiceProvider.notifier).pinMessage(
+            groupId: widget.groupId ?? '',
+            messageId: message.id,
+          );
+
+      if (context.mounted) {
+        getSuccessSnackBar(context, 'message-pinned');
+      }
+    } catch (e) {
+      if (context.mounted) {
+        if (e.toString().contains('Maximum 3 messages')) {
+          getErrorSnackBar(context, 'max-pinned-messages');
+        } else {
+          getErrorSnackBar(context, 'error-pinning-message');
+        }
+      }
+      print('Error pinning message: $e');
+    }
+  }
+
+  /// Unpin message (admin only)
+  Future<void> _unpinMessage(BuildContext context, ChatMessage message) async {
+    final l10n = AppLocalizations.of(context);
+
+    try {
+      await ref.read(pinnedMessagesServiceProvider.notifier).unpinMessage(
+            groupId: widget.groupId ?? '',
+            messageId: message.id,
+          );
+
+      if (context.mounted) {
+        getSuccessSnackBar(context, 'message-unpinned');
+      }
+    } catch (e) {
+      if (context.mounted) {
+        getErrorSnackBar(context, 'error-unpinning-message');
+      }
+      print('Error unpinning message: $e');
     }
   }
 
