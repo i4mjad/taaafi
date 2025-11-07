@@ -24,6 +24,8 @@ import '../../../../core/shared_widgets/action_modal.dart';
 import '../widgets/group_chat_profile_modal.dart';
 import '../widgets/message_report_modal.dart';
 import '../widgets/pinned_messages_banner.dart';
+import '../widgets/reaction_picker.dart';
+import '../widgets/message_reactions_widget.dart';
 import '../../../shared/data/notifiers/user_reports_notifier.dart';
 import 'group_chat_settings_screen.dart';
 import 'package:go_router/go_router.dart';
@@ -47,6 +49,7 @@ class ChatMessage {
   final ModerationStatusType? moderationStatus; // Moderation status
   final String? moderationReason; // Moderation reason if blocked
   final bool isPinned; // Whether this message is pinned
+  final Map<String, List<String>> reactions; // Emoji reactions on this message
 
   const ChatMessage({
     required this.id,
@@ -65,6 +68,7 @@ class ChatMessage {
     this.moderationStatus,
     this.moderationReason,
     this.isPinned = false,
+    this.reactions = const {},
   });
 
   ChatMessage copyWith({
@@ -84,6 +88,7 @@ class ChatMessage {
     ModerationStatusType? moderationStatus,
     String? moderationReason,
     bool? isPinned,
+    Map<String, List<String>>? reactions,
   }) {
     return ChatMessage(
       id: id ?? this.id,
@@ -102,6 +107,7 @@ class ChatMessage {
       moderationStatus: moderationStatus ?? this.moderationStatus,
       moderationReason: moderationReason ?? this.moderationReason,
       isPinned: isPinned ?? this.isPinned,
+      reactions: reactions ?? this.reactions,
     );
   }
 }
@@ -519,6 +525,7 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
         moderationStatus: entity.moderation.status,
         moderationReason: entity.moderation.reason,
         isPinned: entity.isPinned,
+        reactions: entity.reactions,
       );
     }).toList();
   }
@@ -832,6 +839,10 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
                             softWrap: true,
                             overflow: TextOverflow.visible,
                           ),
+                        
+                        // Message reactions
+                        if (message.reactions.isNotEmpty)
+                          _buildReactionsDisplay(context, theme, message),
                       ],
                     ),
                   );
@@ -844,6 +855,92 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
               SizedBox(width: screenWidth * 0.12), // 12% of screen width
           ],
         ),
+      ),
+    );
+  }
+
+  /// Build reactions display widget
+  Widget _buildReactionsDisplay(
+      BuildContext context, CustomThemeData theme, ChatMessage message) {
+    final emojis = message.reactions.keys
+        .where((emoji) => (message.reactions[emoji]?.isNotEmpty ?? false))
+        .toList();
+
+    if (emojis.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    final currentProfile = ref.watch(currentCommunityProfileProvider).value;
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 8.0),
+      child: Wrap(
+        spacing: 6,
+        runSpacing: 4,
+        children: emojis.map((emoji) {
+          final count = message.reactions[emoji]?.length ?? 0;
+          final users = message.reactions[emoji] ?? [];
+          final isCurrentUserReacted =
+              currentProfile != null && users.contains(currentProfile.id);
+
+          return InkWell(
+            onTap: () async {
+              try {
+                await ref
+                    .read(messageReactionsServiceProvider.notifier)
+                    .toggleReaction(
+                      groupId: widget.groupId ?? '',
+                      messageId: message.id,
+                      emoji: emoji,
+                    );
+              } catch (e) {
+                if (context.mounted) {
+                  getErrorSnackBar(context, 'error-toggling-reaction');
+                }
+              }
+            },
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 8,
+                vertical: 4,
+              ),
+              decoration: BoxDecoration(
+                color: isCurrentUserReacted
+                    ? theme.primary[100]!.withOpacity(0.3)
+                    : theme.grey[100]!.withOpacity(0.5),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: isCurrentUserReacted
+                      ? theme.primary[400]!
+                      : theme.grey[300]!,
+                  width: isCurrentUserReacted ? 1.5 : 1,
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    emoji,
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    count.toString(),
+                    style: TextStyles.caption.copyWith(
+                      fontWeight: isCurrentUserReacted
+                          ? FontWeight.bold
+                          : FontWeight.normal,
+                      color: isCurrentUserReacted
+                          ? theme.primary[700]
+                          : theme.grey[700],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }).toList(),
       ),
     );
   }
@@ -1141,6 +1238,18 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Column(
                     children: [
+                      // React action (available to all users)
+                      _buildActionItem(
+                        context,
+                        theme,
+                        icon: LucideIcons.smile,
+                        title: l10n.translate('react-to-message'),
+                        subtitle: l10n.translate('add-reaction'),
+                        onTap: () => _showReactionPicker(context, message),
+                        isDestructive: false,
+                      ),
+                      const SizedBox(height: 8),
+                      
                       // Admin actions (if user is admin)
                       if (isAdminFromWatch) ...[
                         if (message.isHidden)
@@ -1380,6 +1489,25 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
       // Show error message
       getSystemSnackBar(context, l10n.translate('failed-to-unhide-message'));
       print('Error unhiding message: $e');
+    }
+  }
+
+  /// Show reaction picker for a message
+  Future<void> _showReactionPicker(BuildContext context, ChatMessage message) async {
+    final emoji = await ReactionPicker.show(context);
+    if (emoji != null && context.mounted) {
+      try {
+        await ref.read(messageReactionsServiceProvider.notifier).toggleReaction(
+              groupId: widget.groupId ?? '',
+              messageId: message.id,
+              emoji: emoji,
+            );
+      } catch (e) {
+        if (context.mounted) {
+          getErrorSnackBar(context, 'error-toggling-reaction');
+        }
+        print('Error toggling reaction: $e');
+      }
     }
   }
 
