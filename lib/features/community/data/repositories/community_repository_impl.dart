@@ -122,4 +122,31 @@ class CommunityRepositoryImpl implements CommunityRepository {
       throw NetworkException('Failed to record interest: $e');
     }
   }
+
+  @override
+  Future<void> updateGroupBio(String cpId, String bio) async {
+    try {
+      if (bio.length > 200) {
+        throw ProfileUpdateException('Bio exceeds 200 character limit');
+      }
+      await _remoteDatasource.updateGroupBio(cpId, bio);
+    } catch (e) {
+      if (e is CommunityException) {
+        rethrow;
+      }
+      throw NetworkException('Failed to update group bio: $e');
+    }
+  }
+
+  @override
+  Future<void> updateInterests(String cpId, List<String> interests) async {
+    try {
+      await _remoteDatasource.updateInterests(cpId, interests);
+    } catch (e) {
+      if (e is CommunityException) {
+        rethrow;
+      }
+      throw NetworkException('Failed to update interests: $e');
+    }
+  }
 }

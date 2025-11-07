@@ -46,4 +46,20 @@ abstract class CommunityRepository {
   /// This is used for analytics and feature adoption tracking
   /// Throws [NetworkException] if network operation fails
   Future<void> recordInterest();
+
+  /// Updates group-specific bio for a community profile
+  ///
+  /// [cpId] Community profile ID
+  /// [bio] Bio text (max 200 chars)
+  /// Throws [ProfileUpdateException] if update fails
+  /// Throws [NetworkException] if network operation fails
+  Future<void> updateGroupBio(String cpId, String bio);
+
+  /// Updates interests/tags for a community profile
+  ///
+  /// [cpId] Community profile ID
+  /// [interests] List of interest tags
+  /// Throws [ProfileUpdateException] if update fails
+  /// Throws [NetworkException] if network operation fails
+  Future<void> updateInterests(String cpId, List<String> interests);
 }

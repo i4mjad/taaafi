@@ -24,6 +24,12 @@ abstract class CommunityRemoteDatasource {
 
   /// Records user interest in community features
   Future<void> recordInterest();
+
+  /// Updates group-specific bio
+  Future<void> updateGroupBio(String cpId, String bio);
+
+  /// Updates interests/tags
+  Future<void> updateInterests(String cpId, List<String> interests);
 }
 
 /// Implementation of CommunityRemoteDatasource using Firestore
@@ -257,6 +263,56 @@ class CommunityRemoteDatasourceImpl implements CommunityRemoteDatasource {
     } catch (e) {
       throw NetworkException(
         'Unexpected error recording interest: $e',
+      );
+    }
+  }
+
+  @override
+  Future<void> updateGroupBio(String cpId, String bio) async {
+    try {
+      await _profilesCollection.doc(cpId).update({
+        'groupBio': bio,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+    } on FirebaseException catch (e) {
+      if (e.code == 'not-found') {
+        throw const ProfileNotFoundException(
+          'Profile not found for bio update',
+          'PROFILE_NOT_FOUND',
+        );
+      }
+      throw NetworkException(
+        'Failed to update group bio: ${e.message}',
+        e.code,
+      );
+    } catch (e) {
+      throw NetworkException(
+        'Unexpected error updating group bio: $e',
+      );
+    }
+  }
+
+  @override
+  Future<void> updateInterests(String cpId, List<String> interests) async {
+    try {
+      await _profilesCollection.doc(cpId).update({
+        'interests': interests,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+    } on FirebaseException catch (e) {
+      if (e.code == 'not-found') {
+        throw const ProfileNotFoundException(
+          'Profile not found for interests update',
+          'PROFILE_NOT_FOUND',
+        );
+      }
+      throw NetworkException(
+        'Failed to update interests: ${e.message}',
+        e.code,
+      );
+    } catch (e) {
+      throw NetworkException(
+        'Unexpected error updating interests: $e',
       );
     }
   }
