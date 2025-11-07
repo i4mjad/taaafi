@@ -74,15 +74,28 @@ class GroupMemberItem extends ConsumerWidget {
           gender: profile.gender,
         );
 
-        return InkWell(
-          onTap: () {
-            HapticFeedback.lightImpact();
-            _showMemberProfile(context, profile, memberInfo, ref);
+        // Sprint 4 - Feature 4.2: Swipe actions for members
+        return Dismissible(
+          key: Key('member_${memberInfo.membership.cpId}'),
+          direction: DismissDirection.endToStart,
+          confirmDismiss: (_) async => false, // Prevent actual dismissal
+          onUpdate: (details) {
+            // Haptic feedback when swipe reaches threshold
+            if (details.progress > 0.5) {
+              HapticFeedback.lightImpact();
+            }
           },
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
+          background: _buildSwipeBackground(context, theme, memberInfo, l10n, ref),
+          child: InkWell(
+            onTap: () {
+              HapticFeedback.lightImpact();
+              _showMemberProfile(context, profile, memberInfo, ref);
+            },
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              color: theme.backgroundColor,
+              child: Row(
+                children: [
               // Avatar - always show, but different for anonymous users
               Container(
                 width: 48,
@@ -272,11 +285,137 @@ class GroupMemberItem extends ConsumerWidget {
                       ),
                     ),
                   ),
-              ],
+                ],
+              ),
             ),
           ),
         );
       },
+    );
+  }
+
+  /// Build swipe background with action buttons (Sprint 4 - Feature 4.2)
+  Widget _buildSwipeBackground(
+    BuildContext context,
+    dynamic theme,
+    GroupMemberInfo memberInfo,
+    AppLocalizations l10n,
+    WidgetRef ref,
+  ) {
+    final isCurrentUser = memberInfo.membership.cpId == currentUserCpId;
+    final isGroupCreator = memberInfo.membership.cpId == groupCreatorCpId;
+    
+    // Don't show actions for current user or group creator
+    if (isCurrentUser || isGroupCreator) {
+      return Container(color: theme.grey[50]);
+    }
+
+    return Container(
+      alignment: Alignment.centerRight,
+      padding: const EdgeInsets.only(right: 16),
+      color: theme.error[50],
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Admin actions
+          if (isCurrentUserAdmin) ...[
+            // Promote/Demote button
+            if (memberInfo.membership.role == 'admin')
+              _buildSwipeActionButton(
+                context: context,
+                theme: theme,
+                icon: LucideIcons.userMinus,
+                label: l10n.translate('demote'),
+                color: theme.warning[500]!,
+                onTap: () {
+                  HapticFeedback.mediumImpact();
+                  _demoteToMember(context, memberInfo, l10n, isGroupCreator, ref);
+                },
+              )
+            else
+              _buildSwipeActionButton(
+                context: context,
+                theme: theme,
+                icon: LucideIcons.userPlus,
+                label: l10n.translate('promote'),
+                color: theme.success[500]!,
+                onTap: () {
+                  HapticFeedback.mediumImpact();
+                  _promoteToAdmin(context, memberInfo, l10n, ref);
+                },
+              ),
+            const SizedBox(width: 8),
+            // Remove button
+            _buildSwipeActionButton(
+              context: context,
+              theme: theme,
+              icon: LucideIcons.userX,
+              label: l10n.translate('remove'),
+              color: theme.error[500]!,
+              onTap: () {
+                HapticFeedback.heavyImpact();
+                _removeMember(context, memberInfo, l10n, isGroupCreator, ref);
+              },
+            ),
+          ] else ...[
+            // Regular member: Message button
+            _buildSwipeActionButton(
+              context: context,
+              theme: theme,
+              icon: LucideIcons.messageCircle,
+              label: l10n.translate('message'),
+              color: theme.primary[500]!,
+              onTap: () {
+                HapticFeedback.mediumImpact();
+                // TODO: Navigate to direct message
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(l10n.translate('coming-soon')),
+                    duration: const Duration(seconds: 1),
+                  ),
+                );
+              },
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  /// Build individual swipe action button (Sprint 4 - Feature 4.2)
+  Widget _buildSwipeActionButton({
+    required BuildContext context,
+    required dynamic theme,
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 70,
+        height: 70,
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: color, width: 1.5),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 24, color: color),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyles.tinyBold.copyWith(
+                color: color,
+                fontSize: 10,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
