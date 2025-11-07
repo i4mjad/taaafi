@@ -16,7 +16,6 @@ import 'package:reboot_app_3/features/groups/presentation/screens/group_activity
 import 'package:reboot_app_3/features/groups/presentation/widgets/leave_group_modal.dart';
 import 'package:reboot_app_3/features/groups/presentation/widgets/group_overview_card.dart';
 import 'package:reboot_app_3/features/groups/presentation/widgets/group_members_list.dart';
-import 'package:reboot_app_3/features/groups/presentation/widgets/member_profile_modal.dart';
 import 'package:reboot_app_3/features/groups/presentation/widgets/edit_member_profile_modal.dart';
 import 'package:reboot_app_3/features/groups/providers/group_membership_provider.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
