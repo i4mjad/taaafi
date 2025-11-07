@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../../domain/entities/group_message_entity.dart';
 import '../datasources/group_messages_firestore_datasource.dart';
+import '../datasources/groups_datasource.dart';
 import '../models/group_message_model.dart';
 
 /// Repository for group chat operations
@@ -97,8 +98,10 @@ class PaginatedMessagesEntityResult {
 /// Implementation of GroupChatRepository using Firestore
 class GroupChatRepositoryImpl implements GroupChatRepository {
   final GroupMessagesDataSource _dataSource;
+  final GroupsDataSource? _groupsDataSource; // For activity tracking (Sprint 2)
 
-  const GroupChatRepositoryImpl(this._dataSource);
+  GroupChatRepositoryImpl(this._dataSource, {GroupsDataSource? groupsDataSource})
+      : _groupsDataSource = groupsDataSource;
 
   @override
   Stream<List<GroupMessageEntity>> watchMessages(String groupId) {
@@ -161,6 +164,20 @@ class GroupChatRepositoryImpl implements GroupChatRepository {
 
       await _dataSource.sendMessage(model);
       log('Message sent via repository for group ${message.groupId}');
+
+      // Update member activity tracking (Sprint 2 - Feature 2.1)
+      if (_groupsDataSource != null) {
+        try {
+          await _groupsDataSource!.updateMemberActivity(
+            groupId: message.groupId,
+            cpId: message.senderCpId,
+          );
+          log('Activity updated for member ${message.senderCpId}');
+        } catch (e) {
+          // Don't fail message send if activity update fails
+          log('Failed to update activity (non-critical): $e');
+        }
+      }
     } catch (e, stackTrace) {
       log('Error sending message via repository: $e', stackTrace: stackTrace);
       rethrow;
