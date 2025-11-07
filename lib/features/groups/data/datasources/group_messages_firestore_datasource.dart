@@ -110,6 +110,22 @@ abstract class GroupMessagesDataSource {
   /// Unhide a message (moderation)
   Future<void> unhideMessage(String groupId, String messageId);
 
+  /// Pin a message (admin only, max 3 pinned)
+  Future<void> pinMessage({
+    required String groupId,
+    required String messageId,
+    required String adminCpId,
+  });
+
+  /// Unpin a message
+  Future<void> unpinMessage({
+    required String groupId,
+    required String messageId,
+  });
+
+  /// Get pinned messages for a group
+  Future<List<GroupMessageModel>> getPinnedMessages(String groupId);
+
   /// Clear cache for a specific group
   void clearCache(String groupId);
 
@@ -365,6 +381,99 @@ class GroupMessagesFirestoreDataSource implements GroupMessagesDataSource {
       log('Message unhidden successfully');
     } catch (e, stackTrace) {
       log('Error unhiding message: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> pinMessage({
+    required String groupId,
+    required String messageId,
+    required String adminCpId,
+  }) async {
+    try {
+      log('Pinning message $messageId in group $groupId by admin $adminCpId');
+
+      // Check if max 3 pinned messages limit
+      final pinnedMessages = await getPinnedMessages(groupId);
+      if (pinnedMessages.length >= 3) {
+        throw Exception('Maximum 3 messages can be pinned per group');
+      }
+
+      // Check if message exists and is not deleted/hidden
+      final messageDoc = await _messagesCollection.doc(messageId).get();
+      if (!messageDoc.exists) {
+        throw Exception('Message not found');
+      }
+
+      final messageData = messageDoc.data() as Map<String, dynamic>;
+      if (messageData['isDeleted'] == true || messageData['isHidden'] == true) {
+        throw Exception('Cannot pin deleted or hidden messages');
+      }
+
+      // Pin the message
+      await _messagesCollection.doc(messageId).update({
+        'isPinned': true,
+        'pinnedAt': FieldValue.serverTimestamp(),
+        'pinnedBy': adminCpId,
+      });
+
+      // Invalidate cache
+      _messageCache.remove(groupId);
+      _streamCache.remove(groupId);
+
+      log('Message pinned successfully');
+    } catch (e, stackTrace) {
+      log('Error pinning message: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> unpinMessage({
+    required String groupId,
+    required String messageId,
+  }) async {
+    try {
+      log('Unpinning message $messageId in group $groupId');
+
+      await _messagesCollection.doc(messageId).update({
+        'isPinned': false,
+        'pinnedAt': FieldValue.delete(),
+        'pinnedBy': FieldValue.delete(),
+      });
+
+      // Invalidate cache
+      _messageCache.remove(groupId);
+      _streamCache.remove(groupId);
+
+      log('Message unpinned successfully');
+    } catch (e, stackTrace) {
+      log('Error unpinning message: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<List<GroupMessageModel>> getPinnedMessages(String groupId) async {
+    try {
+      log('Fetching pinned messages for group $groupId');
+
+      final snapshot = await _messagesCollection
+          .where('groupId', isEqualTo: groupId)
+          .where('isPinned', isEqualTo: true)
+          .orderBy('pinnedAt', descending: false)
+          .limit(3)
+          .get();
+
+      final pinnedMessages = snapshot.docs
+          .map((doc) => GroupMessageModel.fromFirestore(doc))
+          .toList();
+
+      log('Found ${pinnedMessages.length} pinned messages');
+      return pinnedMessages;
+    } catch (e, stackTrace) {
+      log('Error fetching pinned messages: $e', stackTrace: stackTrace);
       rethrow;
     }
   }
