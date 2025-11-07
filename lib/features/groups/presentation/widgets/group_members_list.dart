@@ -9,15 +9,78 @@ import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/groups/presentation/widgets/group_member_item.dart';
+import 'package:reboot_app_3/features/groups/presentation/widgets/bulk_member_actions_modal.dart';
 import 'package:reboot_app_3/features/groups/providers/group_membership_provider.dart';
 import 'package:reboot_app_3/features/groups/providers/group_members_provider.dart';
 import 'package:reboot_app_3/features/groups/application/groups_providers.dart';
 
-class GroupMembersList extends ConsumerWidget {
+class GroupMembersList extends ConsumerStatefulWidget {
   const GroupMembersList({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<GroupMembersList> createState() => _GroupMembersListState();
+}
+
+class _GroupMembersListState extends ConsumerState<GroupMembersList> {
+  bool _isSelectionMode = false;
+  final Set<String> _selectedCpIds = {};
+
+  void _toggleSelectionMode() {
+    setState(() {
+      _isSelectionMode = !_isSelectionMode;
+      if (!_isSelectionMode) {
+        _selectedCpIds.clear();
+      }
+    });
+  }
+
+  void _toggleMemberSelection(String cpId) {
+    setState(() {
+      if (_selectedCpIds.contains(cpId)) {
+        _selectedCpIds.remove(cpId);
+      } else {
+        _selectedCpIds.add(cpId);
+      }
+    });
+  }
+
+  void _selectAll(List members) {
+    setState(() {
+      _selectedCpIds.clear();
+      for (final member in members) {
+        _selectedCpIds.add(member.cpId);
+      }
+    });
+  }
+
+  void _deselectAll() {
+    setState(() {
+      _selectedCpIds.clear();
+    });
+  }
+
+  void _showBulkActionsModal(BuildContext context, String groupId, String currentUserCpId, String groupCreatorCpId) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => BulkMemberActionsModal(
+        groupId: groupId,
+        selectedCpIds: _selectedCpIds.toList(),
+        currentUserCpId: currentUserCpId,
+        groupCreatorCpId: groupCreatorCpId,
+        onComplete: () {
+          setState(() {
+            _isSelectionMode = false;
+            _selectedCpIds.clear();
+          });
+        },
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
     final l10n = AppLocalizations.of(context);
 
@@ -75,6 +138,7 @@ class GroupMembersList extends ConsumerWidget {
                       currentMembership.memberRole == 'admin',
                       currentProfile.id,
                       groupEntity.createdByCpId,
+                      currentMembership.group.id,
                     );
                   },
                 );
@@ -94,6 +158,7 @@ class GroupMembersList extends ConsumerWidget {
     bool isCurrentUserAdmin,
     String currentUserCpId,
     String groupCreatorCpId,
+    String groupId,
   ) {
     if (members.isEmpty) {
       return WidgetsContainer(
@@ -130,7 +195,7 @@ class GroupMembersList extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Section title
+        // Section title with selection controls
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8),
           child: Row(
@@ -156,9 +221,113 @@ class GroupMembersList extends ConsumerWidget {
                   ),
                 ),
               ),
+              const Spacer(),
+              // Selection mode toggle (admin only)
+              if (isCurrentUserAdmin) ...[
+                if (!_isSelectionMode)
+                  InkWell(
+                    onTap: _toggleSelectionMode,
+                    borderRadius: BorderRadius.circular(8),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: theme.primary[50],
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: theme.primary[200]!,
+                          width: 1,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            LucideIcons.checkSquare,
+                            size: 14,
+                            color: theme.primary[600],
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            l10n.translate('select-members'),
+                            style: TextStyles.small.copyWith(
+                              color: theme.primary[700],
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                else
+                  InkWell(
+                    onTap: _toggleSelectionMode,
+                    borderRadius: BorderRadius.circular(8),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: theme.grey[100],
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: theme.grey[300]!,
+                          width: 1,
+                        ),
+                      ),
+                      child: Text(
+                        l10n.translate('cancel'),
+                        style: TextStyles.small.copyWith(
+                          color: theme.grey[700],
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
             ],
           ),
         ),
+
+        // Selection controls when in selection mode
+        if (_isSelectionMode) ...[
+          verticalSpace(Spacing.points8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Row(
+              children: [
+                Text(
+                  l10n.translate('selected-count').replaceAll('{count}', '${_selectedCpIds.length}'),
+                  style: TextStyles.small.copyWith(
+                    color: theme.grey[700],
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                horizontalSpace(Spacing.points8),
+                InkWell(
+                  onTap: () => _selectAll(members),
+                  child: Text(
+                    l10n.translate('select-all'),
+                    style: TextStyles.small.copyWith(
+                      color: theme.primary[600],
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                horizontalSpace(Spacing.points8),
+                Text('|', style: TextStyles.small.copyWith(color: theme.grey[400])),
+                horizontalSpace(Spacing.points8),
+                InkWell(
+                  onTap: _deselectAll,
+                  child: Text(
+                    l10n.translate('deselect-all'),
+                    style: TextStyles.small.copyWith(
+                      color: theme.grey[600],
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
 
         verticalSpace(Spacing.points8),
 
@@ -168,23 +337,68 @@ class GroupMembersList extends ConsumerWidget {
           child: Column(
             children: [
               for (int i = 0; i < members.length; i++) ...[
-                GroupMemberItem(
-                  membershipEntity: members[i],
-                  isCurrentUserAdmin: isCurrentUserAdmin,
-                  currentUserCpId: currentUserCpId,
-                  groupCreatorCpId: groupCreatorCpId,
+                InkWell(
+                  onTap: _isSelectionMode ? () => _toggleMemberSelection(members[i].cpId) : null,
+                  child: Row(
+                    children: [
+                      // Checkbox in selection mode
+                      if (_isSelectionMode) ...[
+                        Checkbox(
+                          value: _selectedCpIds.contains(members[i].cpId),
+                          onChanged: (_) => _toggleMemberSelection(members[i].cpId),
+                          activeColor: theme.primary[500],
+                        ),
+                        horizontalSpace(Spacing.points8),
+                      ],
+                      Expanded(
+                        child: GroupMemberItem(
+                          membershipEntity: members[i],
+                          isCurrentUserAdmin: isCurrentUserAdmin,
+                          currentUserCpId: currentUserCpId,
+                          groupCreatorCpId: groupCreatorCpId,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 if (i < members.length - 1)
                   Divider(
                     height: 1,
                     thickness: 0.5,
                     color: theme.grey[200],
-                    indent: 80,
+                    indent: _isSelectionMode ? 80 : 80,
                   ),
               ],
             ],
           ),
         ),
+
+        // Bulk action buttons when members are selected
+        if (_isSelectionMode && _selectedCpIds.isNotEmpty) ...[
+          verticalSpace(Spacing.points16),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () => _showBulkActionsModal(context, groupId, currentUserCpId, groupCreatorCpId),
+                    icon: Icon(LucideIcons.zap, size: 16),
+                    label: Text(l10n.translate('bulk-actions')),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: theme.primary[500],
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ],
     );
   }
