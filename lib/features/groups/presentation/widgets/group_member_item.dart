@@ -114,82 +114,142 @@ class GroupMemberItem extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Name and role badge
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    Row(
                       children: [
-                        Text(
-                          _getLocalizedDisplayName(
-                              memberInfo.displayName, l10n),
-                          style: TextStyles.footnote.copyWith(
-                            color: theme.grey[900],
-                            fontWeight: FontWeight.w600,
+                        // Activity indicator (green dot if active in 24h)
+                        if (memberInfo.membership.lastActiveAt != null &&
+                            DateTime.now()
+                                    .difference(
+                                        memberInfo.membership.lastActiveAt!)
+                                    .inHours <
+                                24)
+                          Container(
+                            width: 8,
+                            height: 8,
+                            margin: const EdgeInsets.only(right: 6),
+                            decoration: BoxDecoration(
+                              color: theme.success[500],
+                              shape: BoxShape.circle,
+                            ),
                           ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        verticalSpace(Spacing.points4),
-                        // Role badge
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              memberInfo.membership.role == 'admin'
-                                  ? LucideIcons.crown
-                                  : LucideIcons.user,
-                              size: 10,
-                              color: memberInfo.membership.role == 'admin'
-                                  ? theme.primary[600]
-                                  : theme.grey[600],
-                            ),
-                            const SizedBox(width: 2),
-                            Text(
-                              memberInfo.membership.role == 'admin'
-                                  ? l10n.translate('group-admin')
-                                  : l10n.translate('group-member'),
-                              style: TextStyles.small.copyWith(
-                                color: memberInfo.membership.role == 'admin'
-                                    ? theme.primary[700]
-                                    : theme.grey[600],
-                                fontSize: 10,
-                                fontWeight: FontWeight.w600,
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                _getLocalizedDisplayName(
+                                    memberInfo.displayName, l10n),
+                                style: TextStyles.footnote.copyWith(
+                                  color: theme.grey[900],
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                overflow: TextOverflow.ellipsis,
                               ),
-                            ),
-                          ],
+                              verticalSpace(Spacing.points4),
+                              // Role badge
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    memberInfo.membership.role == 'admin'
+                                        ? LucideIcons.crown
+                                        : LucideIcons.user,
+                                    size: 10,
+                                    color: memberInfo.membership.role == 'admin'
+                                        ? theme.primary[600]
+                                        : theme.grey[600],
+                                  ),
+                                  const SizedBox(width: 2),
+                                  Text(
+                                    memberInfo.membership.role == 'admin'
+                                        ? l10n.translate('group-admin')
+                                        : l10n.translate('group-member'),
+                                    style: TextStyles.small.copyWith(
+                                      color:
+                                          memberInfo.membership.role == 'admin'
+                                              ? theme.primary[700]
+                                              : theme.grey[600],
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
 
                     verticalSpace(Spacing.points4),
 
-                    // Join date and points
-                    Text(
-                      '${l10n.translate('joined')}: ${getDisplayDateTime(memberInfo.membership.joinedAt, locale.languageCode)}',
-                      style: TextStyles.caption.copyWith(
-                        color: theme.grey[600],
-                      ),
-                    ),
-
-                    if (memberInfo.membership.pointsTotal > 0) ...[
-                      verticalSpace(Spacing.points4),
-                      Row(
-                        children: [
+                    // Activity info: Last active & message count
+                    Row(
+                      children: [
+                        // Last active
+                        if (memberInfo.membership.lastActiveAt != null) ...[
                           Icon(
-                            LucideIcons.star,
-                            size: 12,
-                            color: theme.primary[600],
+                            LucideIcons.clock,
+                            size: 11,
+                            color: theme.grey[500],
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            '${memberInfo.membership.pointsTotal} ${l10n.translate('points')}',
+                            _getLastActiveText(
+                                memberInfo.membership.lastActiveAt!, l10n),
                             style: TextStyles.small.copyWith(
-                              color: theme.primary[700],
-                              fontWeight: FontWeight.w500,
+                              color: theme.grey[600],
                               fontSize: 11,
                             ),
                           ),
+                        ] else
+                          Text(
+                            l10n.translate('never-active'),
+                            style: TextStyles.small.copyWith(
+                              color: theme.grey[500],
+                              fontSize: 11,
+                            ),
+                          ),
+
+                        const SizedBox(width: 8),
+
+                        // Message count
+                        if (memberInfo.membership.messageCount > 0) ...[
+                          Icon(
+                            LucideIcons.messageCircle,
+                            size: 11,
+                            color: theme.grey[500],
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            '${memberInfo.membership.messageCount}',
+                            style: TextStyles.small.copyWith(
+                              color: theme.grey[600],
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ],
+
+                        const SizedBox(width: 8),
+
+                        // Engagement badge
+                        _buildEngagementBadge(
+                            memberInfo.membership.engagementLevel, theme, l10n),
+                      ],
+                    ),
+
+                    verticalSpace(Spacing.points4),
+
+                    // Join date
+                    Text(
+                      '${l10n.translate('joined')}: ${getDisplayDateTime(memberInfo.membership.joinedAt, locale.languageCode)}',
+                      style: TextStyles.caption.copyWith(
+                        color: theme.grey[500],
+                        fontSize: 11,
                       ),
-                    ],
+                    ),
                   ],
                 ),
               ),
@@ -330,6 +390,86 @@ class GroupMemberItem extends ConsumerWidget {
       default:
         return displayName;
     }
+  }
+
+  /// Get last active text (Sprint 2 - Feature 2.1)
+  String _getLastActiveText(DateTime lastActiveAt, AppLocalizations l10n) {
+    final now = DateTime.now();
+    final difference = now.difference(lastActiveAt);
+
+    if (difference.inMinutes < 5) {
+      return l10n.translate('active-now');
+    } else if (difference.inHours < 1) {
+      return l10n.translate('active-minutes-ago')
+          .replaceAll('{minutes}', '${difference.inMinutes}');
+    } else if (difference.inHours < 24) {
+      return l10n.translate('active-hours-ago')
+          .replaceAll('{hours}', '${difference.inHours}');
+    } else if (difference.inDays < 7) {
+      return l10n.translate('active-days-ago')
+          .replaceAll('{days}', '${difference.inDays}');
+    } else {
+      final weeks = (difference.inDays / 7).floor();
+      return l10n.translate('active-weeks-ago')
+          .replaceAll('{weeks}', '$weeks');
+    }
+  }
+
+  /// Build engagement badge (Sprint 2 - Feature 2.1)
+  Widget _buildEngagementBadge(
+      String level, dynamic theme, AppLocalizations l10n) {
+    Color badgeColor;
+    String labelKey;
+
+    switch (level) {
+      case 'high':
+        badgeColor = theme.success[500]!;
+        labelKey = 'high-engagement';
+        break;
+      case 'medium':
+        badgeColor = theme.warning[500]!;
+        labelKey = 'medium-engagement';
+        break;
+      case 'low':
+      default:
+        badgeColor = theme.grey[400]!;
+        labelKey = 'low-engagement';
+        break;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: badgeColor.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: badgeColor.withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 6,
+            height: 6,
+            decoration: BoxDecoration(
+              color: badgeColor,
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 4),
+          Text(
+            l10n.translate(labelKey),
+            style: TextStyles.small.copyWith(
+              color: badgeColor,
+              fontSize: 9,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showMemberActions(BuildContext context, GroupMemberInfo memberInfo,
