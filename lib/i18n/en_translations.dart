@@ -1885,6 +1885,9 @@ const Map<String, String> kEn = {
       "Plus membership required for groups with more than 6 members",
   "upgrade-to-plus-for-capacity":
       "Upgrade to Plus to increase capacity beyond 6 members",
+  "plus-feature-active": "Plus feature active - capacity up to 50 members",
+  "manage-group-settings": "Manage group name, description, and capacity",
+  "new-capacity": "New Capacity",
   "capacity-warning":
       "You cannot reduce capacity below the current number of members ({count})",
   "confirm-capacity-change":

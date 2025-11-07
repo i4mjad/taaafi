@@ -127,11 +127,6 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
 
               verticalSpace(Spacing.points24),
 
-              // Admin Settings Section (only for admins)
-              _buildAdminSection(context, theme, l10n, ref),
-
-              verticalSpace(Spacing.points24),
-
               // Group Members List
               const GroupMembersList(),
 
@@ -153,8 +148,7 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
 
     return groupMembershipAsync.when(
       data: (groupMembership) {
-        if (groupMembership == null ||
-            groupMembership.memberRole != 'admin') {
+        if (groupMembership == null || groupMembership.memberRole != 'admin') {
           return const SizedBox.shrink();
         }
 

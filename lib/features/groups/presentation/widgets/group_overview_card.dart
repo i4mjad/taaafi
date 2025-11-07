@@ -12,6 +12,7 @@ import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/groups/providers/group_membership_provider.dart';
+import 'package:reboot_app_3/features/groups/presentation/widgets/admin_settings_sheet.dart';
 
 class GroupOverviewCard extends ConsumerWidget {
   const GroupOverviewCard({super.key});
@@ -339,11 +340,55 @@ class GroupOverviewCard extends ConsumerWidget {
                     ],
                   ),
                 ),
+
+                // Admin Settings CTA (only for admins)
+                if (isAdmin) ...[
+                  verticalSpace(Spacing.points12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: () => _showAdminSettingsSheet(context),
+                      icon: Icon(
+                        LucideIcons.settings,
+                        size: 18,
+                        color: theme.primary[600],
+                      ),
+                      label: Text(
+                        l10n.translate('admin-settings'),
+                        style: TextStyles.footnote.copyWith(
+                          color: theme.primary[600],
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 12,
+                          horizontal: 16,
+                        ),
+                        side: BorderSide(color: theme.primary[300]!, width: 1),
+                        backgroundColor: theme.primary[50],
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
         );
       },
+    );
+  }
+
+  void _showAdminSettingsSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const AdminSettingsSheet(),
     );
   }
 

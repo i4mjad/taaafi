@@ -319,6 +319,78 @@ class GroupsFirestoreDataSource implements GroupsDataSource {
   }
 
   @override
+  Future<void> updateGroupCapacityTransactional({
+    required String groupId,
+    required int newCapacity,
+  }) async {
+    try {
+      await _firestore.runTransaction((transaction) async {
+        // Get group document reference
+        final groupRef = _firestore.collection('groups').doc(groupId);
+        final groupSnapshot = await transaction.get(groupRef);
+
+        if (!groupSnapshot.exists) {
+          throw Exception('error-group-not-found');
+        }
+
+        // Get current member count within transaction
+        final membershipsQuery = await _firestore
+            .collection('group_memberships')
+            .where('groupId', isEqualTo: groupId)
+            .where('isActive', isEqualTo: true)
+            .get();
+
+        final currentMemberCount = membershipsQuery.docs.length;
+
+        // Validate capacity against current member count
+        if (newCapacity < currentMemberCount) {
+          throw Exception('error-capacity-below-member-count');
+        }
+
+        // Update capacity atomically
+        transaction.update(groupRef, {
+          'memberCapacity': newCapacity,
+          'updatedAt': Timestamp.now(),
+        });
+      });
+    } catch (e, stackTrace) {
+      log('Error updating group capacity transactionally: $e',
+          stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> updateGroupDetailsTransactional({
+    required String groupId,
+    required String name,
+    required String description,
+  }) async {
+    try {
+      await _firestore.runTransaction((transaction) async {
+        // Get group document reference
+        final groupRef = _firestore.collection('groups').doc(groupId);
+        final groupSnapshot = await transaction.get(groupRef);
+
+        if (!groupSnapshot.exists) {
+          throw Exception('error-group-not-found');
+        }
+
+        // Update details atomically
+        transaction.update(groupRef, {
+          'name': name,
+          'description': description,
+          'updatedAt': Timestamp.now(),
+        });
+      });
+    } catch (e, stackTrace) {
+      log('Error updating group details transactionally: $e',
+          stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
   Future<void> promoteMemberToAdmin({
     required String groupId,
     required String cpId,

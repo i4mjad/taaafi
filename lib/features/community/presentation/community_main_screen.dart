@@ -359,7 +359,17 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
                           : theme.grey[600],
                     ),
                     const SizedBox(width: 8),
-                    Text(AppLocalizations.of(context).translate('community')),
+                    Text(
+                      AppLocalizations.of(context).translate('community'),
+                      style: (_tabController!.index == 0
+                              ? TextStyles.footnoteSelected
+                              : TextStyles.footnote)
+                          .copyWith(
+                        color: _tabController!.index == 0
+                            ? theme.primary[600]
+                            : theme.grey[600],
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -375,8 +385,18 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
                           : theme.grey[600],
                     ),
                     const SizedBox(width: 8),
-                    Text(AppLocalizations.of(context)
-                        .translate('community-chats')),
+                    Text(
+                      AppLocalizations.of(context)
+                          .translate('community-chats'),
+                      style: (_tabController!.index == 1
+                              ? TextStyles.footnoteSelected
+                              : TextStyles.footnote)
+                          .copyWith(
+                        color: _tabController!.index == 1
+                            ? theme.primary[600]
+                            : theme.grey[600],
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -392,7 +412,17 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
                           : theme.grey[600],
                     ),
                     const SizedBox(width: 8),
-                    Text(AppLocalizations.of(context).translate('groups')),
+                    Text(
+                      AppLocalizations.of(context).translate('group'),
+                      style: (_tabController!.index == 2
+                              ? TextStyles.footnoteSelected
+                              : TextStyles.footnote)
+                          .copyWith(
+                        color: _tabController!.index == 2
+                            ? theme.primary[600]
+                            : theme.grey[600],
+                      ),
+                    ),
                   ],
                 ),
               ),

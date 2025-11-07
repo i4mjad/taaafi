@@ -1831,6 +1831,9 @@ const Map<String, String> kAr = {
       "مطلوب اشتراك بلس للزمالات التي تحتوي على أكثر من 6 أعضاء",
   "upgrade-to-plus-for-capacity":
       "قم بالترقية إلى بلس لزيادة السعة إلى أكثر من 6 أعضاء",
+  "plus-feature-active": "ميزة بلس نشطة - سعة تصل إلى 50 عضواً",
+  "manage-group-settings": "إدارة اسم الزمالة والوصف والسعة",
+  "new-capacity": "السعة الجديدة",
   "capacity-warning":
       "لا يمكنك تقليل السعة أقل من عدد الأعضاء الحاليين ({count})",
   "confirm-capacity-change":

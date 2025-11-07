@@ -55,6 +55,19 @@ abstract class GroupsDataSource {
   /// Update group
   Future<void> updateGroup(GroupModel group);
 
+  /// Update group capacity with transaction (atomic with member count check)
+  Future<void> updateGroupCapacityTransactional({
+    required String groupId,
+    required int newCapacity,
+  });
+
+  /// Update group details with transaction (atomic update)
+  Future<void> updateGroupDetailsTransactional({
+    required String groupId,
+    required String name,
+    required String description,
+  });
+
   /// Promote a member to admin role
   Future<void> promoteMemberToAdmin({
     required String groupId,

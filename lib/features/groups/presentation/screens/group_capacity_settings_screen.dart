@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
+import 'package:reboot_app_3/core/shared_widgets/platform_slider.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
@@ -130,6 +131,10 @@ class _GroupCapacitySettingsScreenState
 
           final currentCapacity = state.group!.memberCapacity;
           final currentMemberCount = state.group!.memberCount;
+          final isUserPlus = state.isUserPlus;
+          
+          // Determine max capacity based on Plus status
+          final maxCapacity = isUserPlus ? 50.0 : 6.0;
 
           _selectedCapacity ??= currentCapacity;
 
@@ -167,33 +172,24 @@ class _GroupCapacitySettingsScreenState
 
                 verticalSpace(Spacing.points24),
 
-                // Capacity Selector
-                Text(
-                  l10n.translate('update-capacity'),
-                  style: TextStyles.h5.copyWith(color: theme.grey[900]),
-                ),
-                verticalSpace(Spacing.points16),
-
-                // Slider
-                Slider(
+                // Capacity Selector using PlatformSlider
+                PlatformSlider(
                   value: _selectedCapacity!.toDouble(),
                   min: currentMemberCount.toDouble(),
-                  max: 50.0,
-                  divisions: (50 - currentMemberCount).toInt(),
-                  label: _selectedCapacity.toString(),
+                  max: maxCapacity,
+                  divisions: (maxCapacity - currentMemberCount).toInt(),
+                  label: l10n.translate('update-capacity'),
+                  valueFormatter: (value) => '${value.toInt()} ${l10n.translate('members')}',
+                  showValue: true,
+                  showMinMaxLabels: true,
+                  valueDisplayPosition: ValueDisplayPosition.above,
                   onChanged: (value) => _onCapacityChanged(value.toInt()),
+                  activeColor: theme.primary[600],
+                  inactiveColor: theme.grey[300],
                 ),
 
-                // Selected value display
-                Center(
-                  child: Text(
-                    '$_selectedCapacity ${l10n.translate('members')}',
-                    style: TextStyles.h2.copyWith(color: theme.grey[900]),
-                  ),
-                ),
-
-                // Warning for Plus requirement
-                if (_selectedCapacity! > 6)
+                // Warning for Plus requirement (show for Plus users with capacity > 6)
+                if (_selectedCapacity! > 6 && isUserPlus)
                     Padding(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     child: WidgetsContainer(
@@ -209,8 +205,34 @@ class _GroupCapacitySettingsScreenState
                           horizontalSpace(Spacing.points8),
                           Expanded(
                             child: Text(
-                              l10n.translate('upgrade-to-plus-for-capacity'),
+                              l10n.translate('plus-feature-active'),
                               style: TextStyles.body.copyWith(color: theme.primary[700]),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                
+                // Upgrade prompt for non-Plus users at max capacity
+                if (!isUserPlus && _selectedCapacity! >= 6)
+                    Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    child: WidgetsContainer(
+                      padding: const EdgeInsets.all(12),
+                      backgroundColor: theme.secondary[50],
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.lock,
+                            color: theme.secondary[600],
+                            size: 20,
+                          ),
+                          horizontalSpace(Spacing.points8),
+                          Expanded(
+                            child: Text(
+                              l10n.translate('upgrade-to-plus-for-capacity'),
+                              style: TextStyles.body.copyWith(color: theme.secondary[700]),
                             ),
                           ),
                         ],

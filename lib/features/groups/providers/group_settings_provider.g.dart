@@ -6,7 +6,7 @@ part of 'group_settings_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$groupSettingsHash() => r'a6e705dbf7c1c47a955cb1ef3d212b808f5cb0b1';
+String _$groupSettingsHash() => r'62640085fe2882cee9a4a7fedacde99d95554c1e';
 
 /// Provider for group settings state
 ///

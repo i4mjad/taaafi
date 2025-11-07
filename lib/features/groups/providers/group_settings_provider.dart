@@ -1,9 +1,9 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../application/groups_providers.dart';
 import '../domain/entities/group_entity.dart';
 import '../../community/domain/entities/community_profile_entity.dart';
 import '../../community/presentation/providers/community_providers_new.dart';
+import '../../plus/data/notifiers/subscription_notifier.dart';
 import 'group_membership_provider.dart';
 
 part 'group_settings_provider.g.dart';
@@ -14,6 +14,8 @@ class GroupSettingsState {
   final GroupEntity? group;
   final CommunityProfileEntity? userProfile;
   final bool isUserAdmin;
+  final bool isUserPlus;
+  final int? actualMemberCount; // Real-time member count from Firestore
   final String? error;
   final String? successMessage;
 
@@ -22,6 +24,8 @@ class GroupSettingsState {
     this.group,
     this.userProfile,
     this.isUserAdmin = false,
+    this.isUserPlus = false,
+    this.actualMemberCount,
     this.error,
     this.successMessage,
   });
@@ -31,6 +35,8 @@ class GroupSettingsState {
     GroupEntity? group,
     CommunityProfileEntity? userProfile,
     bool? isUserAdmin,
+    bool? isUserPlus,
+    int? actualMemberCount,
     String? error,
     String? successMessage,
   }) {
@@ -39,6 +45,8 @@ class GroupSettingsState {
       group: group ?? this.group,
       userProfile: userProfile ?? this.userProfile,
       isUserAdmin: isUserAdmin ?? this.isUserAdmin,
+      isUserPlus: isUserPlus ?? this.isUserPlus,
+      actualMemberCount: actualMemberCount ?? this.actualMemberCount,
       error: error,
       successMessage: successMessage,
     );
@@ -68,10 +76,21 @@ class GroupSettings extends _$GroupSettings {
           ? await settingsService.isUserGroupAdmin(profile.id)
           : false;
 
+      // Check Plus status using the proper provider
+      final isPlus = ref.watch(hasActiveSubscriptionProvider);
+
+      // Get real-time member count if group exists
+      int? memberCount;
+      if (group != null) {
+        memberCount = await settingsService.getGroupMemberCount(group.id);
+      }
+
       return GroupSettingsState(
         group: group,
         userProfile: profile,
         isUserAdmin: isAdmin,
+        isUserPlus: isPlus,
+        actualMemberCount: memberCount,
       );
     } catch (e) {
       return GroupSettingsState(

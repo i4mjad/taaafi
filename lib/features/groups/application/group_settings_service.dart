@@ -75,5 +75,15 @@ class GroupSettingsService {
       return false;
     }
   }
+
+  /// Get real-time member count for a group
+  Future<int> getGroupMemberCount(String groupId) async {
+    try {
+      return await _repository.getGroupMemberCount(groupId);
+    } catch (e, stackTrace) {
+      log('Error in getGroupMemberCount: $e', stackTrace: stackTrace);
+      return 0;
+    }
+  }
 }
 

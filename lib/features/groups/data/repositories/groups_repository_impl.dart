@@ -769,15 +769,12 @@ class GroupsRepositoryImpl implements GroupsRepository {
         }
       }
 
-      // Update the group's capacity
-      final updatedGroup = GroupModel.fromEntity(
-        currentGroup.toEntity().copyWith(
-              memberCapacity: newCapacity,
-              updatedAt: DateTime.now(),
-            ),
+      // Update the group's capacity using transaction for atomicity
+      // This ensures member count is re-validated within the transaction
+      await _dataSource.updateGroupCapacityTransactional(
+        groupId: groupId,
+        newCapacity: newCapacity,
       );
-
-      await _dataSource.updateGroup(updatedGroup);
     } catch (e, stackTrace) {
       log('Error in updateGroupCapacity: $e', stackTrace: stackTrace);
       rethrow;
@@ -832,16 +829,12 @@ class GroupsRepositoryImpl implements GroupsRepository {
         }
       }
 
-      // Update the group details
-      final updatedGroup = GroupModel.fromEntity(
-        currentGroup.toEntity().copyWith(
-              name: validatedName ?? currentGroup.name,
-              description: validatedDescription ?? currentGroup.description,
-              updatedAt: DateTime.now(),
-            ),
+      // Update the group details using transaction for atomicity
+      await _dataSource.updateGroupDetailsTransactional(
+        groupId: groupId,
+        name: validatedName ?? currentGroup.name,
+        description: validatedDescription ?? currentGroup.description,
       );
-
-      await _dataSource.updateGroup(updatedGroup);
     } catch (e, stackTrace) {
       log('Error in updateGroupDetails: $e', stackTrace: stackTrace);
       rethrow;
