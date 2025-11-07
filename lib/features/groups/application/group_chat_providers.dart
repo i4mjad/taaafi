@@ -424,6 +424,55 @@ class PinnedMessagesService extends _$PinnedMessagesService {
   }
 }
 
+// ==================== MESSAGE REACTIONS PROVIDERS ====================
+
+/// Service for managing message reactions
+@riverpod
+class MessageReactionsService extends _$MessageReactionsService {
+  @override
+  bool build() {
+    // Simple state to track if operations are in progress
+    return false;
+  }
+
+  /// Toggle reaction on a message
+  Future<void> toggleReaction({
+    required String groupId,
+    required String messageId,
+    required String emoji,
+  }) async {
+    if (state) {
+      throw Exception('Operation already in progress');
+    }
+
+    try {
+      state = true;
+
+      // Get current user's community profile
+      final currentProfile =
+          await ref.read(currentCommunityProfileProvider.future);
+      if (currentProfile == null) {
+        throw Exception('Community profile required to react to messages');
+      }
+
+      final repository = ref.read(groupChatRepositoryProvider);
+      await repository.toggleReaction(
+        groupId: groupId,
+        messageId: messageId,
+        cpId: currentProfile.id,
+        emoji: emoji,
+      );
+
+      print('Reaction toggled successfully: $emoji on $messageId');
+    } catch (error) {
+      print('Error toggling reaction on message $messageId: $error');
+      rethrow;
+    } finally {
+      state = false;
+    }
+  }
+}
+
 // ==================== CACHE MANAGEMENT ====================
 
 /// Provider for managing message cache
