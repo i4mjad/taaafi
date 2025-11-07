@@ -3425,4 +3425,21 @@ const Map<String, String> kAr = {
   'cannot-bulk-operate-creator': 'لا يمكن تطبيق عمليات جماعية على منشئ الزمالة',
   'max-bulk-selection': 'الحد الأقصى 20 عضواً يمكن تحديدهم',
   'error-loading-activity-data': 'خطأ في تحميل بيانات النشاط',
+
+  // Pin Messages (Sprint 3 - Feature 3.1)
+  'pinned-messages': 'الرسائل المثبتة',
+  'pin-message': 'تثبيت الرسالة',
+  'unpin-message': 'إلغاء التثبيت',
+  'message-pinned': 'تم تثبيت الرسالة',
+  'message-unpinned': 'تم إلغاء تثبيت الرسالة',
+  'max-pinned-messages': 'الحد الأقصى 3 رسائل يمكن تثبيتها',
+  'only-admins-can-pin': 'المشرفون فقط يمكنهم تثبيت الرسائل',
+  'pinned-by': 'تم التثبيت بواسطة {name}',
+  'tap-to-view': 'اضغط لعرض الرسالة المثبتة',
+  'no-pinned-messages': 'لا توجد رسائل مثبتة',
+  'confirm-unpin-message': 'هل تريد إلغاء تثبيت هذه الرسالة؟',
+  'unpin': 'إلغاء التثبيت',
+  'error-pinning-message': 'خطأ في تثبيت الرسالة',
+  'error-unpinning-message': 'خطأ في إلغاء تثبيت الرسالة',
+  'cancel': 'إلغاء',
 };
