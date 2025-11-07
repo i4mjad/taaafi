@@ -106,13 +106,7 @@ class ScaffoldWithNestedNavigation extends ConsumerWidget {
                   size: 20,
                 ),
               ),
-              NavigationDestination(
-                label: AppLocalizations.of(context).translate("group"),
-                icon: Icon(
-                  LucideIcons.heartHandshake,
-                  size: 20,
-                ),
-              ),
+
               NavigationDestination(
                 label: AppLocalizations.of(context).translate("account"),
                 icon: Icon(
