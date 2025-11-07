@@ -19,6 +19,9 @@ class GroupMessageModel {
   final bool isHidden;
   final Map<String, dynamic> moderation;
   final DateTime createdAt;
+  final bool isPinned;
+  final DateTime? pinnedAt;
+  final String? pinnedBy;
 
   const GroupMessageModel({
     required this.id,
@@ -34,6 +37,9 @@ class GroupMessageModel {
     this.isHidden = false,
     this.moderation = const {},
     required this.createdAt,
+    this.isPinned = false,
+    this.pinnedAt,
+    this.pinnedBy,
   });
 
   /// Creates a GroupMessageModel from Firestore document
@@ -54,6 +60,11 @@ class GroupMessageModel {
       isHidden: data['isHidden'] as bool? ?? false,
       moderation: Map<String, dynamic>.from(data['moderation'] ?? {}),
       createdAt: (data['createdAt'] as Timestamp).toDate(),
+      isPinned: data['isPinned'] as bool? ?? false,
+      pinnedAt: data['pinnedAt'] != null 
+          ? (data['pinnedAt'] as Timestamp).toDate() 
+          : null,
+      pinnedBy: data['pinnedBy'] as String?,
     );
   }
 
@@ -73,6 +84,11 @@ class GroupMessageModel {
       isHidden: json['isHidden'] as bool? ?? false,
       moderation: Map<String, dynamic>.from(json['moderation'] ?? {}),
       createdAt: DateTime.parse(json['createdAt'] as String),
+      isPinned: json['isPinned'] as bool? ?? false,
+      pinnedAt: json['pinnedAt'] != null 
+          ? DateTime.parse(json['pinnedAt'] as String) 
+          : null,
+      pinnedBy: json['pinnedBy'] as String?,
     );
   }
 
@@ -91,6 +107,9 @@ class GroupMessageModel {
       'isHidden': isHidden,
       'moderation': moderation,
       'createdAt': Timestamp.fromDate(createdAt),
+      'isPinned': isPinned,
+      if (pinnedAt != null) 'pinnedAt': Timestamp.fromDate(pinnedAt!),
+      if (pinnedBy != null) 'pinnedBy': pinnedBy,
     };
   }
 
@@ -110,6 +129,9 @@ class GroupMessageModel {
       'isHidden': isHidden,
       'moderation': moderation,
       'createdAt': createdAt.toIso8601String(),
+      'isPinned': isPinned,
+      if (pinnedAt != null) 'pinnedAt': pinnedAt!.toIso8601String(),
+      if (pinnedBy != null) 'pinnedBy': pinnedBy,
     };
   }
 
@@ -148,6 +170,9 @@ class GroupMessageModel {
       isHidden: entity.isHidden,
       moderation: entity.moderation.toMap(),
       createdAt: entity.createdAt,
+      isPinned: entity.isPinned,
+      pinnedAt: entity.pinnedAt,
+      pinnedBy: entity.pinnedBy,
     );
   }
 
@@ -165,6 +190,9 @@ class GroupMessageModel {
     bool? isHidden,
     Map<String, dynamic>? moderation,
     DateTime? createdAt,
+    bool? isPinned,
+    DateTime? pinnedAt,
+    String? pinnedBy,
   }) {
     return GroupMessageModel(
       id: id ?? this.id,
@@ -180,6 +208,9 @@ class GroupMessageModel {
       isHidden: isHidden ?? this.isHidden,
       moderation: moderation ?? this.moderation,
       createdAt: createdAt ?? this.createdAt,
+      isPinned: isPinned ?? this.isPinned,
+      pinnedAt: pinnedAt ?? this.pinnedAt,
+      pinnedBy: pinnedBy ?? this.pinnedBy,
     );
   }
 
