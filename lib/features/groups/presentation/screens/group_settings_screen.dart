@@ -16,7 +16,13 @@ import 'package:reboot_app_3/features/groups/presentation/screens/group_activity
 import 'package:reboot_app_3/features/groups/presentation/widgets/leave_group_modal.dart';
 import 'package:reboot_app_3/features/groups/presentation/widgets/group_overview_card.dart';
 import 'package:reboot_app_3/features/groups/presentation/widgets/group_members_list.dart';
+import 'package:reboot_app_3/features/groups/presentation/widgets/member_profile_modal.dart';
+import 'package:reboot_app_3/features/groups/presentation/widgets/edit_member_profile_modal.dart';
 import 'package:reboot_app_3/features/groups/providers/group_membership_provider.dart';
+import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
+import 'package:reboot_app_3/features/community/domain/repositories/community_repository.dart';
+import 'package:reboot_app_3/features/community/application/community_application_providers.dart';
+import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 
 class GroupSettingsScreen extends ConsumerStatefulWidget {
   const GroupSettingsScreen({super.key});
@@ -56,6 +62,11 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
             children: [
               // Group Overview Card (combines details and join code)
               const GroupOverviewCard(),
+
+              verticalSpace(Spacing.points16),
+
+              // My Group Profile Card (Sprint 4 - Feature 4.1)
+              _buildMyProfileCard(context, theme, l10n, ref),
 
               verticalSpace(Spacing.points16),
 
@@ -266,6 +277,153 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
       MaterialPageRoute(
         builder: (context) => GroupActivityInsightsScreen(groupId: groupId),
       ),
+    );
+  }
+
+  Widget _buildMyProfileCard(
+    BuildContext context,
+    CustomThemeData theme,
+    AppLocalizations l10n,
+    WidgetRef ref,
+  ) {
+    final profileAsync = ref.watch(currentCommunityProfileProvider);
+
+    return profileAsync.when(
+      data: (profile) {
+        if (profile == null) return const SizedBox.shrink();
+
+        return GestureDetector(
+          onTap: () => _showEditProfileModal(context, profile, ref),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: WidgetsContainer(
+              padding: const EdgeInsets.all(16),
+              backgroundColor: theme.tint[50],
+              borderRadius: BorderRadius.circular(15),
+              borderSide: BorderSide(
+                color: theme.tint[100]!,
+                width: 0.75,
+              ),
+              cornerSmoothing: 1,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        LucideIcons.user,
+                        size: 20,
+                        color: theme.tint[600],
+                      ),
+                      horizontalSpace(Spacing.points8),
+                      Text(
+                        l10n.translate('my-group-profile'),
+                        style: TextStyles.h6.copyWith(
+                          color: theme.grey[900],
+                        ),
+                      ),
+                      const Spacer(),
+                      Icon(
+                        LucideIcons.chevronRight,
+                        size: 18,
+                        color: theme.grey[400],
+                      ),
+                    ],
+                  ),
+                  if (profile.hasBio() || profile.hasInterests()) ...[
+                    verticalSpace(Spacing.points12),
+                    if (profile.hasBio())
+                      Text(
+                        profile.groupBio!,
+                        style: TextStyles.caption.copyWith(
+                          color: theme.grey[600],
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    if (profile.hasInterests()) ...[
+                      verticalSpace(Spacing.points8),
+                      Wrap(
+                        spacing: 6,
+                        runSpacing: 6,
+                        children: profile.interests.take(3).map((interest) {
+                          return Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: theme.tint[100],
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              l10n.translate('interest-$interest'),
+                              style: TextStyles.tiny.copyWith(
+                                color: theme.tint[700],
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ] else
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        verticalSpace(Spacing.points8),
+                        Text(
+                          l10n.translate('add-bio'),
+                          style: TextStyles.caption.copyWith(
+                            color: theme.grey[500],
+                          ),
+                        ),
+                      ],
+                    ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
+    );
+  }
+
+  void _showEditProfileModal(BuildContext context, profile, WidgetRef ref) {
+    showEditProfileModal(
+      context: context,
+      profile: profile,
+      onSave: (bio, interests) async {
+        try {
+          final repository = ref.read(communityRepositoryProvider);
+          
+          // Update bio
+          if (bio != profile.groupBio) {
+            await repository.updateGroupBio(profile.id, bio);
+          }
+          
+          // Update interests
+          if (interests.toString() != profile.interests.toString()) {
+            await repository.updateInterests(profile.id, interests);
+          }
+          
+          // Refresh profile
+          ref.invalidate(currentCommunityProfileProvider);
+          
+          if (context.mounted) {
+            showSuccessSnackBar(
+              context,
+              AppLocalizations.of(context).translate('group-profile-updated'),
+            );
+          }
+        } catch (e) {
+          if (context.mounted) {
+            showErrorSnackBar(context, 'Failed to update profile');
+          }
+          rethrow;
+        }
+      },
     );
   }
 }
