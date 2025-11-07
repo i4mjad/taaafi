@@ -540,7 +540,7 @@ class MemberProfileModal extends ConsumerWidget {
                   onPressed: onEdit,
                   icon: Icon(LucideIcons.edit, size: 18),
                   label: Text(
-                    l10n.translate('edit-profile'),
+                    l10n.translate('edit-group-profile'),
                     style: TextStyles.footnote,
                   ),
                   style: ElevatedButton.styleFrom(

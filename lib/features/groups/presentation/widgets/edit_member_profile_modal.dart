@@ -131,7 +131,7 @@ class _EditMemberProfileModalState
             child: Row(
               children: [
                 Text(
-                  l10n.translate('edit-profile'),
+                  l10n.translate('edit-group-profile'),
                   style: TextStyles.h5.copyWith(
                     color: theme.grey[900],
                   ),

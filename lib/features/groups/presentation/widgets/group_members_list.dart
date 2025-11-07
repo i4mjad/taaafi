@@ -150,6 +150,13 @@ class _GroupMembersListState extends ConsumerState<GroupMembersList> {
     );
   }
 
+  Future<void> _refreshMembers(String groupId) async {
+    // Invalidate the members provider to trigger a refresh
+    ref.invalidate(groupMembersProvider(groupId));
+    // Wait a bit for the provider to reload
+    await Future.delayed(const Duration(milliseconds: 500));
+  }
+
   Widget _buildMembersList(
     BuildContext context,
     dynamic theme,
@@ -161,23 +168,29 @@ class _GroupMembersListState extends ConsumerState<GroupMembersList> {
     String groupId,
   ) {
     if (members.isEmpty) {
-      return WidgetsContainer(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          children: [
-            Icon(
-              LucideIcons.users,
-              size: 48,
-              color: theme.grey[400],
+      return RefreshIndicator(
+        onRefresh: () => _refreshMembers(groupId),
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: WidgetsContainer(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              children: [
+                Icon(
+                  LucideIcons.users,
+                  size: 48,
+                  color: theme.grey[400],
+                ),
+                verticalSpace(Spacing.points16),
+                Text(
+                  l10n.translate('no-members-found'),
+                  style: TextStyles.h6.copyWith(
+                    color: theme.grey[600],
+                  ),
+                ),
+              ],
             ),
-            verticalSpace(Spacing.points16),
-            Text(
-              l10n.translate('no-members-found'),
-              style: TextStyles.h6.copyWith(
-                color: theme.grey[600],
-              ),
-            ),
-          ],
+          ),
         ),
       );
     }
@@ -192,7 +205,11 @@ class _GroupMembersListState extends ConsumerState<GroupMembersList> {
       return a.joinedAt.compareTo(b.joinedAt);
     });
 
-    return Column(
+    return RefreshIndicator(
+      onRefresh: () => _refreshMembers(groupId),
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Section title with selection controls
