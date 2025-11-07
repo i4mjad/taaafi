@@ -11,6 +11,9 @@ class GroupMembershipModel extends GroupMembershipEntity {
     required super.joinedAt,
     super.leftAt,
     super.pointsTotal = 0,
+    super.lastActiveAt,
+    super.messageCount = 0,
+    super.engagementScore = 0,
   });
 
   /// Create from Firestore document
@@ -28,6 +31,11 @@ class GroupMembershipModel extends GroupMembershipEntity {
           ? (data['leftAt'] as Timestamp).toDate()
           : null,
       pointsTotal: data['pointsTotal'] as int? ?? 0,
+      lastActiveAt: data['lastActiveAt'] != null
+          ? (data['lastActiveAt'] as Timestamp).toDate()
+          : null,
+      messageCount: data['messageCount'] as int? ?? 0,
+      engagementScore: data['engagementScore'] as int? ?? 0,
     );
   }
 
@@ -41,6 +49,9 @@ class GroupMembershipModel extends GroupMembershipEntity {
       'joinedAt': Timestamp.fromDate(joinedAt),
       'leftAt': leftAt != null ? Timestamp.fromDate(leftAt!) : null,
       'pointsTotal': pointsTotal,
+      'lastActiveAt': lastActiveAt != null ? Timestamp.fromDate(lastActiveAt!) : null,
+      'messageCount': messageCount,
+      'engagementScore': engagementScore,
     };
   }
 
@@ -55,6 +66,9 @@ class GroupMembershipModel extends GroupMembershipEntity {
       joinedAt: entity.joinedAt,
       leftAt: entity.leftAt,
       pointsTotal: entity.pointsTotal,
+      lastActiveAt: entity.lastActiveAt,
+      messageCount: entity.messageCount,
+      engagementScore: entity.engagementScore,
     );
   }
 
@@ -69,6 +83,9 @@ class GroupMembershipModel extends GroupMembershipEntity {
       joinedAt: joinedAt,
       leftAt: leftAt,
       pointsTotal: pointsTotal,
+      lastActiveAt: lastActiveAt,
+      messageCount: messageCount,
+      engagementScore: engagementScore,
     );
   }
 }
