@@ -621,48 +621,15 @@ GoRouter goRouter(Ref<GoRouter> ref) {
                       ),
                     ),
                   ),
-                ],
-              ),
-            ],
-          ),
-          // * Groups
-          StatefulShellBranch(
-            navigatorKey: shellNavigatorGroupsKey,
-            routes: [
-              GoRoute(
-                name: RouteNames.groups.name,
-                path: '/groups',
-                // COMMENTED OUT: Redirect to groups onboarding if user lacks a groups profile
-                // redirect: (context, state) async {
-                //   // Skip redirect if already going to onboarding
-                //   if (state.matchedLocation.contains('/onboarding')) {
-                //     return null;
-                //   }
-
-                //   // Check if user has a groups profile
-                //   try {
-                //     // Wait for the provider to load
-                //     final hasProfile =
-                //         await ref.read(hasGroupsProfileProvider.future);
-
-                //     if (!hasProfile) {
-                //       return '/groups/onboarding';
-                //     }
-                //     return null;
-                //   } catch (e) {
-                //     // On error, redirect to onboarding to be safe
-                //     return '/groups/onboarding';
-                //   }
-                // },
-                pageBuilder: (context, state) => NoTransitionPage<void>(
-                  key: state.pageKey,
-                  name: state.name,
-                  child: const GroupsOnboardingScreen(),
-                ),
-                routes: [
-                  // Groups onboarding route
+                  // Groups routes - nested under community
+                  // Redirect old /groups route to /community
                   GoRoute(
-                    path: 'onboarding',
+                    path: 'groups',
+                    name: RouteNames.groups.name,
+                    redirect: (context, state) => '/community',
+                  ),
+                  GoRoute(
+                    path: 'groups/onboarding',
                     name: RouteNames.groupsOnboarding.name,
                     pageBuilder: (context, state) => MaterialPage<void>(
                       name: RouteNames.groupsOnboarding.name,
@@ -670,7 +637,7 @@ GoRouter goRouter(Ref<GoRouter> ref) {
                     ),
                   ),
                   GoRoute(
-                    path: 'list',
+                    path: 'groups/list',
                     name: RouteNames.groupList.name,
                     pageBuilder: (context, state) => MaterialPage<void>(
                       name: RouteNames.groupList.name,
@@ -678,7 +645,7 @@ GoRouter goRouter(Ref<GoRouter> ref) {
                     ),
                   ),
                   GoRoute(
-                    path: 'explore',
+                    path: 'groups/explore',
                     name: RouteNames.groupExploration.name,
                     pageBuilder: (context, state) => MaterialPage<void>(
                       name: RouteNames.groupExploration.name,
@@ -686,7 +653,7 @@ GoRouter goRouter(Ref<GoRouter> ref) {
                     ),
                   ),
                   GoRoute(
-                    path: ':groupId',
+                    path: 'groups/:groupId',
                     name: RouteNames.groupDetail.name,
                     pageBuilder: (context, state) => MaterialPage<void>(
                       name: RouteNames.groupDetail.name,
@@ -695,7 +662,7 @@ GoRouter goRouter(Ref<GoRouter> ref) {
                     ),
                   ),
                   GoRoute(
-                    path: ':groupId/chat',
+                    path: 'groups/:groupId/chat',
                     name: RouteNames.groupChat.name,
                     pageBuilder: (context, state) => MaterialPage<void>(
                       name: RouteNames.groupChat.name,
@@ -704,7 +671,7 @@ GoRouter goRouter(Ref<GoRouter> ref) {
                     ),
                   ),
                   GoRoute(
-                    path: ':groupId/challenge',
+                    path: 'groups/:groupId/challenge',
                     name: RouteNames.groupChallenge.name,
                     pageBuilder: (context, state) => MaterialPage<void>(
                       name: RouteNames.groupChallenge.name,
@@ -713,7 +680,7 @@ GoRouter goRouter(Ref<GoRouter> ref) {
                     ),
                   ),
                   GoRoute(
-                    path: ':groupId/updates',
+                    path: 'groups/:groupId/updates',
                     name: RouteNames.groupUpdates.name,
                     pageBuilder: (context, state) => MaterialPage<void>(
                       name: RouteNames.groupUpdates.name,
@@ -721,7 +688,7 @@ GoRouter goRouter(Ref<GoRouter> ref) {
                     ),
                   ),
                   GoRoute(
-                    path: ':groupId/settings',
+                    path: 'groups/:groupId/settings',
                     name: RouteNames.groupSettings.name,
                     pageBuilder: (context, state) => MaterialPage<void>(
                       name: RouteNames.groupSettings.name,

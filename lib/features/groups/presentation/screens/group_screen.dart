@@ -63,7 +63,9 @@ class ComingSoonFeature {
 }
 
 class GroupScreen extends ConsumerWidget {
-  const GroupScreen({super.key});
+  final bool showAppBar;
+
+  const GroupScreen({super.key, this.showAppBar = true});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -84,9 +86,6 @@ class GroupScreen extends ConsumerWidget {
 
         return Scaffold(
           backgroundColor: theme.backgroundColor,
-          appBar: appBar(context, ref, "group", false, false, actions: [
-            _buildShareAction(context, theme, l10n, membership),
-          ]),
           body: SingleChildScrollView(
             padding: const EdgeInsets.only(bottom: 20), // Add bottom padding
             child: Column(

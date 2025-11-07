@@ -31,7 +31,7 @@ import 'package:reboot_app_3/core/shared_widgets/complete_registration_banner.da
 import 'package:reboot_app_3/core/shared_widgets/confirm_details_banner.dart';
 import 'package:reboot_app_3/core/shared_widgets/confirm_email_banner.dart';
 import 'package:reboot_app_3/features/direct_messaging/presentation/screens/community_chats_screen.dart';
-import 'package:reboot_app_3/core/shared_widgets/custom_segmented_button.dart';
+import 'package:reboot_app_3/features/groups/presentation/screens/group_screen.dart';
 
 class CommunityMainScreen extends ConsumerStatefulWidget {
   /// Optional initial tab to select when the screen opens
@@ -45,22 +45,24 @@ class CommunityMainScreen extends ConsumerStatefulWidget {
 }
 
 class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
-    with WidgetsBindingObserver {
+    with WidgetsBindingObserver, SingleTickerProviderStateMixin {
   late String _selectedFilter;
   final ScrollController _scrollController = ScrollController();
-  late SegmentedButtonOption _selectedSegment;
-  late List<SegmentedButtonOption> _segmentOptions;
+  TabController? _tabController;
 
   @override
   void initState() {
     super.initState();
 
-    // Initialize top-level segments
-    _segmentOptions = [
-      SegmentedButtonOption(value: 'community', translationKey: 'community'),
-      SegmentedButtonOption(value: 'chats', translationKey: 'community-chats'),
-    ];
-    _selectedSegment = _segmentOptions[0]; // Default to community
+    // Initialize tab controller with 3 tabs (Community, Chats, and Groups)
+    // Dispose any existing controller first (in case of hot reload)
+    _tabController?.dispose();
+    _tabController = TabController(length: 3, vsync: this);
+
+    // Listen to tab changes to update UI (e.g., floating action button)
+    _tabController!.addListener(() {
+      setState(() {});
+    });
 
     // Set initial filter based on widget parameter or default to 'posts'
     _selectedFilter = widget.initialTab ?? 'posts';
@@ -123,6 +125,7 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _scrollController.dispose();
+    _tabController?.dispose();
     super.dispose();
   }
 
@@ -337,27 +340,79 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
       backgroundColor: theme.backgroundColor,
       body: Column(
         children: [
-          // Top-level segmented control
-          Container(
-            padding: const EdgeInsets.all(16.0),
-            child: CustomSegmentedButton(
-              options: _segmentOptions,
-              selectedOption: _selectedSegment,
-              onChanged: (option) {
-                setState(() => _selectedSegment = option);
-              },
-            ),
+          // Tab bar
+          TabBar(
+            controller: _tabController!,
+            indicatorColor: theme.primary[600],
+            labelColor: theme.primary[600],
+            unselectedLabelColor: theme.grey[600],
+            tabs: [
+              Tab(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      LucideIcons.users,
+                      size: 18,
+                      color: _tabController!.index == 0
+                          ? theme.primary[600]
+                          : theme.grey[600],
+                    ),
+                    const SizedBox(width: 8),
+                    Text(AppLocalizations.of(context).translate('community')),
+                  ],
+                ),
+              ),
+              Tab(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      LucideIcons.messageSquare,
+                      size: 18,
+                      color: _tabController!.index == 1
+                          ? theme.primary[600]
+                          : theme.grey[600],
+                    ),
+                    const SizedBox(width: 8),
+                    Text(AppLocalizations.of(context)
+                        .translate('community-chats')),
+                  ],
+                ),
+              ),
+              Tab(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      LucideIcons.users2,
+                      size: 18,
+                      color: _tabController!.index == 2
+                          ? theme.primary[600]
+                          : theme.grey[600],
+                    ),
+                    const SizedBox(width: 8),
+                    Text(AppLocalizations.of(context).translate('groups')),
+                  ],
+                ),
+              ),
+            ],
           ),
-          // Content based on selected segment
+          // Tab bar view
           Expanded(
-            child: _selectedSegment.value == 'community'
-                ? _buildForumTab()
-                : const CommunityChatsScreen(showAppBar: false),
+            child: TabBarView(
+              controller: _tabController!,
+              children: [
+                _buildForumTab(),
+                const CommunityChatsScreen(showAppBar: false),
+                const GroupScreen(),
+              ],
+            ),
           ),
         ],
       ),
       floatingActionButton:
-          !shouldBlockForShorebird && _selectedSegment.value == 'community'
+          !shouldBlockForShorebird && _tabController!.index == 0
               ? CommunityPostGuard(
                   onAccessGranted: () {
                     showModalBottomSheet(
