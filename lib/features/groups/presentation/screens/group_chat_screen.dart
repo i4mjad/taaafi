@@ -944,7 +944,7 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
     );
   }
 
-  /// Build quick reactions grid in message actions modal
+  /// Build quick reactions in horizontal scrollable row
   Widget _buildQuickReactions(
     BuildContext context,
     WidgetRef ref,
@@ -956,54 +956,56 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
 
     final currentProfile = ref.watch(currentCommunityProfileProvider).value;
 
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: emojis.map((emoji) {
-        final hasReacted = currentProfile != null &&
-            (message.reactions[emoji]?.contains(currentProfile.id) ?? false);
+    return SizedBox(
+      height: 56,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        itemCount: emojis.length,
+        separatorBuilder: (context, index) => const SizedBox(width: 8),
+        itemBuilder: (context, index) {
+          final emoji = emojis[index];
+          final hasReacted = currentProfile != null &&
+              (message.reactions[emoji]?.contains(currentProfile.id) ?? false);
 
-        return InkWell(
-          onTap: () async {
-            Navigator.of(context).pop(); // Close modal
-            try {
-              await ref
-                  .read(messageReactionsServiceProvider.notifier)
-                  .toggleReaction(
-                    groupId: widget.groupId ?? '',
-                    messageId: message.id,
-                    emoji: emoji,
-                  );
-            } catch (e) {
-              if (context.mounted) {
-                getErrorSnackBar(context, 'error-toggling-reaction');
+          return InkWell(
+            onTap: () async {
+              Navigator.of(context).pop(); // Close modal
+              try {
+                await ref
+                    .read(messageReactionsServiceProvider.notifier)
+                    .toggleReaction(
+                      groupId: widget.groupId ?? '',
+                      messageId: message.id,
+                      emoji: emoji,
+                    );
+              } catch (e) {
+                if (context.mounted) {
+                  getErrorSnackBar(context, 'error-toggling-reaction');
+                }
+                print('Error toggling reaction: $e');
               }
-              print('Error toggling reaction: $e');
-            }
-          },
-          borderRadius: BorderRadius.circular(12),
-          child: Container(
-            width: 52,
-            height: 52,
-            decoration: BoxDecoration(
-              color: hasReacted
-                  ? theme.primary[100]!.withValues(alpha: 0.3)
-                  : theme.grey[100]!.withValues(alpha: 0.5),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: hasReacted ? theme.primary[400]! : theme.grey[300]!,
-                width: hasReacted ? 2 : 1,
+            },
+            borderRadius: BorderRadius.circular(8),
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: hasReacted
+                    ? theme.primary[100]!.withValues(alpha: 0.2)
+                    : Colors.transparent,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Center(
+                child: Text(
+                  emoji,
+                  style: const TextStyle(fontSize: 24),
+                ),
               ),
             ),
-            child: Center(
-              child: Text(
-                emoji,
-                style: const TextStyle(fontSize: 28),
-              ),
-            ),
-          ),
-        );
-      }).toList(),
+          );
+        },
+      ),
     );
   }
 
