@@ -319,6 +319,111 @@ String generateQuotedPreview(Ref ref, String messageBody) {
   return '${messageBody.substring(0, maxLength)}...';
 }
 
+// ==================== PINNED MESSAGES PROVIDERS ====================
+
+/// Provider for watching pinned messages in a specific group
+@riverpod
+Future<List<GroupMessageEntity>> pinnedMessages(Ref ref, String groupId) async {
+  final repository = ref.watch(groupChatRepositoryProvider);
+  
+  try {
+    return await repository.getPinnedMessages(groupId);
+  } catch (error) {
+    print('Error fetching pinned messages for group $groupId: $error');
+    return [];
+  }
+}
+
+/// Service for managing pinned messages
+@riverpod
+class PinnedMessagesService extends _$PinnedMessagesService {
+  @override
+  bool build() {
+    // Simple state to track if operations are in progress
+    return false;
+  }
+
+  /// Pin a message (admin only)
+  Future<void> pinMessage({
+    required String groupId,
+    required String messageId,
+  }) async {
+    if (state) {
+      throw Exception('Operation already in progress');
+    }
+
+    try {
+      state = true;
+
+      // Get current user's community profile
+      final currentProfile =
+          await ref.read(currentCommunityProfileProvider.future);
+      if (currentProfile == null) {
+        throw Exception('Community profile required to pin messages');
+      }
+
+      // Verify user is admin
+      final isAdmin = await ref.read(isCurrentUserGroupAdminProvider(groupId).future);
+      if (!isAdmin) {
+        throw Exception('Only admins can pin messages');
+      }
+
+      final repository = ref.read(groupChatRepositoryProvider);
+      await repository.pinMessage(
+        groupId: groupId,
+        messageId: messageId,
+        adminCpId: currentProfile.id,
+      );
+
+      // Invalidate pinned messages cache
+      ref.invalidate(pinnedMessagesProvider(groupId));
+
+      print('Message pinned successfully: $messageId');
+    } catch (error) {
+      print('Error pinning message $messageId: $error');
+      rethrow;
+    } finally {
+      state = false;
+    }
+  }
+
+  /// Unpin a message (admin only)
+  Future<void> unpinMessage({
+    required String groupId,
+    required String messageId,
+  }) async {
+    if (state) {
+      throw Exception('Operation already in progress');
+    }
+
+    try {
+      state = true;
+
+      // Verify user is admin
+      final isAdmin = await ref.read(isCurrentUserGroupAdminProvider(groupId).future);
+      if (!isAdmin) {
+        throw Exception('Only admins can unpin messages');
+      }
+
+      final repository = ref.read(groupChatRepositoryProvider);
+      await repository.unpinMessage(
+        groupId: groupId,
+        messageId: messageId,
+      );
+
+      // Invalidate pinned messages cache
+      ref.invalidate(pinnedMessagesProvider(groupId));
+
+      print('Message unpinned successfully: $messageId');
+    } catch (error) {
+      print('Error unpinning message $messageId: $error');
+      rethrow;
+    } finally {
+      state = false;
+    }
+  }
+}
+
 // ==================== CACHE MANAGEMENT ====================
 
 /// Provider for managing message cache

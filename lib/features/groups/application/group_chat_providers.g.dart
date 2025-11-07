@@ -645,6 +645,153 @@ class _GenerateQuotedPreviewProviderElement
       (origin as GenerateQuotedPreviewProvider).messageBody;
 }
 
+String _$pinnedMessagesHash() => r'dd3a524311669377aaf644f3c92d9cc15657a885';
+
+/// Provider for watching pinned messages in a specific group
+///
+/// Copied from [pinnedMessages].
+@ProviderFor(pinnedMessages)
+const pinnedMessagesProvider = PinnedMessagesFamily();
+
+/// Provider for watching pinned messages in a specific group
+///
+/// Copied from [pinnedMessages].
+class PinnedMessagesFamily
+    extends Family<AsyncValue<List<GroupMessageEntity>>> {
+  /// Provider for watching pinned messages in a specific group
+  ///
+  /// Copied from [pinnedMessages].
+  const PinnedMessagesFamily();
+
+  /// Provider for watching pinned messages in a specific group
+  ///
+  /// Copied from [pinnedMessages].
+  PinnedMessagesProvider call(
+    String groupId,
+  ) {
+    return PinnedMessagesProvider(
+      groupId,
+    );
+  }
+
+  @override
+  PinnedMessagesProvider getProviderOverride(
+    covariant PinnedMessagesProvider provider,
+  ) {
+    return call(
+      provider.groupId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'pinnedMessagesProvider';
+}
+
+/// Provider for watching pinned messages in a specific group
+///
+/// Copied from [pinnedMessages].
+class PinnedMessagesProvider
+    extends AutoDisposeFutureProvider<List<GroupMessageEntity>> {
+  /// Provider for watching pinned messages in a specific group
+  ///
+  /// Copied from [pinnedMessages].
+  PinnedMessagesProvider(
+    String groupId,
+  ) : this._internal(
+          (ref) => pinnedMessages(
+            ref as PinnedMessagesRef,
+            groupId,
+          ),
+          from: pinnedMessagesProvider,
+          name: r'pinnedMessagesProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$pinnedMessagesHash,
+          dependencies: PinnedMessagesFamily._dependencies,
+          allTransitiveDependencies:
+              PinnedMessagesFamily._allTransitiveDependencies,
+          groupId: groupId,
+        );
+
+  PinnedMessagesProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.groupId,
+  }) : super.internal();
+
+  final String groupId;
+
+  @override
+  Override overrideWith(
+    FutureOr<List<GroupMessageEntity>> Function(PinnedMessagesRef provider)
+        create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: PinnedMessagesProvider._internal(
+        (ref) => create(ref as PinnedMessagesRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        groupId: groupId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<List<GroupMessageEntity>> createElement() {
+    return _PinnedMessagesProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is PinnedMessagesProvider && other.groupId == groupId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, groupId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin PinnedMessagesRef
+    on AutoDisposeFutureProviderRef<List<GroupMessageEntity>> {
+  /// The parameter `groupId` of this provider.
+  String get groupId;
+}
+
+class _PinnedMessagesProviderElement
+    extends AutoDisposeFutureProviderElement<List<GroupMessageEntity>>
+    with PinnedMessagesRef {
+  _PinnedMessagesProviderElement(super.provider);
+
+  @override
+  String get groupId => (origin as PinnedMessagesProvider).groupId;
+}
+
 String _$groupChatMessagesPaginatedHash() =>
     r'9fcdd95dcdebdc1b4da7e4ac9359960b57d3e08a';
 
@@ -826,6 +973,25 @@ final groupChatServiceProvider =
 );
 
 typedef _$GroupChatService = AutoDisposeNotifier<bool>;
+String _$pinnedMessagesServiceHash() =>
+    r'e278038c69b0d8f2167de8e3b971a4f95bf6c4aa';
+
+/// Service for managing pinned messages
+///
+/// Copied from [PinnedMessagesService].
+@ProviderFor(PinnedMessagesService)
+final pinnedMessagesServiceProvider =
+    AutoDisposeNotifierProvider<PinnedMessagesService, bool>.internal(
+  PinnedMessagesService.new,
+  name: r'pinnedMessagesServiceProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$pinnedMessagesServiceHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$PinnedMessagesService = AutoDisposeNotifier<bool>;
 String _$messageCacheManagerHash() =>
     r'7e538d1566805b5f3f34387b2b67c2ebd7e741c3';
 
