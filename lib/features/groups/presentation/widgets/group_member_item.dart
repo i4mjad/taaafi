@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
@@ -11,6 +12,7 @@ import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/groups/domain/entities/group_membership_entity.dart';
 import 'package:reboot_app_3/features/groups/application/group_member_management_controller.dart';
+import 'package:reboot_app_3/features/groups/presentation/widgets/member_profile_modal.dart';
 
 /// Model for group member with user details
 class GroupMemberInfo {
@@ -72,10 +74,15 @@ class GroupMemberItem extends ConsumerWidget {
           gender: profile.gender,
         );
 
-        return Container(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
+        return InkWell(
+          onTap: () {
+            HapticFeedback.lightImpact();
+            _showMemberProfile(context, profile, memberInfo, ref);
+          },
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
               // Avatar - always show, but different for anonymous users
               Container(
                 width: 48,
@@ -249,21 +256,24 @@ class GroupMemberItem extends ConsumerWidget {
                 ),
               ),
 
-              // Three dots menu (only show if not current user)
-              if (!isCurrentUser)
-                GestureDetector(
-                  onTap: () =>
-                      _showMemberActions(context, memberInfo, l10n, ref),
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    child: Icon(
-                      LucideIcons.moreHorizontal,
-                      size: 20,
-                      color: theme.grey[500],
+                // Three dots menu (only show if not current user)
+                if (!isCurrentUser)
+                  GestureDetector(
+                    onTap: () {
+                      HapticFeedback.lightImpact();
+                      _showMemberActions(context, memberInfo, l10n, ref);
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      child: Icon(
+                        LucideIcons.moreHorizontal,
+                        size: 20,
+                        color: theme.grey[500],
+                      ),
                     ),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
         );
       },
@@ -461,6 +471,33 @@ class GroupMemberItem extends ConsumerWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  /// Show member profile modal (Sprint 4 - Feature 4.1)
+  void _showMemberProfile(
+    BuildContext context,
+    dynamic profile,
+    GroupMemberInfo memberInfo,
+    WidgetRef ref,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => MemberProfileModal(
+        profile: profile,
+        membership: memberInfo.membership,
+        achievements: const [], // TODO: Load achievements from service
+        isOwnProfile: memberInfo.membership.cpId == currentUserCpId,
+        onEdit: () {
+          // Already in edit mode via the modal
+        },
+        onMessage: () {
+          // TODO: Navigate to direct message (Future sprint)
+          Navigator.of(context).pop();
+        },
       ),
     );
   }
