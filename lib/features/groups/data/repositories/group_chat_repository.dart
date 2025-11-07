@@ -79,6 +79,13 @@ abstract class GroupChatRepository {
     required String cpId,
     required String emoji,
   });
+
+  /// Search messages by keyword
+  Future<List<GroupMessageEntity>> searchMessages({
+    required String groupId,
+    required String query,
+    int limit = 50,
+  });
 }
 
 /// Domain-level pagination parameters
@@ -367,6 +374,27 @@ class GroupChatRepositoryImpl implements GroupChatRepository {
       log('Reaction toggled via repository: $emoji on $messageId');
     } catch (e, stackTrace) {
       log('Error toggling reaction via repository: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<List<GroupMessageEntity>> searchMessages({
+    required String groupId,
+    required String query,
+    int limit = 50,
+  }) async {
+    try {
+      final models = await _dataSource.searchMessages(
+        groupId: groupId,
+        query: query,
+        limit: limit,
+      );
+      final entities = models.map((model) => model.toEntity()).toList();
+      log('Search completed via repository: found ${entities.length} messages');
+      return entities;
+    } catch (e, stackTrace) {
+      log('Error searching messages via repository: $e', stackTrace: stackTrace);
       rethrow;
     }
   }

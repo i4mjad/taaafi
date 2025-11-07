@@ -134,6 +134,13 @@ abstract class GroupMessagesDataSource {
     required String emoji,
   });
 
+  /// Search messages by keyword in a group
+  Future<List<GroupMessageModel>> searchMessages({
+    required String groupId,
+    required String query,
+    int limit = 50,
+  });
+
   /// Clear cache for a specific group
   void clearCache(String groupId);
 
@@ -545,6 +552,55 @@ class GroupMessagesFirestoreDataSource implements GroupMessagesDataSource {
       log('Reaction toggled successfully');
     } catch (e, stackTrace) {
       log('Error toggling reaction: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<List<GroupMessageModel>> searchMessages({
+    required String groupId,
+    required String query,
+    int limit = 50,
+  }) async {
+    try {
+      log('Searching messages in group $groupId with query: $query');
+
+      if (query.trim().isEmpty) {
+        return [];
+      }
+
+      // Normalize query for case-insensitive search
+      final normalizedQuery = query.trim().toLowerCase();
+
+      // Fetch all non-deleted messages from the group
+      // Note: For large groups, this could be optimized by using pagination or indexed search
+      final snapshot = await _messagesCollection
+          .where('groupId', isEqualTo: groupId)
+          .where('isDeleted', isEqualTo: false)
+          .orderBy('createdAt', descending: true)
+          .limit(500) // Limit to last 500 messages for performance
+          .get();
+
+      // Client-side filtering using case-insensitive search
+      final matchingMessages = <GroupMessageModel>[];
+      
+      for (final doc in snapshot.docs) {
+        final message = GroupMessageModel.fromFirestore(doc);
+        
+        // Search in message body (case-insensitive)
+        if (message.body.toLowerCase().contains(normalizedQuery)) {
+          matchingMessages.add(message);
+          
+          if (matchingMessages.length >= limit) {
+            break;
+          }
+        }
+      }
+
+      log('Found ${matchingMessages.length} matching messages');
+      return matchingMessages;
+    } catch (e, stackTrace) {
+      log('Error searching messages: $e', stackTrace: stackTrace);
       rethrow;
     }
   }
