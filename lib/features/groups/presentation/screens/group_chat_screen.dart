@@ -906,8 +906,8 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
               ),
               decoration: BoxDecoration(
                 color: isCurrentUserReacted
-                    ? theme.primary[100]!.withOpacity(0.3)
-                    : theme.grey[100]!.withOpacity(0.5),
+                    ? theme.primary[100]!.withValues(alpha: 0.3)
+                    : theme.grey[100]!.withValues(alpha: 0.5),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: isCurrentUserReacted
