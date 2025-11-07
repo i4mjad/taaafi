@@ -75,10 +75,7 @@ class ReactionPicker extends StatelessWidget {
               final emoji = _defaultEmojis[index];
               return _EmojiButton(
                 emoji: emoji,
-                onTap: () {
-                  onEmojiSelected(emoji);
-                  Navigator.of(context).pop();
-                },
+                onTap: () => onEmojiSelected(emoji),
               );
             },
           ),
