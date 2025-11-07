@@ -88,79 +88,96 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
       data: (groupMembership) {
         final isAdmin = groupMembership?.memberRole == 'admin';
 
+        // Build list of all action buttons
+        final actions = <Widget>[];
+
+        // Activity Insights (Admin only - Sprint 2)
+        if (isAdmin) {
+          actions.add(
+            _buildActionCard(
+              context: context,
+              theme: theme,
+              l10n: l10n,
+              icon: LucideIcons.barChart2,
+              title: l10n.translate('activity'),
+              onTap: () => _navigateToActivityInsights(
+                  context, groupMembership!.group.id),
+            ),
+          );
+        }
+
+        // Notifications
+        actions.add(
+          _buildActionCard(
+            context: context,
+            theme: theme,
+            l10n: l10n,
+            icon: LucideIcons.bell,
+            title: l10n.translate('notifications'),
+            onTap: () => _navigateToNotificationSettings(context),
+          ),
+        );
+
+        // Chat
+        actions.add(
+          _buildActionCard(
+            context: context,
+            theme: theme,
+            l10n: l10n,
+            icon: LucideIcons.messageCircle,
+            title: l10n.translate('chat'),
+            onTap: () => _navigateToChatSettings(context),
+          ),
+        );
+
+        // Privacy
+        actions.add(
+          _buildActionCard(
+            context: context,
+            theme: theme,
+            l10n: l10n,
+            icon: LucideIcons.shield,
+            title: l10n.translate('privacy'),
+            onTap: () => _navigateToPrivacySettings(context),
+          ),
+        );
+
+        // Leave
+        actions.add(
+          _buildActionCard(
+            context: context,
+            theme: theme,
+            l10n: l10n,
+            icon: LucideIcons.logOut,
+            title: l10n.translate('leave'),
+            onTap: () => _showLeaveGroupDialog(context, l10n),
+            isDestructive: true,
+          ),
+        );
+
+        // Build rows with 2 items each
+        final rows = <Widget>[];
+        for (int i = 0; i < actions.length; i += 2) {
+          final row = Row(
+            children: [
+              Expanded(child: actions[i]),
+              if (i + 1 < actions.length) ...[
+                horizontalSpace(Spacing.points8),
+                Expanded(child: actions[i + 1]),
+              ] else
+                const Expanded(child: SizedBox.shrink()),
+            ],
+          );
+          rows.add(row);
+          if (i + 2 < actions.length) {
+            rows.add(verticalSpace(Spacing.points8));
+          }
+        }
+
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              // Activity Insights (Admin only - Sprint 2)
-              if (isAdmin)
-                SizedBox(
-                  width: (MediaQuery.of(context).size.width - 48) / 4,
-                  child: _buildActionCard(
-                    context: context,
-                    theme: theme,
-                    l10n: l10n,
-                    icon: LucideIcons.barChart2,
-                    title: l10n.translate('activity'),
-                    onTap: () => _navigateToActivityInsights(context, groupMembership!.group.id),
-                  ),
-                ),
-              
-              // Notifications
-              SizedBox(
-                width: (MediaQuery.of(context).size.width - 48) / 4,
-                child: _buildActionCard(
-                  context: context,
-                  theme: theme,
-                  l10n: l10n,
-                  icon: LucideIcons.bell,
-                  title: l10n.translate('notifications'),
-                  onTap: () => _navigateToNotificationSettings(context),
-                ),
-              ),
-
-              // Chat
-              SizedBox(
-                width: (MediaQuery.of(context).size.width - 48) / 4,
-                child: _buildActionCard(
-                  context: context,
-                  theme: theme,
-                  l10n: l10n,
-                  icon: LucideIcons.messageCircle,
-                  title: l10n.translate('chat'),
-                  onTap: () => _navigateToChatSettings(context),
-                ),
-              ),
-
-              // Privacy
-              SizedBox(
-                width: (MediaQuery.of(context).size.width - 48) / 4,
-                child: _buildActionCard(
-                  context: context,
-                  theme: theme,
-                  l10n: l10n,
-                  icon: LucideIcons.shield,
-                  title: l10n.translate('privacy'),
-                  onTap: () => _navigateToPrivacySettings(context),
-                ),
-              ),
-
-              // Leave
-              SizedBox(
-                width: (MediaQuery.of(context).size.width - 48) / 4,
-                child: _buildActionCard(
-                  context: context,
-                  theme: theme,
-                  l10n: l10n,
-                  icon: LucideIcons.logOut,
-                  title: l10n.translate('leave'),
-                  onTap: () => _showLeaveGroupDialog(context, l10n),
-                  isDestructive: true,
-                ),
-              ),
-            ],
+          child: Column(
+            children: rows,
           ),
         );
       },
@@ -181,7 +198,7 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
     return GestureDetector(
       onTap: onTap,
       child: WidgetsContainer(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
         backgroundColor:
             isDestructive ? theme.error[50] : theme.backgroundColor,
         borderRadius: BorderRadius.circular(15),
@@ -190,15 +207,16 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
           width: 0.75,
         ),
         cornerSmoothing: 1,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
+        child: Row(
           children: [
             // Icon
             Container(
-              width: 40,
-              height: 40,
+              width: 36,
+              height: 36,
               decoration: BoxDecoration(
-                color: Colors.transparent,
+                color: isDestructive 
+                    ? theme.error[100]!.withOpacity(0.5)
+                    : theme.grey[50],
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
@@ -208,18 +226,19 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
               ),
             ),
 
-            verticalSpace(Spacing.points8),
+            horizontalSpace(Spacing.points12),
 
             // Title
-            Text(
-              title,
-              style: TextStyles.small.copyWith(
-                color: isDestructive ? theme.error[700] : theme.grey[900],
-                fontWeight: FontWeight.w500,
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyles.footnote.copyWith(
+                  color: isDestructive ? theme.error[700] : theme.grey[900],
+                  fontWeight: FontWeight.w600,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
@@ -271,5 +290,4 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
       ),
     );
   }
-
 }
