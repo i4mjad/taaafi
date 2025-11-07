@@ -3516,4 +3516,12 @@ const Map<String, String> kEn = {
   "unpin": "Unpin",
   "error-pinning-message": "Error pinning message",
   "error-unpinning-message": "Error unpinning message",
+
+  // Message Reactions
+  "react-to-message": "React to message",
+  "add-reaction": "Add reaction",
+  "error-toggling-reaction": "Failed to react. Please try again.",
+  "reactions": "Reactions",
+  "reacted-with": "reacted with",
+  "and-others": "and {count} others",
 };

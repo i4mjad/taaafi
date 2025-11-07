@@ -3441,4 +3441,12 @@ const Map<String, String> kAr = {
   'unpin': 'إلغاء التثبيت',
   'error-pinning-message': 'خطأ في تثبيت الرسالة',
   'error-unpinning-message': 'خطأ في إلغاء تثبيت الرسالة',
+
+  // Message Reactions
+  'react-to-message': 'تفاعل مع الرسالة',
+  'add-reaction': 'إضافة تفاعل',
+  'error-toggling-reaction': 'فشل التفاعل. يرجى المحاولة مرة أخرى.',
+  'reactions': 'التفاعلات',
+  'reacted-with': 'تفاعل بـ',
+  'and-others': 'و {count} آخرين',
 };
