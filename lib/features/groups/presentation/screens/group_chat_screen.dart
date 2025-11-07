@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 // import 'package:grouped_list/grouped_list.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -2559,7 +2560,8 @@ class _AnimatedSwipeMessageState extends State<_AnimatedSwipeMessage>
   }
 
   void _handlePanStart(DragStartDetails details) {
-    // Start of pan gesture - could be used for haptic feedback
+    // Sprint 4 - Feature 4.2: Haptic feedback on swipe start
+    HapticFeedback.selectionClick();
   }
 
   void _handlePanUpdate(DragUpdateDetails details) {
@@ -2585,6 +2587,8 @@ class _AnimatedSwipeMessageState extends State<_AnimatedSwipeMessage>
     final shouldTriggerReply = _dragOffset >= _replyThreshold;
 
     if (shouldTriggerReply) {
+      // Sprint 4 - Feature 4.2: Haptic feedback on successful swipe
+      HapticFeedback.mediumImpact();
       // Trigger reply
       widget.onSwipeToReply();
       // Animate to show completion
