@@ -1220,7 +1220,7 @@ final conversationActionsControllerProvider =
 );
 
 typedef _$ConversationActionsController = AutoDisposeNotifier<bool>;
-String _$blockControllerHash() => r'b0d25dee9a2f0e22e8a0010c8e6e908a691c187a';
+String _$blockControllerHash() => r'94f97101976cb43845b558e3612bb38ef2944e0e';
 
 /// Controller for blocking/unblocking users
 ///

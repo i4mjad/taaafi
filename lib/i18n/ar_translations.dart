@@ -1815,6 +1815,48 @@ const Map<String, String> kAr = {
   "notification-settings": "إعدادات الإشعارات",
   "member-settings": "إعدادات الأعضاء",
   "privacy-settings": "إعدادات الخصوصية",
+
+  // Group Capacity Settings
+  "admin-settings": "إعدادات المشرف",
+  "group-capacity": "سعة الزمالة",
+  "current-capacity": "السعة الحالية",
+  "current-members": "الأعضاء الحاليين",
+  "members-remaining": "الأماكن المتبقية",
+  "update-capacity": "تحديث السعة",
+  "capacity-updated-successfully": "تم تحديث سعة الزمالة بنجاح",
+  "error-capacity-below-member-count":
+      "لا يمكن تعيين السعة أقل من عدد الأعضاء الحاليين",
+  "error-invalid-capacity-range": "يجب أن تكون السعة بين 2 و 50",
+  "error-plus-required-for-capacity":
+      "مطلوب اشتراك بلس للزمالات التي تحتوي على أكثر من 6 أعضاء",
+  "upgrade-to-plus-for-capacity":
+      "قم بالترقية إلى بلس لزيادة السعة إلى أكثر من 6 أعضاء",
+  "capacity-warning":
+      "لا يمكنك تقليل السعة أقل من عدد الأعضاء الحاليين ({count})",
+  "confirm-capacity-change":
+      "هل أنت متأكد أنك تريد تغيير السعة إلى {capacity}؟",
+
+  // Edit Group Details
+  "edit-group-details": "تعديل تفاصيل الزمالة",
+  "group-name-label": "اسم الزمالة",
+  "group-description-label": "وصف الزمالة",
+  "name-and-description": "الاسم والوصف",
+  "name-too-long": "يجب أن يكون اسم الزمالة 60 حرفاً أو أقل",
+  "description-too-long": "يجب أن يكون الوصف 500 حرف أو أقل",
+  "no-changes-made": "لم يتم إجراء أي تغييرات",
+  "details-updated-successfully": "تم تحديث تفاصيل الزمالة بنجاح",
+  "characters-remaining": "{count} حرف متبقي",
+  "save-changes": "حفظ التغييرات",
+  "confirm-save-changes": "هل أنت متأكد أنك تريد حفظ هذه التغييرات؟",
+  "discard-changes": "تجاهل التغييرات",
+  "unsaved-changes-warning":
+      "لديك تغييرات غير محفوظة. هل أنت متأكد أنك تريد المغادرة؟",
+  "error-no-changes-provided": "لم يتم تقديم أي تغييرات",
+  "error-admin-permission-required": "مطلوب صلاحيات المشرف",
+  "error-group-name-required": "اسم الزمالة مطلوب",
+  "error-invalid-group-name": "اسم زمالة غير صالح",
+  "error-invalid-description-length": "الوصف طويل جداً",
+  "error-loading-data": "خطأ في تحميل البيانات",
   "chat-settings": "إعدادات المحادثة",
   "leave-group": "مغادرة الزمالة",
   "leave-group-confirm-title": "مغادرة الزمالة",
@@ -2009,7 +2051,6 @@ const Map<String, String> kAr = {
   "no-follow-ups-found": "لا يوجد مُتَابعات",
   "start-logging-to-see-data":
       "ابدأ بإضافة مُتَابعاتك اليومية بشكل مستمر لرؤية البيانات هنا",
-  "error-loading-data": "خطأ في تحميل البيانات",
   "subscription-status": "حالة الاشتراك",
   "terms-and-conditions-applied": "تطبق الشروط والأحكام",
   "subscription-active-warning": "لديك اشتراك تعافي+",

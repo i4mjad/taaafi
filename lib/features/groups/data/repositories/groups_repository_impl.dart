@@ -727,4 +727,124 @@ class GroupsRepositoryImpl implements GroupsRepository {
       rethrow;
     }
   }
+
+  @override
+  Future<void> updateGroupCapacity({
+    required String groupId,
+    required String adminCpId,
+    required int newCapacity,
+  }) async {
+    try {
+      // Get the current group
+      final currentGroup = await _dataSource.getGroupById(groupId);
+      if (currentGroup == null) {
+        throw Exception('error-group-not-found');
+      }
+
+      // Verify admin permissions by checking membership role
+      final membership = await _dataSource.getCurrentMembership(adminCpId);
+      if (membership == null ||
+          membership.groupId != groupId ||
+          membership.role != 'admin') {
+        throw Exception('error-admin-permission-required');
+      }
+
+      // Get current member count
+      final memberCount = await _dataSource.getGroupMemberCount(groupId);
+
+      // Validate new capacity
+      if (newCapacity < memberCount) {
+        throw Exception('error-capacity-below-member-count');
+      }
+
+      if (newCapacity < 2 || newCapacity > 50) {
+        throw Exception('error-invalid-capacity-range');
+      }
+
+      // Check Plus status if capacity > 6
+      if (newCapacity > 6) {
+        final isPlus = await _dataSource.isUserPlus(adminCpId);
+        if (!isPlus) {
+          throw Exception('error-plus-required-for-capacity');
+        }
+      }
+
+      // Update the group's capacity
+      final updatedGroup = GroupModel.fromEntity(
+        currentGroup.toEntity().copyWith(
+              memberCapacity: newCapacity,
+              updatedAt: DateTime.now(),
+            ),
+      );
+
+      await _dataSource.updateGroup(updatedGroup);
+    } catch (e, stackTrace) {
+      log('Error in updateGroupCapacity: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> updateGroupDetails({
+    required String groupId,
+    required String adminCpId,
+    String? name,
+    String? description,
+  }) async {
+    try {
+      // Get the current group
+      final currentGroup = await _dataSource.getGroupById(groupId);
+      if (currentGroup == null) {
+        throw Exception('error-group-not-found');
+      }
+
+      // Verify admin permissions by checking membership role
+      final membership = await _dataSource.getCurrentMembership(adminCpId);
+      if (membership == null ||
+          membership.groupId != groupId ||
+          membership.role != 'admin') {
+        throw Exception('error-admin-permission-required');
+      }
+
+      // Validate at least one field is being updated
+      if (name == null && description == null) {
+        throw Exception('error-no-changes-provided');
+      }
+
+      // Validate and trim name if provided
+      String? validatedName;
+      if (name != null) {
+        validatedName = name.trim();
+        if (validatedName.isEmpty) {
+          throw Exception('error-group-name-required');
+        }
+        if (validatedName.length > 60) {
+          throw Exception('error-invalid-group-name');
+        }
+      }
+
+      // Validate and trim description if provided
+      String? validatedDescription;
+      if (description != null) {
+        validatedDescription = description.trim();
+        if (validatedDescription.length > 500) {
+          throw Exception('error-invalid-description-length');
+        }
+      }
+
+      // Update the group details
+      final updatedGroup = GroupModel.fromEntity(
+        currentGroup.toEntity().copyWith(
+              name: validatedName ?? currentGroup.name,
+              description: validatedDescription ?? currentGroup.description,
+              updatedAt: DateTime.now(),
+            ),
+      );
+
+      await _dataSource.updateGroup(updatedGroup);
+    } catch (e, stackTrace) {
+      log('Error in updateGroupDetails: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
 }

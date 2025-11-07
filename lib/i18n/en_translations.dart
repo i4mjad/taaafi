@@ -1869,6 +1869,48 @@ const Map<String, String> kEn = {
   "notification-settings": "Notification Settings",
   "member-settings": "Member Settings",
   "privacy-settings": "Privacy Settings",
+
+  // Group Capacity Settings
+  "admin-settings": "Admin Settings",
+  "group-capacity": "Group Capacity",
+  "current-capacity": "Current Capacity",
+  "current-members": "Current Members",
+  "members-remaining": "Members Remaining",
+  "update-capacity": "Update Capacity",
+  "capacity-updated-successfully": "Group capacity updated successfully",
+  "error-capacity-below-member-count":
+      "Cannot set capacity below current member count",
+  "error-invalid-capacity-range": "Capacity must be between 2 and 50",
+  "error-plus-required-for-capacity":
+      "Plus membership required for groups with more than 6 members",
+  "upgrade-to-plus-for-capacity":
+      "Upgrade to Plus to increase capacity beyond 6 members",
+  "capacity-warning":
+      "You cannot reduce capacity below the current number of members ({count})",
+  "confirm-capacity-change":
+      "Are you sure you want to change the capacity to {capacity}?",
+
+  // Edit Group Details
+  "edit-group-details": "Edit Group Details",
+  "group-name-label": "Group Name",
+  "group-description-label": "Group Description",
+  "name-and-description": "Name and Description",
+  "name-too-long": "Group name must be 60 characters or less",
+  "description-too-long": "Description must be 500 characters or less",
+  "no-changes-made": "No changes were made",
+  "details-updated-successfully": "Group details updated successfully",
+  "characters-remaining": "{count} characters remaining",
+  "save-changes": "Save Changes",
+  "confirm-save-changes": "Are you sure you want to save these changes?",
+  "discard-changes": "Discard Changes",
+  "unsaved-changes-warning":
+      "You have unsaved changes. Are you sure you want to leave?",
+  "error-no-changes-provided": "No changes provided",
+  "error-admin-permission-required": "Admin permission required",
+  "error-group-name-required": "Group name is required",
+  "error-invalid-group-name": "Invalid group name",
+  "error-invalid-description-length": "Description is too long",
+  "error-loading-data": "Error loading data",
   "chat-settings": "Chat Settings",
   "leave-group": "Leave Group",
   "leave-group-confirm-title": "Leave Group",
@@ -2399,7 +2441,6 @@ const Map<String, String> kEn = {
   "terms-and-conditions-applied": "Terms and Conditions Applied",
   "start-logging-to-see-data":
       "Start logging your daily follow-ups to see data here",
-  "error-loading-data": "Error loading data",
 
   // Messaging groups
   "notifications-groups": "Notifications Groups",

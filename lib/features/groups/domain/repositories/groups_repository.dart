@@ -100,4 +100,19 @@ abstract class GroupsRepository {
     DateTime? joinCodeExpiresAt,
     int? joinCodeMaxUses,
   });
+
+  /// Update group member capacity (admin only)
+  Future<void> updateGroupCapacity({
+    required String groupId,
+    required String adminCpId,
+    required int newCapacity,
+  });
+
+  /// Update group details (admin only)
+  Future<void> updateGroupDetails({
+    required String groupId,
+    required String adminCpId,
+    String? name,
+    String? description,
+  });
 }
