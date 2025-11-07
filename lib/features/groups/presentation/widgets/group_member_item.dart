@@ -165,12 +165,11 @@ class GroupMemberItem extends ConsumerWidget {
                                     memberInfo.membership.role == 'admin'
                                         ? l10n.translate('group-admin')
                                         : l10n.translate('group-member'),
-                                    style: TextStyles.small.copyWith(
+                                    style: TextStyles.bodyTiny.copyWith(
                                       color:
                                           memberInfo.membership.role == 'admin'
                                               ? theme.primary[700]
                                               : theme.grey[600],
-                                      fontSize: 10,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
@@ -198,17 +197,15 @@ class GroupMemberItem extends ConsumerWidget {
                           Text(
                             _getLastActiveText(
                                 memberInfo.membership.lastActiveAt!, l10n),
-                            style: TextStyles.small.copyWith(
+                            style: TextStyles.bottomNavigationBarLabel.copyWith(
                               color: theme.grey[600],
-                              fontSize: 11,
                             ),
                           ),
                         ] else
                           Text(
                             l10n.translate('never-active'),
-                            style: TextStyles.small.copyWith(
+                            style: TextStyles.bottomNavigationBarLabel.copyWith(
                               color: theme.grey[500],
-                              fontSize: 11,
                             ),
                           ),
 
@@ -224,9 +221,8 @@ class GroupMemberItem extends ConsumerWidget {
                           const SizedBox(width: 4),
                           Text(
                             '${memberInfo.membership.messageCount}',
-                            style: TextStyles.small.copyWith(
+                            style: TextStyles.bottomNavigationBarLabel.copyWith(
                               color: theme.grey[600],
-                              fontSize: 11,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -245,9 +241,8 @@ class GroupMemberItem extends ConsumerWidget {
                     // Join date
                     Text(
                       '${l10n.translate('joined')}: ${getDisplayDateTime(memberInfo.membership.joinedAt, locale.languageCode)}',
-                      style: TextStyles.caption.copyWith(
+                      style: TextStyles.bottomNavigationBarLabel.copyWith(
                         color: theme.grey[500],
-                        fontSize: 11,
                       ),
                     ),
                   ],
@@ -461,10 +456,8 @@ class GroupMemberItem extends ConsumerWidget {
           const SizedBox(width: 4),
           Text(
             l10n.translate(labelKey),
-            style: TextStyles.small.copyWith(
+            style: TextStyles.tinyBold.copyWith(
               color: badgeColor,
-              fontSize: 9,
-              fontWeight: FontWeight.w600,
             ),
           ),
         ],

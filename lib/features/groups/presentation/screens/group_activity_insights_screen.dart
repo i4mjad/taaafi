@@ -370,9 +370,8 @@ class GroupActivityInsightsScreen extends ConsumerWidget {
                         const SizedBox(width: 4),
                         Text(
                           '${member.messageCount} ${l10n.translate('message-count')}',
-                          style: TextStyles.small.copyWith(
+                          style: TextStyles.bottomNavigationBarLabel.copyWith(
                             color: theme.grey[600],
-                            fontSize: 11,
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -384,9 +383,8 @@ class GroupActivityInsightsScreen extends ConsumerWidget {
                         const SizedBox(width: 4),
                         Text(
                           '${member.engagementScore}',
-                          style: TextStyles.small.copyWith(
+                          style: TextStyles.bottomNavigationBarLabel.copyWith(
                             color: theme.grey[600],
-                            fontSize: 11,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -402,10 +400,9 @@ class GroupActivityInsightsScreen extends ConsumerWidget {
                 children: [
                   Text(
                     _getEngagementLabel(member.engagementLevel, l10n),
-                    style: TextStyles.small.copyWith(
+                    style: TextStyles.bottomNavigationBarLabel.copyWith(
                       color: _getEngagementColor(member.engagementLevel, theme),
                       fontWeight: FontWeight.w600,
-                      fontSize: 11,
                     ),
                   ),
                   verticalSpace(Spacing.points4),
@@ -413,9 +410,8 @@ class GroupActivityInsightsScreen extends ConsumerWidget {
                     member.lastActiveAt != null
                         ? _formatLastActive(member.lastActiveAt!, l10n)
                         : l10n.translate('never-active'),
-                    style: TextStyles.caption.copyWith(
+                    style: TextStyles.bodyTiny.copyWith(
                       color: theme.grey[500],
-                      fontSize: 10,
                     ),
                   ),
                 ],

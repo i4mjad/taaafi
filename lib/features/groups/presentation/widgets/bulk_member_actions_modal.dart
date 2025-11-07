@@ -269,9 +269,8 @@ class _BulkMemberActionsModalState extends ConsumerState<BulkMemberActionsModal>
                         padding: const EdgeInsets.only(top: 4),
                         child: Text(
                           '• ${_result!.failedCpIds[i]}: ${_result!.failureReasons[i]}',
-                          style: TextStyles.small.copyWith(
+                          style: TextStyles.bottomNavigationBarLabel.copyWith(
                             color: theme.error[600],
-                            fontSize: 11,
                           ),
                         ),
                       ),
