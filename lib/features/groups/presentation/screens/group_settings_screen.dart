@@ -20,8 +20,6 @@ import 'package:reboot_app_3/features/groups/presentation/widgets/member_profile
 import 'package:reboot_app_3/features/groups/presentation/widgets/edit_member_profile_modal.dart';
 import 'package:reboot_app_3/features/groups/providers/group_membership_provider.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
-import 'package:reboot_app_3/features/community/domain/repositories/community_repository.dart';
-import 'package:reboot_app_3/features/community/application/community_application_providers.dart';
 import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 
 class GroupSettingsScreen extends ConsumerStatefulWidget {
@@ -412,14 +410,14 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
           ref.invalidate(currentCommunityProfileProvider);
 
           if (context.mounted) {
-            showSuccessSnackBar(
+            getSuccessSnackBar(
               context,
               AppLocalizations.of(context).translate('group-profile-updated'),
             );
           }
         } catch (e) {
           if (context.mounted) {
-            showErrorSnackBar(context, 'Failed to update profile');
+            getErrorSnackBar(context, 'Failed to update profile');
           }
           rethrow;
         }
