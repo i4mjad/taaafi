@@ -894,4 +894,146 @@ class GroupsRepositoryImpl implements GroupsRepository {
       rethrow;
     }
   }
+
+  // ==================== BULK OPERATIONS (Sprint 2 - Feature 2.2) ====================
+
+  @override
+  Future<BulkOperationResult> bulkPromoteMembersToAdmin({
+    required String groupId,
+    required String adminCpId,
+    required List<String> memberCpIds,
+  }) async {
+    try {
+      log('Bulk promoting ${memberCpIds.length} members in group $groupId');
+
+      // Validate max limit
+      if (memberCpIds.length > 20) {
+        throw Exception('error-max-bulk-selection');
+      }
+
+      // Verify admin permissions
+      final membership = await _dataSource.getCurrentMembership(adminCpId);
+      if (membership == null ||
+          membership.groupId != groupId ||
+          membership.role != 'admin') {
+        throw Exception('error-admin-permission-required');
+      }
+
+      // Get group to check creator
+      final group = await _dataSource.getGroupById(groupId);
+      if (group == null) {
+        throw Exception('error-group-not-found');
+      }
+
+      int successCount = 0;
+      final List<String> failedCpIds = [];
+      final List<String> failureReasons = [];
+
+      // Process each member
+      for (final cpId in memberCpIds) {
+        try {
+          // Don't allow operations on the group creator
+          if (cpId == group.createdByCpId) {
+            failedCpIds.add(cpId);
+            failureReasons.add('error-cannot-bulk-operate-creator');
+            continue;
+          }
+
+          // Don't operate on self
+          if (cpId == adminCpId) {
+            failedCpIds.add(cpId);
+            failureReasons.add('error-cannot-promote-self');
+            continue;
+          }
+
+          await _dataSource.promoteMemberToAdmin(groupId: groupId, cpId: cpId);
+          successCount++;
+        } catch (e) {
+          log('Failed to promote member $cpId: $e');
+          failedCpIds.add(cpId);
+          failureReasons.add(e.toString());
+        }
+      }
+
+      return BulkOperationResult(
+        successCount: successCount,
+        failureCount: failedCpIds.length,
+        failedCpIds: failedCpIds,
+        failureReasons: failureReasons,
+      );
+    } catch (e, stackTrace) {
+      log('Error in bulkPromoteMembersToAdmin: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<BulkOperationResult> bulkRemoveMembers({
+    required String groupId,
+    required String adminCpId,
+    required List<String> memberCpIds,
+  }) async {
+    try {
+      log('Bulk removing ${memberCpIds.length} members from group $groupId');
+
+      // Validate max limit
+      if (memberCpIds.length > 20) {
+        throw Exception('error-max-bulk-selection');
+      }
+
+      // Verify admin permissions
+      final membership = await _dataSource.getCurrentMembership(adminCpId);
+      if (membership == null ||
+          membership.groupId != groupId ||
+          membership.role != 'admin') {
+        throw Exception('error-admin-permission-required');
+      }
+
+      // Get group to check creator
+      final group = await _dataSource.getGroupById(groupId);
+      if (group == null) {
+        throw Exception('error-group-not-found');
+      }
+
+      int successCount = 0;
+      final List<String> failedCpIds = [];
+      final List<String> failureReasons = [];
+
+      // Process each member
+      for (final cpId in memberCpIds) {
+        try {
+          // Don't allow operations on the group creator
+          if (cpId == group.createdByCpId) {
+            failedCpIds.add(cpId);
+            failureReasons.add('error-cannot-bulk-operate-creator');
+            continue;
+          }
+
+          // Don't operate on self
+          if (cpId == adminCpId) {
+            failedCpIds.add(cpId);
+            failureReasons.add('error-cannot-remove-self');
+            continue;
+          }
+
+          await _dataSource.removeMemberFromGroup(groupId: groupId, cpId: cpId);
+          successCount++;
+        } catch (e) {
+          log('Failed to remove member $cpId: $e');
+          failedCpIds.add(cpId);
+          failureReasons.add(e.toString());
+        }
+      }
+
+      return BulkOperationResult(
+        successCount: successCount,
+        failureCount: failedCpIds.length,
+        failedCpIds: failedCpIds,
+        failureReasons: failureReasons,
+      );
+    } catch (e, stackTrace) {
+      log('Error in bulkRemoveMembers: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
 }

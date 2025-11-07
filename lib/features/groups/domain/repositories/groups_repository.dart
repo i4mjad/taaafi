@@ -1,6 +1,7 @@
 import '../entities/group_entity.dart';
 import '../entities/group_membership_entity.dart';
 import '../entities/join_result_entity.dart';
+import '../entities/bulk_operation_result.dart';
 
 abstract class GroupsRepository {
   /// Get current user's active membership
@@ -131,5 +132,21 @@ abstract class GroupsRepository {
   Future<void> updateMemberActivity({
     required String groupId,
     required String cpId,
+  });
+
+  // ==================== BULK OPERATIONS (Sprint 2 - Feature 2.2) ====================
+  
+  /// Promote multiple members to admin (max 20 at once)
+  Future<BulkOperationResult> bulkPromoteMembersToAdmin({
+    required String groupId,
+    required String adminCpId,
+    required List<String> memberCpIds,
+  });
+
+  /// Remove multiple members from group (max 20 at once)
+  Future<BulkOperationResult> bulkRemoveMembers({
+    required String groupId,
+    required String adminCpId,
+    required List<String> memberCpIds,
   });
 }
