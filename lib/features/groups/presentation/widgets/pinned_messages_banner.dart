@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
-import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import '../../application/group_chat_providers.dart';
 import '../../domain/entities/group_message_entity.dart';
@@ -53,10 +52,10 @@ class PinnedMessagesBanner extends ConsumerWidget {
               // Header
               Padding(
                 padding: const EdgeInsets.fromLTRB(
-                  Spacing.md,
-                  Spacing.sm,
-                  Spacing.md,
-                  Spacing.xs,
+                  16.0,
+                  8.0,
+                  16.0,
+                  4.0,
                 ),
                 child: Row(
                   children: [
@@ -65,9 +64,9 @@ class PinnedMessagesBanner extends ConsumerWidget {
                       size: 16,
                       color: theme.tint[600],
                     ),
-                    const SizedBox(width: Spacing.xs),
+                    const SizedBox(width: 4.0),
                     Text(
-                      context.tr('pinned-messages'),
+                      AppLocalizations.of(context).translate('pinned-messages'),
                       style: TextStyles.smallBold.copyWith(
                         color: theme.tint[700],
                       ),
@@ -82,12 +81,12 @@ class PinnedMessagesBanner extends ConsumerWidget {
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.symmetric(
-                    horizontal: Spacing.md,
-                    vertical: Spacing.xs,
+                    horizontal: 16.0,
+                    vertical: 4.0,
                   ),
                   itemCount: pinnedMessages.length,
                   separatorBuilder: (context, index) =>
-                      const SizedBox(width: Spacing.sm),
+                      const SizedBox(width: 12.0),
                   itemBuilder: (context, index) {
                     final message = pinnedMessages[index];
                     return _PinnedMessageCard(
@@ -139,7 +138,7 @@ class _PinnedMessageCard extends ConsumerWidget {
           : null,
       child: Container(
         width: 240,
-        padding: const EdgeInsets.all(Spacing.sm),
+        padding: const EdgeInsets.all(12.0),
         decoration: ShapeDecoration(
           color: theme.backgroundColor[0],
           shape: SmoothRectangleBorder(
@@ -165,7 +164,7 @@ class _PinnedMessageCard extends ConsumerWidget {
                   size: 12,
                   color: theme.tint[500],
                 ),
-                const SizedBox(width: Spacing.xs),
+                const SizedBox(width: 4.0),
                 Expanded(
                   child: Text(
                     senderName,
@@ -179,7 +178,7 @@ class _PinnedMessageCard extends ConsumerWidget {
                 ),
               ],
             ),
-            const SizedBox(height: Spacing.xs),
+            const SizedBox(height: 4.0),
 
             // Message preview
             Expanded(
@@ -200,6 +199,7 @@ class _PinnedMessageCard extends ConsumerWidget {
 
   void _showUnpinDialog(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
+    final l10n = AppLocalizations.of(context);
 
     showDialog(
       context: context,
@@ -211,18 +211,18 @@ class _PinnedMessageCard extends ConsumerWidget {
           ),
         ),
         title: Text(
-          context.tr('unpin-message'),
+          l10n.translate('unpin-message'),
           style: TextStyles.h6,
         ),
         content: Text(
-          context.tr('confirm-unpin-message'),
+          l10n.translate('confirm-unpin-message'),
           style: TextStyles.body,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
             child: Text(
-              context.tr('cancel'),
+              l10n.translate('cancel'),
               style: TextStyles.footnote.copyWith(
                 color: theme.grey[600],
               ),
@@ -241,7 +241,7 @@ class _PinnedMessageCard extends ConsumerWidget {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text(context.tr('message-unpinned')),
+                      content: Text(l10n.translate('message-unpinned')),
                       duration: const Duration(seconds: 2),
                     ),
                   );
@@ -250,7 +250,7 @@ class _PinnedMessageCard extends ConsumerWidget {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text(context.tr('error-unpinning-message')),
+                      content: Text(l10n.translate('error-unpinning-message')),
                       backgroundColor: theme.error[500],
                       duration: const Duration(seconds: 2),
                     ),
@@ -259,7 +259,7 @@ class _PinnedMessageCard extends ConsumerWidget {
               }
             },
             child: Text(
-              context.tr('unpin'),
+              l10n.translate('unpin'),
               style: TextStyles.footnote.copyWith(
                 color: theme.error[600],
                 fontWeight: FontWeight.w600,
