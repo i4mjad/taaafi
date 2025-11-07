@@ -473,6 +473,32 @@ class MessageReactionsService extends _$MessageReactionsService {
   }
 }
 
+// ==================== SEARCH PROVIDERS ====================
+
+/// Provider for searching messages in a group
+@riverpod
+Future<List<GroupMessageEntity>> searchGroupMessages(
+  Ref ref,
+  String groupId,
+  String query,
+) async {
+  if (query.trim().isEmpty) {
+    return [];
+  }
+
+  final repository = ref.watch(groupChatRepositoryProvider);
+  try {
+    return await repository.searchMessages(
+      groupId: groupId,
+      query: query,
+      limit: 50,
+    );
+  } catch (error) {
+    print('Error searching messages in group $groupId: $error');
+    return [];
+  }
+}
+
 // ==================== CACHE MANAGEMENT ====================
 
 /// Provider for managing message cache

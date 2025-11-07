@@ -1001,7 +1001,7 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
                       messageId: message.id,
                       emoji: emoji,
                     );
-                
+
                 // Close modal after successful operation
                 if (context.mounted) {
                   Navigator.of(context).pop();

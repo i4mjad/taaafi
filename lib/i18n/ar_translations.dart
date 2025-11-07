@@ -3449,4 +3449,13 @@ const Map<String, String> kAr = {
   'reactions': 'التفاعلات',
   'reacted-with': 'تفاعل بـ',
   'and-others': 'و {count} آخرين',
+
+  // Search Messages
+  'search-messages': 'البحث في الرسائل',
+  'search-placeholder': 'ابحث في المحادثة...',
+  'search-results': 'نتائج البحث',
+  'no-results-found': 'لم يتم العثور على رسائل',
+  'search-in-progress': 'جاري البحث...',
+  'clear-search': 'مسح البحث',
+  'found-messages': 'تم العثور على {count} رسائل',
 };

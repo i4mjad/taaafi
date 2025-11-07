@@ -3524,4 +3524,13 @@ const Map<String, String> kEn = {
   "reactions": "Reactions",
   "reacted-with": "reacted with",
   "and-others": "and {count} others",
+
+  // Search Messages
+  "search-messages": "Search Messages",
+  "search-placeholder": "Search in conversation...",
+  "search-results": "Search Results",
+  "no-results-found": "No messages found",
+  "search-in-progress": "Searching...",
+  "clear-search": "Clear Search",
+  "found-messages": "Found {count} messages",
 };
