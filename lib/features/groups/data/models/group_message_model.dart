@@ -22,6 +22,7 @@ class GroupMessageModel {
   final bool isPinned;
   final DateTime? pinnedAt;
   final String? pinnedBy;
+  final Map<String, List<String>> reactions;
 
   const GroupMessageModel({
     required this.id,
@@ -40,6 +41,7 @@ class GroupMessageModel {
     this.isPinned = false,
     this.pinnedAt,
     this.pinnedBy,
+    this.reactions = const {},
   });
 
   /// Creates a GroupMessageModel from Firestore document
@@ -65,7 +67,22 @@ class GroupMessageModel {
           ? (data['pinnedAt'] as Timestamp).toDate() 
           : null,
       pinnedBy: data['pinnedBy'] as String?,
+      reactions: _parseReactions(data['reactions']),
     );
+  }
+
+  /// Parse reactions from Firestore format
+  static Map<String, List<String>> _parseReactions(dynamic reactionsData) {
+    if (reactionsData == null) return {};
+    
+    final Map<String, dynamic> rawReactions = Map<String, dynamic>.from(reactionsData);
+    final Map<String, List<String>> reactions = {};
+    
+    for (final entry in rawReactions.entries) {
+      reactions[entry.key] = List<String>.from(entry.value ?? []);
+    }
+    
+    return reactions;
   }
 
   /// Creates a GroupMessageModel from JSON
@@ -89,6 +106,7 @@ class GroupMessageModel {
           ? DateTime.parse(json['pinnedAt'] as String) 
           : null,
       pinnedBy: json['pinnedBy'] as String?,
+      reactions: _parseReactions(json['reactions']),
     );
   }
 
@@ -110,6 +128,7 @@ class GroupMessageModel {
       'isPinned': isPinned,
       if (pinnedAt != null) 'pinnedAt': Timestamp.fromDate(pinnedAt!),
       if (pinnedBy != null) 'pinnedBy': pinnedBy,
+      'reactions': reactions,
     };
   }
 
@@ -132,6 +151,7 @@ class GroupMessageModel {
       'isPinned': isPinned,
       if (pinnedAt != null) 'pinnedAt': pinnedAt!.toIso8601String(),
       if (pinnedBy != null) 'pinnedBy': pinnedBy,
+      'reactions': reactions,
     };
   }
 
@@ -176,6 +196,7 @@ class GroupMessageModel {
       isPinned: entity.isPinned,
       pinnedAt: entity.pinnedAt,
       pinnedBy: entity.pinnedBy,
+      reactions: entity.reactions,
     );
   }
 
@@ -196,6 +217,7 @@ class GroupMessageModel {
     bool? isPinned,
     DateTime? pinnedAt,
     String? pinnedBy,
+    Map<String, List<String>>? reactions,
   }) {
     return GroupMessageModel(
       id: id ?? this.id,
@@ -214,6 +236,7 @@ class GroupMessageModel {
       isPinned: isPinned ?? this.isPinned,
       pinnedAt: pinnedAt ?? this.pinnedAt,
       pinnedBy: pinnedBy ?? this.pinnedBy,
+      reactions: reactions ?? this.reactions,
     );
   }
 
