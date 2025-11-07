@@ -55,6 +55,22 @@ abstract class GroupChatRepository {
 
   /// Clear profile cache for specific user (when profile is updated)
   void clearProfileCache(String cpId);
+
+  /// Pin a message (admin only, max 3 pinned)
+  Future<void> pinMessage({
+    required String groupId,
+    required String messageId,
+    required String adminCpId,
+  });
+
+  /// Unpin a message
+  Future<void> unpinMessage({
+    required String groupId,
+    required String messageId,
+  });
+
+  /// Get pinned messages for group
+  Future<List<GroupMessageEntity>> getPinnedMessages(String groupId);
 }
 
 /// Domain-level pagination parameters
@@ -276,6 +292,54 @@ class GroupChatRepositoryImpl implements GroupChatRepository {
       (_dataSource as GroupMessagesFirestoreDataSource).clearProfileCache(cpId);
     }
     log('Profile cache cleared via repository for cpId: $cpId');
+  }
+
+  @override
+  Future<void> pinMessage({
+    required String groupId,
+    required String messageId,
+    required String adminCpId,
+  }) async {
+    try {
+      await _dataSource.pinMessage(
+        groupId: groupId,
+        messageId: messageId,
+        adminCpId: adminCpId,
+      );
+      log('Message pinned via repository: $messageId');
+    } catch (e, stackTrace) {
+      log('Error pinning message via repository: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> unpinMessage({
+    required String groupId,
+    required String messageId,
+  }) async {
+    try {
+      await _dataSource.unpinMessage(
+        groupId: groupId,
+        messageId: messageId,
+      );
+      log('Message unpinned via repository: $messageId');
+    } catch (e, stackTrace) {
+      log('Error unpinning message via repository: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<List<GroupMessageEntity>> getPinnedMessages(String groupId) async {
+    try {
+      final models = await _dataSource.getPinnedMessages(groupId);
+      return models.map((model) => model.toEntity()).toList();
+    } catch (e, stackTrace) {
+      log('Error getting pinned messages via repository: $e',
+          stackTrace: stackTrace);
+      rethrow;
+    }
   }
 
   /// Generate search tokens from message body
