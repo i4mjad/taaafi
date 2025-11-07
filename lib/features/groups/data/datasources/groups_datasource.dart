@@ -91,4 +91,12 @@ abstract class GroupsDataSource {
 
   /// Find group by join code
   Future<GroupModel?> findGroupByJoinCode(String joinCode);
+
+  // ==================== ACTIVITY TRACKING (Sprint 2 - Feature 2.1) ====================
+  
+  /// Update member activity (last active timestamp, message count, engagement score)
+  Future<void> updateMemberActivity({
+    required String groupId,
+    required String cpId,
+  });
 }

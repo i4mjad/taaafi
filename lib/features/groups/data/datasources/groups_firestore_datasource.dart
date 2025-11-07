@@ -503,6 +503,59 @@ class GroupsFirestoreDataSource implements GroupsDataSource {
     }
   }
 
+  // ==================== ACTIVITY TRACKING (Sprint 2 - Feature 2.1) ====================
+
+  @override
+  Future<void> updateMemberActivity({
+    required String groupId,
+    required String cpId,
+  }) async {
+    try {
+      final membershipId = '${groupId}_$cpId';
+      final now = Timestamp.now();
+
+      // Get current membership data
+      final membershipDoc = await _firestore
+          .collection('group_memberships')
+          .doc(membershipId)
+          .get();
+
+      if (!membershipDoc.exists) {
+        log('Membership not found for $membershipId');
+        return;
+      }
+
+      final data = membershipDoc.data()!;
+      final currentMessageCount = data['messageCount'] as int? ?? 0;
+      final newMessageCount = currentMessageCount + 1;
+
+      // Calculate engagement score
+      // Formula: messageCount × 2 + activity bonuses
+      int engagementScore = newMessageCount * 2;
+
+      // Active in last 24 hours = +10
+      engagementScore += 10;
+
+      // Ensure score is never negative
+      engagementScore = engagementScore.clamp(0, 999);
+
+      // Update membership with new activity data
+      await _firestore
+          .collection('group_memberships')
+          .doc(membershipId)
+          .update({
+        'lastActiveAt': now,
+        'messageCount': newMessageCount,
+        'engagementScore': engagementScore,
+      });
+
+      log('Updated activity for member $cpId in group $groupId: messages=$newMessageCount, engagement=$engagementScore');
+    } catch (e, stackTrace) {
+      log('Error updating member activity: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
   // Helper method to get user ID from community profile ID
   Future<String> _getUserIdFromCpId(String cpId) async {
     final cpDoc =
