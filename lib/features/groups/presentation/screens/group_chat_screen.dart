@@ -955,23 +955,45 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
     const emojis = ['👍', '❤️', '😂', '😮', '😢', '🙏', '🎉', '🔥', '👏', '💯'];
 
     final currentProfile = ref.watch(currentCommunityProfileProvider).value;
+    
+    // Find current user's reaction (if any)
+    String? currentUserReaction;
+    if (currentProfile != null) {
+      for (final emoji in message.reactions.keys) {
+        if (message.reactions[emoji]?.contains(currentProfile.id) ?? false) {
+          currentUserReaction = emoji;
+          break;
+        }
+      }
+    }
 
     return SizedBox(
-      height: 56,
+      height: 48,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         itemCount: emojis.length,
-        separatorBuilder: (context, index) => const SizedBox(width: 8),
+        separatorBuilder: (context, index) => const SizedBox(width: 6),
         itemBuilder: (context, index) {
           final emoji = emojis[index];
-          final hasReacted = currentProfile != null &&
-              (message.reactions[emoji]?.contains(currentProfile.id) ?? false);
+          final hasReacted = currentUserReaction == emoji;
 
           return InkWell(
             onTap: () async {
               Navigator.of(context).pop(); // Close modal
               try {
+                // First, remove existing reaction if any
+                if (currentUserReaction != null && currentUserReaction != emoji) {
+                  await ref
+                      .read(messageReactionsServiceProvider.notifier)
+                      .toggleReaction(
+                        groupId: widget.groupId ?? '',
+                        messageId: message.id,
+                        emoji: currentUserReaction,
+                      );
+                }
+                
+                // Then add/remove the selected emoji
                 await ref
                     .read(messageReactionsServiceProvider.notifier)
                     .toggleReaction(
@@ -986,20 +1008,20 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
                 print('Error toggling reaction: $e');
               }
             },
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(6),
             child: Container(
-              width: 40,
-              height: 40,
+              width: 36,
+              height: 36,
               decoration: BoxDecoration(
                 color: hasReacted
                     ? theme.primary[100]!.withValues(alpha: 0.2)
                     : Colors.transparent,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(6),
               ),
               child: Center(
                 child: Text(
                   emoji,
-                  style: const TextStyle(fontSize: 24),
+                  style: const TextStyle(fontSize: 22),
                 ),
               ),
             ),
