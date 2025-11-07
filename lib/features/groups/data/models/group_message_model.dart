@@ -174,6 +174,7 @@ class GroupMessageModel {
       isPinned: isPinned,
       pinnedAt: pinnedAt,
       pinnedBy: pinnedBy,
+      reactions: reactions,
     );
   }
 

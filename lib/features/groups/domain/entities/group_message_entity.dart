@@ -19,6 +19,7 @@ class GroupMessageEntity {
   final bool isPinned;
   final DateTime? pinnedAt;
   final String? pinnedBy;
+  final Map<String, List<String>> reactions;
 
   const GroupMessageEntity({
     required this.id,
@@ -37,6 +38,7 @@ class GroupMessageEntity {
     this.isPinned = false,
     this.pinnedAt,
     this.pinnedBy,
+    this.reactions = const {},
   });
 
   GroupMessageEntity copyWith({
@@ -56,6 +58,7 @@ class GroupMessageEntity {
     bool? isPinned,
     DateTime? pinnedAt,
     String? pinnedBy,
+    Map<String, List<String>>? reactions,
   }) {
     return GroupMessageEntity(
       id: id ?? this.id,
@@ -74,7 +77,28 @@ class GroupMessageEntity {
       isPinned: isPinned ?? this.isPinned,
       pinnedAt: pinnedAt ?? this.pinnedAt,
       pinnedBy: pinnedBy ?? this.pinnedBy,
+      reactions: reactions ?? this.reactions,
     );
+  }
+
+  /// Get reaction count for a specific emoji
+  int getReactionCount(String emoji) {
+    return reactions[emoji]?.length ?? 0;
+  }
+
+  /// Check if user has reacted with a specific emoji
+  bool hasUserReacted(String cpId, String emoji) {
+    return reactions[emoji]?.contains(cpId) ?? false;
+  }
+
+  /// Get total number of reactions
+  int getTotalReactions() {
+    return reactions.values.fold(0, (sum, list) => sum + list.length);
+  }
+
+  /// Get all unique emojis used in reactions
+  List<String> getReactionEmojis() {
+    return reactions.keys.where((emoji) => reactions[emoji]!.isNotEmpty).toList();
   }
 
   /// Helper to check if message is visible (not deleted/hidden/blocked)
