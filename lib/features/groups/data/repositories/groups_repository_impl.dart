@@ -840,4 +840,58 @@ class GroupsRepositoryImpl implements GroupsRepository {
       rethrow;
     }
   }
+
+  // ==================== ACTIVITY TRACKING (Sprint 2 - Feature 2.1) ====================
+
+  @override
+  Future<List<GroupMembershipEntity>> getMembersWithActivity(
+      String groupId) async {
+    try {
+      log('Getting members with activity for group $groupId');
+      final members = await _dataSource.getActiveGroupMembersSorted(groupId);
+      return members.map((m) => m.toEntity()).toList();
+    } catch (e, stackTrace) {
+      log('Error in getMembersWithActivity: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<List<GroupMembershipEntity>> getInactiveMembers(
+    String groupId,
+    int inactiveDays,
+  ) async {
+    try {
+      log('Getting inactive members for group $groupId (${inactiveDays} days)');
+      
+      final allMembers = await _dataSource.getActiveGroupMembersSorted(groupId);
+      final now = DateTime.now();
+      
+      // Filter inactive members
+      final inactiveMembers = allMembers.where((member) {
+        if (member.lastActiveAt == null) return true;
+        final daysSinceActive = now.difference(member.lastActiveAt!).inDays;
+        return daysSinceActive >= inactiveDays;
+      }).toList();
+      
+      return inactiveMembers.map((m) => m.toEntity()).toList();
+    } catch (e, stackTrace) {
+      log('Error in getInactiveMembers: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> updateMemberActivity({
+    required String groupId,
+    required String cpId,
+  }) async {
+    try {
+      log('Updating activity for member $cpId in group $groupId');
+      await _dataSource.updateMemberActivity(groupId: groupId, cpId: cpId);
+    } catch (e, stackTrace) {
+      log('Error in updateMemberActivity: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
 }
