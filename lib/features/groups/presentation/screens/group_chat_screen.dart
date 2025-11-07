@@ -944,6 +944,69 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
     );
   }
 
+  /// Build quick reactions grid in message actions modal
+  Widget _buildQuickReactions(
+    BuildContext context,
+    WidgetRef ref,
+    CustomThemeData theme,
+    ChatMessage message,
+  ) {
+    // Default reaction emojis (same as in ReactionPicker)
+    const emojis = ['👍', '❤️', '😂', '😮', '😢', '🙏', '🎉', '🔥', '👏', '💯'];
+    
+    final currentProfile = ref.watch(currentCommunityProfileProvider).value;
+    
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: emojis.map((emoji) {
+        final hasReacted = currentProfile != null && 
+            (message.reactions[emoji]?.contains(currentProfile.id) ?? false);
+        
+        return InkWell(
+          onTap: () async {
+            Navigator.of(context).pop(); // Close modal
+            try {
+              await ref.read(messageReactionsServiceProvider.notifier).toggleReaction(
+                    groupId: widget.groupId ?? '',
+                    messageId: message.id,
+                    emoji: emoji,
+                  );
+            } catch (e) {
+              if (context.mounted) {
+                getErrorSnackBar(context, 'error-toggling-reaction');
+              }
+              print('Error toggling reaction: $e');
+            }
+          },
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            width: 52,
+            height: 52,
+            decoration: BoxDecoration(
+              color: hasReacted
+                  ? theme.primary[100]!.withValues(alpha: 0.3)
+                  : theme.grey[100]!.withValues(alpha: 0.5),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: hasReacted
+                    ? theme.primary[400]!
+                    : theme.grey[300]!,
+                width: hasReacted ? 2 : 1,
+              ),
+            ),
+            child: Center(
+              child: Text(
+                emoji,
+                style: const TextStyle(fontSize: 28),
+              ),
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
   void _startReplyToMessage(ChatMessage message) {
     setState(() {
       _replyState = ChatReplyState(
@@ -1230,6 +1293,27 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
                   ),
                 ),
 
+                const SizedBox(height: 12),
+
+                // Quick reactions section
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.translate('add-reaction'),
+                        style: TextStyles.smallBold.copyWith(
+                          color: theme.grey[700],
+                          fontSize: 12,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      _buildQuickReactions(context, ref, theme, message),
+                    ],
+                  ),
+                ),
+
                 const SizedBox(height: 20),
 
                 // Actions with ActionModal styling
@@ -1237,18 +1321,6 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Column(
                     children: [
-                      // React action (available to all users)
-                      _buildActionItem(
-                        context,
-                        theme,
-                        icon: LucideIcons.smile,
-                        title: l10n.translate('react-to-message'),
-                        subtitle: l10n.translate('add-reaction'),
-                        onTap: () => _showReactionPicker(context, message),
-                        isDestructive: false,
-                      ),
-                      const SizedBox(height: 8),
-
                       // Admin actions (if user is admin)
                       if (isAdminFromWatch) ...[
                         if (message.isHidden)
