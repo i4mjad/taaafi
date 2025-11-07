@@ -27,7 +27,7 @@ final groupMessagesDataSourceProvider =
 typedef GroupMessagesDataSourceRef
     = AutoDisposeProviderRef<GroupMessagesDataSource>;
 String _$groupChatRepositoryHash() =>
-    r'a34ab8ee692e18ac75a4af0524d02d6fb4e07ad0';
+    r'c14de72e795c889df40593770616394c3e1d0353';
 
 /// See also [groupChatRepository].
 @ProviderFor(groupChatRepository)
