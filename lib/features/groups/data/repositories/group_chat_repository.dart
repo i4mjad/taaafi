@@ -297,7 +297,10 @@ class GroupChatRepositoryImpl implements GroupChatRepository {
 
 /// Factory for creating GroupChatRepository instances
 class GroupChatRepositoryFactory {
-  static GroupChatRepository create(GroupMessagesDataSource dataSource) {
-    return GroupChatRepositoryImpl(dataSource);
+  static GroupChatRepository create(
+    GroupMessagesDataSource dataSource, {
+    GroupsDataSource? groupsDataSource,
+  }) {
+    return GroupChatRepositoryImpl(dataSource, groupsDataSource: groupsDataSource);
   }
 }

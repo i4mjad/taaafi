@@ -7,6 +7,7 @@ import '../domain/entities/group_message_entity.dart';
 import '../data/datasources/group_messages_firestore_datasource.dart';
 import '../data/repositories/group_chat_repository.dart';
 import '../../community/presentation/providers/community_providers_new.dart';
+import 'groups_providers.dart';
 
 part 'group_chat_providers.g.dart';
 
@@ -22,7 +23,8 @@ GroupMessagesDataSource groupMessagesDataSource(Ref ref) {
 @riverpod
 GroupChatRepository groupChatRepository(Ref ref) {
   final dataSource = ref.watch(groupMessagesDataSourceProvider);
-  return GroupChatRepositoryFactory.create(dataSource);
+  final groupsDataSource = ref.watch(groupsDataSourceProvider);
+  return GroupChatRepositoryFactory.create(dataSource, groupsDataSource: groupsDataSource);
 }
 
 // ==================== MESSAGE STREAM PROVIDERS ====================

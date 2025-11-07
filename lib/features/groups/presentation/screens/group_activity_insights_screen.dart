@@ -152,7 +152,7 @@ class GroupActivityInsightsScreen extends ConsumerWidget {
                   icon: LucideIcons.award,
                   value: '${stats.mostActiveMemberScore}',
                   label: l10n.translate('most-active-member'),
-                  color: theme.warning[500]!,
+                  color: theme.warn[500]!,
                   theme: theme,
                 ),
               ),
@@ -213,12 +213,12 @@ class GroupActivityInsightsScreen extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: theme.warning[100],
+              color: theme.warn[100],
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(
               LucideIcons.alertTriangle,
-              color: theme.warning[600],
+              color: theme.warn[600],
               size: 24,
             ),
           ),
@@ -229,7 +229,7 @@ class GroupActivityInsightsScreen extends ConsumerWidget {
                   .translate('inactive-warning')
                   .replaceAll('{count}', '$count'),
               style: TextStyles.body.copyWith(
-                color: theme.warning[700],
+                color: theme.warn[700],
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -536,7 +536,7 @@ class GroupActivityInsightsScreen extends ConsumerWidget {
       case 'high':
         return theme.success[600]!;
       case 'medium':
-        return theme.warning[600]!;
+        return theme.warn[600]!;
       case 'low':
       default:
         return theme.grey[600]!;
