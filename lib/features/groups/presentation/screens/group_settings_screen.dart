@@ -16,10 +16,12 @@ import 'package:reboot_app_3/features/groups/presentation/screens/group_privacy_
 import 'package:reboot_app_3/features/groups/presentation/screens/group_chat_settings_screen.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/group_capacity_settings_screen.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/edit_group_details_screen.dart';
+import 'package:reboot_app_3/features/groups/presentation/screens/group_activity_insights_screen.dart';
 import 'package:reboot_app_3/features/groups/presentation/widgets/leave_group_modal.dart';
 import 'package:reboot_app_3/features/groups/presentation/widgets/group_overview_card.dart';
 import 'package:reboot_app_3/features/groups/presentation/widgets/group_members_list.dart';
 import 'package:reboot_app_3/features/groups/providers/group_membership_provider.dart';
+import 'package:reboot_app_3/features/groups/providers/group_activity_provider.dart';
 
 class GroupSettingsScreen extends ConsumerStatefulWidget {
   const GroupSettingsScreen({super.key});
@@ -127,6 +129,11 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
 
               verticalSpace(Spacing.points24),
 
+              // Admin Section (Sprint 1 & Sprint 2 Features)
+              _buildAdminSection(context, theme, l10n, ref),
+
+              verticalSpace(Spacing.points24),
+
               // Group Members List
               const GroupMembersList(),
 
@@ -152,6 +159,8 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
           return const SizedBox.shrink();
         }
 
+        final statsAsync = ref.watch(groupActivityStatsProvider(groupMembership.group.id));
+
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -160,6 +169,23 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
               style: TextStyles.h5.copyWith(color: theme.grey[900]),
             ),
             verticalSpace(Spacing.points12),
+
+            // Activity Insights (Sprint 2 - Feature 2.1)
+            statsAsync.when(
+              data: (stats) => _buildSettingsCard(
+                context: context,
+                theme: theme,
+                l10n: l10n,
+                icon: LucideIcons.barChart2,
+                title: l10n.translate('activity-insights'),
+                subtitle: '${stats.activeMembers} ${l10n.translate('active-members')}, ${stats.inactiveMembers} ${l10n.translate('inactive-members')}',
+                onTap: () => _navigateToActivityInsights(context, groupMembership.group.id),
+              ),
+              loading: () => const SizedBox.shrink(),
+              error: (_, __) => const SizedBox.shrink(),
+            ),
+            verticalSpace(Spacing.points8),
+
             _buildSettingsCard(
               context: context,
               theme: theme,
@@ -344,6 +370,14 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => const GroupChatSettingsScreen(),
+      ),
+    );
+  }
+
+  void _navigateToActivityInsights(BuildContext context, String groupId) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => GroupActivityInsightsScreen(groupId: groupId),
       ),
     );
   }
