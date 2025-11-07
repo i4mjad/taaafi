@@ -2,14 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
-import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/community/domain/entities/community_profile_entity.dart';
 import 'package:reboot_app_3/features/groups/domain/entities/group_membership_entity.dart';
 import 'package:reboot_app_3/features/groups/domain/entities/group_achievement_entity.dart';
 import 'package:reboot_app_3/features/groups/presentation/widgets/achievement_badge_widget.dart';
-import 'package:reboot_app_3/features/groups/presentation/widgets/edit_member_profile_modal.dart';
 
 /// Member profile modal
 /// Sprint 4 - Feature 4.1: Enhanced Member Profiles

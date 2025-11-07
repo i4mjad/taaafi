@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
-import 'package:reboot_app_3/core/shared_widgets/custom_textarea.dart';
-import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/community/domain/entities/community_profile_entity.dart';
@@ -65,10 +63,11 @@ class _EditMemberProfileModalState
 
     // Validate bio length
     if (bio.length > 200) {
-      showErrorSnackBar(
-        context,
-        'Bio exceeds 200 character limit',
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Bio exceeds 200 character limit')),
+        );
+      }
       return;
     }
 
@@ -81,7 +80,9 @@ class _EditMemberProfileModalState
       }
     } catch (e) {
       if (mounted) {
-        showErrorSnackBar(context, 'Failed to update profile');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to update profile')),
+        );
         setState(() => _isSaving = false);
       }
     }
@@ -165,12 +166,28 @@ class _EditMemberProfileModalState
                     ),
                   ),
                   const SizedBox(height: 8),
-                  CustomTextArea(
+                  TextField(
                     controller: _bioController,
-                    hintText: l10n.translate('bio-placeholder'),
+                    decoration: InputDecoration(
+                      hintText: l10n.translate('bio-placeholder'),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: theme.grey[300]!),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: theme.grey[300]!),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: theme.tint[600]!, width: 2),
+                      ),
+                      contentPadding: const EdgeInsets.all(16),
+                    ),
                     maxLines: 5,
                     maxLength: 200,
                     onChanged: (_) => setState(() {}),
+                    style: TextStyles.body.copyWith(color: theme.grey[900]),
                   ),
                   const SizedBox(height: 4),
                   Row(
