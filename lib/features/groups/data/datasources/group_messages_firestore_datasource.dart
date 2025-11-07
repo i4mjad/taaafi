@@ -516,7 +516,7 @@ class GroupMessagesFirestoreDataSource implements GroupMessagesDataSource {
       }
 
       final messageData = messageDoc.data() as Map<String, dynamic>;
-      final currentReactions = GroupMessageModel._parseReactions(messageData['reactions']);
+      final currentReactions = _parseReactions(messageData['reactions']);
 
       // Toggle logic: if user already reacted with this emoji, remove it; otherwise add it
       final List<String> emojiReactions = List<String>.from(currentReactions[emoji] ?? []);
@@ -603,6 +603,20 @@ class GroupMessagesFirestoreDataSource implements GroupMessagesDataSource {
       log('Error searching messages: $e', stackTrace: stackTrace);
       rethrow;
     }
+  }
+
+  /// Parse reactions from Firestore format
+  Map<String, List<String>> _parseReactions(dynamic reactionsData) {
+    if (reactionsData == null) return {};
+    
+    final Map<String, dynamic> rawReactions = Map<String, dynamic>.from(reactionsData);
+    final Map<String, List<String>> reactions = {};
+    
+    for (final entry in rawReactions.entries) {
+      reactions[entry.key] = List<String>.from(entry.value ?? []);
+    }
+    
+    return reactions;
   }
 
   @override

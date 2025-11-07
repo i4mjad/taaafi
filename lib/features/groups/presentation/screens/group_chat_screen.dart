@@ -25,7 +25,6 @@ import '../widgets/group_chat_profile_modal.dart';
 import '../widgets/message_report_modal.dart';
 import '../widgets/pinned_messages_banner.dart';
 import '../widgets/reaction_picker.dart';
-import '../widgets/message_reactions_widget.dart';
 import '../../../shared/data/notifiers/user_reports_notifier.dart';
 import 'group_chat_settings_screen.dart';
 import 'package:go_router/go_router.dart';
@@ -839,7 +838,7 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
                             softWrap: true,
                             overflow: TextOverflow.visible,
                           ),
-                        
+
                         // Message reactions
                         if (message.reactions.isNotEmpty)
                           _buildReactionsDisplay(context, theme, message),
@@ -1249,7 +1248,7 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
                         isDestructive: false,
                       ),
                       const SizedBox(height: 8),
-                      
+
                       // Admin actions (if user is admin)
                       if (isAdminFromWatch) ...[
                         if (message.isHidden)
@@ -1493,7 +1492,8 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
   }
 
   /// Show reaction picker for a message
-  Future<void> _showReactionPicker(BuildContext context, ChatMessage message) async {
+  Future<void> _showReactionPicker(
+      BuildContext context, ChatMessage message) async {
     final emoji = await ReactionPicker.show(context);
     if (emoji != null && context.mounted) {
       try {

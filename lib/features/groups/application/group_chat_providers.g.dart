@@ -992,6 +992,25 @@ final pinnedMessagesServiceProvider =
 );
 
 typedef _$PinnedMessagesService = AutoDisposeNotifier<bool>;
+String _$messageReactionsServiceHash() =>
+    r'83dec155f5604395ae5e2cab10a721bcdd3430f4';
+
+/// Service for managing message reactions
+///
+/// Copied from [MessageReactionsService].
+@ProviderFor(MessageReactionsService)
+final messageReactionsServiceProvider =
+    AutoDisposeNotifierProvider<MessageReactionsService, bool>.internal(
+  MessageReactionsService.new,
+  name: r'messageReactionsServiceProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$messageReactionsServiceHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$MessageReactionsService = AutoDisposeNotifier<bool>;
 String _$messageCacheManagerHash() =>
     r'7e538d1566805b5f3f34387b2b67c2ebd7e741c3';
 
