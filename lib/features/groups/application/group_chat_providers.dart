@@ -24,7 +24,8 @@ GroupMessagesDataSource groupMessagesDataSource(Ref ref) {
 GroupChatRepository groupChatRepository(Ref ref) {
   final dataSource = ref.watch(groupMessagesDataSourceProvider);
   final groupsDataSource = ref.watch(groupsDataSourceProvider);
-  return GroupChatRepositoryFactory.create(dataSource, groupsDataSource: groupsDataSource);
+  return GroupChatRepositoryFactory.create(dataSource,
+      groupsDataSource: groupsDataSource);
 }
 
 // ==================== MESSAGE STREAM PROVIDERS ====================
@@ -325,7 +326,7 @@ String generateQuotedPreview(Ref ref, String messageBody) {
 @riverpod
 Future<List<GroupMessageEntity>> pinnedMessages(Ref ref, String groupId) async {
   final repository = ref.watch(groupChatRepositoryProvider);
-  
+
   try {
     return await repository.getPinnedMessages(groupId);
   } catch (error) {
@@ -363,7 +364,8 @@ class PinnedMessagesService extends _$PinnedMessagesService {
       }
 
       // Verify user is admin
-      final isAdmin = await ref.read(isCurrentUserGroupAdminProvider(groupId).future);
+      final isAdmin =
+          await ref.read(isCurrentUserGroupAdminProvider(groupId).future);
       if (!isAdmin) {
         throw Exception('Only admins can pin messages');
       }
@@ -400,7 +402,8 @@ class PinnedMessagesService extends _$PinnedMessagesService {
       state = true;
 
       // Verify user is admin
-      final isAdmin = await ref.read(isCurrentUserGroupAdminProvider(groupId).future);
+      final isAdmin =
+          await ref.read(isCurrentUserGroupAdminProvider(groupId).future);
       if (!isAdmin) {
         throw Exception('Only admins can unpin messages');
       }

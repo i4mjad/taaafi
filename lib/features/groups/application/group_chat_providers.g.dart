@@ -792,6 +792,171 @@ class _PinnedMessagesProviderElement
   String get groupId => (origin as PinnedMessagesProvider).groupId;
 }
 
+String _$searchGroupMessagesHash() =>
+    r'4cc29d1f8f504770cac4da2401aa2fc74f9d2fc1';
+
+/// Provider for searching messages in a group
+///
+/// Copied from [searchGroupMessages].
+@ProviderFor(searchGroupMessages)
+const searchGroupMessagesProvider = SearchGroupMessagesFamily();
+
+/// Provider for searching messages in a group
+///
+/// Copied from [searchGroupMessages].
+class SearchGroupMessagesFamily
+    extends Family<AsyncValue<List<GroupMessageEntity>>> {
+  /// Provider for searching messages in a group
+  ///
+  /// Copied from [searchGroupMessages].
+  const SearchGroupMessagesFamily();
+
+  /// Provider for searching messages in a group
+  ///
+  /// Copied from [searchGroupMessages].
+  SearchGroupMessagesProvider call(
+    String groupId,
+    String query,
+  ) {
+    return SearchGroupMessagesProvider(
+      groupId,
+      query,
+    );
+  }
+
+  @override
+  SearchGroupMessagesProvider getProviderOverride(
+    covariant SearchGroupMessagesProvider provider,
+  ) {
+    return call(
+      provider.groupId,
+      provider.query,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'searchGroupMessagesProvider';
+}
+
+/// Provider for searching messages in a group
+///
+/// Copied from [searchGroupMessages].
+class SearchGroupMessagesProvider
+    extends AutoDisposeFutureProvider<List<GroupMessageEntity>> {
+  /// Provider for searching messages in a group
+  ///
+  /// Copied from [searchGroupMessages].
+  SearchGroupMessagesProvider(
+    String groupId,
+    String query,
+  ) : this._internal(
+          (ref) => searchGroupMessages(
+            ref as SearchGroupMessagesRef,
+            groupId,
+            query,
+          ),
+          from: searchGroupMessagesProvider,
+          name: r'searchGroupMessagesProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$searchGroupMessagesHash,
+          dependencies: SearchGroupMessagesFamily._dependencies,
+          allTransitiveDependencies:
+              SearchGroupMessagesFamily._allTransitiveDependencies,
+          groupId: groupId,
+          query: query,
+        );
+
+  SearchGroupMessagesProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.groupId,
+    required this.query,
+  }) : super.internal();
+
+  final String groupId;
+  final String query;
+
+  @override
+  Override overrideWith(
+    FutureOr<List<GroupMessageEntity>> Function(SearchGroupMessagesRef provider)
+        create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: SearchGroupMessagesProvider._internal(
+        (ref) => create(ref as SearchGroupMessagesRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        groupId: groupId,
+        query: query,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<List<GroupMessageEntity>> createElement() {
+    return _SearchGroupMessagesProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is SearchGroupMessagesProvider &&
+        other.groupId == groupId &&
+        other.query == query;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, groupId.hashCode);
+    hash = _SystemHash.combine(hash, query.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin SearchGroupMessagesRef
+    on AutoDisposeFutureProviderRef<List<GroupMessageEntity>> {
+  /// The parameter `groupId` of this provider.
+  String get groupId;
+
+  /// The parameter `query` of this provider.
+  String get query;
+}
+
+class _SearchGroupMessagesProviderElement
+    extends AutoDisposeFutureProviderElement<List<GroupMessageEntity>>
+    with SearchGroupMessagesRef {
+  _SearchGroupMessagesProviderElement(super.provider);
+
+  @override
+  String get groupId => (origin as SearchGroupMessagesProvider).groupId;
+  @override
+  String get query => (origin as SearchGroupMessagesProvider).query;
+}
+
 String _$groupChatMessagesPaginatedHash() =>
     r'9fcdd95dcdebdc1b4da7e4ac9359960b57d3e08a';
 

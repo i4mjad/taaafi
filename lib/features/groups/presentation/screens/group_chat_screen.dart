@@ -163,8 +163,10 @@ class GroupChatScreen extends ConsumerStatefulWidget {
 class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
     with TickerProviderStateMixin {
   final TextEditingController _messageController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   bool _isSubmitting = false;
+  bool _isSearchMode = false;
   ChatReplyState _replyState = const ChatReplyState();
 
   // Animation for reply preview dismissal
@@ -211,6 +213,7 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
   @override
   void dispose() {
     _messageController.dispose();
+    _searchController.dispose();
     _scrollController.dispose();
     _replyPreviewController.dispose();
     _highlightController?.dispose();
@@ -225,55 +228,69 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
 
     return Scaffold(
       backgroundColor: theme.backgroundColor,
-      appBar: appBar(
-        context,
-        ref,
-        "group-chat",
-        false,
-        true,
-        actions: [
-          IconButton(
-            icon: Icon(
-              LucideIcons.settings,
-              color: theme.grey[700],
-              size: 20,
+      appBar: _isSearchMode
+          ? _buildSearchAppBar(context, theme, l10n)
+          : appBar(
+              context,
+              ref,
+              "group-chat",
+              false,
+              true,
+              actions: [
+                IconButton(
+                  icon: Icon(
+                    LucideIcons.search,
+                    color: theme.grey[700],
+                    size: 20,
+                  ),
+                  onPressed: () => _enterSearchMode(),
+                  tooltip: l10n.translate('search-messages'),
+                ),
+                IconButton(
+                  icon: Icon(
+                    LucideIcons.settings,
+                    color: theme.grey[700],
+                    size: 20,
+                  ),
+                  onPressed: () => _navigateToChatSettings(context),
+                  tooltip: l10n.translate('chat-settings'),
+                ),
+              ],
             ),
-            onPressed: () => _navigateToChatSettings(context),
-            tooltip: l10n.translate('chat-settings'),
-          ),
-        ],
-      ),
       body: Column(
         children: [
-          // Pinned messages banner
-          Consumer(
-            builder: (context, ref, child) {
-              final groupId = widget.groupId;
-              if (groupId == null) return const SizedBox.shrink();
+          // Pinned messages banner (hide in search mode)
+          if (!_isSearchMode)
+            Consumer(
+              builder: (context, ref, child) {
+                final groupId = widget.groupId;
+                if (groupId == null) return const SizedBox.shrink();
 
-              final isAdminAsync =
-                  ref.watch(isCurrentUserGroupAdminProvider(groupId));
-              final isAdmin = isAdminAsync.valueOrNull ?? false;
+                final isAdminAsync =
+                    ref.watch(isCurrentUserGroupAdminProvider(groupId));
+                final isAdmin = isAdminAsync.valueOrNull ?? false;
 
-              return PinnedMessagesBanner(
-                groupId: groupId,
-                isAdmin: isAdmin,
-                onTapMessage: (messageId) {
-                  // TODO: Scroll to message in chat
-                  // This will be implemented when we add scroll-to-message functionality
-                  print('Tapped pinned message: $messageId');
-                },
-              );
-            },
-          ),
+                return PinnedMessagesBanner(
+                  groupId: groupId,
+                  isAdmin: isAdmin,
+                  onTapMessage: (messageId) {
+                    // TODO: Scroll to message in chat
+                    // This will be implemented when we add scroll-to-message functionality
+                    print('Tapped pinned message: $messageId');
+                  },
+                );
+              },
+            ),
 
-          // Messages list
+          // Messages list or search results
           Expanded(
-            child: _buildMessagesList(context, theme, l10n, chatTextSize),
+            child: _isSearchMode
+                ? _buildSearchResults(context, theme, l10n, chatTextSize)
+                : _buildMessagesList(context, theme, l10n, chatTextSize),
           ),
 
-          // Input area
-          _buildInputArea(context, theme, l10n),
+          // Input area (hide in search mode)
+          if (!_isSearchMode) _buildInputArea(context, theme, l10n),
         ],
       ),
     );
@@ -1034,6 +1051,257 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
           );
         },
       ),
+    );
+  }
+
+  /// Enter search mode
+  void _enterSearchMode() {
+    setState(() {
+      _isSearchMode = true;
+    });
+  }
+
+  /// Exit search mode
+  void _exitSearchMode() {
+    setState(() {
+      _isSearchMode = false;
+      _searchController.clear();
+    });
+  }
+
+  /// Build search app bar
+  PreferredSizeWidget _buildSearchAppBar(
+    BuildContext context,
+    CustomThemeData theme,
+    AppLocalizations l10n,
+  ) {
+    return AppBar(
+      backgroundColor: theme.backgroundColor,
+      elevation: 0,
+      leading: IconButton(
+        icon: Icon(LucideIcons.arrowLeft, color: theme.grey[700]),
+        onPressed: _exitSearchMode,
+      ),
+      title: TextField(
+        controller: _searchController,
+        autofocus: true,
+        decoration: InputDecoration(
+          hintText: l10n.translate('search-placeholder'),
+          border: InputBorder.none,
+          hintStyle: TextStyles.body.copyWith(color: theme.grey[500]),
+        ),
+        style: TextStyles.body.copyWith(color: theme.grey[900]),
+        onChanged: (value) {
+          setState(() {}); // Trigger rebuild to show/update results
+        },
+      ),
+      actions: [
+        if (_searchController.text.isNotEmpty)
+          IconButton(
+            icon: Icon(LucideIcons.x, color: theme.grey[700], size: 18),
+            onPressed: () {
+              _searchController.clear();
+              setState(() {});
+            },
+            tooltip: l10n.translate('clear-search'),
+          ),
+      ],
+    );
+  }
+
+  /// Build search results
+  Widget _buildSearchResults(
+    BuildContext context,
+    CustomThemeData theme,
+    AppLocalizations l10n,
+    ChatTextSize chatTextSize,
+  ) {
+    final query = _searchController.text.trim();
+
+    if (query.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(LucideIcons.search, size: 48, color: theme.grey[400]),
+            const SizedBox(height: 16),
+            Text(
+              l10n.translate('search-placeholder'),
+              style: TextStyles.body.copyWith(color: theme.grey[600]),
+            ),
+          ],
+        ),
+      );
+    }
+
+    final searchResultsAsync =
+        ref.watch(searchGroupMessagesProvider(widget.groupId ?? '', query));
+
+    return searchResultsAsync.when(
+      loading: () => Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const CircularProgressIndicator(),
+            const SizedBox(height: 16),
+            Text(
+              l10n.translate('search-in-progress'),
+              style: TextStyles.body.copyWith(color: theme.grey[600]),
+            ),
+          ],
+        ),
+      ),
+      error: (error, stack) => Center(
+        child: Text(
+          'خطأ في البحث',
+          style: TextStyles.body.copyWith(color: theme.grey[600]),
+        ),
+      ),
+      data: (results) {
+        if (results.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(LucideIcons.searchX, size: 48, color: theme.grey[400]),
+                const SizedBox(height: 16),
+                Text(
+                  l10n.translate('no-results-found'),
+                  style: TextStyles.body.copyWith(color: theme.grey[600]),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: results.length,
+          itemBuilder: (context, index) {
+            final result = results[index];
+            return _buildSearchResultItem(context, theme, l10n, result, query);
+          },
+        );
+      },
+    );
+  }
+
+  /// Build individual search result item
+  Widget _buildSearchResultItem(
+    BuildContext context,
+    CustomThemeData theme,
+    AppLocalizations l10n,
+    GroupMessageEntity result,
+    String query,
+  ) {
+    // Get repository for sender info
+    final repository = ref.read(groupChatRepositoryProvider);
+    final senderName = repository.getSenderDisplayName(result.senderCpId);
+
+    return InkWell(
+      onTap: () {
+        // Exit search and highlight the message
+        _exitSearchMode();
+        // TODO: Scroll to and highlight message
+        print('Tapped search result: ${result.id}');
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: theme.grey[50],
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: theme.grey[200]!, width: 1),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Sender and time
+            Row(
+              children: [
+                Text(
+                  senderName,
+                  style: TextStyles.smallBold.copyWith(
+                    color: theme.grey[900],
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const Spacer(),
+                Text(
+                  _formatTime(result.createdAt, l10n),
+                  style: TextStyles.small.copyWith(color: theme.grey[600]),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            // Message body with highlighted search term
+            _buildHighlightedText(result.body, query, theme),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Build text with highlighted search query
+  Widget _buildHighlightedText(
+    String text,
+    String query,
+    CustomThemeData theme,
+  ) {
+    if (query.isEmpty) {
+      return Text(
+        text,
+        style: TextStyles.body.copyWith(color: theme.grey[700]),
+        maxLines: 3,
+        overflow: TextOverflow.ellipsis,
+      );
+    }
+
+    final lowerText = text.toLowerCase();
+    final lowerQuery = query.toLowerCase();
+    final matches = <TextSpan>[];
+    int lastMatchEnd = 0;
+
+    // Find all occurrences of the query
+    int startIndex = 0;
+    while (startIndex < text.length) {
+      final index = lowerText.indexOf(lowerQuery, startIndex);
+      if (index == -1) break;
+
+      // Add text before match
+      if (index > lastMatchEnd) {
+        matches.add(TextSpan(
+          text: text.substring(lastMatchEnd, index),
+          style: TextStyles.body.copyWith(color: theme.grey[700]),
+        ));
+      }
+
+      // Add highlighted match
+      matches.add(TextSpan(
+        text: text.substring(index, index + query.length),
+        style: TextStyles.body.copyWith(
+          color: theme.primary[700],
+          backgroundColor: theme.primary[100],
+          fontWeight: FontWeight.bold,
+        ),
+      ));
+
+      lastMatchEnd = index + query.length;
+      startIndex = lastMatchEnd;
+    }
+
+    // Add remaining text
+    if (lastMatchEnd < text.length) {
+      matches.add(TextSpan(
+        text: text.substring(lastMatchEnd),
+        style: TextStyles.body.copyWith(color: theme.grey[700]),
+      ));
+    }
+
+    return RichText(
+      text: TextSpan(children: matches),
+      maxLines: 3,
+      overflow: TextOverflow.ellipsis,
     );
   }
 
