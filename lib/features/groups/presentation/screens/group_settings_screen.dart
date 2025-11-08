@@ -341,7 +341,9 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
                         ),
                       ),
                       Icon(
-                        LucideIcons.chevronRight,
+                        Directionality.of(context).textDirection == TextDirection.rtl
+                            ? LucideIcons.chevronLeft
+                            : LucideIcons.chevronRight,
                         size: 18,
                         color: theme.grey[400],
                       ),
@@ -395,10 +397,28 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
     );
   }
 
-  void _showEditProfileModal(BuildContext context, profile, WidgetRef ref) {
+  void _showEditProfileModal(BuildContext context, profile, WidgetRef ref) async {
+    print('✏️ [SETTINGS EDIT] Opening edit modal');
+    print('✏️ [SETTINGS EDIT] Profile ID: ${profile.id}');
+    print('✏️ [SETTINGS EDIT] Current Bio: "${profile.groupBio}"');
+    print('✏️ [SETTINGS EDIT] Current Interests: ${profile.interests}');
+    
+    // Force fresh fetch before editing
+    ref.invalidate(currentCommunityProfileProvider);
+    final freshProfile = await ref.read(currentCommunityProfileProvider.future);
+    
+    if (freshProfile == null) {
+      print('❌ [SETTINGS EDIT] Failed to fetch fresh profile');
+      return;
+    }
+    
+    print('✅ [SETTINGS EDIT] Fresh profile fetched!');
+    print('✅ [SETTINGS EDIT] Fresh Bio: "${freshProfile.groupBio}"');
+    print('✅ [SETTINGS EDIT] Fresh Interests: ${freshProfile.interests}');
+    
     showEditProfileModal(
       context: context,
-      profile: profile,
+      profile: freshProfile,
       onSave: (bio, interests) async {
         try {
           final repository = ref.read(communityRepositoryProvider);

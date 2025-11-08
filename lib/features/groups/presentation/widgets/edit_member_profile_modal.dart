@@ -46,8 +46,16 @@ class _EditMemberProfileModalState
   @override
   void initState() {
     super.initState();
+    print('📝 [EDIT MODAL INIT] Initializing edit modal');
+    print('📝 [EDIT MODAL INIT] Profile ID: ${widget.profile.id}');
+    print('📝 [EDIT MODAL INIT] Profile Bio: "${widget.profile.groupBio}"');
+    print('📝 [EDIT MODAL INIT] Profile Interests: ${widget.profile.interests}');
+    
     _bioController = TextEditingController(text: widget.profile.groupBio ?? '');
     _selectedInterests = Set<String>.from(widget.profile.interests);
+    
+    print('📝 [EDIT MODAL INIT] Bio Controller Text: "${_bioController.text}"');
+    print('📝 [EDIT MODAL INIT] Selected Interests: $_selectedInterests');
   }
 
   @override
