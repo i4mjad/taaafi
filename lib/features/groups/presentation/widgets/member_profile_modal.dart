@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -518,59 +519,85 @@ class MemberProfileModal extends ConsumerWidget {
   Widget _buildActionButtons(
       BuildContext context, dynamic theme, AppLocalizations l10n) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
       decoration: BoxDecoration(
-        color: theme.backgroundColor,
-        border: Border(
-          top: BorderSide(
-            color: theme.grey[200]!,
-            width: 1,
-          ),
-        ),
+        color: Colors.transparent,
       ),
       child: SafeArea(
         top: false,
-        child: Row(
-          children: [
-            if (isOwnProfile && onEdit != null)
-              Expanded(
-                child: ElevatedButton.icon(
-                  onPressed: onEdit,
-                  icon: Icon(LucideIcons.edit, size: 18),
-                  label: Text(
-                    l10n.translate('edit-group-profile'),
-                    style: TextStyles.footnote,
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: theme.tint[600],
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(
+              decoration: BoxDecoration(
+                color: theme.backgroundColor.withOpacity(0.8),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: theme.grey[200]!.withOpacity(0.5),
+                  width: 1,
                 ),
-              )
-            else if (!isOwnProfile && onMessage != null)
-              Expanded(
-                child: ElevatedButton.icon(
-                  onPressed: onMessage,
-                  icon: Icon(LucideIcons.messageCircle, size: 18),
-                  label: Text(
-                    l10n.translate('send-message'),
-                    style: TextStyles.footnote,
+                boxShadow: [
+                  BoxShadow(
+                    color: theme.grey[900]!.withOpacity(0.05),
+                    blurRadius: 20,
+                    offset: const Offset(0, -4),
                   ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: theme.tint[600],
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
+                ],
               ),
-          ],
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  if (isOwnProfile && onEdit != null)
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: onEdit,
+                        icon: Icon(LucideIcons.edit, size: 18),
+                        label: Text(
+                          l10n.translate('edit-group-profile'),
+                          style: TextStyles.footnote.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: theme.tint[600],
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          shadowColor: theme.tint[600]!.withOpacity(0.3),
+                        ),
+                      ),
+                    )
+                  else if (!isOwnProfile && onMessage != null)
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: onMessage,
+                        icon: Icon(LucideIcons.messageCircle, size: 18),
+                        label: Text(
+                          l10n.translate('send-message'),
+                          style: TextStyles.footnote.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: theme.tint[600],
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          shadowColor: theme.tint[600]!.withOpacity(0.3),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );
