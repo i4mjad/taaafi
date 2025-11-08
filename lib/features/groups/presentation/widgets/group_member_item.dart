@@ -649,6 +649,9 @@ class GroupMemberItem extends ConsumerWidget {
   ) {
     final isOwnProfile = memberInfo.membership.cpId == currentUserCpId;
     
+    // Refresh profile data before showing modal to ensure latest data (Sprint 4 Enhancement)
+    ref.invalidate(communityProfileByIdProvider(memberInfo.membership.cpId));
+    
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
