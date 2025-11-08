@@ -13,6 +13,9 @@ import 'package:reboot_app_3/features/community/presentation/providers/community
 import 'package:reboot_app_3/features/groups/domain/entities/group_membership_entity.dart';
 import 'package:reboot_app_3/features/groups/application/group_member_management_controller.dart';
 import 'package:reboot_app_3/features/groups/presentation/widgets/member_profile_modal.dart';
+import 'package:reboot_app_3/features/groups/presentation/widgets/edit_member_profile_modal.dart';
+import 'package:reboot_app_3/features/community/domain/repositories/community_repository.dart';
+import 'package:reboot_app_3/features/groups/providers/group_members_provider.dart';
 
 /// Model for group member with user details
 class GroupMemberInfo {
@@ -652,20 +655,21 @@ class GroupMemberItem extends ConsumerWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => MemberProfileModal(
+      builder: (modalContext) => MemberProfileModal(
         profile: profile,
         membership: memberInfo.membership,
         achievements: const [], // TODO: Load achievements from service
         isOwnProfile: isOwnProfile,
         // Only provide onEdit for own profile (Sprint 4 Enhancement)
         onEdit: isOwnProfile ? () {
-          Navigator.of(context).pop();
-          // TODO: Navigate to edit profile screen
+          Navigator.of(modalContext).pop();
+          // Open edit profile modal (Sprint 4 Enhancement)
+          _showEditProfileModal(context, profile, ref);
         } : null,
         // Only provide onMessage for other members
         onMessage: !isOwnProfile ? () {
           // TODO: Navigate to direct message (Future sprint)
-          Navigator.of(context).pop();
+          Navigator.of(modalContext).pop();
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(AppLocalizations.of(context).translate('coming-soon')),
@@ -674,6 +678,54 @@ class GroupMemberItem extends ConsumerWidget {
           );
         } : null,
       ),
+    );
+  }
+
+  /// Show edit profile modal (Sprint 4 Enhancement)
+  void _showEditProfileModal(BuildContext context, dynamic profile, WidgetRef ref) {
+    showEditProfileModal(
+      context: context,
+      profile: profile,
+      onSave: (bio, interests) async {
+        try {
+          final repository = ref.read(communityRepositoryProvider);
+
+          // Update bio
+          if (bio != profile.groupBio) {
+            await repository.updateGroupBio(profile.id, bio);
+          }
+
+          // Update interests
+          if (interests.toString() != profile.interests.toString()) {
+            await repository.updateInterests(profile.id, interests);
+          }
+
+          // Refresh profile to show updates
+          ref.invalidate(currentCommunityProfileProvider);
+          ref.invalidate(communityProfileByIdProvider(profile.id));
+
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  AppLocalizations.of(context).translate('group-profile-updated'),
+                ),
+                duration: const Duration(seconds: 2),
+              ),
+            );
+          }
+        } catch (e) {
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Failed to update profile: $e'),
+                duration: const Duration(seconds: 2),
+              ),
+            );
+          }
+          rethrow;
+        }
+      },
     );
   }
 

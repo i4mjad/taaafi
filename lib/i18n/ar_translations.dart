@@ -3465,7 +3465,6 @@ const Map<String, String> kAr = {
   'profile-completed': 'تم إكمال الملف',
   'joined-recently': 'انضم للتو',
   'no-activity-yet': 'لا يوجد نشاط بعد',
-  'send-message': 'إرسال رسالة',
   'joined-today': 'انضم اليوم',
   'joined-yesterday': 'انضم أمس',
   'joined-days-ago': 'انضم منذ {days} يوم',

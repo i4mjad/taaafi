@@ -3540,7 +3540,6 @@ const Map<String, String> kEn = {
   "profile-completed": "Profile completed",
   "joined-recently": "Just joined",
   "no-activity-yet": "No activity yet",
-  "send-message": "Send Message",
   "joined-today": "Joined today",
   "joined-yesterday": "Joined yesterday",
   "joined-days-ago": "Joined {days} days ago",
