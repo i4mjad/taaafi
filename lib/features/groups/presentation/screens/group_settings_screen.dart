@@ -419,7 +419,7 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
           if (context.mounted) {
             getSuccessSnackBar(
               context,
-              AppLocalizations.of(context).translate('group-profile-updated'),
+              "group-profile-updated",
             );
           }
         } catch (e) {

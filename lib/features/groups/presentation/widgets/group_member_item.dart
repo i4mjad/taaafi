@@ -649,11 +649,6 @@ class GroupMemberItem extends ConsumerWidget {
   ) {
     final isOwnProfile = memberInfo.membership.cpId == currentUserCpId;
     
-    // Defer profile refresh to avoid Riverpod lifecycle issues (Sprint 4 Enhancement)
-    Future.microtask(() {
-      ref.invalidate(communityProfileByIdProvider(memberInfo.membership.cpId));
-    });
-    
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
