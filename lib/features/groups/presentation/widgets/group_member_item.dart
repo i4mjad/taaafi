@@ -649,13 +649,27 @@ class GroupMemberItem extends ConsumerWidget {
   ) async {
     final isOwnProfile = memberInfo.membership.cpId == currentUserCpId;
     
+    print('🔍 [PROFILE MODAL] Opening profile for cpId: ${memberInfo.membership.cpId}');
+    print('🔍 [PROFILE MODAL] Is own profile: $isOwnProfile');
+    
     // Force fresh fetch from Firestore - no cache (Sprint 4 Enhancement)
     ref.invalidate(communityProfileByIdProvider(memberInfo.membership.cpId));
     final freshProfile = await ref.read(
       communityProfileByIdProvider(memberInfo.membership.cpId).future,
     );
     
-    if (!context.mounted || freshProfile == null) return;
+    print('🔍 [PROFILE MODAL] Fresh profile fetched!');
+    print('🔍 [PROFILE MODAL] Profile ID: ${freshProfile?.id}');
+    print('🔍 [PROFILE MODAL] Display Name: ${freshProfile?.displayName}');
+    print('🔍 [PROFILE MODAL] Has Bio: ${freshProfile?.hasBio()}');
+    print('🔍 [PROFILE MODAL] Bio Content: "${freshProfile?.groupBio}"');
+    print('🔍 [PROFILE MODAL] Has Interests: ${freshProfile?.hasInterests()}');
+    print('🔍 [PROFILE MODAL] Interests: ${freshProfile?.interests}');
+    
+    if (!context.mounted || freshProfile == null) {
+      print('❌ [PROFILE MODAL] Context not mounted or profile is null!');
+      return;
+    }
     
     showModalBottomSheet(
       context: context,
@@ -689,26 +703,44 @@ class GroupMemberItem extends ConsumerWidget {
 
   /// Show edit profile modal (Sprint 4 Enhancement)
   void _showEditProfileModal(BuildContext context, dynamic profile, WidgetRef ref) {
+    print('✏️ [EDIT MODAL] Opening edit modal');
+    print('✏️ [EDIT MODAL] Profile ID: ${profile.id}');
+    print('✏️ [EDIT MODAL] Current Bio: "${profile.groupBio}"');
+    print('✏️ [EDIT MODAL] Current Interests: ${profile.interests}');
+    
     showEditProfileModal(
       context: context,
       profile: profile,
       onSave: (bio, interests) async {
+        print('💾 [SAVE] Saving profile changes...');
+        print('💾 [SAVE] New Bio: "$bio"');
+        print('💾 [SAVE] New Interests: $interests');
         try {
           final repository = ref.read(communityRepositoryProvider);
 
           // Update bio
           if (bio != profile.groupBio) {
+            print('💾 [SAVE] Bio changed, updating in Firestore...');
             await repository.updateGroupBio(profile.id, bio);
+            print('✅ [SAVE] Bio updated successfully');
+          } else {
+            print('⏭️ [SAVE] Bio unchanged, skipping update');
           }
 
           // Update interests
           if (interests.toString() != profile.interests.toString()) {
+            print('💾 [SAVE] Interests changed, updating in Firestore...');
             await repository.updateInterests(profile.id, interests);
+            print('✅ [SAVE] Interests updated successfully');
+          } else {
+            print('⏭️ [SAVE] Interests unchanged, skipping update');
           }
 
           // Invalidate cache to force fresh fetch next time
+          print('🔄 [SAVE] Invalidating profile cache...');
           ref.invalidate(currentCommunityProfileProvider);
           ref.invalidate(communityProfileByIdProvider(profile.id));
+          print('✅ [SAVE] Cache invalidated');
 
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(

@@ -35,6 +35,15 @@ class MemberProfileModal extends ConsumerWidget {
     final theme = AppTheme.of(context);
     final l10n = AppLocalizations.of(context);
 
+    print('🎨 [MEMBER PROFILE MODAL] Building modal...');
+    print('🎨 [MEMBER PROFILE MODAL] Profile ID: ${profile.id}');
+    print('🎨 [MEMBER PROFILE MODAL] Display Name: ${profile.displayName}');
+    print('🎨 [MEMBER PROFILE MODAL] Has Bio: ${profile.hasBio()}');
+    print('🎨 [MEMBER PROFILE MODAL] Bio: "${profile.groupBio}"');
+    print('🎨 [MEMBER PROFILE MODAL] Has Interests: ${profile.hasInterests()}');
+    print('🎨 [MEMBER PROFILE MODAL] Interests: ${profile.interests}');
+    print('🎨 [MEMBER PROFILE MODAL] Is Own Profile: $isOwnProfile');
+
     return Container(
       height: MediaQuery.of(context).size.height * 0.85,
       decoration: BoxDecoration(
