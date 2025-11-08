@@ -14,8 +14,6 @@ import 'package:reboot_app_3/features/groups/domain/entities/group_membership_en
 import 'package:reboot_app_3/features/groups/application/group_member_management_controller.dart';
 import 'package:reboot_app_3/features/groups/presentation/widgets/member_profile_modal.dart';
 import 'package:reboot_app_3/features/groups/presentation/widgets/edit_member_profile_modal.dart';
-import 'package:reboot_app_3/features/community/domain/repositories/community_repository.dart';
-import 'package:reboot_app_3/features/groups/providers/group_members_provider.dart';
 
 /// Model for group member with user details
 class GroupMemberInfo {
