@@ -3537,6 +3537,9 @@ const Map<String, String> kEn = {
   // Member Profiles (Sprint 4 - Feature 4.1)
   "member-profile": "Member Profile",
   "my-group-profile": "My Group Profile",
+  "profile-completed": "Profile completed",
+  "joined-recently": "Just joined",
+  "no-activity-yet": "No activity yet",
   "edit-group-profile": "Edit Profile",
   "group-bio": "Group Bio",
   "interests": "Interests",

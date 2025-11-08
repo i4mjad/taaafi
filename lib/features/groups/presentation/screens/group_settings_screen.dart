@@ -289,16 +289,18 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
       data: (profile) {
         if (profile == null) return const SizedBox.shrink();
 
+        final hasProfile = profile.hasBio() || profile.hasInterests();
+
         return GestureDetector(
           onTap: () => _showEditProfileModal(context, profile, ref),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8),
             child: WidgetsContainer(
               padding: const EdgeInsets.all(16),
-              backgroundColor: theme.tint[50],
+              backgroundColor: hasProfile ? theme.success[50] : theme.tint[50],
               borderRadius: BorderRadius.circular(15),
               borderSide: BorderSide(
-                color: theme.tint[100]!,
+                color: hasProfile ? theme.success[100]! : theme.tint[100]!,
                 width: 0.75,
               ),
               cornerSmoothing: 1,
@@ -308,18 +310,33 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
                   Row(
                     children: [
                       Icon(
-                        LucideIcons.user,
+                        hasProfile ? LucideIcons.userCheck : LucideIcons.user,
                         size: 20,
-                        color: theme.tint[600],
+                        color: hasProfile ? theme.success[600] : theme.tint[600],
                       ),
                       horizontalSpace(Spacing.points8),
-                      Text(
-                        l10n.translate('my-group-profile'),
-                        style: TextStyles.h6.copyWith(
-                          color: theme.grey[900],
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              l10n.translate('my-group-profile'),
+                              style: TextStyles.h6.copyWith(
+                                color: theme.grey[900],
+                              ),
+                            ),
+                            verticalSpace(Spacing.points4),
+                            Text(
+                              hasProfile 
+                                  ? l10n.translate('profile-completed')
+                                  : l10n.translate('add-bio'),
+                              style: TextStyles.caption.copyWith(
+                                color: hasProfile ? theme.success[700] : theme.grey[500],
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      const Spacer(),
                       Icon(
                         LucideIcons.chevronRight,
                         size: 18,
@@ -363,19 +380,7 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
                         }).toList(),
                       ),
                     ],
-                  ] else
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        verticalSpace(Spacing.points8),
-                        Text(
-                          l10n.translate('add-bio'),
-                          style: TextStyles.caption.copyWith(
-                            color: theme.grey[500],
-                          ),
-                        ),
-                      ],
-                    ),
+                  ],
                 ],
               ),
             ),

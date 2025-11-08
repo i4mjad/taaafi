@@ -206,7 +206,7 @@ class GroupMemberItem extends ConsumerWidget {
                     // Activity info: Last active & message count
                     Row(
                       children: [
-                        // Last active
+                        // Last active - improved logic (Sprint 4 Enhancement)
                         if (memberInfo.membership.lastActiveAt != null) ...[
                           Icon(
                             LucideIcons.clock,
@@ -221,13 +221,22 @@ class GroupMemberItem extends ConsumerWidget {
                               color: theme.grey[600],
                             ),
                           ),
-                        ] else
+                        ] else ...[
+                          // If no lastActiveAt, check if recently joined
+                          Icon(
+                            LucideIcons.clock,
+                            size: 11,
+                            color: theme.grey[500],
+                          ),
+                          const SizedBox(width: 4),
                           Text(
-                            l10n.translate('never-active'),
+                            _getActivityFallbackText(
+                                memberInfo.membership.joinedAt, l10n),
                             style: TextStyles.bottomNavigationBarLabel.copyWith(
-                              color: theme.grey[500],
+                              color: theme.grey[600],
                             ),
                           ),
+                        ],
 
                         const SizedBox(width: 8),
 
@@ -556,6 +565,22 @@ class GroupMemberItem extends ConsumerWidget {
       final weeks = (difference.inDays / 7).floor();
       return l10n.translate('active-weeks-ago')
           .replaceAll('{weeks}', '$weeks');
+    }
+  }
+
+  /// Get activity fallback text when lastActiveAt is null (Sprint 4 Enhancement)
+  String _getActivityFallbackText(DateTime joinedAt, AppLocalizations l10n) {
+    final now = DateTime.now();
+    final difference = now.difference(joinedAt);
+
+    // If joined very recently (within 1 hour), assume they're active
+    if (difference.inMinutes < 60) {
+      return l10n.translate('active-now');
+    } else if (difference.inHours < 24) {
+      return l10n.translate('joined-recently');
+    } else {
+      // Show "No activity yet" for older members without lastActiveAt
+      return l10n.translate('no-activity-yet');
     }
   }
 

@@ -3462,6 +3462,9 @@ const Map<String, String> kAr = {
   // Member Profiles (Sprint 4 - Feature 4.1)
   'member-profile': 'ملف العضو',
   'my-group-profile': 'ملفي في الزمالة',
+  'profile-completed': 'تم إكمال الملف',
+  'joined-recently': 'انضم للتو',
+  'no-activity-yet': 'لا يوجد نشاط بعد',
   'edit-group-profile': 'تعديل الملف',
   'group-bio': 'النبذة التعريفية',
   'interests': 'الاهتمامات',
