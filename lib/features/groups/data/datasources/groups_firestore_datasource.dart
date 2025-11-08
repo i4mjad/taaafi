@@ -540,16 +540,17 @@ class GroupsFirestoreDataSource implements GroupsDataSource {
       engagementScore = engagementScore.clamp(0, 999);
 
       // Update membership with new activity data
+      // Use set with merge to create fields if they don't exist
       await _firestore
           .collection('group_memberships')
           .doc(membershipId)
-          .update({
+          .set({
         'lastActiveAt': now,
         'messageCount': newMessageCount,
         'engagementScore': engagementScore,
-      });
+      }, SetOptions(merge: true));
 
-      log('Updated activity for member $cpId in group $groupId: messages=$newMessageCount, engagement=$engagementScore');
+      log('✅ Updated activity for member $cpId in group $groupId: messages=$newMessageCount, engagement=$engagementScore');
     } catch (e, stackTrace) {
       log('Error updating member activity: $e', stackTrace: stackTrace);
       rethrow;

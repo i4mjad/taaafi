@@ -326,7 +326,7 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
                                 color: theme.grey[900],
                               ),
                             ),
-                            verticalSpace(Spacing.points4),
+                            verticalSpace(Spacing.points8),
                             Text(
                               hasProfile
                                   ? l10n.translate('profile-completed')

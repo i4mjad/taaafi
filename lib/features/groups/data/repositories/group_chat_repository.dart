@@ -194,20 +194,24 @@ class GroupChatRepositoryImpl implements GroupChatRepository {
           GroupMessageModel.fromEntity(message.copyWith(tokens: tokens));
 
       await _dataSource.sendMessage(model);
-      log('Message sent via repository for group ${message.groupId}');
+      log('✅ Message sent via repository for group ${message.groupId}');
 
       // Update member activity tracking (Sprint 2 - Feature 2.1)
       if (_groupsDataSource != null) {
         try {
+          log('📊 Updating activity for member ${message.senderCpId} in group ${message.groupId}...');
           await _groupsDataSource!.updateMemberActivity(
             groupId: message.groupId,
             cpId: message.senderCpId,
           );
-          log('Activity updated for member ${message.senderCpId}');
-        } catch (e) {
+          log('✅ Activity updated for member ${message.senderCpId}');
+        } catch (e, stackTrace) {
           // Don't fail message send if activity update fails
-          log('Failed to update activity (non-critical): $e');
+          log('❌ Failed to update activity (non-critical): $e');
+          log('Stack trace: $stackTrace');
         }
+      } else {
+        log('⚠️ GroupsDataSource is null - cannot update activity');
       }
     } catch (e, stackTrace) {
       log('Error sending message via repository: $e', stackTrace: stackTrace);
