@@ -574,14 +574,22 @@ class GroupMemberItem extends ConsumerWidget {
     final now = DateTime.now();
     final difference = now.difference(joinedAt);
 
-    // If joined very recently (within 1 hour), assume they're active
+    // Backward compatibility: For existing users without lastActiveAt tracking
+    // We assume they're active members rather than showing "No activity yet"
+    
     if (difference.inMinutes < 60) {
+      // Just joined (< 1 hour)
       return l10n.translate('active-now');
     } else if (difference.inHours < 24) {
+      // Joined recently (< 24 hours)
+      return l10n.translate('joined-recently');
+    } else if (difference.inDays <= 7) {
+      // Joined within a week
       return l10n.translate('joined-recently');
     } else {
-      // Show "No activity yet" for older members without lastActiveAt
-      return l10n.translate('no-activity-yet');
+      // Older member - assume active (backward compatibility)
+      // Once they send a message, lastActiveAt will be set
+      return l10n.translate('active-member');
     }
   }
 

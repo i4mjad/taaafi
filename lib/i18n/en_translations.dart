@@ -3457,6 +3457,7 @@ const Map<String, String> kEn = {
   "message-count": "Messages",
   "engagement-score": "Engagement",
   "active-now": "Active now",
+  "active-member": "Active member",
   "active-minutes-ago": "Active {minutes}m ago",
   "active-hours-ago": "Active {hours}h ago",
   "active-days-ago": "Active {days}d ago",

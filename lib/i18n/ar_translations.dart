@@ -3383,6 +3383,7 @@ const Map<String, String> kAr = {
   'message-count': 'الرسائل',
   'engagement-score': 'التفاعل',
   'active-now': 'نشط الآن',
+  'active-member': 'عضو نشط',
   'active-minutes-ago': 'نشط منذ {minutes}د',
   'active-hours-ago': 'نشط منذ {hours}س',
   'active-days-ago': 'نشط منذ {days}ي',
