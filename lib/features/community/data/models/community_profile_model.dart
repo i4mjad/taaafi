@@ -53,6 +53,16 @@ class CommunityProfileModel {
   /// User's notification preferences for community features
   final NotificationPreferences? notificationPreferences;
 
+  // Sprint 4 - Group-specific profile fields
+  /// Bio specific to the group context (max 200 chars)
+  final String? groupBio;
+
+  /// User's interests/tags for the group
+  final List<String> interests;
+
+  /// IDs of achievements earned in groups
+  final List<String> groupAchievements;
+
   const CommunityProfileModel({
     required this.id,
     required this.userUID,
@@ -69,6 +79,10 @@ class CommunityProfileModel {
     required this.createdAt,
     this.updatedAt,
     this.notificationPreferences,
+    // Sprint 4 fields
+    this.groupBio,
+    this.interests = const [],
+    this.groupAchievements = const [],
   });
 
   /// Helper method to convert timestamp fields from Firestore or JSON
@@ -111,6 +125,14 @@ class CommunityProfileModel {
           ? NotificationPreferences.fromJson(
               json['notificationPreferences'] as Map<String, dynamic>)
           : null,
+      // Sprint 4 fields
+      groupBio: json['groupBio'] as String?,
+      interests: json['interests'] != null 
+          ? List<String>.from(json['interests'] as List)
+          : const [],
+      groupAchievements: json['groupAchievements'] != null
+          ? List<String>.from(json['groupAchievements'] as List)
+          : const [],
     );
   }
 
@@ -141,6 +163,14 @@ class CommunityProfileModel {
           ? NotificationPreferences.fromJson(
               data['notificationPreferences'] as Map<String, dynamic>)
           : null,
+      // Sprint 4 fields
+      groupBio: data['groupBio'] as String?,
+      interests: data['interests'] != null 
+          ? List<String>.from(data['interests'] as List)
+          : const [],
+      groupAchievements: data['groupAchievements'] != null
+          ? List<String>.from(data['groupAchievements'] as List)
+          : const [],
     );
   }
 
@@ -162,6 +192,10 @@ class CommunityProfileModel {
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
       notificationPreferences: entity.notificationPreferences,
+      // Sprint 4 fields
+      groupBio: entity.groupBio,
+      interests: entity.interests,
+      groupAchievements: entity.groupAchievements,
     );
   }
 
@@ -182,6 +216,10 @@ class CommunityProfileModel {
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
       'notificationPreferences': notificationPreferences?.toJson(),
+      // Sprint 4 fields
+      'groupBio': groupBio,
+      'interests': interests,
+      'groupAchievements': groupAchievements,
     };
   }
 
@@ -201,6 +239,10 @@ class CommunityProfileModel {
       'createdAt': Timestamp.fromDate(createdAt),
       'updatedAt': updatedAt != null ? Timestamp.fromDate(updatedAt!) : null,
       'notificationPreferences': notificationPreferences?.toJson(),
+      // Sprint 4 fields
+      'groupBio': groupBio,
+      'interests': interests,
+      'groupAchievements': groupAchievements,
     };
   }
 
@@ -222,6 +264,10 @@ class CommunityProfileModel {
       createdAt: createdAt,
       updatedAt: updatedAt,
       notificationPreferences: notificationPreferences,
+      // Sprint 4 fields
+      groupBio: groupBio,
+      interests: interests,
+      groupAchievements: groupAchievements,
     );
   }
 
@@ -242,6 +288,10 @@ class CommunityProfileModel {
     DateTime? createdAt,
     DateTime? updatedAt,
     NotificationPreferences? notificationPreferences,
+    // Sprint 4 fields
+    String? groupBio,
+    List<String>? interests,
+    List<String>? groupAchievements,
   }) {
     return CommunityProfileModel(
       id: id ?? this.id,
@@ -260,6 +310,10 @@ class CommunityProfileModel {
       updatedAt: updatedAt ?? this.updatedAt,
       notificationPreferences:
           notificationPreferences ?? this.notificationPreferences,
+      // Sprint 4 fields
+      groupBio: groupBio ?? this.groupBio,
+      interests: interests ?? this.interests,
+      groupAchievements: groupAchievements ?? this.groupAchievements,
     );
   }
 
