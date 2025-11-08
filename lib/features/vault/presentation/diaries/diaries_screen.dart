@@ -5,7 +5,6 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
-import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
 import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
@@ -56,7 +55,6 @@ class _DiariesScreenState extends ConsumerState<DiariesScreen> {
 
     return Scaffold(
       backgroundColor: theme.backgroundColor,
-      appBar: appBar(context, ref, "diaries", false, true),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -125,29 +123,6 @@ class _DiariesScreenState extends ConsumerState<DiariesScreen> {
             ),
           ),
         ),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: theme.primary[700],
-        onPressed: () async {
-          try {
-            final diaryId = await ref
-                .read(diariesNotifierProvider.notifier)
-                .createEmptyDiary();
-            if (mounted) {
-              context.goNamed(RouteNames.diary.name,
-                  pathParameters: {'id': diaryId});
-            }
-          } catch (e) {
-            if (mounted) {
-              getErrorSnackBar(context, "error-creating-diary");
-            }
-          }
-        },
-        label: Text(
-          AppLocalizations.of(context).translate("new-diary"),
-          style: TextStyles.caption.copyWith(color: theme.grey[50]),
-        ),
-        icon: Icon(LucideIcons.pencil, color: theme.grey[50]),
       ),
     );
   }

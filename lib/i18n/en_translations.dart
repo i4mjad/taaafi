@@ -249,6 +249,7 @@ const Map<String, String> kEn = {
   "view-progress": "View Progress",
   "view-all": "View All",
   "view-journey": "View Journey",
+  "open": "Open",
   "relapse-free": "Relapse Free",
   "porn-free": "Porn Free",
   "clean-days": "Clean Days",

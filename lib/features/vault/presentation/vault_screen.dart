@@ -6,7 +6,6 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
-import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/premium_cta_button.dart';
 import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
@@ -35,7 +34,6 @@ import 'package:reboot_app_3/features/vault/presentation/widgets/analytics/trigg
 import 'package:reboot_app_3/features/vault/presentation/widgets/analytics/risk_clock.dart';
 import 'package:reboot_app_3/features/vault/presentation/widgets/analytics/mood_correlation_chart.dart';
 import 'package:reboot_app_3/features/vault/presentation/widgets/help/help_bottom_sheet.dart';
-import 'package:reboot_app_3/core/shared_widgets/ta3afi_platform_icons_icons.dart';
 import 'package:reboot_app_3/features/vault/data/analytics/analytics_notifier.dart';
 import 'package:reboot_app_3/features/vault/data/statistics/statistics_notifier.dart';
 import 'package:reboot_app_3/features/vault/data/streaks/streak_notifier.dart';
@@ -44,9 +42,60 @@ import 'package:reboot_app_3/features/vault/data/streaks/streak_duration_notifie
 import 'package:reboot_app_3/features/vault/presentation/widgets/statistics/statistics_widget.dart';
 import 'package:reboot_app_3/features/vault/data/calendar/calendar_notifier.dart';
 import 'package:reboot_app_3/features/vault/presentation/widgets/data_restoration/data_restoration_button.dart';
+import 'package:reboot_app_3/features/vault/presentation/activities/activities_screen.dart';
+import 'package:reboot_app_3/features/vault/presentation/library/library_screen.dart';
+import 'package:reboot_app_3/features/vault/presentation/diaries/diaries_screen.dart';
+import 'package:reboot_app_3/features/vault/data/diaries/diaries_notifier.dart';
+import 'package:reboot_app_3/features/messaging/providers/messaging_groups_providers.dart';
+import 'package:reboot_app_3/features/messaging/presentation/messaging_groups_screen.dart';
+import 'package:reboot_app_3/features/vault/presentation/vault_settings/vault_settings_screen.dart';
 
-class VaultScreen extends ConsumerWidget {
+class VaultScreen extends ConsumerStatefulWidget {
   const VaultScreen({super.key});
+
+  @override
+  ConsumerState<VaultScreen> createState() => _VaultScreenState();
+}
+
+class _VaultScreenState extends ConsumerState<VaultScreen>
+    with SingleTickerProviderStateMixin {
+  TabController? _tabController;
+  List<String> _visibleCards = [];
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize will happen in build after we have the vault layout settings
+  }
+
+  @override
+  void dispose() {
+    _tabController?.dispose();
+    super.dispose();
+  }
+
+  void _initializeTabController(List<String> visibleCards) {
+    if (visibleCards.length != _visibleCards.length ||
+        !_listEquals(visibleCards, _visibleCards)) {
+      _visibleCards = List.from(visibleCards);
+      _tabController?.dispose();
+      _tabController = TabController(
+        length: visibleCards.length + 1, // +1 for the vault tab
+        vsync: this,
+      );
+      _tabController!.addListener(() {
+        setState(() {});
+      });
+    }
+  }
+
+  bool _listEquals(List<String> a, List<String> b) {
+    if (a.length != b.length) return false;
+    for (int i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) return false;
+    }
+    return true;
+  }
 
   Future<void> _refreshVaultData(WidgetRef ref) async {
     // Refresh core data providers
@@ -79,7 +128,7 @@ class VaultScreen extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
     final themeController = ref.watch(customThemeProvider);
     final accountStatus = ref.watch(accountStatusProvider);
@@ -167,22 +216,12 @@ class VaultScreen extends ConsumerWidget {
         },
       ),
       floatingActionButton: showMainContent && !shouldBlockForShorebird
-          ? FloatingActionButton.extended(
-              backgroundColor: theme.primary[600],
-              onPressed: () {
-                showModalBottomSheet<void>(
-                  context: context,
-                  isScrollControlled: true,
-                  builder: (BuildContext context) {
-                    return FollowUpSheet(DateTime.now());
-                  },
-                );
+          ? AnimatedBuilder(
+              animation: _tabController ?? const AlwaysStoppedAnimation(0),
+              builder: (context, child) {
+                return _buildFloatingActionButton(context, theme) ??
+                    const SizedBox.shrink();
               },
-              label: Text(
-                AppLocalizations.of(context).translate("daily-follow-up"),
-                style: TextStyles.caption.copyWith(color: theme.grey[50]),
-              ),
-              icon: Icon(LucideIcons.pencil, color: theme.grey[50]),
             )
           : null,
     );
@@ -200,6 +239,16 @@ class VaultScreen extends ConsumerWidget {
 
         final hasSubscription = ref.watch(hasActiveSubscriptionProvider);
         final isDarkTheme = themeController.darkTheme;
+
+        // Initialize tab controller with visible cards (vault will be added separately)
+        _initializeTabController(orderedCards);
+        final allTabs = ['vault', ...orderedCards];
+
+        if (_tabController == null || allTabs.isEmpty) {
+          return const Center(child: Spinner());
+        }
+
+        final cardData = _getCardData(context, theme);
 
         final vaultElementsMap = <String, Widget>{
           'currentStreaks': _buildVaultElement(
@@ -250,7 +299,7 @@ class VaultScreen extends ConsumerWidget {
           'calendar': _buildVaultElement(
             context,
             theme,
-            AppLocalizations.of(context).translate('calendar'),
+            AppLocalizations.of(context).translate('reboot-calender'),
             AppLocalizations.of(context).translate('calendar-description'),
             const CalendarSection(),
             LucideIcons.calendar,
@@ -296,211 +345,340 @@ class VaultScreen extends ConsumerWidget {
           ),
         };
 
-        return RefreshIndicator(
-          onRefresh: () => _refreshVaultData(ref),
-          child: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Data restoration button (for eligible users)
-                const DataRestorationButton(),
+        return Column(
+          children: [
+            // Tab bar with animated indicator
+            AnimatedBuilder(
+              animation: _tabController!,
+              builder: (context, child) {
+                return TabBar(
+                  controller: _tabController!,
+                  indicatorColor: _getActiveTabColor(theme, allTabs, cardData),
+                  labelColor: theme.primary[600],
+                  unselectedLabelColor: theme.grey[600],
+                  isScrollable: true,
+                  tabAlignment: TabAlignment.start,
+                  tabs: allTabs.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final tab = entry.value;
 
-                // Horizontal Scrollable Cards
-                _buildHorizontalCards(context, theme, orderedCards),
-                verticalSpace(Spacing.points16),
+                    if (tab == 'vault') {
+                      return Tab(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              LucideIcons.lock,
+                              size: 18,
+                              color: _tabController!.index == index
+                                  ? theme.primary[600]
+                                  : theme.grey[600],
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              AppLocalizations.of(context).translate('vault'),
+                              style: (_tabController!.index == index
+                                      ? TextStyles.footnoteSelected
+                                      : TextStyles.footnote)
+                                  .copyWith(
+                                color: _tabController!.index == index
+                                    ? theme.primary[600]
+                                    : theme.grey[600],
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
 
-                // Render ordered vault elements with consistent spacing
-                ..._buildVaultElementsWithSpacing(
-                    orderedVaultElements, vaultElementsMap),
+                    final card = cardData[tab];
+                    if (card == null)
+                      return const Tab(child: SizedBox.shrink());
 
-                verticalSpace(Spacing.points16),
-              ],
+                    // Get card color based on the card type
+                    final Color cardColor = card['color'] as Color;
+
+                    return Tab(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            card['icon'] as IconData,
+                            size: 18,
+                            color: _tabController!.index == index
+                                ? cardColor
+                                : theme.grey[600],
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            AppLocalizations.of(context)
+                                .translate(card['translationKey'] as String),
+                            style: (_tabController!.index == index
+                                    ? TextStyles.footnoteSelected
+                                    : TextStyles.footnote)
+                                .copyWith(
+                              color: _tabController!.index == index
+                                  ? cardColor
+                                  : theme.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                );
+              },
             ),
-          ),
+
+            // Tab bar view
+            Expanded(
+              child: TabBarView(
+                controller: _tabController!,
+                physics: const NeverScrollableScrollPhysics(), // Disable swipe
+                children: allTabs.map((tab) {
+                  if (tab == 'vault') {
+                    return _buildVaultContent(
+                      context,
+                      theme,
+                      ref,
+                      orderedVaultElements,
+                      vaultElementsMap,
+                    );
+                  }
+
+                  final card = cardData[tab];
+                  if (card == null) return const SizedBox.shrink();
+
+                  return _buildCardContent(
+                    context,
+                    theme,
+                    tab,
+                    card,
+                  );
+                }).toList(),
+              ),
+            ),
+          ],
         );
       },
     );
   }
 
-  Widget _buildHorizontalCards(
-      BuildContext context, CustomThemeData theme, List<String> orderedCards) {
-    final cardData = {
+  Widget _buildVaultContent(
+    BuildContext context,
+    CustomThemeData theme,
+    WidgetRef ref,
+    List<String> orderedVaultElements,
+    Map<String, Widget> vaultElementsMap,
+  ) {
+    return RefreshIndicator(
+      onRefresh: () => _refreshVaultData(ref),
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Data restoration button (for eligible users)
+            const DataRestorationButton(),
+
+            verticalSpace(Spacing.points16),
+
+            // Render ordered vault elements with consistent spacing
+            ..._buildVaultElementsWithSpacing(
+                orderedVaultElements, vaultElementsMap),
+
+            verticalSpace(Spacing.points16),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCardContent(
+    BuildContext context,
+    CustomThemeData theme,
+    String cardKey,
+    Map<String, dynamic> cardData,
+  ) {
+    // Use the ACTUAL original screen components
+    switch (cardKey) {
+      case 'activities':
+        return const ActivitiesScreen();
+      case 'library':
+        return const LibraryScreen();
+      case 'diaries':
+        return const DiariesScreen();
+      case 'messagingGroups':
+        return const MessagingGroupsScreen();
+      case 'settings':
+        return const VaultSettingsScreen();
+      default:
+        return const SizedBox.shrink();
+    }
+  }
+
+  Color _getActiveTabColor(CustomThemeData theme, List<String> allTabs,
+      Map<String, Map<String, dynamic>> cardData) {
+    if (_tabController == null) return theme.primary[600]!;
+
+    final currentIndex = _tabController!.index;
+    if (currentIndex >= allTabs.length) return theme.primary[600]!;
+
+    final currentTab = allTabs[currentIndex];
+
+    if (currentTab == 'vault') {
+      return theme.primary[600]!;
+    }
+
+    final card = cardData[currentTab];
+    if (card == null) return theme.primary[600]!;
+
+    return card['color'] as Color? ?? theme.primary[600]!;
+  }
+
+  Widget? _buildFloatingActionButton(
+      BuildContext context, CustomThemeData theme) {
+    if (_tabController == null) return null;
+
+    final currentIndex = _tabController!.index;
+    final allTabs = ['vault', ..._visibleCards];
+
+    if (currentIndex >= allTabs.length) return null;
+
+    final currentTab = allTabs[currentIndex];
+    final cardData = _getCardData(context, theme);
+
+    switch (currentTab) {
+      case 'vault':
+        // Daily follow-up FAB
+        return FloatingActionButton.extended(
+          backgroundColor: theme.primary[600],
+          onPressed: () {
+            showModalBottomSheet<void>(
+              context: context,
+              isScrollControlled: true,
+              builder: (BuildContext context) {
+                return FollowUpSheet(DateTime.now());
+              },
+            );
+          },
+          label: Text(
+            AppLocalizations.of(context).translate("daily-follow-up"),
+            style: TextStyles.caption.copyWith(color: theme.grey[50]),
+          ),
+          icon: Icon(LucideIcons.pencil, color: theme.grey[50]),
+        );
+
+      case 'activities':
+        // Add activity FAB with matching color
+        final activitiesColor =
+            cardData['activities']?['color'] as Color? ?? theme.primary[600]!;
+        return FloatingActionButton.extended(
+          backgroundColor: activitiesColor,
+          onPressed: () {
+            HapticFeedback.lightImpact();
+            context.goNamed(RouteNames.addActivity.name);
+          },
+          label: Text(
+            AppLocalizations.of(context).translate("add-activity"),
+            style: TextStyles.caption.copyWith(color: theme.grey[50]),
+          ),
+          icon: Icon(LucideIcons.plus, color: theme.grey[50]),
+        );
+
+      case 'diaries':
+        // Add diary FAB with matching color
+        final diariesColor =
+            cardData['diaries']?['color'] as Color? ?? theme.tint[500]!;
+        return FloatingActionButton.extended(
+          backgroundColor: diariesColor,
+          onPressed: () async {
+            try {
+              HapticFeedback.lightImpact();
+              final diaryId = await ref
+                  .read(diariesNotifierProvider.notifier)
+                  .createEmptyDiary();
+              if (context.mounted) {
+                context.goNamed(RouteNames.diary.name,
+                    pathParameters: {'id': diaryId});
+              }
+            } catch (e) {
+              // Handle error silently
+            }
+          },
+          label: Text(
+            AppLocalizations.of(context).translate("new-diary"),
+            style: TextStyles.caption.copyWith(color: theme.grey[50]),
+          ),
+          icon: Icon(LucideIcons.plus, color: theme.grey[50]),
+        );
+
+      case 'messagingGroups':
+        // Refresh FAB with matching color
+        final messagingColor =
+            cardData['messagingGroups']?['color'] as Color? ?? theme.warn[500]!;
+        return FloatingActionButton(
+          backgroundColor: messagingColor,
+          onPressed: () async {
+            try {
+              HapticFeedback.lightImpact();
+              await ref
+                  .read(messagingGroupsNotifierProvider.notifier)
+                  .refresh();
+            } catch (e) {
+              // Silently handle refresh errors
+            }
+          },
+          child: Icon(LucideIcons.refreshCw, color: theme.grey[50]),
+        );
+
+      case 'library':
+      case 'settings':
+      default:
+        // No FAB for library and settings
+        return null;
+    }
+  }
+
+  Map<String, Map<String, dynamic>> _getCardData(
+      BuildContext context, CustomThemeData theme) {
+    return {
       'activities': {
         'icon': LucideIcons.clipboardCheck,
         'color': theme.primary[500]!,
         'backgroundColor': theme.primary[50]!,
-        'hasPlusBadge': false,
+        'translationKey': 'activities',
         'route': () => context.goNamed(RouteNames.activities.name),
       },
       'library': {
         'icon': LucideIcons.lamp,
         'color': theme.secondary[500]!,
         'backgroundColor': theme.secondary[50]!,
-        'hasPlusBadge': false,
+        'translationKey': 'library',
         'route': () => context.goNamed(RouteNames.library.name),
       },
       'diaries': {
         'icon': LucideIcons.pencil,
         'color': theme.tint[500]!,
         'backgroundColor': theme.tint[50]!,
-        'hasPlusBadge': false,
+        'translationKey': 'diaries',
         'route': () => context.goNamed(RouteNames.diaries.name),
       },
       'messagingGroups': {
         'icon': LucideIcons.messageSquare,
         'color': theme.warn[500]!,
         'backgroundColor': theme.warn[50]!,
-        'hasPlusBadge': true,
+        'translationKey': 'messagingGroups',
         'route': () => context.goNamed(RouteNames.messagingGroups.name),
       },
       'settings': {
         'icon': LucideIcons.settings,
         'color': theme.grey[700]!,
         'backgroundColor': theme.grey[50]!,
-        'hasPlusBadge': false,
+        'translationKey': 'vault-settings',
         'route': () => context.goNamed(RouteNames.vaultSettings.name),
       },
     };
-
-    return SizedBox(
-      height: 105, // Height to accommodate uniform cards with badge margin
-      child: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        scrollDirection: Axis.horizontal,
-        children: orderedCards
-            .where((card) =>
-                cardData.containsKey(card)) // Filter out cards that don't exist
-            .expand((card) => [
-                  _buildHorizontalCard(
-                    context,
-                    theme,
-                    cardData[card]!['icon'] as IconData,
-                    card,
-                    cardData[card]!['color'] as Color,
-                    cardData[card]!['backgroundColor'] as Color,
-                    cardData[card]!['route'] as VoidCallback,
-                    hasPlusBadge:
-                        cardData[card]!['hasPlusBadge'] as bool? ?? false,
-                  ),
-                  if (card !=
-                      orderedCards.where((c) => cardData.containsKey(c)).last)
-                    horizontalSpace(
-                        Spacing.points4), // Reduced spacing between cards
-                ])
-            .toList(),
-      ),
-    );
-  }
-
-  Widget _buildHorizontalCard(
-    BuildContext context,
-    CustomThemeData theme,
-    IconData icon,
-    String textKey,
-    Color iconColor,
-    Color backgroundColor,
-    VoidCallback onTap, {
-    bool hasPlusBadge = false,
-  }) {
-    return GestureDetector(
-      onTap: () {
-        HapticFeedback.lightImpact();
-        onTap();
-      },
-      child: Container(
-        margin: EdgeInsets.all(4), // Add margin to accommodate badge
-        child: Stack(
-          clipBehavior: Clip.none, // Allow badge to overflow slightly
-          children: [
-            WidgetsContainer(
-              width: 90, // Fixed width for all cards based on longest content
-              height: 85, // Fixed height for consistency
-              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-              backgroundColor: backgroundColor,
-              borderSide:
-                  BorderSide(color: iconColor.withValues(alpha: 0.3), width: 1),
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: iconColor.withValues(alpha: 0.1),
-                  blurRadius: 8,
-                  offset: Offset(0, 2),
-                ),
-              ],
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Icon container with fixed size
-                  Container(
-                    width: 30,
-                    height: 30,
-                    decoration: BoxDecoration(
-                      color: iconColor.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Icon(
-                      icon,
-                      size: 18,
-                      color: iconColor,
-                    ),
-                  ),
-                  // Fixed spacing
-                  SizedBox(height: 6),
-                  // Text with consistent width
-                  Expanded(
-                    child: Container(
-                      width: double.infinity,
-                      alignment: Alignment.center,
-                      child: Text(
-                        AppLocalizations.of(context).translate(textKey),
-                        style: TextStyles.small.copyWith(
-                          color: theme.grey[900],
-                          fontWeight: FontWeight.w500,
-                          fontSize: 11,
-                          height: 1.2,
-                        ),
-                        textAlign: TextAlign.center,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            // Plus badge overlay - positioned within visible area
-            if (hasPlusBadge)
-              Positioned(
-                top: 2,
-                right: 2,
-                child: Container(
-                  padding:
-                      EdgeInsets.all(5), // Increased padding for larger badge
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFEBA01),
-                    borderRadius:
-                        BorderRadius.circular(8), // Larger border radius
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.15),
-                        blurRadius: 4,
-                        offset: Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Icon(
-                    Ta3afiPlatformIcons.plus,
-                    color: Colors.black,
-                    size: 12, // Larger icon size
-                  ),
-                ),
-              ),
-          ],
-        ),
-      ),
-    );
   }
 
   List<Widget> _buildVaultElementsWithSpacing(
@@ -519,7 +697,8 @@ class VaultScreen extends ConsumerWidget {
 
       // Add spacing after each element except the last one
       if (i < visibleElements.length - 1) {
-        result.add(verticalSpace(Spacing.points4)); // Consistent 24px spacing
+        result.add(
+            verticalSpace(Spacing.points16)); // 16px spacing between sections
       }
     }
 
@@ -537,7 +716,7 @@ class VaultScreen extends ConsumerWidget {
     String sectionKey,
   ) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -577,14 +756,15 @@ class VaultScreen extends ConsumerWidget {
               ),
             ],
           ),
-          verticalSpace(Spacing.points8),
+          verticalSpace(Spacing.points4),
           Text(
             description,
             style: TextStyles.small.copyWith(
               color: theme.grey[600],
+              height: 1.35,
             ),
           ),
-          verticalSpace(Spacing.points20),
+          verticalSpace(Spacing.points8),
 
           // Content (no blur for free features)
           content,
@@ -606,7 +786,7 @@ class VaultScreen extends ConsumerWidget {
     String sectionKey,
   ) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -646,14 +826,15 @@ class VaultScreen extends ConsumerWidget {
               ),
             ],
           ),
-          verticalSpace(Spacing.points8),
+          verticalSpace(Spacing.points4),
           Text(
             description,
             style: TextStyles.small.copyWith(
               color: theme.grey[600],
+              height: 1.35,
             ),
           ),
-          verticalSpace(Spacing.points20),
+          verticalSpace(Spacing.points8),
 
           // Content with conditional blur
           if (hasSubscription)

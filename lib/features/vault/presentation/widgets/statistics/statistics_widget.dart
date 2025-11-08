@@ -126,8 +126,7 @@ class CurrentStreaksWidget extends ConsumerWidget {
       data: (data) {
         // For days-only mode, use the original horizontal layout
         if (displayMode == StreakDisplayMode.days) {
-          return Padding(
-            padding: const EdgeInsets.only(top: 16.0, bottom: 16),
+          return IntrinsicHeight(
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -350,53 +349,50 @@ class CurrentStreaksWidget extends ConsumerWidget {
         }
         // For detailed mode, use a vertical layout with full-width rows
         else {
-          return Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                if (visibilitySettings['relapse']!) ...[
-                  DetailedStreakCard(
-                    titleKey: "current-streak",
-                    icon: LucideIcons.heartCrack,
-                    followUpType: FollowUpType.relapse,
-                    followUpsState: followUpsState,
-                    initialInfo: detailedStreaks['relapse']!,
-                  ),
-                  verticalSpace(Spacing.points8),
-                ],
-                if (visibilitySettings['pornOnly']!) ...[
-                  DetailedStreakCard(
-                    titleKey: "free-porn-days",
-                    icon: LucideIcons.play,
-                    followUpType: FollowUpType.pornOnly,
-                    followUpsState: followUpsState,
-                    initialInfo: detailedStreaks['pornOnly']!,
-                  ),
-                  verticalSpace(Spacing.points8),
-                ],
-                if (visibilitySettings['mastOnly']!) ...[
-                  DetailedStreakCard(
-                    titleKey: "free-mast-days",
-                    icon: LucideIcons.hand,
-                    followUpType: FollowUpType.mastOnly,
-                    followUpsState: followUpsState,
-                    initialInfo: detailedStreaks['mastOnly']!,
-                  ),
-                  verticalSpace(Spacing.points8),
-                ],
-                if (visibilitySettings['slipUp']!)
-                  DetailedStreakCard(
-                    titleKey: "free-slips-days",
-                    icon: LucideIcons.planeLanding,
-                    followUpType: FollowUpType.slipUp,
-                    followUpsState: followUpsState,
-                    initialInfo: detailedStreaks['slipUp']!,
-                  ),
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (visibilitySettings['relapse']!) ...[
+                DetailedStreakCard(
+                  titleKey: "current-streak",
+                  icon: LucideIcons.heartCrack,
+                  followUpType: FollowUpType.relapse,
+                  followUpsState: followUpsState,
+                  initialInfo: detailedStreaks['relapse']!,
+                ),
                 verticalSpace(Spacing.points8),
               ],
-            ),
+              if (visibilitySettings['pornOnly']!) ...[
+                DetailedStreakCard(
+                  titleKey: "free-porn-days",
+                  icon: LucideIcons.play,
+                  followUpType: FollowUpType.pornOnly,
+                  followUpsState: followUpsState,
+                  initialInfo: detailedStreaks['pornOnly']!,
+                ),
+                verticalSpace(Spacing.points8),
+              ],
+              if (visibilitySettings['mastOnly']!) ...[
+                DetailedStreakCard(
+                  titleKey: "free-mast-days",
+                  icon: LucideIcons.hand,
+                  followUpType: FollowUpType.mastOnly,
+                  followUpsState: followUpsState,
+                  initialInfo: detailedStreaks['mastOnly']!,
+                ),
+                verticalSpace(Spacing.points8),
+              ],
+              if (visibilitySettings['slipUp']!)
+                DetailedStreakCard(
+                  titleKey: "free-slips-days",
+                  icon: LucideIcons.planeLanding,
+                  followUpType: FollowUpType.slipUp,
+                  followUpsState: followUpsState,
+                  initialInfo: detailedStreaks['slipUp']!,
+                ),
+              verticalSpace(Spacing.points8),
+            ],
           );
         }
       },
@@ -528,125 +524,122 @@ class UserStatisticsWidget extends ConsumerWidget {
 
     return statisticsState.when(
       data: (data) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16.0),
-          child: Column(
-            children: [
-              IntrinsicHeight(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Expanded(
-                      child: WidgetsContainer(
-                        padding: EdgeInsets.all(16),
-                        backgroundColor: theme.backgroundColor,
-                        borderSide:
-                            BorderSide(color: theme.grey[600]!, width: 0.5),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              LucideIcons.heart,
-                              color: theme.primary[600],
-                              size: 25,
+        return Column(
+          children: [
+            IntrinsicHeight(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    child: WidgetsContainer(
+                      padding: EdgeInsets.all(16),
+                      backgroundColor: theme.backgroundColor,
+                      borderSide:
+                          BorderSide(color: theme.grey[600]!, width: 0.5),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            LucideIcons.heart,
+                            color: theme.primary[600],
+                            size: 25,
+                          ),
+                          verticalSpace(Spacing.points8),
+                          Text(
+                              "${data.daysWithoutRelapse} " +
+                                  localization.translate("day"),
+                              style: TextStyles.h6.copyWith(
+                                color: theme.grey[800],
+                              )),
+                          verticalSpace(Spacing.points8),
+                          Text(
+                            localization.translate("free-days-from-start"),
+                            style: TextStyles.caption.copyWith(
+                              color: theme.grey[500],
+                              height: 1.2,
                             ),
-                            verticalSpace(Spacing.points8),
-                            Text(
-                                "${data.daysWithoutRelapse} " +
-                                    localization.translate("day"),
-                                style: TextStyles.h6.copyWith(
-                                  color: theme.grey[800],
-                                )),
-                            verticalSpace(Spacing.points8),
-                            Text(
-                              localization.translate("free-days-from-start"),
-                              style: TextStyles.caption.copyWith(
-                                color: theme.grey[500],
-                                height: 1.2,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
                       ),
                     ),
-                    horizontalSpace(Spacing.points8),
-                    Expanded(
-                      child: WidgetsContainer(
-                        padding: EdgeInsets.all(16),
-                        backgroundColor: theme.backgroundColor,
-                        borderSide:
-                            BorderSide(color: theme.grey[600]!, width: 0.5),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              LucideIcons.lineChart,
-                              size: 25,
-                              color: theme.primary[600],
+                  ),
+                  horizontalSpace(Spacing.points8),
+                  Expanded(
+                    child: WidgetsContainer(
+                      padding: EdgeInsets.all(16),
+                      backgroundColor: theme.backgroundColor,
+                      borderSide:
+                          BorderSide(color: theme.grey[600]!, width: 0.5),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            LucideIcons.lineChart,
+                            size: 25,
+                            color: theme.primary[600],
+                          ),
+                          verticalSpace(Spacing.points8),
+                          Text(
+                              "${data.longestRelapseStreak} " +
+                                  localization.translate("day"),
+                              style: TextStyles.h6.copyWith(
+                                color: theme.grey[800],
+                              )),
+                          verticalSpace(Spacing.points8),
+                          Text(
+                            localization.translate("highest-streak"),
+                            style: TextStyles.caption.copyWith(
+                              color: theme.grey[500],
                             ),
-                            verticalSpace(Spacing.points8),
-                            Text(
-                                "${data.longestRelapseStreak} " +
-                                    localization.translate("day"),
-                                style: TextStyles.h6.copyWith(
-                                  color: theme.grey[800],
-                                )),
-                            verticalSpace(Spacing.points8),
-                            Text(
-                              localization.translate("highest-streak"),
-                              style: TextStyles.caption.copyWith(
-                                color: theme.grey[500],
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
                       ),
                     ),
-                    horizontalSpace(Spacing.points8),
-                    Expanded(
-                      child: WidgetsContainer(
-                        padding: EdgeInsets.all(16),
-                        backgroundColor: theme.backgroundColor,
-                        borderSide:
-                            BorderSide(color: theme.grey[600]!, width: 0.5),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              LucideIcons.calendarRange,
-                              size: 25,
-                              color: theme.primary[600],
+                  ),
+                  horizontalSpace(Spacing.points8),
+                  Expanded(
+                    child: WidgetsContainer(
+                      padding: EdgeInsets.all(16),
+                      backgroundColor: theme.backgroundColor,
+                      borderSide:
+                          BorderSide(color: theme.grey[600]!, width: 0.5),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            LucideIcons.calendarRange,
+                            size: 25,
+                            color: theme.primary[600],
+                          ),
+                          verticalSpace(Spacing.points8),
+                          Text(
+                              "${data.relapsesInLast30Days} " +
+                                  localization.translate("relapse"),
+                              style: TextStyles.h6.copyWith(
+                                color: theme.grey[800],
+                              )),
+                          verticalSpace(Spacing.points8),
+                          Text(
+                            localization.translate("relapses-30-days"),
+                            style: TextStyles.caption.copyWith(
+                              color: theme.grey[500],
+                              height: 1.2,
                             ),
-                            verticalSpace(Spacing.points8),
-                            Text(
-                                "${data.relapsesInLast30Days} " +
-                                    localization.translate("relapse"),
-                                style: TextStyles.h6.copyWith(
-                                  color: theme.grey[800],
-                                )),
-                            verticalSpace(Spacing.points8),
-                            Text(
-                              localization.translate("relapses-30-days"),
-                              style: TextStyles.caption.copyWith(
-                                color: theme.grey[500],
-                                height: 1.2,
-                              ),
-                              textAlign: TextAlign.center,
-                            )
-                          ],
-                        ),
+                            textAlign: TextAlign.center,
+                          )
+                        ],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         );
       },
       loading: () => const SizedBox(

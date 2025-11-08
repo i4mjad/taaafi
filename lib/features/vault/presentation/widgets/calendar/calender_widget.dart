@@ -5,7 +5,6 @@ import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
-import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/shared/models/follow_up.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
@@ -64,7 +63,6 @@ class _CalenderWidgetState extends ConsumerState<CalenderWidget> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              verticalSpace(Spacing.points8),
               WidgetsContainer(
                 backgroundColor: theme.backgroundColor,
                 borderSide: BorderSide(

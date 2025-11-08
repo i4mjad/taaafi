@@ -33,7 +33,6 @@ import 'package:reboot_app_3/features/authentication/presentation/login_screen.d
 import 'package:reboot_app_3/features/authentication/presentation/signup_screen.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
 import 'package:reboot_app_3/features/authentication/data/repositories/auth_repository.dart';
-import 'package:reboot_app_3/features/messaging/presentation/messaging_groups_screen.dart';
 
 import 'package:reboot_app_3/features/community/presentation/community_onboarding_screen.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/groups_onboarding_screen.dart';
@@ -57,21 +56,17 @@ import 'package:reboot_app_3/features/direct_messaging/presentation/screens/dire
 import 'package:reboot_app_3/features/vault/presentation/day_overview/day_overview_screen.dart';
 import 'package:reboot_app_3/features/home/presentation/home/home_screen.dart';
 import 'package:reboot_app_3/features/onboarding/presentation/onboarding_screen.dart';
-import 'package:reboot_app_3/features/vault/presentation/activities/activities_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/activities/activity_overview_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/activities/add_activity_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/activities/all_tasks_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/activities/ongoing_activitiy_screen.dart';
-import 'package:reboot_app_3/features/vault/presentation/diaries/diaries_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/diaries/diary_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/library/content_lists_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/library/content_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/library/content_type_screen.dart';
-import 'package:reboot_app_3/features/vault/presentation/library/library_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/library/list_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/vault_settings/activities_notifications_settings_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/vault_settings/smart_alerts_settings_screen.dart';
-import 'package:reboot_app_3/features/vault/presentation/vault_settings/vault_settings_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/vault_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/premium_analytics_screen.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -308,156 +303,113 @@ GoRouter goRouter(Ref<GoRouter> ref) {
                       ),
                     ),
                   ),
+                  // Activities routes (moved from activities screen)
                   GoRoute(
-                    path: "activities",
-                    name: RouteNames.activities.name,
+                    path: "allTasks",
+                    name: RouteNames.allTasks.name,
                     pageBuilder: (context, state) => MaterialPage(
-                      name: RouteNames.activities.name,
-                      child: ActivitiesScreen(),
+                      name: RouteNames.allTasks.name,
+                      child: AllTasksScreen(),
+                    ),
+                  ),
+                  GoRoute(
+                    path: "ongoingActivity/:id",
+                    name: RouteNames.ongoingActivity.name,
+                    pageBuilder: (context, state) => MaterialPage(
+                      name: RouteNames.ongoingActivity.name,
+                      child: OngoingActivitiyScreen(
+                          state.pathParameters["id"]!),
+                    ),
+                  ),
+                  GoRoute(
+                    path: "addActivity",
+                    name: RouteNames.addActivity.name,
+                    pageBuilder: (context, state) => MaterialPage(
+                      name: RouteNames.addActivity.name,
+                      child: AddActivityScreen(),
                     ),
                     routes: [
                       GoRoute(
-                        path: "allTasks",
-                        name: RouteNames.allTasks.name,
+                        path: "activityOverview/:id",
+                        name: RouteNames.activityOverview.name,
                         pageBuilder: (context, state) => MaterialPage(
-                          name: RouteNames.allTasks.name,
-                          child: AllTasksScreen(),
-                        ),
-                      ),
-                      GoRoute(
-                        path: "ongoingActivity/:id",
-                        name: RouteNames.ongoingActivity.name,
-                        pageBuilder: (context, state) => MaterialPage(
-                          name: RouteNames.ongoingActivity.name,
-                          child: OngoingActivitiyScreen(
+                          name: RouteNames.activityOverview.name,
+                          child: ActivityOverviewScreen(
                               state.pathParameters["id"]!),
                         ),
-                      ),
-                      GoRoute(
-                        path: "addActivity",
-                        name: RouteNames.addActivity.name,
-                        pageBuilder: (context, state) => MaterialPage(
-                          name: RouteNames.addActivity.name,
-                          child: AddActivityScreen(),
-                        ),
-                        routes: [
-                          GoRoute(
-                            path: "activityOverview/:id",
-                            name: RouteNames.activityOverview.name,
-                            pageBuilder: (context, state) => MaterialPage(
-                              name: RouteNames.activityOverview.name,
-                              child: ActivityOverviewScreen(
-                                  state.pathParameters["id"]!),
-                            ),
-                          )
-                        ],
                       )
                     ],
                   ),
+                  // Diaries routes (moved from diaries screen)
                   GoRoute(
-                    path: "diaries",
-                    name: RouteNames.diaries.name,
+                    path: "diary/:id",
+                    name: RouteNames.diary.name,
                     pageBuilder: (context, state) => MaterialPage(
-                      name: RouteNames.diaries.name,
-                      child: DiariesScreen(),
+                      name: RouteNames.diary.name,
+                      child: DiaryScreen(
+                        diaryId: state.pathParameters["id"]!,
+                      ),
                     ),
-                    routes: [
-                      GoRoute(
-                        path: "diary/:id",
-                        name: RouteNames.diary.name,
-                        pageBuilder: (context, state) => MaterialPage(
-                          name: RouteNames.diary.name,
-                          child: DiaryScreen(
-                            diaryId: state.pathParameters["id"]!,
-                          ),
-                        ),
-                      )
-                    ],
+                  ),
+                  // Library routes (moved from library screen)
+                  GoRoute(
+                    path: "list/:id",
+                    name: RouteNames.libraryList.name,
+                    pageBuilder: (context, state) => MaterialPage(
+                      name: RouteNames.libraryList.name,
+                      child: ListScreen(state.pathParameters["id"]!),
+                    ),
                   ),
                   GoRoute(
-                    path: "library",
-                    name: RouteNames.library.name,
+                    path: "content",
+                    name: RouteNames.contents.name,
                     pageBuilder: (context, state) => MaterialPage(
-                      name: RouteNames.library.name,
-                      child: LibraryScreen(),
+                      name: RouteNames.contents.name,
+                      child: ContentScreen(),
                     ),
-                    routes: [
-                      GoRoute(
-                        path: "list/:id",
-                        name: RouteNames.libraryList.name,
-                        pageBuilder: (context, state) => MaterialPage(
-                          name: RouteNames.libraryList.name,
-                          child: ListScreen(state.pathParameters["id"]!),
-                        ),
-                      ),
-                      GoRoute(
-                        path: "content",
-                        name: RouteNames.contents.name,
-                        pageBuilder: (context, state) => MaterialPage(
-                          name: RouteNames.contents.name,
-                          child: ContentScreen(),
-                        ),
-                      ),
-                      GoRoute(
-                        path: "lists",
-                        name: RouteNames.contentLists.name,
-                        pageBuilder: (context, state) => MaterialPage(
-                          name: RouteNames.contentLists.name,
-                          child: ContentListsScreen(),
-                        ),
-                      ),
-                      GoRoute(
-                        path: "contentType/:typeId",
-                        name: RouteNames.contentType.name,
-                        pageBuilder: (context, state) => MaterialPage(
-                          name: RouteNames.contentType.name,
-                          child: ContentTypeScreen(
-                            state.pathParameters["typeId"]!,
-                          ),
-                        ),
-                      )
-                    ],
                   ),
                   GoRoute(
-                    path: "settings",
-                    name: RouteNames.vaultSettings.name,
+                    path: "lists",
+                    name: RouteNames.contentLists.name,
                     pageBuilder: (context, state) => MaterialPage(
-                      name: RouteNames.vaultSettings.name,
-                      child: VaultSettingsScreen(),
+                      name: RouteNames.contentLists.name,
+                      child: ContentListsScreen(),
                     ),
-                    routes: [
-                      GoRoute(
-                        path: "activitiesNotifications",
-                        name: RouteNames.activitiesNotifications.name,
-                        pageBuilder: (context, state) => MaterialPage(
-                          name: RouteNames.activitiesNotifications.name,
-                          child: ActivitiesNotificationsSettingsScreen(),
-                        ),
-                      ),
-                      GoRoute(
-                        path: "smartAlertsSettings",
-                        name: RouteNames.smartAlertsSettings.name,
-                        pageBuilder: (context, state) => MaterialPage(
-                          name: RouteNames.smartAlertsSettings.name,
-                          child: SmartAlertsSettingsScreen(),
-                        ),
-                      ),
-                    ],
                   ),
+                  GoRoute(
+                    path: "contentType/:typeId",
+                    name: RouteNames.contentType.name,
+                    pageBuilder: (context, state) => MaterialPage(
+                      name: RouteNames.contentType.name,
+                      child: ContentTypeScreen(
+                        state.pathParameters["typeId"]!,
+                      ),
+                    ),
+                  ),
+                  // Settings routes (moved from vault settings screen)
+                  GoRoute(
+                    path: "activitiesNotifications",
+                    name: RouteNames.activitiesNotifications.name,
+                    pageBuilder: (context, state) => MaterialPage(
+                      name: RouteNames.activitiesNotifications.name,
+                      child: ActivitiesNotificationsSettingsScreen(),
+                    ),
+                  ),
+                  GoRoute(
+                    path: "smartAlertsSettings",
+                    name: RouteNames.smartAlertsSettings.name,
+                    pageBuilder: (context, state) => MaterialPage(
+                      name: RouteNames.smartAlertsSettings.name,
+                      child: SmartAlertsSettingsScreen(),
+                    ),
+                  ),
+                  // Other vault routes
                   GoRoute(
                     path: "premiumAnalytics",
                     name: RouteNames.premiumAnalytics.name,
                     pageBuilder: (context, state) => MaterialPage(
                       name: RouteNames.premiumAnalytics.name,
                       child: PremiumAnalyticsScreen(),
-                    ),
-                  ),
-                  GoRoute(
-                    path: "messagingGroups",
-                    name: RouteNames.messagingGroups.name,
-                    pageBuilder: (context, state) => MaterialPage(
-                      name: RouteNames.messagingGroups.name,
-                      child: MessagingGroupsScreen(),
                     ),
                   ),
                 ],

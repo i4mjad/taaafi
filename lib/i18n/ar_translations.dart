@@ -135,6 +135,7 @@ const Map<String, String> kAr = {
   "view-progress": "عرض التقدم",
   "view-all": "عرض الكل",
   "view-journey": "عرض رحلة التعافي",
+  "open": "فتح",
   "relapse-free": "بلا انتكاسة",
   "porn-free": "بلا مشاهدة",
   "clean-days": "بلا عادة",
