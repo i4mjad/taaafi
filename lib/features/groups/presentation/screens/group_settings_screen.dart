@@ -363,13 +363,13 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
                     if (profile.hasInterests()) ...[
                       verticalSpace(Spacing.points8),
                       Wrap(
-                        spacing: 6,
-                        runSpacing: 6,
+                        spacing: 8,
+                        runSpacing: 8,
                         children: profile.interests.take(3).map((interest) {
                           return Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
+                              horizontal: 12,
+                              vertical: 6,
                             ),
                             decoration: BoxDecoration(
                               color: theme.tint[100],
@@ -377,8 +377,9 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
                             ),
                             child: Text(
                               l10n.translate('interest-$interest'),
-                              style: TextStyles.tiny.copyWith(
+                              style: TextStyles.caption.copyWith(
                                 color: theme.tint[700],
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
                           );
