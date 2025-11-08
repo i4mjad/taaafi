@@ -646,15 +646,23 @@ class GroupMemberItem extends ConsumerWidget {
     dynamic profile,
     GroupMemberInfo memberInfo,
     WidgetRef ref,
-  ) {
+  ) async {
     final isOwnProfile = memberInfo.membership.cpId == currentUserCpId;
+    
+    // Force fresh fetch from Firestore - no cache (Sprint 4 Enhancement)
+    ref.invalidate(communityProfileByIdProvider(memberInfo.membership.cpId));
+    final freshProfile = await ref.read(
+      communityProfileByIdProvider(memberInfo.membership.cpId).future,
+    );
+    
+    if (!context.mounted || freshProfile == null) return;
     
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (modalContext) => MemberProfileModal(
-        profile: profile,
+        profile: freshProfile,
         membership: memberInfo.membership,
         achievements: const [], // TODO: Load achievements from service
         isOwnProfile: isOwnProfile,
@@ -662,7 +670,7 @@ class GroupMemberItem extends ConsumerWidget {
         onEdit: isOwnProfile ? () {
           Navigator.of(modalContext).pop();
           // Open edit profile modal (Sprint 4 Enhancement)
-          _showEditProfileModal(context, profile, ref);
+          _showEditProfileModal(context, freshProfile, ref);
         } : null,
         // Only provide onMessage for other members
         onMessage: !isOwnProfile ? () {
@@ -698,7 +706,7 @@ class GroupMemberItem extends ConsumerWidget {
             await repository.updateInterests(profile.id, interests);
           }
 
-          // Refresh profile to show updates
+          // Invalidate cache to force fresh fetch next time
           ref.invalidate(currentCommunityProfileProvider);
           ref.invalidate(communityProfileByIdProvider(profile.id));
 
@@ -712,9 +720,6 @@ class GroupMemberItem extends ConsumerWidget {
                 backgroundColor: Colors.green,
               ),
             );
-            
-            // Small delay to ensure Firestore write completes and cache updates
-            await Future.delayed(const Duration(milliseconds: 500));
           }
         } catch (e) {
           if (context.mounted) {
