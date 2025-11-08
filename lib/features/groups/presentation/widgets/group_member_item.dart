@@ -646,6 +646,8 @@ class GroupMemberItem extends ConsumerWidget {
     GroupMemberInfo memberInfo,
     WidgetRef ref,
   ) {
+    final isOwnProfile = memberInfo.membership.cpId == currentUserCpId;
+    
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -654,14 +656,23 @@ class GroupMemberItem extends ConsumerWidget {
         profile: profile,
         membership: memberInfo.membership,
         achievements: const [], // TODO: Load achievements from service
-        isOwnProfile: memberInfo.membership.cpId == currentUserCpId,
-        onEdit: () {
-          // Already in edit mode via the modal
-        },
-        onMessage: () {
+        isOwnProfile: isOwnProfile,
+        // Only provide onEdit for own profile (Sprint 4 Enhancement)
+        onEdit: isOwnProfile ? () {
+          Navigator.of(context).pop();
+          // TODO: Navigate to edit profile screen
+        } : null,
+        // Only provide onMessage for other members
+        onMessage: !isOwnProfile ? () {
           // TODO: Navigate to direct message (Future sprint)
           Navigator.of(context).pop();
-        },
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(AppLocalizations.of(context).translate('coming-soon')),
+              duration: const Duration(seconds: 1),
+            ),
+          );
+        } : null,
       ),
     );
   }

@@ -312,7 +312,8 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
                       Icon(
                         hasProfile ? LucideIcons.userCheck : LucideIcons.user,
                         size: 20,
-                        color: hasProfile ? theme.success[600] : theme.tint[600],
+                        color:
+                            hasProfile ? theme.success[600] : theme.tint[600],
                       ),
                       horizontalSpace(Spacing.points8),
                       Expanded(
@@ -327,11 +328,13 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
                             ),
                             verticalSpace(Spacing.points4),
                             Text(
-                              hasProfile 
+                              hasProfile
                                   ? l10n.translate('profile-completed')
                                   : l10n.translate('add-bio'),
                               style: TextStyles.caption.copyWith(
-                                color: hasProfile ? theme.success[700] : theme.grey[500],
+                                color: hasProfile
+                                    ? theme.success[700]
+                                    : theme.grey[500],
                               ),
                             ),
                           ],

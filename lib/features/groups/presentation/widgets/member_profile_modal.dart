@@ -208,7 +208,7 @@ class MemberProfileModal extends ConsumerWidget {
               ),
               const SizedBox(width: 4),
               Text(
-                _formatJoinDate(membership!.joinedAt),
+                _formatJoinDate(membership!.joinedAt, l10n),
                 style: TextStyles.caption.copyWith(
                   color: theme.grey[500],
                 ),
@@ -557,7 +557,7 @@ class MemberProfileModal extends ConsumerWidget {
                   onPressed: onMessage,
                   icon: Icon(LucideIcons.messageCircle, size: 18),
                   label: Text(
-                    'Message ${profile.displayName}',
+                    l10n.translate('send-message'),
                     style: TextStyles.footnote,
                   ),
                   style: ElevatedButton.styleFrom(
@@ -576,21 +576,24 @@ class MemberProfileModal extends ConsumerWidget {
     );
   }
 
-  String _formatJoinDate(DateTime date) {
+  String _formatJoinDate(DateTime date, AppLocalizations l10n) {
     final now = DateTime.now();
     final difference = now.difference(date);
 
     if (difference.inDays == 0) {
-      return 'Joined today';
+      return l10n.translate('joined-today');
     } else if (difference.inDays == 1) {
-      return 'Joined yesterday';
+      return l10n.translate('joined-yesterday');
     } else if (difference.inDays < 30) {
-      return 'Joined ${difference.inDays} days ago';
+      return l10n.translate('joined-days-ago')
+          .replaceAll('{days}', '${difference.inDays}');
     } else if (difference.inDays < 365) {
       final months = (difference.inDays / 30).floor();
-      return 'Joined $months ${months == 1 ? "month" : "months"} ago';
+      return l10n.translate('joined-months-ago')
+          .replaceAll('{months}', '$months');
     } else {
-      return 'Joined ${date.day}/${date.month}/${date.year}';
+      return l10n.translate('joined-on-date')
+          .replaceAll('{date}', '${date.day}/${date.month}/${date.year}');
     }
   }
 
