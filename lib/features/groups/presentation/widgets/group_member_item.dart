@@ -709,8 +709,12 @@ class GroupMemberItem extends ConsumerWidget {
                   AppLocalizations.of(context).translate('group-profile-updated'),
                 ),
                 duration: const Duration(seconds: 2),
+                backgroundColor: Colors.green,
               ),
             );
+            
+            // Small delay to ensure Firestore write completes and cache updates
+            await Future.delayed(const Duration(milliseconds: 500));
           }
         } catch (e) {
           if (context.mounted) {
