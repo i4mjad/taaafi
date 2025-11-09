@@ -20,6 +20,7 @@
 		6DB3DF292E5081AC0063474F /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6DB3DF282E5081AC0063474F /* StoreKit.framework */; };
 		6DB3DF2D2E5083070063474F /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6DB3DF2A2E5083070063474F /* GoogleService-Info.plist */; };
 		6DD3B0082EC090980011B7DE /* DeviceActivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6DB3DF072E507DAD0063474F /* DeviceActivity.framework */; };
+		6DD3B0102EC090980011B7DE /* FocusDeviceActivityMonitor.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 6DD3B0072EC090980011B7DE /* FocusDeviceActivityMonitor.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
@@ -51,6 +52,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
+				6DD3B0102EC090980011B7DE /* FocusDeviceActivityMonitor.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;

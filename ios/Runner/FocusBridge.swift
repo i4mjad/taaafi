@@ -41,11 +41,7 @@ final class FocusBridge {
     }
 
     // 3) Start frequent DeviceActivity monitoring (every 5 minutes + events)
-    // DISABLED: Extension not built in CI/CD
     func startHourlyMonitoring() throws {
-        FocusLogger.d("DeviceActivity monitoring disabled - extension not available")
-        return
-        /*
         FocusLogger.d("startRealtimeMonitoring")
         
         // 5-minute intervals for regular updates
@@ -69,7 +65,6 @@ final class FocusBridge {
             events: events
         )
         FocusLogger.d("realtime monitoring started (5min intervals + 1min thresholds)")
-        */
     }
 
     // 4) Read last snapshot from App Group
