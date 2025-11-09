@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -317,8 +316,8 @@ GoRouter goRouter(Ref<GoRouter> ref) {
                     name: RouteNames.ongoingActivity.name,
                     pageBuilder: (context, state) => MaterialPage(
                       name: RouteNames.ongoingActivity.name,
-                      child: OngoingActivitiyScreen(
-                          state.pathParameters["id"]!),
+                      child:
+                          OngoingActivitiyScreen(state.pathParameters["id"]!),
                     ),
                   ),
                   GoRoute(
@@ -418,24 +417,22 @@ GoRouter goRouter(Ref<GoRouter> ref) {
           ),
 
           // * Guard
-          if (kDebugMode) ...[
-            StatefulShellBranch(
-              navigatorKey: shellNavigatorGuardKey,
-              observers: [
-                GoRouterObserver(ref.read(analyticsFacadeProvider)),
-              ],
-              routes: [
-                GoRoute(
+          StatefulShellBranch(
+            navigatorKey: shellNavigatorGuardKey,
+            observers: [
+              GoRouterObserver(ref.read(analyticsFacadeProvider)),
+            ],
+            routes: [
+              GoRoute(
+                name: RouteNames.guard.name,
+                path: '/guard',
+                pageBuilder: (context, state) => MaterialPage(
                   name: RouteNames.guard.name,
-                  path: '/guard',
-                  pageBuilder: (context, state) => MaterialPage(
-                    name: RouteNames.guard.name,
-                    child: GuardScreen(),
-                  ),
+                  child: GuardScreen(),
                 ),
-              ],
-            ),
-          ],
+              ),
+            ],
+          ),
           // * Community
           StatefulShellBranch(
             navigatorKey: shellNavigatorFellowshipKey,

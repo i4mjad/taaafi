@@ -17,14 +17,12 @@ class ScaffoldWithNestedNavigation extends ConsumerWidget {
   final StatefulNavigationShell navigationShell;
 
   void _goBranch(int index, WidgetRef ref) {
-    // Community tab index is 2 (home=0, vault=1, community=2, groups=3, account=4)
-    const int communityTabIndex = kDebugMode ? 3 : 2;
+    // Tab indices: home=0, vault=1, guard=2, community=3, account=4
+    const int guardTabIndex = 2;
+    const int communityTabIndex = 3;
 
-    if (kDebugMode) {
-      const int guardTabIndex = 2;
-      final isGuardTab = index == guardTabIndex;
-      ref.read(guardStreamActiveProvider.notifier).state = isGuardTab;
-    }
+    final isGuardTab = index == guardTabIndex;
+    ref.read(guardStreamActiveProvider.notifier).state = isGuardTab;
 
     if (index == communityTabIndex) {
       // Refresh community status when community tab is clicked
@@ -47,16 +45,14 @@ class ScaffoldWithNestedNavigation extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
-    if (kDebugMode) {
-      const int guardTabIndex = 2;
-      final isGuardActive = navigationShell.currentIndex == guardTabIndex;
-      final guardState = ref.read(guardStreamActiveProvider.notifier);
-      if (guardState.state != isGuardActive) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (!context.mounted) return;
-          guardState.state = isGuardActive;
-        });
-      }
+    const int guardTabIndex = 2;
+    final isGuardActive = navigationShell.currentIndex == guardTabIndex;
+    final guardState = ref.read(guardStreamActiveProvider.notifier);
+    if (guardState.state != isGuardActive) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!context.mounted) return;
+        guardState.state = isGuardActive;
+      });
     }
     return Scaffold(
       body: navigationShell,
@@ -90,15 +86,13 @@ class ScaffoldWithNestedNavigation extends ConsumerWidget {
                   size: 20,
                 ),
               ),
-              //TODO: remove this when done with this feature
-              if (kDebugMode)
-                NavigationDestination(
-                  label: AppLocalizations.of(context).translate("guard"),
-                  icon: Icon(
-                    LucideIcons.castle,
-                    size: 20,
-                  ),
+              NavigationDestination(
+                label: AppLocalizations.of(context).translate("guard"),
+                icon: Icon(
+                  LucideIcons.castle,
+                  size: 20,
                 ),
+              ),
               NavigationDestination(
                 label: AppLocalizations.of(context).translate("community"),
                 icon: Icon(
@@ -106,7 +100,6 @@ class ScaffoldWithNestedNavigation extends ConsumerWidget {
                   size: 20,
                 ),
               ),
-
               NavigationDestination(
                 label: AppLocalizations.of(context).translate("account"),
                 icon: Icon(
