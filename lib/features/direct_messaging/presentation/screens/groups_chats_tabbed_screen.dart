@@ -9,6 +9,8 @@ import 'package:reboot_app_3/features/groups/presentation/screens/group_screen.d
 import 'community_chats_screen.dart';
 
 /// Tabbed screen that shows Groups and Chats tabs
+/// Note: This screen is displayed by GroupsMainScreen when user is in a group.
+/// Status changes are handled by the parent GroupsMainScreen reactively.
 class GroupsChatsTabbedScreen extends ConsumerStatefulWidget {
   const GroupsChatsTabbedScreen({Key? key}) : super(key: key);
 

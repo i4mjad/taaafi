@@ -326,7 +326,12 @@ class _DirectChatScreenState extends ConsumerState<DirectChatScreen>
             .clearCache(widget.conversationId);
         return AppBar(
           leading: IconButton(
-            icon: Icon(LucideIcons.arrowLeft, color: theme.grey[900]),
+            icon: Icon(
+              Directionality.of(context) == TextDirection.RTL
+                  ? LucideIcons.arrowRight
+                  : LucideIcons.arrowLeft,
+              color: theme.grey[900],
+            ),
             onPressed: () => context.pop(),
           ),
           title: FutureBuilder(

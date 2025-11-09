@@ -1080,7 +1080,12 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
       backgroundColor: theme.backgroundColor,
       elevation: 0,
       leading: IconButton(
-        icon: Icon(LucideIcons.arrowLeft, color: theme.grey[700]),
+        icon: Icon(
+          Directionality.of(context) == TextDirection.rtl
+              ? LucideIcons.arrowRight
+              : LucideIcons.arrowLeft,
+          color: theme.grey[700],
+        ),
         onPressed: _exitSearchMode,
       ),
       title: TextField(

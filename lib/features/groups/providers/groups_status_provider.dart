@@ -68,13 +68,34 @@ Future<GroupsStatus> groupsStatus(Ref ref) async {
 
   // Check if user is already in a group
   if (groupMembership != null) {
+    print('groupsStatus: User has active membership');
     return GroupsStatus.alreadyInGroup;
   }
 
+  print('groupsStatus: No active membership, checking cooldown...');
+
   // Check if user has cooldown active
   final canJoinAsync = ref.watch(canJoinGroupProvider(currentProfile.id));
-  if (canJoinAsync.hasValue && !canJoinAsync.value!) {
-    return GroupsStatus.cooldownActive;
+  
+  // Wait for canJoinGroup to finish loading
+  if (canJoinAsync.isLoading) {
+    print('groupsStatus: canJoinGroupProvider is loading...');
+    return GroupsStatus.loading;
+  }
+  
+  // Handle errors in canJoinGroup provider (assume no cooldown on error)
+  if (canJoinAsync.hasError) {
+    print('groupsStatus: Error checking cooldown: ${canJoinAsync.error}');
+    return GroupsStatus.canJoinGroup;
+  }
+  
+  if (canJoinAsync.hasValue) {
+    if (!canJoinAsync.value!) {
+      print('groupsStatus: Cooldown is active (canJoin = false)');
+      return GroupsStatus.cooldownActive;
+    } else {
+      print('groupsStatus: No cooldown (canJoin = true)');
+    }
   }
 
   // TODO: Check if user has pending invitations

@@ -75,11 +75,13 @@ class GroupScreen extends ConsumerWidget {
 
     return membershipAsync.when(
       data: (membership) {
+        // If membership is null, show loading instead of error
+        // This happens when user just left the group and navigation is in progress
         if (membership == null) {
           return Scaffold(
             backgroundColor: theme.backgroundColor,
-            body: Center(
-              child: Text(l10n.translate('error-no-group-membership')),
+            body: const Center(
+              child: CircularProgressIndicator(),
             ),
           );
         }

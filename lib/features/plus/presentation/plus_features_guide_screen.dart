@@ -37,7 +37,12 @@ class PlusFeaturesGuideScreen extends ConsumerWidget {
         backgroundColor: theme.backgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(LucideIcons.arrowLeft, color: theme.grey[700]),
+          icon: Icon(
+            Directionality.of(context) == TextDirection.rtl
+                ? LucideIcons.arrowRight
+                : LucideIcons.arrowLeft,
+            color: theme.grey[700],
+          ),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(

@@ -37,7 +37,12 @@ class GroupActivityInsightsScreen extends ConsumerWidget {
         backgroundColor: theme.backgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(LucideIcons.arrowLeft, color: theme.grey[900]),
+          icon: Icon(
+            Directionality.of(context) == TextDirection.rtl
+                ? LucideIcons.arrowRight
+                : LucideIcons.arrowLeft,
+            color: theme.grey[900],
+          ),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(

@@ -514,7 +514,9 @@ class _EnhancedProfileSelectionModalState
             ),
           ),
           Icon(
-            LucideIcons.arrowRight,
+            Directionality.of(context) == TextDirection.RTL
+                ? LucideIcons.arrowLeft
+                : LucideIcons.arrowRight,
             color: Colors.white,
             size: 16,
           ),

@@ -31,7 +31,7 @@ import 'package:reboot_app_3/core/shared_widgets/complete_registration_banner.da
 import 'package:reboot_app_3/core/shared_widgets/confirm_details_banner.dart';
 import 'package:reboot_app_3/core/shared_widgets/confirm_email_banner.dart';
 import 'package:reboot_app_3/features/direct_messaging/presentation/screens/community_chats_screen.dart';
-import 'package:reboot_app_3/features/groups/presentation/screens/group_screen.dart';
+import 'package:reboot_app_3/features/groups/presentation/screens/groups_main_screen.dart';
 
 class CommunityMainScreen extends ConsumerStatefulWidget {
   /// Optional initial tab to select when the screen opens
@@ -435,7 +435,7 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
               children: [
                 _buildForumTab(),
                 const CommunityChatsScreen(showAppBar: false),
-                const GroupScreen(),
+                const GroupsMainScreen(),
               ],
             ),
           ),
@@ -948,8 +948,10 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
                     ),
                   ),
                   const SizedBox(width: 8),
-                  const Icon(
-                    LucideIcons.arrowRight,
+                  Icon(
+                    Directionality.of(context) == TextDirection.rtl
+                        ? LucideIcons.arrowLeft
+                        : LucideIcons.arrowRight,
                     size: 18,
                     color: Colors.white,
                   ),
