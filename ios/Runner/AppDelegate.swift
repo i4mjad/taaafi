@@ -1,5 +1,7 @@
 import UIKit
 import Flutter
+import FamilyControls
+import DeviceActivity
 
 @main
 @objc class AppDelegate: FlutterAppDelegate {
@@ -25,6 +27,13 @@ import Flutter
             FocusLogger.e("ios_requestAuthorization:error \(error)")
             result(FlutterError(code: "auth_failed", message: error.localizedDescription, details: nil)) 
           }
+
+        case "ios_getAuthorizationStatus":
+          FocusLogger.d("ios_getAuthorizationStatus:start")
+          let status = await AuthorizationCenter.shared.authorizationStatus
+          let ok = (status == .approved)
+          FocusLogger.d("ios_getAuthorizationStatus:done \(ok)")
+          result(ok)
 
         case "ios_presentPicker":
           FocusLogger.d("ios_presentPicker:start")
