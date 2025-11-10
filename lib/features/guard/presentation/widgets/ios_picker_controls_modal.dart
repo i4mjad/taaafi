@@ -58,6 +58,46 @@ class IosPickerControlsModal extends ConsumerWidget {
           auth.maybeWhen(
             data: (ok) => Column(
               children: [
+                // If not authorized, show authorization request button
+                if (!ok)
+                  _buildOption(
+                    context,
+                    theme,
+                    localizations,
+                    icon: Icons.lock_open,
+                    title: localizations.translate('request_authorization'),
+                    subtitle: localizations.translate('grant_family_controls_access'),
+                    isEnabled: true,
+                    onTap: () async {
+                      try {
+                        await iosRequestAuthorization();
+                        // Refresh authorization status
+                        ref.invalidate(iosAuthStatusProvider);
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(localizations.translate('authorization_granted')),
+                              backgroundColor: theme.success[600],
+                              duration: const Duration(seconds: 3),
+                            ),
+                          );
+                        }
+                      } catch (e) {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Authorization failed: ${e.toString()}'),
+                              backgroundColor: theme.error[600],
+                              duration: const Duration(seconds: 5),
+                            ),
+                          );
+                        }
+                      }
+                    },
+                  ),
+                
+                if (!ok) const SizedBox(height: 8),
+                
                 // Select Apps and Sites Option
                 _buildOption(
                   context,
@@ -70,7 +110,21 @@ class IosPickerControlsModal extends ConsumerWidget {
                   onTap: ok
                       ? () async {
                           Navigator.of(context).pop();
-                          await iosPresentPicker();
+                          try {
+                            await iosPresentPicker();
+                          } catch (e) {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Error: ${e.toString()}'),
+                                  backgroundColor: theme.error[600],
+                                  duration: const Duration(seconds: 5),
+                                ),
+                              );
+                              // Refresh authorization status
+                              ref.invalidate(iosAuthStatusProvider);
+                            }
+                          }
                         }
                       : null,
                 ),

@@ -6,38 +6,107 @@ const MethodChannel _chan = MethodChannel('analytics.usage');
 
 Future<T?> _call<T>(String method, [dynamic args]) async {
   final t0 = DateTime.now();
-  focusLog('Dart→Native $method', data: args);
+  focusLog('🟢 [DART→NATIVE] $method: START', data: args != null ? {'args': args} : null);
   try {
     final res = await _chan.invokeMethod<T>(method, args);
+    final duration = DateTime.now().difference(t0).inMilliseconds;
     focusLog(
-        'Native→Dart $method OK (${DateTime.now().difference(t0).inMilliseconds} ms)',
-        data: res);
+        '🟢 [DART→NATIVE] $method: ✅ SUCCESS (${duration}ms)',
+        data: res != null ? {'result': res} : null);
     return res;
-  } catch (e) {
-    focusLog('Native→Dart $method ERROR', data: e);
+  } catch (e, stackTrace) {
+    final duration = DateTime.now().difference(t0).inMilliseconds;
+    focusLog('🟢 [DART→NATIVE] $method: ❌ ERROR (${duration}ms)', 
+        data: {'error': e.toString(), 'trace': stackTrace.toString().split('\n').take(3).join('\n')});
     rethrow;
   }
 }
 
+Future<bool> iosGetAuthorizationStatus() async {
+  focusLog('=== iosGetAuthorizationStatus: START ===');
+  if (!Platform.isIOS) {
+    focusLog('iosGetAuthorizationStatus: not iOS, returning true');
+    return true;
+  }
+  
+  final status = await _call<bool>('ios_getAuthorizationStatus');
+  final result = status ?? false;
+  focusLog('iosGetAuthorizationStatus: final result = $result', data: {'status': status});
+  focusLog('=== iosGetAuthorizationStatus: END ===');
+  return result;
+}
+
 Future<void> iosRequestAuthorization() async {
-  if (!Platform.isIOS) return;
+  focusLog('=== iosRequestAuthorization: START ===');
+  if (!Platform.isIOS) {
+    focusLog('iosRequestAuthorization: not iOS, skipping');
+    return;
+  }
+  
   await _call('ios_requestAuthorization');
+  focusLog('=== iosRequestAuthorization: END ===');
 }
 
 Future<void> iosPresentPicker() async {
-  if (!Platform.isIOS) return;
+  focusLog('=== iosPresentPicker: START ===');
+  if (!Platform.isIOS) {
+    focusLog('iosPresentPicker: not iOS, skipping');
+    return;
+  }
+  
+  // Always check/request authorization before presenting picker
+  focusLog('iosPresentPicker: checking authorization status...');
+  final status = await iosGetAuthorizationStatus();
+  focusLog('iosPresentPicker: authorization status = $status');
+  
+  if (!status) {
+    focusLog('iosPresentPicker: ⚠️ authorization NOT granted, requesting...');
+    await iosRequestAuthorization();
+    
+    // Verify authorization was granted
+    focusLog('iosPresentPicker: re-checking authorization after request...');
+    final newStatus = await iosGetAuthorizationStatus();
+    focusLog('iosPresentPicker: new authorization status = $newStatus');
+    
+    if (!newStatus) {
+      focusLog('iosPresentPicker: ❌ authorization DENIED, cannot show picker');
+      throw Exception('Family Controls authorization is required to select apps');
+    }
+    focusLog('iosPresentPicker: ✅ authorization granted after request');
+  } else {
+    focusLog('iosPresentPicker: ✅ authorization already granted');
+  }
+  
+  focusLog('iosPresentPicker: presenting picker...');
   await _call('ios_presentPicker');
+  focusLog('=== iosPresentPicker: END ===');
 }
 
 Future<void> iosStartMonitoring() async {
-  if (!Platform.isIOS) return;
+  focusLog('=== iosStartMonitoring: START ===');
+  if (!Platform.isIOS) {
+    focusLog('iosStartMonitoring: not iOS, skipping');
+    return;
+  }
+  
   await _call('ios_startMonitoring');
+  focusLog('=== iosStartMonitoring: END ===');
 }
 
 Future<Map<String, dynamic>> iosGetSnapshot() async {
   if (!Platform.isIOS) return {};
+  
   final map = await _call('ios_getSnapshot');
-  return Map<String, dynamic>.from((map ?? {}) as Map);
+  final result = Map<String, dynamic>.from((map ?? {}) as Map);
+  
+  if (result.isEmpty) {
+    focusLog('iosGetSnapshot: ⚠️ empty snapshot returned');
+  } else {
+    final apps = (result['apps'] as List?)?.length ?? 0;
+    focusLog('iosGetSnapshot: ✅ snapshot received - apps=$apps');
+  }
+  
+  return result;
 }
 
 Future<List<String>> getNativeLogs() async {

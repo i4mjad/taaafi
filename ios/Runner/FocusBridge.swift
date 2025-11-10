@@ -17,61 +17,126 @@ final class FocusBridge {
 
     // 1) Request FamilyControls authorization
     func requestAuthorization() async throws {
+        FocusLogger.d("=== requestAuthorization: START ===")
         let center = AuthorizationCenter.shared
         let currentStatus = await center.authorizationStatus
-        FocusLogger.d("requestAuthorization current status: \(currentStatus)")
+        FocusLogger.d("requestAuthorization: current status = \(currentStatus.rawValue) [\(statusToString(currentStatus))]")
         
         if currentStatus != .approved {
-            FocusLogger.d("requesting authorization for individual")
-            try await center.requestAuthorization(for: .individual)
-            let newStatus = await center.authorizationStatus
-            FocusLogger.d("authorization result: \(newStatus)")
+            FocusLogger.d("requestAuthorization: status NOT approved, requesting for .individual")
+            do {
+                try await center.requestAuthorization(for: .individual)
+                let newStatus = await center.authorizationStatus
+                FocusLogger.d("requestAuthorization: ✅ request completed, new status = \(newStatus.rawValue) [\(statusToString(newStatus))]")
+            } catch {
+                FocusLogger.e("requestAuthorization: ❌ ERROR - \(error.localizedDescription)")
+                throw error
+            }
         } else {
-            FocusLogger.d("authorization already approved")
+            FocusLogger.d("requestAuthorization: ✅ already approved, skipping request")
+        }
+        FocusLogger.d("=== requestAuthorization: END ===")
+    }
+    
+    private func statusToString(_ status: AuthorizationStatus) -> String {
+        switch status {
+        case .notDetermined: return "notDetermined"
+        case .denied: return "denied"
+        case .approved: return "approved"
+        @unknown default: return "unknown"
         }
     }
 
     // 2) Present the FamilyActivityPicker modally
     func presentPicker() {
-        FocusLogger.d("presenting FamilyActivityPicker")
+        FocusLogger.d("=== presentPicker: START ===")
+        FocusLogger.d("presentPicker: creating FamilyPickerView")
         let vc = UIHostingController(rootView: FamilyPickerView())
         vc.modalPresentationStyle = .formSheet
-        UIApplication.shared.topMostViewController()?.present(vc, animated: true)
-        FocusLogger.d("FamilyActivityPicker presented")
+        
+        guard let topVC = UIApplication.shared.topMostViewController() else {
+            FocusLogger.e("presentPicker: ❌ ERROR - no top view controller found")
+            return
+        }
+        
+        FocusLogger.d("presentPicker: presenting picker on \(type(of: topVC))")
+        topVC.present(vc, animated: true)
+        FocusLogger.d("presentPicker: ✅ picker presented successfully")
+        FocusLogger.d("=== presentPicker: END ===")
     }
 
-    // 3) Start frequent DeviceActivity monitoring (every 5 minutes + events)
+    // 3) Start DeviceActivity monitoring (all-day schedule per Apple requirements)
     func startHourlyMonitoring() throws {
-        FocusLogger.d("startRealtimeMonitoring")
+        FocusLogger.d("=== startHourlyMonitoring: START ===")
         
-        // 5-minute intervals for regular updates
-        let frequentSchedule = DeviceActivitySchedule(
-            intervalStart: DateComponents(minute: 0),
-            intervalEnd: DateComponents(minute: 4, second: 59),
+        // Load selected apps
+        let selection = FocusSelectionStore.load()
+        let appCount = selection?.applicationTokens.count ?? 0
+        let categoryCount = selection?.categoryTokens.count ?? 0
+        FocusLogger.d("startHourlyMonitoring: loaded selection - apps=\(appCount), categories=\(categoryCount)")
+        
+        if appCount == 0 && categoryCount == 0 {
+            FocusLogger.d("startHourlyMonitoring: ⚠️ WARNING - no apps or categories selected, monitoring will not track anything")
+        }
+        
+        // Monitor for entire day (midnight to midnight)
+        // Apple requires monitoring window to be at least 15 minutes
+        // We use full day and rely on threshold events for more frequent updates
+        let allDaySchedule = DeviceActivitySchedule(
+            intervalStart: DateComponents(hour: 0, minute: 0),
+            intervalEnd: DateComponents(hour: 23, minute: 59),
             repeats: true
         )
+        FocusLogger.d("startHourlyMonitoring: schedule configured - start=00:00, end=23:59, repeats=true")
         
-        // Set up usage threshold events for real-time notifications
+        // Set up usage threshold events for frequent updates
+        // These will trigger throughout the day as users use apps
         let events: [DeviceActivityEvent.Name: DeviceActivityEvent] = [
             .usageThreshold: DeviceActivityEvent(
-                applications: FocusSelectionStore.load()?.applicationTokens ?? Set(),
-                threshold: DateComponents(minute: 1) // Trigger every 1 minute of usage
+                applications: selection?.applicationTokens ?? Set(),
+                threshold: DateComponents(minute: 15) // Trigger every 15 minutes of usage
             )
         ]
+        FocusLogger.d("startHourlyMonitoring: threshold events configured - threshold=15min")
         
-        try DeviceActivityCenter().startMonitoring(
-            .realtimeUpdates, 
-            during: frequentSchedule,
-            events: events
-        )
-        FocusLogger.d("realtime monitoring started (5min intervals + 1min thresholds)")
+        do {
+            FocusLogger.d("startHourlyMonitoring: calling DeviceActivityCenter.startMonitoring(...)")
+            try DeviceActivityCenter().startMonitoring(
+                .realtimeUpdates, 
+                during: allDaySchedule,
+                events: events
+            )
+            FocusLogger.d("startHourlyMonitoring: ✅ monitoring started successfully")
+        } catch {
+            FocusLogger.e("startHourlyMonitoring: ❌ ERROR - \(error.localizedDescription)")
+            throw error
+        }
+        
+        FocusLogger.d("=== startHourlyMonitoring: END ===")
     }
 
     // 4) Read last snapshot from App Group
     func getLastSnapshot() -> [String: Any] {
-        let ud = UserDefaults(suiteName: FocusShared.appGroupId)
-        let snapshot = ud?.dictionary(forKey: FocusShared.lastSnapshotKey) ?? [:]
-        FocusLogger.d("getLastSnapshot retrieved", snapshot)
+        FocusLogger.d("=== getLastSnapshot: START ===")
+        
+        guard let ud = UserDefaults(suiteName: FocusShared.appGroupId) else {
+            FocusLogger.e("getLastSnapshot: ❌ ERROR - could not access app group '\(FocusShared.appGroupId)'")
+            return [:]
+        }
+        
+        FocusLogger.d("getLastSnapshot: accessing key '\(FocusShared.lastSnapshotKey)' in app group")
+        let snapshot = ud.dictionary(forKey: FocusShared.lastSnapshotKey) ?? [:]
+        
+        if snapshot.isEmpty {
+            FocusLogger.d("getLastSnapshot: ⚠️ no snapshot data found")
+        } else {
+            let apps = (snapshot["apps"] as? [[String: Any]])?.count ?? 0
+            let generatedAt = snapshot["generatedAt"] as? Int ?? 0
+            let updateReason = snapshot["updateReason"] as? String ?? "unknown"
+            FocusLogger.d("getLastSnapshot: ✅ snapshot found - apps=\(apps), reason=\(updateReason), timestamp=\(generatedAt)")
+        }
+        
+        FocusLogger.d("=== getLastSnapshot: END ===")
         return snapshot
     }
 }

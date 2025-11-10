@@ -27,6 +27,12 @@ class GuardScreen extends ConsumerWidget {
     final theme = AppTheme.of(context);
     final localizations = AppLocalizations.of(context);
 
+    // Preload iOS authorization status BEFORE screen renders
+    // This prevents the banner from flashing on screen
+    if (Platform.isIOS) {
+      ref.watch(iosAuthStatusProvider);
+    }
+
     // Activate guard streams when this screen is visible
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (context.mounted) {

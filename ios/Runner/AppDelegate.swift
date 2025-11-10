@@ -17,64 +17,65 @@ import DeviceActivity
       Task { @MainActor in
         switch call.method {
         case "ios_requestAuthorization":
-          FocusLogger.d("ios_requestAuthorization:start")
+          FocusLogger.d("🔵 [FLUTTER→IOS] ios_requestAuthorization: START")
           do { 
             try await FocusBridge.shared.requestAuthorization()
-            FocusLogger.d("ios_requestAuthorization:done true")
+            FocusLogger.d("🔵 [FLUTTER→IOS] ios_requestAuthorization: ✅ SUCCESS - returning true")
             result(true) 
           }
           catch { 
-            FocusLogger.e("ios_requestAuthorization:error \(error)")
+            FocusLogger.e("🔵 [FLUTTER→IOS] ios_requestAuthorization: ❌ ERROR - \(error.localizedDescription)")
             result(FlutterError(code: "auth_failed", message: error.localizedDescription, details: nil)) 
           }
 
         case "ios_getAuthorizationStatus":
-          FocusLogger.d("ios_getAuthorizationStatus:start")
+          FocusLogger.d("🔵 [FLUTTER→IOS] ios_getAuthorizationStatus: START")
           let status = await AuthorizationCenter.shared.authorizationStatus
           let ok = (status == .approved)
-          FocusLogger.d("ios_getAuthorizationStatus:done \(ok)")
+          let statusString = status == .notDetermined ? "notDetermined" : (status == .denied ? "denied" : (status == .approved ? "approved" : "unknown"))
+          FocusLogger.d("🔵 [FLUTTER→IOS] ios_getAuthorizationStatus: status=\(statusString), returning=\(ok)")
           result(ok)
 
         case "ios_presentPicker":
-          FocusLogger.d("ios_presentPicker:start")
+          FocusLogger.d("🔵 [FLUTTER→IOS] ios_presentPicker: START")
           FocusBridge.shared.presentPicker()
-          FocusLogger.d("ios_presentPicker:done")
+          FocusLogger.d("🔵 [FLUTTER→IOS] ios_presentPicker: ✅ DONE - returning nil")
           result(nil)
 
         case "ios_startMonitoring":
-          FocusLogger.d("ios_startMonitoring:start")
+          FocusLogger.d("🔵 [FLUTTER→IOS] ios_startMonitoring: START")
           do { 
             try FocusBridge.shared.startHourlyMonitoring()
-            FocusLogger.d("ios_startMonitoring:done true")
+            FocusLogger.d("🔵 [FLUTTER→IOS] ios_startMonitoring: ✅ SUCCESS - returning true")
             result(true) 
           }
           catch { 
-            FocusLogger.e("ios_startMonitoring:error \(error)")
+            FocusLogger.e("🔵 [FLUTTER→IOS] ios_startMonitoring: ❌ ERROR - \(error.localizedDescription)")
             result(FlutterError(code: "monitor_failed", message: error.localizedDescription, details: nil)) 
           }
 
         case "ios_getSnapshot":
-          FocusLogger.d("ios_getSnapshot:start")
+          FocusLogger.d("🔵 [FLUTTER→IOS] ios_getSnapshot: START")
           let snapshot = FocusBridge.shared.getLastSnapshot()
-          FocusLogger.d("ios_getSnapshot:done", snapshot)
+          FocusLogger.d("🔵 [FLUTTER→IOS] ios_getSnapshot: ✅ DONE - returning snapshot")
           result(snapshot)
 
         case "ios_getLogs":
-          FocusLogger.d("ios_getLogs:start")
+          FocusLogger.d("🔵 [FLUTTER→IOS] ios_getLogs: START")
           let ud = UserDefaults(suiteName: FocusShared.appGroupId) ?? UserDefaults.standard
           let logs = ud.stringArray(forKey: FocusShared.logsKey) ?? []
-          FocusLogger.d("ios_getLogs:done count=\(logs.count)")
+          FocusLogger.d("🔵 [FLUTTER→IOS] ios_getLogs: ✅ DONE - returning \(logs.count) log entries")
           result(logs)
 
         case "ios_clearLogs":
-          FocusLogger.d("ios_clearLogs:start")
+          FocusLogger.d("🔵 [FLUTTER→IOS] ios_clearLogs: START")
           let ud = UserDefaults(suiteName: FocusShared.appGroupId) ?? UserDefaults.standard
           ud.removeObject(forKey: FocusShared.logsKey)
-          FocusLogger.d("ios_clearLogs:done")
+          FocusLogger.d("🔵 [FLUTTER→IOS] ios_clearLogs: ✅ DONE")
           result(true)
 
         default: 
-          FocusLogger.d("unknown method: \(call.method)")
+          FocusLogger.d("🔵 [FLUTTER→IOS] ❌ unknown method: \(call.method)")
           result(FlutterMethodNotImplemented)
         }
       }

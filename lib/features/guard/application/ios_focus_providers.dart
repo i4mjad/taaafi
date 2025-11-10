@@ -1,16 +1,50 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/guard_usage_repository.dart';
 import '../../../core/logging/focus_log.dart';
 
+const MethodChannel _chan = MethodChannel('analytics.usage');
+
+Future<T?> _call<T>(String method, [dynamic args]) async {
+  final t0 = DateTime.now();
+  focusLog('Dart→Native $method', data: args);
+  try {
+    final res = await _chan.invokeMethod<T>(method, args);
+    focusLog(
+        'Native→Dart $method OK (${DateTime.now().difference(t0).inMilliseconds} ms)',
+        data: res);
+    return res;
+  } catch (e) {
+    focusLog('Native→Dart $method ERROR', data: e);
+    rethrow;
+  }
+}
+
 /// iOS Screen Time auth status. On non-iOS, always true.
-/// Note: Authorization status checking is handled during requestAuthorization flow
-final iosAuthStatusProvider = FutureProvider.autoDispose<bool>((ref) async {
+/// Checks if Family Controls authorization has been approved.
+/// Note: Not autoDispose to maintain cached status and reduce unnecessary checks
+final iosAuthStatusProvider = FutureProvider<bool>((ref) async {
   if (!Platform.isIOS) return true;
-  // For now, assume authorization is needed and will be handled by requestAuthorization
-  // TODO: Implement proper authorization status checking if needed
-  return true;
+  
+  try {
+    focusLog('iosAuthStatusProvider: checking authorization status...');
+    final status = await _call<bool>('ios_getAuthorizationStatus');
+    focusLog('iosAuthStatusProvider: authorization status', data: status);
+    
+    // If authorization is granted, cache it
+    if (status == true) {
+      focusLog('iosAuthStatusProvider: ✅ Authorization GRANTED');
+    } else {
+      focusLog('iosAuthStatusProvider: ❌ Authorization NOT granted');
+    }
+    
+    return status ?? false;
+  } catch (e) {
+    focusLog('iosAuthStatusProvider: error checking status', data: e);
+    return false;
+  }
 });
 
 /// Streams iosGetSnapshot every 10s for near real-time updates.
