@@ -2,6 +2,14 @@
 //  FocusBridge.swift
 //  Runner
 //
+//  Bridge between Flutter and iOS Family Controls / DeviceActivity APIs
+//  Provides four main functions:
+//  1. Request Family Controls authorization from user
+//  2. Present app/category picker for user selection
+//  3. Start DeviceActivity monitoring with schedules and threshold events
+//  4. Retrieve usage snapshot data from App Group shared storage
+//
+//  All methods are marked @MainActor as Family Controls APIs require main thread
 //  Created by Amjad Khalfan on 15/08/2025.
 //
 
@@ -10,12 +18,24 @@ import FamilyControls
 import DeviceActivity
 import SwiftUI
 
+/// Singleton bridge class providing Family Controls functionality to Flutter
+/// @MainActor ensures all methods run on main thread (required by Family Controls)
 @MainActor
 final class FocusBridge {
+    /// Shared singleton instance
     static let shared = FocusBridge()
+    
+    /// Private initializer to enforce singleton pattern
     private init() {}
 
-    // 1) Request FamilyControls authorization
+    // MARK: - Authorization
+    
+    /// Requests Family Controls authorization from the user
+    /// Shows system permission dialog if not already approved
+    /// Required before using FamilyActivityPicker or DeviceActivity monitoring
+    ///
+    /// - Throws: Authorization error if user denies or if request fails
+    /// - Note: Authorization status persists across app launches
     func requestAuthorization() async throws {
         FocusLogger.d("=== requestAuthorization: START ===")
         let center = AuthorizationCenter.shared
@@ -38,6 +58,9 @@ final class FocusBridge {
         FocusLogger.d("=== requestAuthorization: END ===")
     }
     
+    /// Converts AuthorizationStatus enum to human-readable string for logging
+    /// - Parameter status: The authorization status to convert
+    /// - Returns: String representation ("notDetermined", "denied", "approved", or "unknown")
     private func statusToString(_ status: AuthorizationStatus) -> String {
         switch status {
         case .notDetermined: return "notDetermined"
@@ -47,7 +70,14 @@ final class FocusBridge {
         }
     }
 
-    // 2) Present the FamilyActivityPicker modally
+    // MARK: - App Selection
+    
+    /// Presents the FamilyActivityPicker modal for user to select apps/categories
+    /// The picker allows users to choose which apps and categories to monitor
+    /// Selection is automatically saved via FocusSelectionStore when user makes changes
+    ///
+    /// - Important: Requires Family Controls authorization to be approved first
+    /// - Note: Picker is presented on the topmost view controller
     func presentPicker() {
         FocusLogger.d("=== presentPicker: START ===")
         FocusLogger.d("presentPicker: creating FamilyPickerView")
@@ -65,7 +95,22 @@ final class FocusBridge {
         FocusLogger.d("=== presentPicker: END ===")
     }
 
-    // 3) Start DeviceActivity monitoring (all-day schedule per Apple requirements)
+    // MARK: - Monitoring
+    
+    /// Starts DeviceActivity monitoring with all-day schedule and threshold events
+    /// 
+    /// Monitoring Strategy:
+    /// - Schedule: All-day (00:00 to 23:59) repeating daily
+    /// - Threshold Events: Triggered every 15 minutes of app usage
+    /// - Monitor Extension: Receives callbacks and updates usage data
+    ///
+    /// Apple Requirements:
+    /// - Minimum interval: 15 minutes (we use full day to satisfy this)
+    /// - Must specify apps/categories to monitor (loaded from FocusSelectionStore)
+    /// - Extension runs in separate process with limited resources
+    ///
+    /// - Throws: DeviceActivity error if schedule is invalid or monitoring fails
+    /// - Note: Monitoring continues even when app is closed/in background
     func startHourlyMonitoring() throws {
         FocusLogger.d("=== startHourlyMonitoring: START ===")
         
@@ -115,7 +160,24 @@ final class FocusBridge {
         FocusLogger.d("=== startHourlyMonitoring: END ===")
     }
 
-    // 4) Read last snapshot from App Group
+    // MARK: - Data Retrieval
+    
+    /// Retrieves the latest usage snapshot from App Group shared storage
+    /// 
+    /// The snapshot is written by the Monitor extension (FocusDeviceActivityMonitor)
+    /// when monitoring intervals complete or threshold events fire.
+    ///
+    /// Snapshot Structure:
+    /// - apps: Array of app usage data [bundle, label, minutes]
+    /// - domains: Web domain usage (currently unused)
+    /// - pickups: Device pickup count (currently unused)
+    /// - notifications: Notification count (currently unused)
+    /// - generatedAt: Unix timestamp of last update
+    /// - updateReason: Why snapshot was generated (intervalStart/End, thresholdReached)
+    /// - lastUpdate: ISO8601 timestamp string
+    ///
+    /// - Returns: Dictionary containing usage snapshot, or empty dict if no data
+    /// - Note: Returns empty dictionary if App Group access fails
     func getLastSnapshot() -> [String: Any] {
         FocusLogger.d("=== getLastSnapshot: START ===")
         
