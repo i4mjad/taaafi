@@ -76,7 +76,7 @@ class DeviceActivityReportFlutterView: NSObject, FlutterPlatformView {
 }
 
 struct ActivityReportContainerView: View {
-    @State private var context = DeviceActivityReport.Context.totalActivity
+    @State private var context = DeviceActivity.DeviceActivityReport.Context.totalActivity
     @State private var filter = DeviceActivityFilter(
         segment: .daily(during: Calendar.current.dateInterval(of: .day, for: Date())!),
         users: .all,
@@ -85,8 +85,8 @@ struct ActivityReportContainerView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            // Embed the DeviceActivityReport
-            DeviceActivityReport(context, filter: filter)
+            // Embed the DeviceActivityReport from the framework
+            DeviceActivity.DeviceActivityReport(context, filter: filter)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .background(Color(UIColor.systemBackground))

@@ -4,12 +4,11 @@
 //
 
 import DeviceActivity
-import ExtensionKit
 import SwiftUI
 import FamilyControls
 
-extension DeviceActivityReport.Context {
-    // Context for total activity report
+// Define custom context for our report
+extension DeviceActivity.DeviceActivityReport.Context {
     static let totalActivity = Self("Total Activity")
 }
 
@@ -29,36 +28,43 @@ struct AppUsageData: Identifiable {
 }
 
 struct TotalActivityReport: DeviceActivityReportScene {
-    let context: DeviceActivityReport.Context = .totalActivity
+    let context: DeviceActivity.DeviceActivityReport.Context = .totalActivity
     
     let content: (ActivityReportConfig) -> TotalActivityView
     
     func makeConfiguration(representing data: DeviceActivityResults<DeviceActivityData>) async -> ActivityReportConfig {
-        FocusLogger.d("=== TotalActivityReport.makeConfiguration: START ===")
+        FocusLogger.d("🟢 [REPORT SCENE] === makeConfiguration: START ===")
         
         var appUsageList: [AppUsageData] = []
         var totalDuration: TimeInterval = 0
         
-        // Process the data from DeviceActivityResults
-        for await deviceData in data {
-            FocusLogger.d("TotalActivityReport: processing device data")
+        FocusLogger.d("🟢 [REPORT SCENE] makeConfiguration: processing activity data...")
+        
+        // Process each user's activity data
+        let activities = data.map { $0 }
+        FocusLogger.d("🟢 [REPORT SCENE] makeConfiguration: found \(activities.count) activity records")
+        
+        for activityData in activities {
+            FocusLogger.d("🟢 [REPORT SCENE] makeConfiguration: processing activity segments...")
             
-            // Iterate through activity segments
-            for segment in deviceData.activitySegments {
-                FocusLogger.d("TotalActivityReport: segment duration = \(segment.totalActivityDuration)s")
-                totalDuration += segment.totalActivityDuration
+            // Process activity segments
+            for segment in activityData.activitySegments {
+                let segmentDuration = segment.totalActivityDuration
+                totalDuration += segmentDuration
+                FocusLogger.d("🟢 [REPORT SCENE] makeConfiguration: segment duration = \(Int(segmentDuration))s")
                 
-                // Process individual app activities
+                // Process categories within segment
                 for category in segment.categories {
-                    for app in category.applications {
-                        let duration = app.totalActivityDuration
-                        
-                        // Get app token and display info
-                        let appToken = app.application
-                        let appName = (appToken.localizedDisplayName ?? "Unknown App")
+                    FocusLogger.d("🟢 [REPORT SCENE] makeConfiguration: category with \(category.applications.count) apps")
+                    
+                    // Process individual apps
+                    for appActivity in category.applications {
+                        let duration = appActivity.totalActivityDuration
+                        let appToken = appActivity.application
+                        let appName = appToken.localizedDisplayName ?? "Unknown App"
                         let bundleId = appToken.bundleIdentifier ?? "unknown.bundle"
                         
-                        FocusLogger.d("TotalActivityReport: app=\(appName), duration=\(duration)s")
+                        FocusLogger.d("🟢 [REPORT SCENE] makeConfiguration: app=\(appName), duration=\(Int(duration))s")
                         
                         let formatted = formatDuration(duration)
                         
@@ -77,12 +83,14 @@ struct TotalActivityReport: DeviceActivityReportScene {
         appUsageList.sort { $0.duration > $1.duration }
         
         // Take top 10 apps
+        let originalCount = appUsageList.count
         appUsageList = Array(appUsageList.prefix(10))
         
         let totalFormatted = formatDuration(totalDuration)
         
-        FocusLogger.d("TotalActivityReport: total apps=\(appUsageList.count), total duration=\(totalFormatted)")
-        FocusLogger.d("=== TotalActivityReport.makeConfiguration: END ===")
+        FocusLogger.d("🟢 [REPORT SCENE] makeConfiguration: ✅ processed \(originalCount) apps, showing top \(appUsageList.count)")
+        FocusLogger.d("🟢 [REPORT SCENE] makeConfiguration: total screen time = \(totalFormatted)")
+        FocusLogger.d("🟢 [REPORT SCENE] === makeConfiguration: END ===")
         
         return ActivityReportConfig(
             apps: appUsageList,

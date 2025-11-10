@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 70;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -133,14 +133,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		6D5D94F02EC21C5B008872BE /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+		6D5D94F02EC21C5B008872BE /* Exceptions for "DeviceActivityReport" folder in "DeviceActivityReport" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
 			target = 6D5D94DE2EC21C5B008872BE /* DeviceActivityReport */;
 		};
-		6DD3B0142EC090980011B7DE /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+		6DD3B0142EC090980011B7DE /* Exceptions for "FocusDeviceActivityMonitor" folder in "FocusDeviceActivityMonitor" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -150,8 +150,30 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		6D5D94E02EC21C5B008872BE /* DeviceActivityReport */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (6D5D94F02EC21C5B008872BE /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = DeviceActivityReport; sourceTree = "<group>"; };
-		6DD3B0092EC090980011B7DE /* FocusDeviceActivityMonitor */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (6DD3B0142EC090980011B7DE /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = FocusDeviceActivityMonitor; sourceTree = "<group>"; };
+		6D5D94E02EC21C5B008872BE /* DeviceActivityReport */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				6D5D94F02EC21C5B008872BE /* Exceptions for "DeviceActivityReport" folder in "DeviceActivityReport" target */,
+			);
+			explicitFileTypes = {
+			};
+			explicitFolders = (
+			);
+			path = DeviceActivityReport;
+			sourceTree = "<group>";
+		};
+		6DD3B0092EC090980011B7DE /* FocusDeviceActivityMonitor */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				6DD3B0142EC090980011B7DE /* Exceptions for "FocusDeviceActivityMonitor" folder in "FocusDeviceActivityMonitor" target */,
+			);
+			explicitFileTypes = {
+			};
+			explicitFolders = (
+			);
+			path = FocusDeviceActivityMonitor;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -322,8 +344,6 @@
 				6D5D94E02EC21C5B008872BE /* DeviceActivityReport */,
 			);
 			name = DeviceActivityReport;
-			packageProductDependencies = (
-			);
 			productName = DeviceActivityReport;
 			productReference = 6D5D94DF2EC21C5B008872BE /* DeviceActivityReport.appex */;
 			productType = "com.apple.product-type.extensionkit-extension";
@@ -484,13 +504,9 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -505,13 +521,9 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
