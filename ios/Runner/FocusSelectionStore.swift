@@ -12,19 +12,56 @@ enum FocusSelectionStore {
     private static let key = "familySelection"
 
     static func save(selection: FamilyActivitySelection) {
-        // Persist minimal opaque data, not PII.
+        FocusLogger.d("🟡 [STORE] === save: START ===")
+        let appCount = selection.applicationTokens.count
+        let catCount = selection.categoryTokens.count
+        FocusLogger.d("🟡 [STORE] save: encoding selection - apps=\(appCount), categories=\(catCount)")
+        
         do {
-            // FamilyActivitySelection is Codable in modern SDKs; if not, store tokens separately.
             let data = try JSONEncoder().encode(selection)
-            UserDefaults(suiteName: FocusShared.appGroupId)?.set(data, forKey: key)
+            FocusLogger.d("🟡 [STORE] save: encoded \(data.count) bytes")
+            
+            guard let ud = UserDefaults(suiteName: FocusShared.appGroupId) else {
+                FocusLogger.e("🟡 [STORE] save: ❌ ERROR - cannot access app group '\(FocusShared.appGroupId)'")
+                return
+            }
+            
+            ud.set(data, forKey: key)
+            FocusLogger.d("🟡 [STORE] save: ✅ saved to app group successfully")
         } catch {
-            // fallback: store empty
+            FocusLogger.e("🟡 [STORE] save: ❌ ERROR encoding - \(error.localizedDescription)")
             UserDefaults(suiteName: FocusShared.appGroupId)?.removeObject(forKey: key)
         }
+        
+        FocusLogger.d("🟡 [STORE] === save: END ===")
     }
 
     static func load() -> FamilyActivitySelection? {
-        guard let data = UserDefaults(suiteName: FocusShared.appGroupId)?.data(forKey: key) else { return nil }
-        return try? JSONDecoder().decode(FamilyActivitySelection.self, from: data)
+        FocusLogger.d("🟡 [STORE] === load: START ===")
+        
+        guard let ud = UserDefaults(suiteName: FocusShared.appGroupId) else {
+            FocusLogger.e("🟡 [STORE] load: ❌ ERROR - cannot access app group '\(FocusShared.appGroupId)'")
+            return nil
+        }
+        
+        guard let data = ud.data(forKey: key) else {
+            FocusLogger.d("🟡 [STORE] load: ℹ️ no saved selection found (empty)")
+            return nil
+        }
+        
+        FocusLogger.d("🟡 [STORE] load: found \(data.count) bytes, decoding...")
+        
+        do {
+            let selection = try JSONDecoder().decode(FamilyActivitySelection.self, from: data)
+            let appCount = selection.applicationTokens.count
+            let catCount = selection.categoryTokens.count
+            FocusLogger.d("🟡 [STORE] load: ✅ decoded successfully - apps=\(appCount), categories=\(catCount)")
+            FocusLogger.d("🟡 [STORE] === load: END ===")
+            return selection
+        } catch {
+            FocusLogger.e("🟡 [STORE] load: ❌ ERROR decoding - \(error.localizedDescription)")
+            FocusLogger.d("🟡 [STORE] === load: END ===")
+            return nil
+        }
     }
 }

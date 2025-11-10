@@ -16,6 +16,7 @@ import 'package:reboot_app_3/features/guard/presentation/widgets/opal_style_focu
 import 'package:reboot_app_3/features/guard/application/ios_focus_providers.dart';
 import 'package:reboot_app_3/features/guard/data/guard_usage_repository.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/core/logging/focus_log.dart';
 // Removed unused import: custom_theme_data
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 // Removed unused import: container
@@ -25,19 +26,27 @@ class GuardScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    focusLog('📱 [GUARD SCREEN] ========================================');
+    focusLog('📱 [GUARD SCREEN] === GuardScreen: BUILD START ===');
+    focusLog('📱 [GUARD SCREEN] ========================================');
+    
     final theme = AppTheme.of(context);
     final localizations = AppLocalizations.of(context);
 
     // Preload iOS authorization status BEFORE screen renders
     // This prevents the banner from flashing on screen
     if (Platform.isIOS) {
-      ref.watch(iosAuthStatusProvider);
+      focusLog('📱 [GUARD SCREEN] build: watching iosAuthStatusProvider');
+      final authStatus = ref.watch(iosAuthStatusProvider);
+      focusLog('📱 [GUARD SCREEN] build: auth status = ${authStatus.toString()}');
     }
 
     // Activate guard streams when this screen is visible
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      focusLog('📱 [GUARD SCREEN] postFrameCallback: activating guard streams');
       if (context.mounted) {
         ref.read(guardStreamActiveProvider.notifier).state = true;
+        focusLog('📱 [GUARD SCREEN] postFrameCallback: ✅ guard streams activated');
       }
     });
 

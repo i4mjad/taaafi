@@ -9,15 +9,18 @@ const MethodChannel _chan = MethodChannel('analytics.usage');
 
 Future<T?> _call<T>(String method, [dynamic args]) async {
   final t0 = DateTime.now();
-  focusLog('Dart→Native $method', data: args);
+  focusLog('🟢 [PROVIDERS→NATIVE] $method: START', data: args != null ? {'args': args} : null);
   try {
     final res = await _chan.invokeMethod<T>(method, args);
+    final duration = DateTime.now().difference(t0).inMilliseconds;
     focusLog(
-        'Native→Dart $method OK (${DateTime.now().difference(t0).inMilliseconds} ms)',
-        data: res);
+        '🟢 [PROVIDERS→NATIVE] $method: ✅ SUCCESS (${duration}ms)',
+        data: res != null ? {'result': res} : null);
     return res;
-  } catch (e) {
-    focusLog('Native→Dart $method ERROR', data: e);
+  } catch (e, stackTrace) {
+    final duration = DateTime.now().difference(t0).inMilliseconds;
+    focusLog('🟢 [PROVIDERS→NATIVE] $method: ❌ ERROR (${duration}ms)', 
+        data: {'error': e.toString(), 'trace': stackTrace.toString().split('\n').take(3).join('\n')});
     rethrow;
   }
 }

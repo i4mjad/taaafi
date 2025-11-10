@@ -7,15 +7,19 @@ import '../../../../core/localization/localization.dart';
 import '../../../../core/theming/text_styles.dart';
 import '../../../../core/theming/app-themes.dart';
 import '../../../../core/shared_widgets/snackbar.dart';
+import '../../../../core/logging/focus_log.dart';
 
 class IosPickerControlsModal extends ConsumerWidget {
   const IosPickerControlsModal({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    focusLog('📱 [PICKER MODAL] === build: START ===');
     final theme = AppTheme.of(context);
     final localizations = AppLocalizations.of(context);
     final auth = ref.watch(iosAuthStatusProvider);
+    
+    focusLog('📱 [PICKER MODAL] build: auth state = ${auth.toString()}');
 
     return Container(
       decoration: BoxDecoration(
@@ -69,11 +73,18 @@ class IosPickerControlsModal extends ConsumerWidget {
                     subtitle: localizations.translate('grant_family_controls_access'),
                     isEnabled: true,
                     onTap: () async {
+                      focusLog('📱 [PICKER MODAL] === Request Authorization: TAPPED ===');
                       try {
+                        focusLog('📱 [PICKER MODAL] Request Auth: calling iosRequestAuthorization()');
                         await iosRequestAuthorization();
+                        focusLog('📱 [PICKER MODAL] Request Auth: ✅ authorization completed');
+                        
                         // Refresh authorization status
+                        focusLog('📱 [PICKER MODAL] Request Auth: invalidating auth provider');
                         ref.invalidate(iosAuthStatusProvider);
+                        
                         if (context.mounted) {
+                          focusLog('📱 [PICKER MODAL] Request Auth: showing success snackbar');
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(localizations.translate('authorization_granted')),
@@ -83,6 +94,7 @@ class IosPickerControlsModal extends ConsumerWidget {
                           );
                         }
                       } catch (e) {
+                        focusLog('📱 [PICKER MODAL] Request Auth: ❌ ERROR - ${e.toString()}');
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
@@ -93,6 +105,7 @@ class IosPickerControlsModal extends ConsumerWidget {
                           );
                         }
                       }
+                      focusLog('📱 [PICKER MODAL] === Request Authorization: COMPLETE ===');
                     },
                   ),
                 
@@ -109,10 +122,16 @@ class IosPickerControlsModal extends ConsumerWidget {
                   isEnabled: ok,
                   onTap: ok
                       ? () async {
+                          focusLog('📱 [PICKER MODAL] === Select Apps: TAPPED ===');
+                          focusLog('📱 [PICKER MODAL] Select Apps: closing modal');
                           Navigator.of(context).pop();
+                          
                           try {
+                            focusLog('📱 [PICKER MODAL] Select Apps: calling iosPresentPicker()');
                             await iosPresentPicker();
+                            focusLog('📱 [PICKER MODAL] Select Apps: ✅ picker completed');
                           } catch (e) {
+                            focusLog('📱 [PICKER MODAL] Select Apps: ❌ ERROR - ${e.toString()}');
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
@@ -122,9 +141,11 @@ class IosPickerControlsModal extends ConsumerWidget {
                                 ),
                               );
                               // Refresh authorization status
+                              focusLog('📱 [PICKER MODAL] Select Apps: invalidating auth provider');
                               ref.invalidate(iosAuthStatusProvider);
                             }
                           }
+                          focusLog('📱 [PICKER MODAL] === Select Apps: COMPLETE ===');
                         }
                       : null,
                 ),
@@ -142,10 +163,28 @@ class IosPickerControlsModal extends ConsumerWidget {
                   isEnabled: ok,
                   onTap: ok
                       ? () async {
+                          focusLog('📱 [PICKER MODAL] === Start Monitoring: TAPPED ===');
+                          focusLog('📱 [PICKER MODAL] Start Monitoring: closing modal');
                           Navigator.of(context).pop();
-                          await iosStartMonitoring();
-                          getSuccessSnackBar(
-                              context, "hourly_monitoring_started");
+                          
+                          try {
+                            focusLog('📱 [PICKER MODAL] Start Monitoring: calling iosStartMonitoring()');
+                            await iosStartMonitoring();
+                            focusLog('📱 [PICKER MODAL] Start Monitoring: ✅ monitoring started');
+                            
+                            getSuccessSnackBar(context, "hourly_monitoring_started");
+                          } catch (e) {
+                            focusLog('📱 [PICKER MODAL] Start Monitoring: ❌ ERROR - ${e.toString()}');
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Error: ${e.toString()}'),
+                                  backgroundColor: theme.error[600],
+                                ),
+                              );
+                            }
+                          }
+                          focusLog('📱 [PICKER MODAL] === Start Monitoring: COMPLETE ===');
                         }
                       : null,
                 ),
