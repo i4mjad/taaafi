@@ -44,6 +44,18 @@ Future<void> iosRequestAuthorization() async {
   }
   
   await _call('ios_requestAuthorization');
+  
+  // Auto-start monitoring immediately after authorization
+  // This ensures we capture ALL usage from this point forward
+  focusLog('iosRequestAuthorization: auto-starting monitoring...');
+  try {
+    await iosStartMonitoring();
+    focusLog('iosRequestAuthorization: ✅ monitoring auto-started');
+  } catch (e) {
+    focusLog('iosRequestAuthorization: ⚠️ auto-start monitoring failed', data: e);
+    // Don't throw - authorization still succeeded
+  }
+  
   focusLog('=== iosRequestAuthorization: END ===');
 }
 
