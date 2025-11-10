@@ -130,8 +130,8 @@ class DeviceActivityReportFlutterView: NSObject, FlutterPlatformView {
 /// Manages the report context and filter settings
 struct ActivityReportContainerView: View {
     /// Context identifying which report scene to use
-    /// Must match the context defined in TotalActivityReport
-    @State private var context = DeviceActivity.DeviceActivityReport.Context.totalActivity
+    /// Must match the context defined in TotalActivityReport ("Total Activity")
+    @State private var context = DeviceActivityReport.Context("Total Activity")
     
     /// Filter specifying what data to show (date range, users, devices)
     /// Configured to show today's data for all users on iPhone/iPad
@@ -146,7 +146,7 @@ struct ActivityReportContainerView: View {
             // MARK: - Embedded DeviceActivityReport
             // This is the framework-provided component that connects to the report extension
             // It automatically calls our TotalActivityReport.makeConfiguration() method
-            DeviceActivity.DeviceActivityReport(context, filter: filter)
+            DeviceActivityReport(context, filter: filter)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .background(Color(UIColor.systemBackground))

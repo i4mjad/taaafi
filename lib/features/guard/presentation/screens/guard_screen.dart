@@ -29,7 +29,7 @@ class GuardScreen extends ConsumerWidget {
     focusLog('📱 [GUARD SCREEN] ========================================');
     focusLog('📱 [GUARD SCREEN] === GuardScreen: BUILD START ===');
     focusLog('📱 [GUARD SCREEN] ========================================');
-    
+
     final theme = AppTheme.of(context);
     final localizations = AppLocalizations.of(context);
 
@@ -38,7 +38,8 @@ class GuardScreen extends ConsumerWidget {
     if (Platform.isIOS) {
       focusLog('📱 [GUARD SCREEN] build: watching iosAuthStatusProvider');
       final authStatus = ref.watch(iosAuthStatusProvider);
-      focusLog('📱 [GUARD SCREEN] build: auth status = ${authStatus.toString()}');
+      focusLog(
+          '📱 [GUARD SCREEN] build: auth status = ${authStatus.toString()}');
     }
 
     // Activate guard streams when this screen is visible
@@ -46,7 +47,8 @@ class GuardScreen extends ConsumerWidget {
       focusLog('📱 [GUARD SCREEN] postFrameCallback: activating guard streams');
       if (context.mounted) {
         ref.read(guardStreamActiveProvider.notifier).state = true;
-        focusLog('📱 [GUARD SCREEN] postFrameCallback: ✅ guard streams activated');
+        focusLog(
+            '📱 [GUARD SCREEN] postFrameCallback: ✅ guard streams activated');
       }
     });
 
@@ -221,10 +223,9 @@ class GuardScreen extends ConsumerWidget {
               const IosAuthBanner(),
               const SizedBox(height: 12),
 
-              // TODO: iOS DeviceActivityReport (temporarily disabled due to API complexity)
-              // Will be re-enabled after proper testing
-              // if (Platform.isIOS)
-              //   Consumer(...),
+              // TODO: DeviceActivityReport - disabled temporarily due to Xcode embedding issues
+              // Will be re-enabled after manual Xcode configuration
+              // Issue: Extension embedded twice causing circular dependency
 
               // Beautiful Opal-style Focus Score Card
               Consumer(
