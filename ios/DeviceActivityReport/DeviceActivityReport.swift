@@ -2,26 +2,26 @@
 //  DeviceActivityReport.swift
 //  DeviceActivityReport
 //
-//  Main entry point for DeviceActivityReport extension
-//  This extension generates visual reports of Screen Time usage data
+//  Main entry point for the DeviceActivityReport extension
+//  Registers all report scenes that can be displayed
 //
 
 import DeviceActivity
+import ExtensionKit
 import SwiftUI
 
-/// Main extension struct that registers all report scenes
-/// @main indicates this is the entry point for the extension
+/// Main extension struct
+/// @main marks this as the entry point for the extension
 @main
 struct FocusActivityReportExtension: DeviceActivityReportExtension {
-    /// Returns the collection of report scenes this extension provides
-    /// Each scene represents a different way to visualize the data
+    /// Body returns all report scenes this extension provides
+    /// The system calls the appropriate scene based on context
     var body: some DeviceActivityReportScene {
-        FocusLogger.d("🟢 [EXTENSION MAIN] === Extension body called ===")
-        
-        // Register the total activity report scene
-        // This scene will be used when the app requests data with .totalActivity context
-        return TotalActivityReport { config in
-            TotalActivityView(config: config)
+        // Register TotalActivityReport scene
+        // The closure receives the formatted string from makeConfiguration()
+        // and passes it to TotalActivityView for display
+        return TotalActivityReport { totalActivity in
+            TotalActivityView(totalActivity: totalActivity)
         }
     }
 }

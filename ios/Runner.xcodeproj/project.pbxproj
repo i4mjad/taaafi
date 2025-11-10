@@ -133,13 +133,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		6D5D94F02EC21C5B008872BE /* Exceptions for "DeviceActivityReport" folder in "DeviceActivityReport" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			target = 6D5D94DE2EC21C5B008872BE /* DeviceActivityReport */;
-		};
 		6DD3B0142EC090980011B7DE /* Exceptions for "FocusDeviceActivityMonitor" folder in "FocusDeviceActivityMonitor" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -153,7 +146,6 @@
 		6D5D94E02EC21C5B008872BE /* DeviceActivityReport */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				6D5D94F02EC21C5B008872BE /* Exceptions for "DeviceActivityReport" folder in "DeviceActivityReport" target */,
 			);
 			explicitFileTypes = {
 			};

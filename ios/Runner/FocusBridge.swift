@@ -45,8 +45,8 @@ final class FocusBridge {
         if currentStatus != .approved {
             FocusLogger.d("requestAuthorization: status NOT approved, requesting for .individual")
             do {
-                try await center.requestAuthorization(for: .individual)
-                let newStatus = await center.authorizationStatus
+            try await center.requestAuthorization(for: .individual)
+            let newStatus = await center.authorizationStatus
                 FocusLogger.d("requestAuthorization: ✅ request completed, new status = \(newStatus.rawValue) [\(statusToString(newStatus))]")
             } catch {
                 FocusLogger.e("requestAuthorization: ❌ ERROR - \(error.localizedDescription)")
@@ -57,7 +57,7 @@ final class FocusBridge {
         }
         FocusLogger.d("=== requestAuthorization: END ===")
     }
-    
+
     /// Converts AuthorizationStatus enum to human-readable string for logging
     /// - Parameter status: The authorization status to convert
     /// - Returns: String representation ("notDetermined", "denied", "approved", or "unknown")
@@ -146,11 +146,11 @@ final class FocusBridge {
         
         do {
             FocusLogger.d("startHourlyMonitoring: calling DeviceActivityCenter.startMonitoring(...)")
-            try DeviceActivityCenter().startMonitoring(
-                .realtimeUpdates, 
+        try DeviceActivityCenter().startMonitoring(
+            .realtimeUpdates, 
                 during: allDaySchedule,
-                events: events
-            )
+            events: events
+        )
             FocusLogger.d("startHourlyMonitoring: ✅ monitoring started successfully")
         } catch {
             FocusLogger.e("startHourlyMonitoring: ❌ ERROR - \(error.localizedDescription)")

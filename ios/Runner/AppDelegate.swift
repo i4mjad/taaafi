@@ -13,7 +13,7 @@ import DeviceActivity
     let controller : FlutterViewController = window?.rootViewController as! FlutterViewController
     let channel = FlutterMethodChannel(name: "analytics.usage", binaryMessenger: controller.binaryMessenger)
     
-    // Register DeviceActivityReport platform view
+    // Register DeviceActivityReport platform view for embedding in Flutter
     let reportFactory = DeviceActivityReportViewFactory(messenger: controller.binaryMessenger)
     controller.registrar(forPlugin: "DeviceActivityReportView")?.register(reportFactory, withId: "DeviceActivityReportView")
 

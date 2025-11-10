@@ -128,7 +128,7 @@ class IosPickerControlsModal extends ConsumerWidget {
                           
                           try {
                             focusLog('📱 [PICKER MODAL] Select Apps: calling iosPresentPicker()');
-                            await iosPresentPicker();
+                          await iosPresentPicker();
                             focusLog('📱 [PICKER MODAL] Select Apps: ✅ picker completed');
                           } catch (e) {
                             focusLog('📱 [PICKER MODAL] Select Apps: ❌ ERROR - ${e.toString()}');
@@ -169,7 +169,7 @@ class IosPickerControlsModal extends ConsumerWidget {
                           
                           try {
                             focusLog('📱 [PICKER MODAL] Start Monitoring: calling iosStartMonitoring()');
-                            await iosStartMonitoring();
+                          await iosStartMonitoring();
                             focusLog('📱 [PICKER MODAL] Start Monitoring: ✅ monitoring started');
                             
                             getSuccessSnackBar(context, "hourly_monitoring_started");

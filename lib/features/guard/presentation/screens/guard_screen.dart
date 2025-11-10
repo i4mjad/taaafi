@@ -221,48 +221,10 @@ class GuardScreen extends ConsumerWidget {
               const IosAuthBanner(),
               const SizedBox(height: 12),
 
-              // iOS DeviceActivityReport (shows today's actual usage)
-              if (Platform.isIOS)
-                Consumer(
-                  builder: (context, ref, child) {
-                    final auth = ref.watch(iosAuthStatusProvider);
-                    return auth.maybeWhen(
-                      data: (isAuthorized) {
-                        if (!isAuthorized) return const SizedBox.shrink();
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              localizations.translate('todays_usage'),
-                              style: TextStyles.h6.copyWith(
-                                color: theme.grey[900],
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            Container(
-                              decoration: BoxDecoration(
-                                color: theme.grey[50],
-                                borderRadius: BorderRadius.circular(16),
-                                border: Border.all(
-                                  color: theme.grey[200]!,
-                                  width: 1,
-                                ),
-                              ),
-                              clipBehavior: Clip.antiAlias,
-                              child: const SizedBox(
-                                height: 400,
-                                child: IosActivityReportView(),
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-                          ],
-                        );
-                      },
-                      orElse: () => const SizedBox.shrink(),
-                    );
-                  },
-                ),
+              // TODO: iOS DeviceActivityReport (temporarily disabled due to API complexity)
+              // Will be re-enabled after proper testing
+              // if (Platform.isIOS)
+              //   Consumer(...),
 
               // Beautiful Opal-style Focus Score Card
               Consumer(

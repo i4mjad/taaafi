@@ -48,7 +48,7 @@ class IosAuthBanner extends ConsumerWidget {
                   await iosRequestAuthorization();
                   focusLog('IosAuthBanner: authorization requested successfully');
                   // Invalidate to refresh status
-                  ref.invalidate(iosAuthStatusProvider);
+                ref.invalidate(iosAuthStatusProvider);
                   
                   // Also start monitoring if authorized
                   final newStatus = await iosGetAuthorizationStatus();

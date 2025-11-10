@@ -50,7 +50,7 @@ final class Monitor: DeviceActivityMonitor {
     var apps = (existing["apps"] as? [[String: Any]]) ?? []
     var bucketIndex: Int? = apps.firstIndex { ($0["bundle"] as? String) == "monitored" }
     var minutes = (bucketIndex != nil ? (apps[bucketIndex!]["minutes"] as? Int) : nil) ?? 0
-    
+
     FocusLogger.d("🔴 [EXTENSION] updateSnapshot: existing minutes=\(minutes)")
 
     // Calculate new minutes based on reason
