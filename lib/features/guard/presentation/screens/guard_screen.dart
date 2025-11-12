@@ -9,7 +9,6 @@ import 'package:reboot_app_3/features/guard/application/usage_access_provider.da
 import 'package:reboot_app_3/features/guard/presentation/screens/usage_access_intro_sheet.dart';
 import 'package:reboot_app_3/features/guard/presentation/widgets/usage_access_banner.dart';
 import 'package:reboot_app_3/features/guard/application/ios_lifecycle_observer.dart';
-import 'package:reboot_app_3/features/guard/presentation/widgets/ios_auth_banner.dart';
 import 'package:reboot_app_3/features/guard/presentation/widgets/ios_picker_controls.dart';
 import 'package:reboot_app_3/features/guard/presentation/widgets/ios_activity_report_view.dart';
 import 'package:reboot_app_3/features/guard/presentation/widgets/opal_style_focus_display.dart';
@@ -33,15 +32,60 @@ class GuardScreen extends ConsumerWidget {
     final theme = AppTheme.of(context);
     final localizations = AppLocalizations.of(context);
 
-    // Preload iOS authorization status BEFORE screen renders
-    // This prevents the banner from flashing on screen
+    // FOR iOS: BLOCK UI RENDERING UNTIL PERMISSION CHECK COMPLETES
+    // This prevents the banner from showing incorrectly and ensures
+    // we know the actual permission state before rendering content
     if (Platform.isIOS) {
-      focusLog('📱 [GUARD SCREEN] build: watching iosAuthStatusProvider');
-      final authStatus = ref.watch(iosAuthStatusProvider);
-      focusLog(
-          '📱 [GUARD SCREEN] build: auth status = ${authStatus.toString()}');
+      final authStatusAsync = ref.watch(iosAuthStatusProvider);
+
+      // Show loading state while checking permissions
+      return authStatusAsync.when(
+        loading: () {
+          focusLog('📱 [GUARD SCREEN] ⏳ Checking iOS authorization status...');
+          return Scaffold(
+            appBar: appBar(context, ref, "guard", false, false),
+            backgroundColor: theme.backgroundColor,
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const CircularProgressIndicator(),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Checking permissions...',
+                    style: TextStyles.body.copyWith(color: theme.grey[600]),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+        error: (error, stack) {
+          focusLog('📱 [GUARD SCREEN] ❌ Error checking authorization',
+              data: error);
+          // On error, assume not authorized and continue
+          return _buildMainContent(context, ref, theme, localizations, false);
+        },
+        data: (isAuthorized) {
+          focusLog(
+              '📱 [GUARD SCREEN] ✅ Authorization check complete: $isAuthorized');
+          return _buildMainContent(
+              context, ref, theme, localizations, isAuthorized);
+        },
+      );
     }
 
+    // For non-iOS platforms, render directly
+    return _buildMainContent(context, ref, theme, localizations, true);
+  }
+
+  Widget _buildMainContent(
+    BuildContext context,
+    WidgetRef ref,
+    dynamic theme,
+    dynamic localizations,
+    bool isIosAuthorized,
+  ) {
     // Activate guard streams when this screen is visible
     WidgetsBinding.instance.addPostFrameCallback((_) {
       focusLog('📱 [GUARD SCREEN] postFrameCallback: activating guard streams');
@@ -219,83 +263,136 @@ class GuardScreen extends ConsumerWidget {
               // Usage Access Permission Banner
               const UsageAccessBanner(),
 
-              // iOS Screen Time Banner
-              const IosAuthBanner(),
-              const SizedBox(height: 12),
+              // iOS Screen Time Banner (only show if NOT authorized)
+              if (Platform.isIOS && !isIosAuthorized) ...[
+                MaterialBanner(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  leading: const Icon(Icons.lock_outline),
+                  content: const Text(
+                      'Screen Time access is required to track app usage on iOS.'),
+                  actions: [
+                    TextButton(
+                      onPressed: () async {
+                        focusLog(
+                            '🔵 [GUARD SCREEN] Enable Screen Time button tapped');
+                        try {
+                          await iosRequestAuthorization();
+                          focusLog('🔵 [GUARD SCREEN] Authorization requested');
+                          // Invalidate to refresh the entire screen with new status
+                          ref.invalidate(iosAuthStatusProvider);
 
-              // TODO: DeviceActivityReport - disabled temporarily due to Xcode embedding issues
-              // Will be re-enabled after manual Xcode configuration
-              // Issue: Extension embedded twice causing circular dependency
+                          // Start monitoring if authorized
+                          final newStatus = await iosGetAuthorizationStatus();
+                          if (newStatus) {
+                            focusLog(
+                                '🔵 [GUARD SCREEN] Starting monitoring...');
+                            await iosStartMonitoring();
+                          }
+                        } catch (e) {
+                          focusLog(
+                              '🔵 [GUARD SCREEN] Error requesting authorization',
+                              data: e);
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Error: ${e.toString()}')),
+                            );
+                          }
+                        }
+                      },
+                      child: const Text('Enable'),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+              ],
 
-              // Beautiful Opal-style Focus Score Card
-              Consumer(
-                builder: (context, ref, child) {
-                  final usageAccessAsync =
-                      ref.watch(usageAccessGrantedProvider);
+              // ========================================
+              // HIDDEN: iOS DeviceActivityReport Widget (Data Extraction Trigger)
+              // This widget is hidden but ACTIVE to trigger per-app data extraction
+              // The native extension processes Screen Time data and saves to App Group
+              // Only render if authorized (already checked above)
+              // ========================================
+              if (Platform.isIOS && isIosAuthorized)
+                const SizedBox(
+                  height: 0,
+                  width: 0,
+                  child: IosActivityReportView(),
+                ),
 
-                  return usageAccessAsync.when(
-                    data: (isGranted) {
-                      final heroCard = const OpalFocusScoreCard();
+              // ========================================
+              // COMMENTED OUT: Opal-style Focus Score Card
+              // Reason: Focusing on Apps list only
+              // ========================================
+              // Consumer(
+              //   builder: (context, ref, child) {
+              //     final usageAccessAsync =
+              //         ref.watch(usageAccessGrantedProvider);
+              //
+              //     return usageAccessAsync.when(
+              //       data: (isGranted) {
+              //         final heroCard = const OpalFocusScoreCard();
+              //
+              //         if (!isGranted) {
+              //           // Mute the card when permission is missing
+              //           return Stack(
+              //             children: [
+              //               IgnorePointer(
+              //                 ignoring: true,
+              //                 child: Opacity(
+              //                   opacity: 0.4,
+              //                   child: heroCard,
+              //                 ),
+              //               ),
+              //               Positioned.fill(
+              //                 child: Center(
+              //                   child: Container(
+              //                     padding: const EdgeInsets.symmetric(
+              //                       horizontal: 12,
+              //                       vertical: 6,
+              //                     ),
+              //                     decoration: BoxDecoration(
+              //                       color: theme.backgroundColor,
+              //                       borderRadius: BorderRadius.circular(20),
+              //                       border: Border.all(
+              //                         color:
+              //                             Theme.of(context).colorScheme.outline,
+              //                       ),
+              //                     ),
+              //                     child: Text(
+              //                       localizations
+              //                           .translate('usage_access_required'),
+              //                       style: TextStyles.caption.copyWith(
+              //                         color: theme.grey[600],
+              //                       ),
+              //                     ),
+              //                   ),
+              //                 ),
+              //               ),
+              //             ],
+              //           );
+              //         }
+              //
+              //         return heroCard;
+              //       },
+              //       loading: () =>
+              //           const Center(child: CircularProgressIndicator()),
+              //       error: (error, stackTrace) =>
+              //           Center(child: Text('Error: $error')),
+              //     );
+              //   },
+              // ),
+              // const SizedBox(height: 24),
 
-                      if (!isGranted) {
-                        // Mute the card when permission is missing
-                        return Stack(
-                          children: [
-                            IgnorePointer(
-                              ignoring: true,
-                              child: Opacity(
-                                opacity: 0.4,
-                                child: heroCard,
-                              ),
-                            ),
-                            Positioned.fill(
-                              child: Center(
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 6,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: theme.backgroundColor,
-                                    borderRadius: BorderRadius.circular(20),
-                                    border: Border.all(
-                                      color:
-                                          Theme.of(context).colorScheme.outline,
-                                    ),
-                                  ),
-                                  child: Text(
-                                    localizations
-                                        .translate('usage_access_required'),
-                                    style: TextStyles.caption.copyWith(
-                                      color: theme.grey[600],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        );
-                      }
-
-                      return heroCard;
-                    },
-                    loading: () =>
-                        const Center(child: CircularProgressIndicator()),
-                    error: (error, stackTrace) =>
-                        Center(child: Text('Error: $error')),
-                  );
-                },
-              ),
-              const SizedBox(height: 24),
-
-              // Top Apps Section with Live indicator
+              // Apps Section with Live indicator (RENAMED from "Top Apps")
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    localizations.translate('top_apps'),
+                    'Apps', // Changed from localizations.translate('top_apps')
                     style: TextStyles.h6.copyWith(
                       color: theme.grey[900],
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                   Row(

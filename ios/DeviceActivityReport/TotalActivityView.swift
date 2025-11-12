@@ -26,7 +26,7 @@ struct TotalActivityView: View {
                 .foregroundColor(.secondary)
             
             // Total time
-            Text(totalActivity)
+        Text(totalActivity)
                 .font(.system(size: 42, weight: .bold))
                 .foregroundColor(.primary)
         }

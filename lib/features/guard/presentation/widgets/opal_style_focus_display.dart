@@ -30,11 +30,13 @@ class UsageMetrics {
 
 class AppUsageDisplay {
   final String name;
+  final String category; // NEW: Category info (Social, Games, etc.)
   final int minutes;
   final double percentage;
 
   AppUsageDisplay({
     required this.name,
+    required this.category,
     required this.minutes,
     required this.percentage,
   });
@@ -57,7 +59,7 @@ final usageMetricsProvider =
             .toList();
 
         apps.sort((a, b) => b.minutes.compareTo(a.minutes));
-        final topApps = apps.take(5).toList();
+        final topApps = apps.toList(); // CHANGED: Show ALL apps, not just top 5
 
         final totalMinutes = apps.fold<int>(0, (sum, app) => sum + app.minutes);
         final pickups = (data['pickups'] as int?) ?? 0;
@@ -68,8 +70,15 @@ final usageMetricsProvider =
         final displayApps = topApps.map((app) {
           final percentage =
               totalMinutes > 0 ? app.minutes / totalMinutes.toDouble() : 0.0;
+          
+          // Extract category from snapshot data
+          final appData = (data['apps'] as List? ?? [])
+              .firstWhere((a) => a['label'] == app.label, orElse: () => {});
+          final category = appData['category'] as String? ?? '';
+          
           return AppUsageDisplay(
             name: app.label,
+            category: category,
             minutes: app.minutes,
             percentage: percentage,
           );
@@ -600,6 +609,19 @@ class _AppUsageItem extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
+                  // Show category if available
+                  if (app.category.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      app.category,
+                      style: TextStyles.caption.copyWith(
+                        color: theme.grey[500],
+                        fontSize: 12,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                   const SizedBox(height: 8),
 
                   // Progress bar
