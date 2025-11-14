@@ -40,32 +40,6 @@ class _GroupsChatsTabbedScreenState
     final localizations = AppLocalizations.of(context);
     final selectedIndex = _options.indexOf(_selectedOption);
 
-    return Scaffold(
-      appBar: appBar(context, ref,
-          selectedIndex == 0 ? 'groups' : 'community-chats', false, false),
-      backgroundColor: theme.backgroundColor,
-      body: Column(
-        children: [
-          // Segmented control for tabs
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: CustomSegmentedButton(
-              options: _options,
-              selectedOption: _selectedOption,
-              onChanged: (option) {
-                setState(() => _selectedOption = option);
-              },
-            ),
-          ),
-
-          // Content based on selected tab
-          Expanded(
-            child: _selectedOption.value == 'groups'
-                ? const GroupScreen()
-                : const CommunityChatsScreen(showAppBar: false),
-          ),
-        ],
-      ),
-    );
+    return GroupScreen();
   }
 }

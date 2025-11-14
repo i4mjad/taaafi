@@ -242,7 +242,7 @@ class AchievementDetailsModal extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    'Not earned yet',
+                    l10n.translate('not-earned-yet'),
                     style: TextStyles.footnote.copyWith(
                       color: theme.grey[600],
                     ),
@@ -268,7 +268,7 @@ class AchievementDetailsModal extends StatelessWidget {
                 ),
               ),
               child: Text(
-                'Close',
+                l10n.translate('close'),
                 style: TextStyles.h6,
               ),
             ),
@@ -283,11 +283,11 @@ class AchievementDetailsModal extends StatelessWidget {
     final difference = now.difference(date);
 
     if (difference.inDays == 0) {
-      return 'Today';
+      return l10n.translate('today');
     } else if (difference.inDays == 1) {
-      return 'Yesterday';
+      return l10n.translate('yesterday');
     } else if (difference.inDays < 7) {
-      return '${difference.inDays} days ago';
+      return l10n.translate('days-ago').replaceAll('{days}', '${difference.inDays}');
     } else {
       return '${date.day}/${date.month}/${date.year}';
     }

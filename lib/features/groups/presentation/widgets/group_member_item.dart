@@ -3,15 +3,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
-import 'package:reboot_app_3/core/shared_widgets/action_modal.dart';
-import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
-import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/groups/domain/entities/group_membership_entity.dart';
-import 'package:reboot_app_3/features/groups/application/group_member_management_controller.dart';
 import 'package:reboot_app_3/features/groups/presentation/widgets/member_profile_modal.dart';
 import 'package:reboot_app_3/features/groups/presentation/widgets/edit_member_profile_modal.dart';
 
@@ -52,7 +48,6 @@ class GroupMemberItem extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
     final l10n = AppLocalizations.of(context);
-    final locale = Localizations.localeOf(context);
 
     final memberProfileAsync =
         ref.watch(communityProfileByIdProvider(membershipEntity.cpId));
@@ -75,357 +70,168 @@ class GroupMemberItem extends ConsumerWidget {
           gender: profile.gender,
         );
 
-        // Sprint 4 - Feature 4.2: Swipe actions for members
-        return Dismissible(
-          key: Key('member_${memberInfo.membership.cpId}'),
-          direction: DismissDirection.endToStart,
-          confirmDismiss: (_) async => false, // Prevent actual dismissal
-          onUpdate: (details) {
-            // Haptic feedback when swipe reaches threshold
-            if (details.progress > 0.5) {
-              HapticFeedback.lightImpact();
-            }
+        return InkWell(
+          onTap: () {
+            HapticFeedback.lightImpact();
+            _showMemberProfile(context, profile, memberInfo, ref);
           },
-          background: _buildSwipeBackground(context, theme, memberInfo, l10n, ref),
-          child: InkWell(
-            onTap: () {
-              HapticFeedback.lightImpact();
-              _showMemberProfile(context, profile, memberInfo, ref);
-            },
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              color: theme.backgroundColor,
-              child: Row(
-                children: [
-              // Avatar - always show, but different for anonymous users
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: _getAvatarColor(memberInfo.gender, theme),
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: memberInfo.membership.role == 'admin'
-                        ? theme.primary[200]!
-                        : theme.grey[200]!,
-                    width: 2,
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                // Avatar - always show, but different for anonymous users
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: _getAvatarColor(memberInfo.gender, theme),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: memberInfo.membership.role == 'admin'
+                          ? theme.primary[200]!
+                          : theme.grey[200]!,
+                      width: 2,
+                    ),
                   ),
-                ),
-                child: memberInfo.isAnonymous
-                    ? _buildAnonymousAvatar(theme, memberInfo)
-                    : (memberInfo.avatarUrl != null
-                        ? ClipOval(
-                            child: Image.network(
-                              memberInfo.avatarUrl!,
-                              width: 48,
-                              height: 48,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) =>
-                                  _buildDefaultAvatar(theme, memberInfo),
-                            ),
-                          )
-                        : _buildDefaultAvatar(theme, memberInfo)),
-              ),
-
-              horizontalSpace(Spacing.points16),
-
-              // Member details
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Name and role badge
-                    Row(
-                      children: [
-                        // Activity indicator (green dot if active in 24h)
-                        if (memberInfo.membership.lastActiveAt != null &&
-                            DateTime.now()
-                                    .difference(
-                                        memberInfo.membership.lastActiveAt!)
-                                    .inHours <
-                                24)
-                          Container(
-                            width: 8,
-                            height: 8,
-                            margin: const EdgeInsets.only(right: 6),
-                            decoration: BoxDecoration(
-                              color: theme.success[500],
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                        Expanded(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                _getLocalizedDisplayName(
-                                    memberInfo.displayName, l10n),
-                                style: TextStyles.footnote.copyWith(
-                                  color: theme.grey[900],
-                                  fontWeight: FontWeight.w600,
-                                ),
-                                overflow: TextOverflow.ellipsis,
+                  child: memberInfo.isAnonymous
+                      ? _buildAnonymousAvatar(theme, memberInfo)
+                      : (memberInfo.avatarUrl != null
+                          ? ClipOval(
+                              child: Image.network(
+                                memberInfo.avatarUrl!,
+                                width: 48,
+                                height: 48,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) =>
+                                    _buildDefaultAvatar(theme, memberInfo),
                               ),
-                              verticalSpace(Spacing.points4),
-                              // Role badge
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
+                            )
+                          : _buildDefaultAvatar(theme, memberInfo)),
+                ),
+
+                horizontalSpace(Spacing.points16),
+
+                // Member details
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Name with admin shield
+                      Row(
+                        children: [
+                          // Activity indicator (green dot if active in 24h)
+                          if (memberInfo.membership.lastActiveAt != null &&
+                              DateTime.now()
+                                      .difference(
+                                          memberInfo.membership.lastActiveAt!)
+                                      .inHours <
+                                  24)
+                            Container(
+                              width: 8,
+                              height: 8,
+                              margin: const EdgeInsets.only(right: 6),
+                              decoration: BoxDecoration(
+                                color: theme.success[500],
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          Expanded(
+                            child: Row(
+                              children: [
+                                // Admin shield icon
+                                if (memberInfo.membership.role == 'admin') ...[
                                   Icon(
-                                    memberInfo.membership.role == 'admin'
-                                        ? LucideIcons.crown
-                                        : LucideIcons.user,
-                                    size: 10,
-                                    color: memberInfo.membership.role == 'admin'
-                                        ? theme.primary[600]
-                                        : theme.grey[600],
+                                    LucideIcons.shield,
+                                    size: 14,
+                                    color: theme.primary[600],
                                   ),
-                                  const SizedBox(width: 2),
-                                  Text(
-                                    memberInfo.membership.role == 'admin'
-                                        ? l10n.translate('group-admin')
-                                        : l10n.translate('group-member'),
-                                    style: TextStyles.bodyTiny.copyWith(
+                                  const SizedBox(width: 6),
+                                ],
+                                Expanded(
+                                  child: Text(
+                                    _getLocalizedDisplayName(
+                                        memberInfo.displayName, l10n),
+                                    style: TextStyles.footnote.copyWith(
                                       color:
                                           memberInfo.membership.role == 'admin'
                                               ? theme.primary[700]
-                                              : theme.grey[600],
+                                              : theme.grey[900],
                                       fontWeight: FontWeight.w600,
                                     ),
+                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      verticalSpace(Spacing.points4),
+
+                      // Activity info: Last active & message count
+                      Row(
+                        children: [
+                          // Last active - improved logic (Sprint 4 Enhancement)
+                          if (memberInfo.membership.lastActiveAt != null) ...[
+                            Icon(
+                              LucideIcons.clock,
+                              size: 11,
+                              color: theme.grey[500],
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              _getLastActiveText(
+                                  memberInfo.membership.lastActiveAt!, l10n),
+                              style:
+                                  TextStyles.bottomNavigationBarLabel.copyWith(
+                                color: theme.grey[600],
                               ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    verticalSpace(Spacing.points4),
-
-                    // Activity info: Last active & message count
-                    Row(
-                      children: [
-                        // Last active - improved logic (Sprint 4 Enhancement)
-                        if (memberInfo.membership.lastActiveAt != null) ...[
-                          Icon(
-                            LucideIcons.clock,
-                            size: 11,
-                            color: theme.grey[500],
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            _getLastActiveText(
-                                memberInfo.membership.lastActiveAt!, l10n),
-                            style: TextStyles.bottomNavigationBarLabel.copyWith(
-                              color: theme.grey[600],
                             ),
-                          ),
-                        ] else ...[
-                          // If no lastActiveAt, check if recently joined
-                          Icon(
-                            LucideIcons.clock,
-                            size: 11,
-                            color: theme.grey[500],
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            _getActivityFallbackText(
-                                memberInfo.membership.joinedAt, l10n),
-                            style: TextStyles.bottomNavigationBarLabel.copyWith(
-                              color: theme.grey[600],
+                          ] else ...[
+                            // If no lastActiveAt, check if recently joined
+                            Icon(
+                              LucideIcons.clock,
+                              size: 11,
+                              color: theme.grey[500],
                             ),
-                          ),
+                            const SizedBox(width: 4),
+                            Text(
+                              _getActivityFallbackText(
+                                  memberInfo.membership.joinedAt, l10n),
+                              style:
+                                  TextStyles.bottomNavigationBarLabel.copyWith(
+                                color: theme.grey[600],
+                              ),
+                            ),
+                          ],
+
+                          const SizedBox(width: 8),
+
+                          // Engagement badge
+                          _buildEngagementBadge(
+                              memberInfo.membership.engagementLevel,
+                              theme,
+                              l10n),
                         ],
-
-                        const SizedBox(width: 8),
-
-                        // Message count
-                        if (memberInfo.membership.messageCount > 0) ...[
-                          Icon(
-                            LucideIcons.messageCircle,
-                            size: 11,
-                            color: theme.grey[500],
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            '${memberInfo.membership.messageCount}',
-                            style: TextStyles.bottomNavigationBarLabel.copyWith(
-                              color: theme.grey[600],
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-
-                        const SizedBox(width: 8),
-
-                        // Engagement badge
-                        _buildEngagementBadge(
-                            memberInfo.membership.engagementLevel, theme, l10n),
-                      ],
-                    ),
-
-                    verticalSpace(Spacing.points4),
-
-                    // Join date
-                    Text(
-                      '${l10n.translate('joined')}: ${getDisplayDateTime(memberInfo.membership.joinedAt, locale.languageCode)}',
-                      style: TextStyles.bottomNavigationBarLabel.copyWith(
-                        color: theme.grey[500],
                       ),
-                    ),
-                  ],
-                ),
-              ),
-
-                // Three dots menu (only show if not current user)
-                if (!isCurrentUser)
-                  GestureDetector(
-                    onTap: () {
-                      HapticFeedback.lightImpact();
-                      _showMemberActions(context, memberInfo, l10n, ref);
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      child: Icon(
-                        LucideIcons.moreHorizontal,
-                        size: 20,
-                        color: theme.grey[500],
-                      ),
-                    ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+
+                // Chevron icon (respects RTL/LTR)
+                Icon(
+                  Directionality.of(context) == TextDirection.rtl
+                      ? LucideIcons.chevronLeft
+                      : LucideIcons.chevronRight,
+                  size: 18,
+                  color: theme.grey[400],
+                ),
+              ],
             ),
           ),
         );
       },
-    );
-  }
-
-  /// Build swipe background with action buttons (Sprint 4 - Feature 4.2)
-  Widget _buildSwipeBackground(
-    BuildContext context,
-    dynamic theme,
-    GroupMemberInfo memberInfo,
-    AppLocalizations l10n,
-    WidgetRef ref,
-  ) {
-    final isCurrentUser = memberInfo.membership.cpId == currentUserCpId;
-    final isGroupCreator = memberInfo.membership.cpId == groupCreatorCpId;
-    
-    // Don't show actions for current user or group creator
-    if (isCurrentUser || isGroupCreator) {
-      return Container(color: theme.grey[50]);
-    }
-
-    return Container(
-      alignment: Alignment.centerRight,
-      padding: const EdgeInsets.only(right: 16),
-      color: theme.error[50],
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Admin actions
-          if (isCurrentUserAdmin) ...[
-            // Promote/Demote button
-            if (memberInfo.membership.role == 'admin')
-              _buildSwipeActionButton(
-                context: context,
-                theme: theme,
-                icon: LucideIcons.userMinus,
-                label: l10n.translate('demote'),
-                color: theme.warning[500]!,
-                onTap: () {
-                  HapticFeedback.mediumImpact();
-                  _demoteToMember(context, memberInfo, l10n, isGroupCreator, ref);
-                },
-              )
-            else
-              _buildSwipeActionButton(
-                context: context,
-                theme: theme,
-                icon: LucideIcons.userPlus,
-                label: l10n.translate('promote'),
-                color: theme.success[500]!,
-                onTap: () {
-                  HapticFeedback.mediumImpact();
-                  _promoteToAdmin(context, memberInfo, l10n, ref);
-                },
-              ),
-            const SizedBox(width: 8),
-            // Remove button
-            _buildSwipeActionButton(
-              context: context,
-              theme: theme,
-              icon: LucideIcons.userX,
-              label: l10n.translate('remove'),
-              color: theme.error[500]!,
-              onTap: () {
-                HapticFeedback.heavyImpact();
-                _removeMember(context, memberInfo, l10n, isGroupCreator, ref);
-              },
-            ),
-          ] else ...[
-            // Regular member: Message button
-            _buildSwipeActionButton(
-              context: context,
-              theme: theme,
-              icon: LucideIcons.messageCircle,
-              label: l10n.translate('message'),
-              color: theme.primary[500]!,
-              onTap: () {
-                HapticFeedback.mediumImpact();
-                // TODO: Navigate to direct message
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(l10n.translate('coming-soon')),
-                    duration: const Duration(seconds: 1),
-                  ),
-                );
-              },
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  /// Build individual swipe action button (Sprint 4 - Feature 4.2)
-  Widget _buildSwipeActionButton({
-    required BuildContext context,
-    required dynamic theme,
-    required IconData icon,
-    required String label,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 70,
-        height: 70,
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color, width: 1.5),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 24, color: color),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyles.tinyBold.copyWith(
-                color: color,
-                fontSize: 10,
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -554,18 +360,20 @@ class GroupMemberItem extends ConsumerWidget {
     if (difference.inMinutes < 5) {
       return l10n.translate('active-now');
     } else if (difference.inHours < 1) {
-      return l10n.translate('active-minutes-ago')
+      return l10n
+          .translate('active-minutes-ago')
           .replaceAll('{minutes}', '${difference.inMinutes}');
     } else if (difference.inHours < 24) {
-      return l10n.translate('active-hours-ago')
+      return l10n
+          .translate('active-hours-ago')
           .replaceAll('{hours}', '${difference.inHours}');
     } else if (difference.inDays < 7) {
-      return l10n.translate('active-days-ago')
+      return l10n
+          .translate('active-days-ago')
           .replaceAll('{days}', '${difference.inDays}');
     } else {
       final weeks = (difference.inDays / 7).floor();
-      return l10n.translate('active-weeks-ago')
-          .replaceAll('{weeks}', '$weeks');
+      return l10n.translate('active-weeks-ago').replaceAll('{weeks}', '$weeks');
     }
   }
 
@@ -576,7 +384,7 @@ class GroupMemberItem extends ConsumerWidget {
 
     // Backward compatibility: For existing users without lastActiveAt tracking
     // We assume they're active members rather than showing "No activity yet"
-    
+
     if (difference.inMinutes < 60) {
       // Just joined (< 1 hour)
       return l10n.translate('active-now');
@@ -605,7 +413,7 @@ class GroupMemberItem extends ConsumerWidget {
         labelKey = 'high-engagement';
         break;
       case 'medium':
-        badgeColor = theme.warning[500]!;
+        badgeColor = theme.warn[500]!;
         labelKey = 'medium-engagement';
         break;
       case 'low':
@@ -656,105 +464,86 @@ class GroupMemberItem extends ConsumerWidget {
     WidgetRef ref,
   ) async {
     final isOwnProfile = memberInfo.membership.cpId == currentUserCpId;
-    
-    print('🔍 [PROFILE MODAL] Opening profile for cpId: ${memberInfo.membership.cpId}');
-    print('🔍 [PROFILE MODAL] Is own profile: $isOwnProfile');
-    
+
     // Force fresh fetch from Firestore - no cache (Sprint 4 Enhancement)
     ref.invalidate(communityProfileByIdProvider(memberInfo.membership.cpId));
     final freshProfile = await ref.read(
       communityProfileByIdProvider(memberInfo.membership.cpId).future,
     );
-    
-    print('🔍 [PROFILE MODAL] Fresh profile fetched!');
-    print('🔍 [PROFILE MODAL] Profile ID: ${freshProfile?.id}');
-    print('🔍 [PROFILE MODAL] Display Name: ${freshProfile?.displayName}');
-    print('🔍 [PROFILE MODAL] Has Bio: ${freshProfile?.hasBio()}');
-    print('🔍 [PROFILE MODAL] Bio Content: "${freshProfile?.groupBio}"');
-    print('🔍 [PROFILE MODAL] Has Interests: ${freshProfile?.hasInterests()}');
-    print('🔍 [PROFILE MODAL] Interests: ${freshProfile?.interests}');
-    
+
     if (!context.mounted || freshProfile == null) {
-      print('❌ [PROFILE MODAL] Context not mounted or profile is null!');
       return;
     }
-    
+
+    final isGroupCreator = memberInfo.membership.cpId == groupCreatorCpId;
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
       backgroundColor: Colors.transparent,
       builder: (modalContext) => MemberProfileModal(
         profile: freshProfile,
         membership: memberInfo.membership,
-        achievements: const [], // TODO: Load achievements from service
         isOwnProfile: isOwnProfile,
+        isCurrentUserAdmin: isCurrentUserAdmin,
+        isGroupCreator: isGroupCreator,
         // Only provide onEdit for own profile (Sprint 4 Enhancement)
-        onEdit: isOwnProfile ? () {
-          Navigator.of(modalContext).pop();
-          // Open edit profile modal (Sprint 4 Enhancement)
-          _showEditProfileModal(context, freshProfile, ref);
-        } : null,
+        onEdit: isOwnProfile
+            ? () {
+                Navigator.of(modalContext).pop();
+                // Open edit profile modal (Sprint 4 Enhancement)
+                _showEditProfileModal(context, freshProfile, ref);
+              }
+            : null,
         // Only provide onMessage for other members
-        onMessage: !isOwnProfile ? () {
-          // TODO: Navigate to direct message (Future sprint)
-          Navigator.of(modalContext).pop();
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(AppLocalizations.of(context).translate('coming-soon')),
-              duration: const Duration(seconds: 1),
-            ),
-          );
-        } : null,
+        onMessage: !isOwnProfile
+            ? () {
+                // TODO: Navigate to direct message (Future sprint)
+                Navigator.of(modalContext).pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                        AppLocalizations.of(context).translate('coming-soon')),
+                    duration: const Duration(seconds: 1),
+                  ),
+                );
+              }
+            : null,
       ),
     );
   }
 
   /// Show edit profile modal (Sprint 4 Enhancement)
-  void _showEditProfileModal(BuildContext context, dynamic profile, WidgetRef ref) {
-    print('✏️ [EDIT MODAL] Opening edit modal');
-    print('✏️ [EDIT MODAL] Profile ID: ${profile.id}');
-    print('✏️ [EDIT MODAL] Current Bio: "${profile.groupBio}"');
-    print('✏️ [EDIT MODAL] Current Interests: ${profile.interests}');
-    
+  void _showEditProfileModal(
+      BuildContext context, dynamic profile, WidgetRef ref) {
     showEditProfileModal(
       context: context,
       profile: profile,
       onSave: (bio, interests) async {
-        print('💾 [SAVE] Saving profile changes...');
-        print('💾 [SAVE] New Bio: "$bio"');
-        print('💾 [SAVE] New Interests: $interests');
         try {
           final repository = ref.read(communityRepositoryProvider);
 
           // Update bio
           if (bio != profile.groupBio) {
-            print('💾 [SAVE] Bio changed, updating in Firestore...');
             await repository.updateGroupBio(profile.id, bio);
-            print('✅ [SAVE] Bio updated successfully');
-          } else {
-            print('⏭️ [SAVE] Bio unchanged, skipping update');
           }
 
           // Update interests
           if (interests.toString() != profile.interests.toString()) {
-            print('💾 [SAVE] Interests changed, updating in Firestore...');
             await repository.updateInterests(profile.id, interests);
-            print('✅ [SAVE] Interests updated successfully');
-          } else {
-            print('⏭️ [SAVE] Interests unchanged, skipping update');
           }
 
           // Invalidate cache to force fresh fetch next time
-          print('🔄 [SAVE] Invalidating profile cache...');
           ref.invalidate(currentCommunityProfileProvider);
           ref.invalidate(communityProfileByIdProvider(profile.id));
-          print('✅ [SAVE] Cache invalidated');
 
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
-                  AppLocalizations.of(context).translate('group-profile-updated'),
+                  AppLocalizations.of(context)
+                      .translate('group-profile-updated'),
                 ),
                 duration: const Duration(seconds: 2),
                 backgroundColor: Colors.green,
@@ -774,203 +563,5 @@ class GroupMemberItem extends ConsumerWidget {
         }
       },
     );
-  }
-
-  void _showMemberActions(BuildContext context, GroupMemberInfo memberInfo,
-      AppLocalizations l10n, WidgetRef ref) {
-    final actions = <ActionItem>[];
-
-    // Report action - always available
-    actions.add(ActionItem(
-      icon: LucideIcons.flag,
-      title: l10n.translate('report-user'),
-      subtitle: l10n.translate('report-inappropriate-behavior'),
-      onTap: () => _reportUser(context, memberInfo, l10n, ref),
-    ));
-
-    // Admin-only actions
-    if (isCurrentUserAdmin) {
-      final isGroupCreator = memberInfo.membership.cpId == groupCreatorCpId;
-
-      // Promote/Demote action (not allowed for group creator)
-      if (memberInfo.membership.role == 'admin') {
-        actions.add(ActionItem(
-          icon: LucideIcons.userMinus,
-          title: l10n.translate('demote-to-member'),
-          subtitle: l10n.translate('remove-admin-privileges'),
-          onTap: () =>
-              _demoteToMember(context, memberInfo, l10n, isGroupCreator, ref),
-        ));
-      } else {
-        actions.add(ActionItem(
-          icon: LucideIcons.userPlus,
-          title: l10n.translate('promote-to-admin'),
-          subtitle: l10n.translate('grant-admin-privileges'),
-          onTap: () => _promoteToAdmin(context, memberInfo, l10n, ref),
-        ));
-      }
-
-      // Remove from group action (not allowed for group creator)
-      actions.add(ActionItem(
-        icon: LucideIcons.userX,
-        title: l10n.translate('remove-from-group'),
-        subtitle: l10n.translate('permanently-remove-member'),
-        isDestructive: true,
-        onTap: () =>
-            _removeMember(context, memberInfo, l10n, isGroupCreator, ref),
-      ));
-    }
-
-    ActionModal.show(context, actions: actions);
-  }
-
-  void _reportUser(BuildContext context, GroupMemberInfo memberInfo,
-      AppLocalizations l10n, WidgetRef ref) {
-    final actions = <ActionItem>[
-      ActionItem(
-        icon: LucideIcons.alertTriangle,
-        title: l10n.translate('report-inappropriate-content'),
-        onTap: () => _submitUserReport(
-            context, memberInfo, 'inappropriate-content', l10n, ref),
-        isDestructive: true,
-      ),
-      ActionItem(
-        icon: LucideIcons.userMinus,
-        title: l10n.translate('report-harassment'),
-        onTap: () =>
-            _submitUserReport(context, memberInfo, 'harassment', l10n, ref),
-        isDestructive: true,
-      ),
-      ActionItem(
-        icon: LucideIcons.shield,
-        title: l10n.translate('report-spam'),
-        onTap: () => _submitUserReport(context, memberInfo, 'spam', l10n, ref),
-        isDestructive: true,
-      ),
-      ActionItem(
-        icon: LucideIcons.frown,
-        title: l10n.translate('report-hate-speech'),
-        onTap: () =>
-            _submitUserReport(context, memberInfo, 'hate-speech', l10n, ref),
-        isDestructive: true,
-      ),
-      ActionItem(
-        icon: LucideIcons.moreHorizontal,
-        title: l10n.translate('report-other-reason'),
-        onTap: () => _submitUserReport(context, memberInfo, 'other', l10n, ref),
-        isDestructive: true,
-      ),
-    ];
-
-    ActionModal.show(context,
-        actions: actions, title: l10n.translate('report-reason'));
-  }
-
-  /// Submit a user report
-  void _submitUserReport(BuildContext context, GroupMemberInfo memberInfo,
-      String reportTypeId, AppLocalizations l10n, WidgetRef ref) async {
-    // Get the context and ref for the async operation
-    if (!context.mounted) return;
-
-    final scaffoldMessenger = ScaffoldMessenger.of(context);
-    final navigator = Navigator.of(context);
-
-    try {
-      // Close the action modal first
-      navigator.pop();
-
-      final controller =
-          ref.read(groupMemberManagementControllerProvider.notifier);
-      final result = await controller.reportUser(
-        reportedUserCpId: memberInfo.membership.cpId,
-        reportMessage: l10n.translate('inappropriate-behavior-in-group'),
-      );
-
-      if (result.success) {
-        getSuccessSnackBar(context, 'report-submitted-successfully');
-      } else {
-        getErrorSnackBar(
-            context, result.errorKey ?? 'report-submission-failed');
-      }
-    } catch (e) {
-      getErrorSnackBar(context, 'report-submission-failed');
-    }
-  }
-
-  void _promoteToAdmin(BuildContext context, GroupMemberInfo memberInfo,
-      AppLocalizations l10n, WidgetRef ref) async {
-    if (!context.mounted) return;
-
-    try {
-      final controller =
-          ref.read(groupMemberManagementControllerProvider.notifier);
-      final result = await controller.promoteMemberToAdmin(
-        groupId: memberInfo.membership.groupId,
-        memberCpId: memberInfo.membership.cpId,
-      );
-
-      if (result.success) {
-        getSuccessSnackBar(context, 'member-promoted-successfully');
-      } else {
-        getErrorSnackBar(
-            context, result.errorKey ?? 'failed-to-promote-member');
-      }
-    } catch (e) {
-      getErrorSnackBar(context, 'failed-to-promote-member');
-    }
-  }
-
-  void _demoteToMember(BuildContext context, GroupMemberInfo memberInfo,
-      AppLocalizations l10n, bool isGroupCreator, WidgetRef ref) async {
-    if (isGroupCreator) {
-      getErrorSnackBar(context, 'cannot-demote-group-creator');
-      return;
-    }
-
-    if (!context.mounted) return;
-
-    try {
-      final controller =
-          ref.read(groupMemberManagementControllerProvider.notifier);
-      final result = await controller.demoteMemberToMember(
-        groupId: memberInfo.membership.groupId,
-        memberCpId: memberInfo.membership.cpId,
-      );
-
-      if (result.success) {
-        getSuccessSnackBar(context, 'member-demoted-successfully');
-      } else {
-        getErrorSnackBar(context, result.errorKey ?? 'failed-to-demote-member');
-      }
-    } catch (e) {
-      getErrorSnackBar(context, 'failed-to-demote-member');
-    }
-  }
-
-  void _removeMember(BuildContext context, GroupMemberInfo memberInfo,
-      AppLocalizations l10n, bool isGroupCreator, WidgetRef ref) async {
-    if (isGroupCreator) {
-      getErrorSnackBar(context, 'cannot-remove-group-creator');
-      return;
-    }
-
-    if (!context.mounted) return;
-
-    try {
-      final controller =
-          ref.read(groupMemberManagementControllerProvider.notifier);
-      final result = await controller.removeMemberFromGroup(
-        groupId: memberInfo.membership.groupId,
-        memberCpId: memberInfo.membership.cpId,
-      );
-
-      if (result.success) {
-        getSuccessSnackBar(context, 'member-removed-successfully');
-      } else {
-        getErrorSnackBar(context, result.errorKey ?? 'failed-to-remove-member');
-      }
-    } catch (e) {
-      getErrorSnackBar(context, 'failed-to-remove-member');
-    }
   }
 }

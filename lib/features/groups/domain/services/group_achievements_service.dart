@@ -18,19 +18,26 @@ class GroupAchievementsService {
     try {
       log('Getting achievements for member $cpId in group $groupId');
       
+      // Query by cpId only to avoid composite index requirement
       final snapshot = await _firestore
           .collection('groupAchievements')
-          .where('groupId', isEqualTo: groupId)
           .where('cpId', isEqualTo: cpId)
-          .orderBy('earnedAt', descending: true)
           .get();
 
-      return snapshot.docs
+      // Filter by groupId and sort in code
+      final achievements = snapshot.docs
           .map((doc) => GroupAchievementEntity.fromJson({
                 ...doc.data(),
                 'id': doc.id,
               }))
+          .where((achievement) => achievement.groupId == groupId)
           .toList();
+      
+      // Sort by earnedAt descending
+      achievements.sort((a, b) => b.earnedAt.compareTo(a.earnedAt));
+
+      log('Found ${achievements.length} achievements for member');
+      return achievements;
     } catch (e, stackTrace) {
       log('Error getting achievements: $e', stackTrace: stackTrace);
       rethrow;

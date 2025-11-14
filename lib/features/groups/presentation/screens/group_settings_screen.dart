@@ -349,44 +349,6 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
                       ),
                     ],
                   ),
-                  if (profile.hasBio() || profile.hasInterests()) ...[
-                    verticalSpace(Spacing.points12),
-                    if (profile.hasBio())
-                      Text(
-                        profile.groupBio!,
-                        style: TextStyles.caption.copyWith(
-                          color: theme.grey[600],
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    if (profile.hasInterests()) ...[
-                      verticalSpace(Spacing.points8),
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: profile.interests.take(3).map((interest) {
-                          return Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              color: theme.tint[100],
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              l10n.translate('interest-$interest'),
-                              style: TextStyles.caption.copyWith(
-                                color: theme.tint[700],
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    ],
-                  ],
                 ],
               ),
             ),
@@ -400,23 +362,13 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
 
   void _showEditProfileModal(
       BuildContext context, profile, WidgetRef ref) async {
-    print('✏️ [SETTINGS EDIT] Opening edit modal');
-    print('✏️ [SETTINGS EDIT] Profile ID: ${profile.id}');
-    print('✏️ [SETTINGS EDIT] Current Bio: "${profile.groupBio}"');
-    print('✏️ [SETTINGS EDIT] Current Interests: ${profile.interests}');
-
     // Force fresh fetch before editing
     ref.invalidate(currentCommunityProfileProvider);
     final freshProfile = await ref.read(currentCommunityProfileProvider.future);
 
     if (freshProfile == null) {
-      print('❌ [SETTINGS EDIT] Failed to fetch fresh profile');
       return;
     }
-
-    print('✅ [SETTINGS EDIT] Fresh profile fetched!');
-    print('✅ [SETTINGS EDIT] Fresh Bio: "${freshProfile.groupBio}"');
-    print('✅ [SETTINGS EDIT] Fresh Interests: ${freshProfile.interests}');
 
     showEditProfileModal(
       context: context,

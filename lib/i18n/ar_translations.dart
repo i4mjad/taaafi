@@ -241,7 +241,6 @@ const Map<String, String> kAr = {
   "user_name": "اسم المستخدم",
   "user_email": "البريد الالكتروني",
   "registered-since": "مسجل منذ:",
-  "processing": "جاري التحديث...",
   "duplicates-deleted": "تم حذف التكرارات بنجاح",
   "processing-new-account": "جاري إنشاء الحساب...",
   "daily-notification-time": "التذكير اليومي",
@@ -3403,6 +3402,20 @@ const Map<String, String> kAr = {
   'engagement-level': 'مستوى التفاعل',
   'total-messages': 'إجمالي الرسائل',
 
+  // Activity Backfill (Sprint 2 - Backward Compatibility)
+  'new-activity-tracking': '📊 جديد: تتبع النشاط!',
+  'activity-tracking-description':
+      'لقد أضفنا تتبع النشاط! قم بتحميل إحصائياتك التاريخية وإنجازاتك بالضغط أدناه.',
+  'load-my-activity': 'تحميل نشاطي',
+  'activity-backfill-success':
+      'تم تحميل بيانات النشاط بنجاح! إحصائياتك وإنجازاتك محدثة الآن.',
+  'refresh-activity-data': 'تحديث بيانات النشاط',
+  'backfill-historical-activity': 'تحميل رسائلك التاريخية وإنجازاتك',
+  'error-backfill-internal': 'فشل تحميل بيانات النشاط. يرجى المحاولة مرة أخرى.',
+  'error-not-group-member': 'أنت لست عضواً في هذه الزمالة.',
+  'error-unauthenticated': 'يجب عليك تسجيل الدخول لتحميل بيانات النشاط.',
+  'error-invalid-request': 'طلب غير صالح. يرجى المحاولة مرة أخرى.',
+
   // Bulk operations (Sprint 2 - Feature 2.2)
   'bulk-actions': 'إجراءات جماعية',
   'select-members': 'اختيار الأعضاء',
@@ -3477,7 +3490,16 @@ const Map<String, String> kAr = {
   'interests': 'الاهتمامات',
   'achievements': 'الإنجازات',
   'member-stats': 'إحصائيات العضو',
+  'member-stats-explained': 'إحصائيات العضو',
+  'joined-date': 'تاريخ الانضمام',
+  'joined-date-explanation': 'متى انضم هذا العضو إلى الزمالة',
+  'messages-sent-explanation':
+      'إجمالي عدد الرسائل المرسلة في هذه الزمالة (باستثناء الرسائل المحذوفة)',
+  'days-active-explanation': 'عدد الأيام منذ الانضمام إلى الزمالة',
+  'engagement-score-explanation':
+      'درجة النشاط بناءً على الرسائل المرسلة والنشاط الأخير. درجة أعلى تعني عضو أكثر نشاطاً.',
   'days-active': 'أيام النشاط',
+  'days-short': 'ي',
   'messages-sent': 'الرسائل المُرسلة',
   'add-bio': 'أضف نبذة تعريفية لتخبر الآخرين عن نفسك',
   'bio-placeholder': 'أخبر الزمالة عن نفسك...',
@@ -3493,19 +3515,22 @@ const Map<String, String> kAr = {
   'bio-max-length': 'الحد الأقصى 200 حرف',
   'bio-char-count': '{count}/200',
 
-  // Achievement Types
-  'first-message-achievement': 'الرسالة الأولى',
-  'first-message-desc': 'أرسلت رسالتك الأولى للزمالة',
+  // Achievement Types (matches AchievementType constants with underscores)
+  'not-earned-yet': 'لم يتم الحصول عليه بعد',
+  'earned-on': 'تم الحصول عليه في {date}',
+  'error-loading-achievements': 'فشل تحميل الإنجازات',
+  'first_message-achievement': 'الرسالة الأولى',
+  'first_message-desc': 'أرسلت رسالتك الأولى للزمالة',
   'welcome-achievement': 'أهلاً وسهلاً',
   'welcome-desc': 'انضممت للزمالة',
-  'week-warrior-achievement': 'محارب الأسبوع',
-  'week-warrior-desc': 'نشط لمدة 7 أيام متتالية',
-  'month-master-achievement': 'سيد الشهر',
-  'month-master-desc': 'نشط لمدة 30 يوماً متتالية',
+  'week_warrior-achievement': 'محارب الأسبوع',
+  'week_warrior-desc': 'نشط لمدة 7 أيام متتالية',
+  'month_master-achievement': 'سيد الشهر',
+  'month_master-desc': 'نشط لمدة 30 يوماً متتالية',
   'helpful-achievement': 'مساعد',
   'helpful-desc': 'حصلت على 10+ تفاعلات إيجابية',
-  'top-contributor-achievement': 'أكثر مساهمة',
-  'top-contributor-desc': 'العضو الأكثر نشاطاً هذا الشهر',
+  'top_contributor-achievement': 'أكثر مساهمة',
+  'top_contributor-desc': 'العضو الأكثر نشاطاً هذا الشهر',
 
   // Interest Tags
   'interest-fitness': 'اللياقة البدنية',

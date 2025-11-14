@@ -1271,6 +1271,16 @@ import {
   sendDirectMessageNotification 
 } from './directMessageNotifications';
 
+// Import groups activity backfill function
+import { 
+  backfillMemberActivity 
+} from './groups/backfillMemberActivity';
+
+// Import groups achievements check function
+import { 
+  checkAndAwardAchievements 
+} from './groups/checkAndAwardAchievements';
+
 // Export group message notification functions
 export { 
   sendGroupMessageNotification,
@@ -1285,6 +1295,16 @@ export {
 // Export direct message notification functions
 export {
   sendDirectMessageNotification
+};
+
+// Export groups activity backfill function
+export {
+  backfillMemberActivity
+};
+
+// Export groups achievements check function (scheduled)
+export {
+  checkAndAwardAchievements
 };
 
 // Community Notification Triggers

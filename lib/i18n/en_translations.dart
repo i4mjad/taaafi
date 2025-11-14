@@ -3477,6 +3477,21 @@ const Map<String, String> kEn = {
   "engagement-level": "Engagement Level",
   "total-messages": "Total Messages",
 
+  // Activity Backfill (Sprint 2 - Backward Compatibility)
+  "new-activity-tracking": "📊 New: Activity Tracking!",
+  "activity-tracking-description":
+      "We've added activity tracking! Load your historical stats and achievements by clicking below.",
+  "load-my-activity": "Load My Activity",
+  "activity-backfill-success":
+      "Activity data loaded successfully! Your stats and achievements are now up to date.",
+  "refresh-activity-data": "Refresh Activity Data",
+  "backfill-historical-activity":
+      "Load your historical messages and achievements",
+  "error-backfill-internal": "Failed to load activity data. Please try again.",
+  "error-not-group-member": "You are not a member of this group.",
+  "error-unauthenticated": "You must be signed in to load activity data.",
+  "error-invalid-request": "Invalid request. Please try again.",
+
   // Bulk operations (Sprint 2 - Feature 2.2)
   "bulk-actions": "Bulk Actions",
   "select-members": "Select Members",
@@ -3552,6 +3567,14 @@ const Map<String, String> kEn = {
   "interests": "Interests",
   "achievements": "Achievements",
   "member-stats": "Member Stats",
+  "member-stats-explained": "Member Stats",
+  "joined-date": "Joined Date",
+  "joined-date-explanation": "When this member joined the group",
+  "messages-sent-explanation":
+      "Total number of messages sent in this group (excluding deleted messages)",
+  "days-active-explanation": "Number of days since joining the group",
+  "engagement-score-explanation":
+      "Activity score based on messages sent and recent activity. Higher score means more active member.",
   "days-active": "Days Active",
   "messages-sent": "Messages Sent",
   "add-bio": "Add a bio to tell others about yourself",
@@ -3568,19 +3591,22 @@ const Map<String, String> kEn = {
   "bio-max-length": "Maximum 200 characters",
   "bio-char-count": "{count}/200",
 
-  // Achievement Types
-  "first-message-achievement": "First Message",
-  "first-message-desc": "Sent your first message to the group",
+  // Achievement Types (matches AchievementType constants with underscores)
+  "not-earned-yet": "Not earned yet",
+  "earned-on": "Earned on {date}",
+  "error-loading-achievements": "Failed to load achievements",
+  "first_message-achievement": "First Message",
+  "first_message-desc": "Sent your first message to the group",
   "welcome-achievement": "Welcome",
   "welcome-desc": "Joined the group",
-  "week-warrior-achievement": "Week Warrior",
-  "week-warrior-desc": "Active for 7 days straight",
-  "month-master-achievement": "Month Master",
-  "month-master-desc": "Active for 30 days straight",
+  "week_warrior-achievement": "Week Warrior",
+  "week_warrior-desc": "Active for 7 days straight",
+  "month_master-achievement": "Month Master",
+  "month_master-desc": "Active for 30 days straight",
   "helpful-achievement": "Helpful",
   "helpful-desc": "Received 10+ supportive reactions",
-  "top-contributor-achievement": "Top Contributor",
-  "top-contributor-desc": "Most active member this month",
+  "top_contributor-achievement": "Top Contributor",
+  "top_contributor-desc": "Most active member this month",
 
   // Interest Tags
   "interest-fitness": "Fitness",
