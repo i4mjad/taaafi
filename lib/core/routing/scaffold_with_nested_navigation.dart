@@ -7,7 +7,6 @@ import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
-import 'package:reboot_app_3/features/guard/application/ios_focus_providers.dart';
 
 class ScaffoldWithNestedNavigation extends ConsumerWidget {
   const ScaffoldWithNestedNavigation({
@@ -17,12 +16,8 @@ class ScaffoldWithNestedNavigation extends ConsumerWidget {
   final StatefulNavigationShell navigationShell;
 
   void _goBranch(int index, WidgetRef ref) {
-    // Tab indices: home=0, vault=1, guard=2, community=3, account=4
-    const int guardTabIndex = 2;
-    const int communityTabIndex = 3;
-
-    final isGuardTab = index == guardTabIndex;
-    ref.read(guardStreamActiveProvider.notifier).state = isGuardTab;
+    // Tab indices: home=0, vault=1, community=2, account=3
+    const int communityTabIndex = 2;
 
     if (index == communityTabIndex) {
       // Refresh community status when community tab is clicked
@@ -45,15 +40,6 @@ class ScaffoldWithNestedNavigation extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
-    const int guardTabIndex = 2;
-    final isGuardActive = navigationShell.currentIndex == guardTabIndex;
-    final guardState = ref.read(guardStreamActiveProvider.notifier);
-    if (guardState.state != isGuardActive) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!context.mounted) return;
-        guardState.state = isGuardActive;
-      });
-    }
     return Scaffold(
       body: navigationShell,
       bottomNavigationBar: NavigationBarTheme(
@@ -83,13 +69,6 @@ class ScaffoldWithNestedNavigation extends ConsumerWidget {
                 label: AppLocalizations.of(context).translate("vault"),
                 icon: Icon(
                   LucideIcons.bookLock,
-                  size: 20,
-                ),
-              ),
-              NavigationDestination(
-                label: AppLocalizations.of(context).translate("guard"),
-                icon: Icon(
-                  LucideIcons.castle,
                   size: 20,
                 ),
               ),

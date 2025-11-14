@@ -15,7 +15,6 @@ import 'package:reboot_app_3/features/account/presentation/delete_account_screen
 import 'package:reboot_app_3/features/account/presentation/account_deletion_login_screen.dart';
 import 'package:reboot_app_3/features/account/presentation/account_deletion_loading_screen.dart';
 import 'package:reboot_app_3/features/account/presentation/user_profile_screen.dart';
-import 'package:reboot_app_3/features/guard/presentation/screens/guard_screen.dart';
 import 'package:reboot_app_3/features/plus/presentation/taaafi_plus_features_list_screen.dart';
 import 'package:reboot_app_3/features/plus/presentation/plus_features_guide_screen.dart';
 import 'package:reboot_app_3/features/community/presentation/posts_list_screen.dart';
@@ -416,23 +415,6 @@ GoRouter goRouter(Ref<GoRouter> ref) {
             ],
           ),
 
-          // * Guard
-          StatefulShellBranch(
-            navigatorKey: shellNavigatorGuardKey,
-            observers: [
-              GoRouterObserver(ref.read(analyticsFacadeProvider)),
-            ],
-            routes: [
-              GoRoute(
-                name: RouteNames.guard.name,
-                path: '/guard',
-                pageBuilder: (context, state) => MaterialPage(
-                  name: RouteNames.guard.name,
-                  child: GuardScreen(),
-                ),
-              ),
-            ],
-          ),
           // * Community
           StatefulShellBranch(
             navigatorKey: shellNavigatorFellowshipKey,
