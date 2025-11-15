@@ -1888,7 +1888,6 @@ const Map<String, String> kAr = {
   "leaderboard": "لوحة النتائج",
   "my_tasks": "مهامي",
   "your-tasks-today": "مهامك لليوم 🔥",
-  "time-remaining": "الوقت المتبقي",
   "hours-left": "ساعات متبقية",
   "minutes-left": "دقائق متبقية",
   "task-expired": "انتهى وقت المهمة",

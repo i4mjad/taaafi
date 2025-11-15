@@ -2286,7 +2286,6 @@ const Map<String, String> kEn = {
   "leaderboard": "Leaderboard",
   "my_tasks": "My Tasks",
   "your-tasks-today": "Your Tasks for today 🔥",
-  "time-remaining": "Time remaining",
   "hours-left": "hours left",
   "minutes-left": "minutes left",
   "task-expired": "Task expired",
