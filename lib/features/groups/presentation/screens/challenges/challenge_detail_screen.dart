@@ -127,12 +127,6 @@ class ChallengeDetailScreen extends ConsumerWidget {
 
                   verticalSpace(Spacing.points16),
 
-                  // View History Button (if participating)
-                  if (isParticipating) ...[
-                    _buildHistoryButton(context, theme, l10n),
-                    verticalSpace(Spacing.points16),
-                  ],
-
                   // Action Buttons
                   _buildActionButtons(context, ref, theme, l10n, challenge,
                       isParticipating, state.isLoading),
@@ -533,40 +527,6 @@ class ChallengeDetailScreen extends ConsumerWidget {
             color: Colors.white,
             fontWeight: FontWeight.bold,
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHistoryButton(BuildContext context, theme, AppLocalizations l10n) {
-    return GestureDetector(
-      onTap: () {
-        context.pushNamed(
-          RouteNames.challengeHistory.name,
-          pathParameters: {
-            'groupId': groupId,
-            'challengeId': challengeId,
-          },
-        );
-      },
-      child: WidgetsContainer(
-        backgroundColor: theme.primary[50],
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: theme.primary[200]!, width: 1),
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(LucideIcons.history, size: 20, color: theme.primary[700]),
-            const SizedBox(width: 8),
-            Text(
-              l10n.translate('view-task-history'),
-              style: TextStyles.body.copyWith(
-                color: theme.primary[700],
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
         ),
       ),
     );
