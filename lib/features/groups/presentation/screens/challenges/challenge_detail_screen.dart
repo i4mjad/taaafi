@@ -11,6 +11,7 @@ import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/groups/domain/entities/challenge_entity.dart';
+import 'package:reboot_app_3/features/groups/domain/entities/challenge_task_entity.dart';
 import 'package:reboot_app_3/features/groups/providers/challenge_detail_notifier.dart';
 
 class ChallengeDetailScreen extends ConsumerWidget {
@@ -35,9 +36,7 @@ class ChallengeDetailScreen extends ConsumerWidget {
       appBar: AppBar(
         title: Text(
           l10n.translate('challenge-details'),
-          style: TextStyles.screenHeadding.copyWith(
-            color: theme.grey[900],
-          ),
+          style: TextStyles.screenHeadding.copyWith(color: theme.grey[900]),
         ),
         backgroundColor: theme.backgroundColor,
         surfaceTintColor: theme.backgroundColor,
@@ -74,26 +73,21 @@ class ChallengeDetailScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Header Card
-                  _buildHeaderCard(context, theme, l10n, challenge),
-
-                  verticalSpace(Spacing.points16),
-
-                  // Description Card
-                  _buildDescriptionCard(theme, l10n, challenge),
+                  _buildHeaderCard(theme, l10n, challenge),
 
                   verticalSpace(Spacing.points16),
 
                   // Stats Card
-                  _buildStatsCard(theme, l10n, challenge, state.stats),
+                  if (isParticipating)
+                    _buildUserProgressCard(theme, l10n, challenge, userParticipation),
 
                   verticalSpace(Spacing.points16),
 
-                  // User Progress Card (if participating)
-                  if (isParticipating) ...[
-                    _buildUserProgressCard(
-                        context, theme, l10n, challenge, userParticipation),
-                    verticalSpace(Spacing.points16),
-                  ],
+                  // Tasks Checklist
+                  _buildTasksSection(
+                      context, ref, theme, l10n, challenge, userParticipation),
+
+                  verticalSpace(Spacing.points16),
 
                   // Leaderboard Preview
                   _buildLeaderboardPreview(
@@ -122,82 +116,27 @@ class ChallengeDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeaderCard(
-      BuildContext context, theme, AppLocalizations l10n, ChallengeEntity challenge) {
-    Color headerColor;
-    IconData headerIcon;
-
-    switch (challenge.type) {
-      case ChallengeType.duration:
-        headerColor = theme.primary[600]!;
-        headerIcon = LucideIcons.clock;
-        break;
-      case ChallengeType.goal:
-        headerColor = theme.success[600]!;
-        headerIcon = LucideIcons.target;
-        break;
-      case ChallengeType.team:
-        headerColor = theme.secondary[600]!;
-        headerIcon = LucideIcons.users;
-        break;
-      case ChallengeType.recurring:
-        headerColor = theme.warn[600]!;
-        headerIcon = LucideIcons.repeat;
-        break;
-    }
-
+  Widget _buildHeaderCard(theme, AppLocalizations l10n, ChallengeEntity challenge) {
     return WidgetsContainer(
-      backgroundColor: headerColor.withValues(alpha: 0.1),
+      backgroundColor: _getColorValue(theme, challenge.color).withValues(alpha: 0.1),
       borderRadius: BorderRadius.circular(16),
-      borderSide: BorderSide(color: headerColor.withValues(alpha: 0.3), width: 2),
+      borderSide: BorderSide(
+        color: _getColorValue(theme, challenge.color).withValues(alpha: 0.3),
+        width: 2,
+      ),
       cornerSmoothing: 0.8,
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Type Badge
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  children: [
-                    Icon(headerIcon, size: 16, color: headerColor),
-                    const SizedBox(width: 6),
-                    Text(
-                      _getChallengeTypeLabel(l10n, challenge.type),
-                      style: TextStyles.caption.copyWith(
-                        color: headerColor,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              // Status Badge
-              _buildStatusBadge(theme, l10n, challenge),
-            ],
-          ),
-
-          verticalSpace(Spacing.points16),
-
-          // Title
           Text(
-            challenge.title,
+            challenge.name,
             style: TextStyles.h3.copyWith(
               color: theme.grey[900],
               fontWeight: FontWeight.bold,
             ),
           ),
-
           verticalSpace(Spacing.points12),
-
-          // Info Row
           Row(
             children: [
               Icon(LucideIcons.users, size: 18, color: theme.grey[700]),
@@ -220,119 +159,9 @@ class ChallengeDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildDescriptionCard(
-      theme, AppLocalizations l10n, ChallengeEntity challenge) {
-    return WidgetsContainer(
-      backgroundColor: theme.backgroundColor,
-      borderRadius: BorderRadius.circular(12),
-      borderSide: BorderSide(color: theme.grey[200]!, width: 1),
-      cornerSmoothing: 0.8,
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            l10n.translate('description'),
-            style: TextStyles.h6.copyWith(
-              color: theme.grey[900],
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          verticalSpace(Spacing.points8),
-          Text(
-            challenge.description,
-            style: TextStyles.body.copyWith(
-              color: theme.grey[700],
-              height: 1.5,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStatsCard(theme, AppLocalizations l10n, ChallengeEntity challenge, stats) {
-    return WidgetsContainer(
-      backgroundColor: theme.backgroundColor,
-      borderRadius: BorderRadius.circular(12),
-      borderSide: BorderSide(color: theme.grey[200]!, width: 1),
-      cornerSmoothing: 0.8,
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            l10n.translate('challenge-stats'),
-            style: TextStyles.h6.copyWith(
-              color: theme.grey[900],
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          verticalSpace(Spacing.points16),
-          Row(
-            children: [
-              Expanded(
-                child: _buildStatItem(
-                  theme,
-                  l10n,
-                  LucideIcons.users,
-                  '${challenge.participantCount}',
-                  l10n.translate('participants'),
-                ),
-              ),
-              Expanded(
-                child: _buildStatItem(
-                  theme,
-                  l10n,
-                  LucideIcons.calendar,
-                  '${challenge.durationDays}',
-                  l10n.translate('days'),
-                ),
-              ),
-              if (stats != null)
-                Expanded(
-                  child: _buildStatItem(
-                    theme,
-                    l10n,
-                    LucideIcons.trendingUp,
-                    '${stats.averageProgress.toStringAsFixed(0)}%',
-                    l10n.translate('avg-progress'),
-                  ),
-                ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStatItem(
-      theme, AppLocalizations l10n, IconData icon, String value, String label) {
-    return Column(
-      children: [
-        Icon(icon, size: 24, color: theme.primary[600]),
-        verticalSpace(Spacing.points8),
-        Text(
-          value,
-          style: TextStyles.h4.copyWith(
-            color: theme.grey[900],
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        Text(
-          label,
-          style: TextStyles.caption.copyWith(
-            color: theme.grey[600],
-          ),
-          textAlign: TextAlign.center,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildUserProgressCard(BuildContext context, theme, AppLocalizations l10n,
-      ChallengeEntity challenge, userParticipation) {
-    final progressPercent = userParticipation.getProgressPercentage();
+  Widget _buildUserProgressCard(theme, AppLocalizations l10n, ChallengeEntity challenge, userParticipation) {
+    final totalPoints = challenge.getTotalPossiblePoints();
+    final progressPercent = userParticipation.getProgressPercentage(totalPoints);
 
     return WidgetsContainer(
       backgroundColor: theme.success[50],
@@ -354,7 +183,7 @@ class ChallengeDetailScreen extends ConsumerWidget {
                 ),
               ),
               Text(
-                '${progressPercent.toStringAsFixed(0)}%',
+                '${userParticipation.earnedPoints} / $totalPoints ${l10n.translate('points')}',
                 style: TextStyles.h5.copyWith(
                   color: theme.success[700],
                   fontWeight: FontWeight.bold,
@@ -363,7 +192,6 @@ class ChallengeDetailScreen extends ConsumerWidget {
             ],
           ),
           verticalSpace(Spacing.points12),
-          // Progress Bar
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
             child: LinearProgressIndicator(
@@ -373,30 +201,131 @@ class ChallengeDetailScreen extends ConsumerWidget {
               valueColor: AlwaysStoppedAnimation(theme.success[600]!),
             ),
           ),
-          verticalSpace(Spacing.points12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '${userParticipation.currentValue} / ${userParticipation.goalValue}',
-                style: TextStyles.small.copyWith(color: theme.grey[700]),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTasksSection(
+      BuildContext context,
+      WidgetRef ref,
+      theme,
+      AppLocalizations l10n,
+      ChallengeEntity challenge,
+      userParticipation) {
+    return WidgetsContainer(
+      backgroundColor: theme.backgroundColor,
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide(color: theme.grey[200]!, width: 1),
+      cornerSmoothing: 0.8,
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l10n.translate('tasks'),
+            style: TextStyles.h6.copyWith(
+              color: theme.grey[900],
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          verticalSpace(Spacing.points16),
+          ...challenge.tasks.asMap().entries.map((entry) {
+            final index = entry.key;
+            final task = entry.value;
+            final isCompleted =
+                userParticipation?.hasCompletedTask(task.id) ?? false;
+            final canComplete = userParticipation != null && !isCompleted;
+
+            return _buildTaskItem(
+              context,
+              ref,
+              theme,
+              l10n,
+              task,
+              index + 1,
+              isCompleted,
+              canComplete,
+            );
+          }).toList(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTaskItem(
+    BuildContext context,
+    WidgetRef ref,
+    theme,
+    AppLocalizations l10n,
+    ChallengeTaskEntity task,
+    int number,
+    bool isCompleted,
+    bool canComplete,
+  ) {
+    final frequencyLabel = _getFrequencyLabel(l10n, task.frequency);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        children: [
+          // Checkbox
+          GestureDetector(
+            onTap: canComplete
+                ? () {
+                    ref
+                        .read(challengeDetailNotifierProvider(challengeId).notifier)
+                        .completeTask(task.id, task.points);
+                  }
+                : null,
+            child: Container(
+              width: 28,
+              height: 28,
+              decoration: BoxDecoration(
+                color:
+                    isCompleted ? theme.success[600] : theme.backgroundColor,
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(
+                  color:
+                      isCompleted ? theme.success[600]! : theme.grey[400]!,
+                  width: 2,
+                ),
               ),
-              if (userParticipation.rank != null)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: theme.warn[100],
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    '${l10n.translate('rank')}: #${userParticipation.rank}',
-                    style: TextStyles.caption.copyWith(
-                      color: theme.warn[700],
-                      fontWeight: FontWeight.bold,
-                    ),
+              child: isCompleted
+                  ? const Icon(
+                      Icons.check,
+                      color: Colors.white,
+                      size: 20,
+                    )
+                  : null,
+            ),
+          ),
+
+          const SizedBox(width: 12),
+
+          // Task info
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '$number. ${task.name}',
+                  style: TextStyles.body.copyWith(
+                    color: theme.grey[900],
+                    decoration: isCompleted
+                        ? TextDecoration.lineThrough
+                        : TextDecoration.none,
                   ),
                 ),
-            ],
+                const SizedBox(height: 4),
+                Text(
+                  '$frequencyLabel • ${task.points} ${l10n.translate('points')}',
+                  style: TextStyles.caption.copyWith(
+                    color: theme.grey[600],
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -451,8 +380,8 @@ class ChallengeDetailScreen extends ConsumerWidget {
             ...leaderboard.take(5).toList().asMap().entries.map((entry) {
               final index = entry.key;
               final participant = entry.value;
-              final isCurrentUser =
-                  userParticipation != null && participant.cpId == userParticipation.cpId;
+              final isCurrentUser = userParticipation != null &&
+                  participant.cpId == userParticipation.cpId;
 
               return _buildLeaderboardItem(
                 theme,
@@ -469,23 +398,15 @@ class ChallengeDetailScreen extends ConsumerWidget {
 
   Widget _buildLeaderboardItem(
       theme, AppLocalizations l10n, int rank, participant, bool isCurrentUser) {
-    Color? backgroundColor;
-    if (isCurrentUser) {
-      backgroundColor = theme.primary[50];
-    } else if (rank == 1) {
-      backgroundColor = theme.warn[50];
-    }
-
     return Container(
       margin: const EdgeInsets.only(top: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: backgroundColor,
+        color: isCurrentUser ? theme.primary[50] : null,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
         children: [
-          // Rank
           Container(
             width: 32,
             height: 32,
@@ -502,25 +423,18 @@ class ChallengeDetailScreen extends ConsumerWidget {
               ),
             ),
           ),
-          const SizedBox(width: 12),
-          // User Info (placeholder)
+          const SizedBox(width: 16),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  isCurrentUser ? l10n.translate('you') : l10n.translate('participant'),
-                  style: TextStyles.small.copyWith(
-                    color: theme.grey[900],
-                    fontWeight: isCurrentUser ? FontWeight.bold : FontWeight.normal,
-                  ),
-                ),
-              ],
+            child: Text(
+              isCurrentUser ? l10n.translate('you') : l10n.translate('participant'),
+              style: TextStyles.body.copyWith(
+                color: theme.grey[900],
+                fontWeight: isCurrentUser ? FontWeight.bold : FontWeight.normal,
+              ),
             ),
           ),
-          // Progress
           Text(
-            '${participant.progress}%',
+            '${participant.earnedPoints} ${l10n.translate('points')}',
             style: TextStyles.smallBold.copyWith(
               color: theme.success[700],
             ),
@@ -533,58 +447,27 @@ class ChallengeDetailScreen extends ConsumerWidget {
   Widget _buildActionButtons(BuildContext context, WidgetRef ref, theme,
       AppLocalizations l10n, ChallengeEntity challenge, bool isParticipating, bool isLoading) {
     if (isParticipating) {
-      return Column(
-        children: [
-          // Update Progress Button
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: isLoading
-                  ? null
-                  : () => _showUpdateProgressDialog(context, ref, l10n),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: theme.success[600],
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              icon: const Icon(LucideIcons.trendingUp, color: Colors.white),
-              label: Text(
-                l10n.translate('update-progress'),
-                style: TextStyles.h6.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+      return SizedBox(
+        width: double.infinity,
+        child: OutlinedButton.icon(
+          onPressed:
+              isLoading ? null : () => _confirmLeaveChallenge(context, ref, l10n),
+          style: OutlinedButton.styleFrom(
+            side: BorderSide(color: theme.error[600]!, width: 1.5),
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
             ),
           ),
-          verticalSpace(Spacing.points8),
-          // Leave Challenge Button
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton.icon(
-              onPressed: isLoading
-                  ? null
-                  : () => _confirmLeaveChallenge(context, ref, l10n),
-              style: OutlinedButton.styleFrom(
-                side: BorderSide(color: theme.error[600]!, width: 1.5),
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              icon: Icon(LucideIcons.logOut, color: theme.error[600]),
-              label: Text(
-                l10n.translate('leave-challenge'),
-                style: TextStyles.small.copyWith(
-                  color: theme.error[600],
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+          icon: Icon(LucideIcons.logOut, color: theme.error[600]),
+          label: Text(
+            l10n.translate('leave-challenge'),
+            style: TextStyles.small.copyWith(
+              color: theme.error[600],
+              fontWeight: FontWeight.bold,
             ),
           ),
-        ],
+        ),
       );
     }
 
@@ -592,8 +475,9 @@ class ChallengeDetailScreen extends ConsumerWidget {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton.icon(
-        onPressed:
-            isLoading || !challenge.canJoin('') ? null : () => _joinChallenge(context, ref, l10n),
+        onPressed: isLoading || !challenge.canJoin('')
+            ? null
+            : () => _joinChallenge(context, ref, l10n),
         style: ElevatedButton.styleFrom(
           backgroundColor: theme.primary[600],
           padding: const EdgeInsets.symmetric(vertical: 16),
@@ -613,71 +497,6 @@ class ChallengeDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildStatusBadge(theme, AppLocalizations l10n, ChallengeEntity challenge) {
-    if (challenge.status == ChallengeStatus.completed) {
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        decoration: BoxDecoration(
-          color: theme.success[600],
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(LucideIcons.checkCircle2, size: 14, color: Colors.white),
-            const SizedBox(width: 4),
-            Text(
-              l10n.translate('completed'),
-              style: TextStyles.caption.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    if (challenge.isEndingSoon()) {
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        decoration: BoxDecoration(
-          color: theme.error[600],
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(LucideIcons.alertCircle, size: 14, color: Colors.white),
-            const SizedBox(width: 4),
-            Text(
-              l10n.translate('ending-soon'),
-              style: TextStyles.caption.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    return const SizedBox.shrink();
-  }
-
-  String _getChallengeTypeLabel(AppLocalizations l10n, ChallengeType type) {
-    switch (type) {
-      case ChallengeType.duration:
-        return l10n.translate('duration-challenge');
-      case ChallengeType.goal:
-        return l10n.translate('goal-challenge');
-      case ChallengeType.team:
-        return l10n.translate('team-challenge');
-      case ChallengeType.recurring:
-        return l10n.translate('recurring-challenge');
-    }
-  }
-
   void _navigateToLeaderboard(BuildContext context) {
     context.pushNamed(
       RouteNames.challengeLeaderboard.name,
@@ -690,7 +509,9 @@ class ChallengeDetailScreen extends ConsumerWidget {
 
   Future<void> _joinChallenge(
       BuildContext context, WidgetRef ref, AppLocalizations l10n) async {
-    await ref.read(challengeDetailNotifierProvider(challengeId).notifier).joinChallenge();
+    await ref
+        .read(challengeDetailNotifierProvider(challengeId).notifier)
+        .joinChallenge();
 
     if (!context.mounted) return;
 
@@ -725,56 +546,29 @@ class ChallengeDetailScreen extends ConsumerWidget {
     }
   }
 
-  Future<void> _showUpdateProgressDialog(
-      BuildContext context, WidgetRef ref, AppLocalizations l10n) async {
-    final controller = TextEditingController();
+  String _getFrequencyLabel(AppLocalizations l10n, TaskFrequency frequency) {
+    switch (frequency) {
+      case TaskFrequency.daily:
+        return l10n.translate('daily');
+      case TaskFrequency.weekly:
+        return l10n.translate('weekly');
+      case TaskFrequency.oneTime:
+        return l10n.translate('one-time');
+    }
+  }
 
-    final result = await showDialog<int>(
-      context: context,
-      builder: (context) {
-        final theme = AppTheme.of(context);
-        return AlertDialog(
-          backgroundColor: theme.backgroundColor,
-          title: Text(l10n.translate('update-progress')),
-          content: TextField(
-            controller: controller,
-            keyboardType: TextInputType.number,
-            decoration: InputDecoration(
-              labelText: l10n.translate('new-value'),
-              hintText: l10n.translate('enter-new-value'),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(l10n.translate('cancel')),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                final value = int.tryParse(controller.text);
-                if (value != null) {
-                  Navigator.pop(context, value);
-                }
-              },
-              child: Text(l10n.translate('update')),
-            ),
-          ],
-        );
-      },
-    );
-
-    if (result != null && context.mounted) {
-      await ref
-          .read(challengeDetailNotifierProvider(challengeId).notifier)
-          .updateProgress(result);
-
-      if (!context.mounted) return;
-
-      getSuccessSnackBar(
-        context,
-        'progress-updated',
-      );
+  Color _getColorValue(theme, String color) {
+    switch (color) {
+      case 'yellow':
+        return theme.warn[400]!;
+      case 'coral':
+        return theme.tint[400]!;
+      case 'blue':
+        return theme.secondary[400]!;
+      case 'teal':
+        return theme.primary[400]!;
+      default:
+        return theme.primary[400]!;
     }
   }
 }
-
