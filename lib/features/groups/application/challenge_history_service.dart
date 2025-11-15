@@ -38,6 +38,7 @@ class ChallengeHistoryService {
           task.id,
           date,
           participation.taskCompletions,
+          task.frequency,
         );
 
         TaskInstanceStatus status;
@@ -113,7 +114,11 @@ class ChallengeHistoryService {
         break;
 
       case TaskFrequency.oneTime:
-        dates.add(start);
+        // For one-time tasks, always show on the challenge start date
+        // Only include if it's before or equal to the end date
+        if (!start.isAfter(end)) {
+          dates.add(start);
+        }
         break;
     }
 
@@ -123,14 +128,33 @@ class ChallengeHistoryService {
   }
 
   /// Find completion record for a specific task on a specific date
+  /// For daily/weekly tasks, matches any completion on that date
+  /// For one-time tasks, matches any completion (since there's only one instance)
   TaskCompletionRecord? _findCompletionOn(
     String taskId,
     DateTime date,
     List<TaskCompletionRecord> completions,
+    TaskFrequency frequency,
   ) {
+    // Normalize the target date to just year/month/day
+    final targetDate = DateTime(date.year, date.month, date.day);
+    
     for (final completion in completions) {
-      if (completion.taskId == taskId &&
-          _isSameDay(completion.completedAt, date)) {
+      if (completion.taskId != taskId) continue;
+      
+      // For one-time tasks, any completion counts (regardless of date)
+      if (frequency == TaskFrequency.oneTime) {
+        return completion;
+      }
+      
+      // For daily/weekly, match by date (normalize both dates for comparison)
+      final completionDate = DateTime(
+        completion.completedAt.year,
+        completion.completedAt.month,
+        completion.completedAt.day,
+      );
+      
+      if (_isSameDay(completionDate, targetDate)) {
         return completion;
       }
     }
