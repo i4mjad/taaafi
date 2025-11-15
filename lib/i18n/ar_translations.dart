@@ -3578,6 +3578,8 @@ const Map<String, String> kAr = {
   'no-task-history': 'لا يوجد سجل مهام بعد',
   'task-missed': 'فائت',
   'task-pending': 'معلق',
+  'allow-late-completion': 'السماح بالإكمال المتأخر',
+  'allow-late-completion-desc': 'يمكن للمستخدمين إكمال هذه المهمة بعد موعدها',
 
   // Challenge List - قائمة التحديات
   'upcoming': 'قادم',

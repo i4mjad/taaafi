@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/platform_dropdown.dart';
+import 'package:reboot_app_3/core/shared_widgets/platform_switch.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
@@ -26,6 +27,7 @@ class _AddTaskModalState extends State<AddTaskModal> {
   late TextEditingController _nameController;
   late TextEditingController _pointsController;
   late TaskFrequency _selectedFrequency;
+  late bool _allowRetroactive;
 
   @override
   void initState() {
@@ -34,6 +36,7 @@ class _AddTaskModalState extends State<AddTaskModal> {
     _pointsController = TextEditingController(
         text: widget.existingTask?.points.toString() ?? '');
     _selectedFrequency = widget.existingTask?.frequency ?? TaskFrequency.daily;
+    _allowRetroactive = widget.existingTask?.allowRetroactiveCompletion ?? true;
   }
 
   @override
@@ -244,6 +247,7 @@ class _AddTaskModalState extends State<AddTaskModal> {
       points: points,
       frequency: _selectedFrequency,
       order: widget.existingTask?.order ?? widget.nextOrder,
+      allowRetroactiveCompletion: _allowRetroactive,
     );
 
     Navigator.pop(context, task);
