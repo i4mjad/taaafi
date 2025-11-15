@@ -3656,6 +3656,7 @@ const Map<String, String> kEn = {
   "task-pending": "Pending",
   "allow-late-completion": "Allow Late Completion",
   "allow-late-completion-desc": "Users can complete this task after its deadline",
+  "can-still-complete": "Can Still Complete",
 
   // Challenge List
   "upcoming": "Upcoming",

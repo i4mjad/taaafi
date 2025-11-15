@@ -143,11 +143,20 @@ class ChallengeHistoryScreen extends ConsumerWidget {
         statusText = l10n.translate('completed');
         break;
       case TaskInstanceStatus.missed:
-        backgroundColor = theme.error[50]!;
-        borderColor = theme.error[200]!;
-        textColor = theme.error[700]!;
-        icon = LucideIcons.xCircle;
-        statusText = l10n.translate('task-missed');
+        // If retroactive is allowed, show as pending (can still complete)
+        if (instance.task.allowRetroactiveCompletion) {
+          backgroundColor = theme.warn[50]!;
+          borderColor = theme.warn[200]!;
+          textColor = theme.warn[700]!;
+          icon = LucideIcons.alertCircle;
+          statusText = l10n.translate('can-still-complete');
+        } else {
+          backgroundColor = theme.error[50]!;
+          borderColor = theme.error[200]!;
+          textColor = theme.error[700]!;
+          icon = LucideIcons.xCircle;
+          statusText = l10n.translate('task-missed');
+        }
         break;
       case TaskInstanceStatus.today:
         backgroundColor = theme.primary[50]!;

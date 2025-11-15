@@ -300,8 +300,18 @@ class ChallengeDetailScreen extends ConsumerWidget {
             final task = entry.value;
             final isCompletedToday =
                 userParticipation?.isTaskCompletedToday(task.id) ?? false;
-            final canComplete = userParticipation != null &&
-                userParticipation.canCompleteTask(task.id, task.frequency);
+            
+            // Check if can complete based on frequency and retroactive setting
+            bool canComplete = false;
+            if (userParticipation != null) {
+              if (userParticipation.canCompleteTask(task.id, task.frequency)) {
+                // Normal flow: can complete today/this week
+                canComplete = true;
+              } else if (task.allowRetroactiveCompletion) {
+                // Retroactive: can complete past instances
+                canComplete = true;
+              }
+            }
 
             return _buildTaskItem(
               context,
