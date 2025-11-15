@@ -3596,6 +3596,8 @@ const Map<String, String> kAr = {
   'error-creating-challenge': 'فشل إنشاء التحدي',
 
   // Challenge List - قائمة التحديات
+  'upcoming': 'قادم',
+  'completed': 'مكتمل',
   'no-active-challenges': 'لا توجد تحديات نشطة حالياً',
   'no-upcoming-challenges': 'لا توجد تحديات قادمة',
   'no-completed-challenges': 'لا توجد تحديات مكتملة بعد',

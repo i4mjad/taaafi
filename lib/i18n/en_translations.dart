@@ -3674,6 +3674,8 @@ const Map<String, String> kEn = {
   "error-creating-challenge": "Failed to create challenge",
 
   // Challenge List
+  "upcoming": "Upcoming",
+  "completed": "Completed",
   "no-active-challenges": "No active challenges yet",
   "no-upcoming-challenges": "No upcoming challenges",
   "no-completed-challenges": "No completed challenges yet",
