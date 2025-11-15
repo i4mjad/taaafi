@@ -6,7 +6,7 @@ import '../domain/entities/task_completion_record_entity.dart';
 
 /// Service to generate task instances for history view
 class ChallengeHistoryService {
-  /// Generate task instances from joinedAt to today
+  /// Generate task instances from joinedAt to challenge endDate
   List<ChallengeTaskInstance> generateTaskInstances({
     required ChallengeEntity challenge,
     required ChallengeParticipationEntity participation,
@@ -14,12 +14,17 @@ class ChallengeHistoryService {
     final instances = <ChallengeTaskInstance>[];
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
+    final endDate = DateTime(
+      challenge.endDate.year,
+      challenge.endDate.month,
+      challenge.endDate.day,
+    );
 
     for (final task in challenge.tasks) {
       final taskDates = _generateDatesForTask(
         task.frequency,
         participation.joinedAt,
-        today,
+        endDate, // Changed from 'today' to 'endDate'
       );
 
       for (final date in taskDates) {
