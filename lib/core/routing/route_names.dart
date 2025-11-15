@@ -53,6 +53,12 @@ enum RouteNames {
   groupUpdates,
   groupSettings,
   globalChallengeList,
+  // Challenge routes
+  groupChallenges,
+  selectChallengeType,
+  createChallenge,
+  challengeDetail,
+  challengeLeaderboard,
   communityProfile,
   userReports,
   reportConversation,

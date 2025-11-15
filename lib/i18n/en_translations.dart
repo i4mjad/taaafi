@@ -3627,4 +3627,100 @@ const Map<String, String> kEn = {
   "refreshing": "Refreshing...",
   "reply-sent": "Reply sent",
   "quick-reply": "Quick Reply",
+
+  // Challenges (Sprint 5)
+  "challenge": "Challenge",
+  "create-challenge": "Create Challenge",
+  "challenge-details": "Challenge Details",
+  "select-challenge-type": "Select Challenge Type",
+  "choose-challenge-type": "Choose Your Challenge Type",
+  "challenge-type": "Challenge Type",
+  "challenge-type-description":
+      "Select the type of challenge that best fits your goals",
+  "duration-challenge": "Duration Challenge",
+  "duration-challenge-desc": "Complete an activity for a set number of days",
+  "goal-challenge": "Goal Challenge",
+  "goal-challenge-desc": "Reach a specific target or milestone",
+  "team-challenge": "Team Challenge",
+  "team-challenge-desc": "Work together toward a group goal",
+  "recurring-challenge": "Recurring Challenge",
+  "recurring-challenge-desc": "Regular check-ins on a schedule",
+
+  // Challenge Creation
+  "basic-information": "Basic Information",
+  "challenge-title": "Challenge Title",
+  "enter-challenge-title": "Enter a catchy title for your challenge",
+  "describe-your-challenge": "Describe what this challenge is about",
+  "duration-and-dates": "Duration & Dates",
+  "ends-on": "Ends on",
+  "goal-settings": "Goal Settings",
+  "goal-type": "Goal Type",
+  "target-value": "Target Value",
+  "enter-goal-target": "Enter your goal target",
+  "challenge-type-message-count": "Send X messages",
+  "challenge-type-active-days": "Be active X days",
+  "challenge-type-custom": "Custom goal",
+  "challenge-settings": "Challenge Settings",
+  "max-participants": "Maximum Participants",
+  "leave-empty-for-unlimited": "Leave empty for unlimited",
+  "allow-late-join": "Allow Late Joining",
+  "allow-late-join-description":
+      "Let members join even after the challenge has started",
+  "milestone-notifications": "Milestone Notifications",
+  "milestone-notifications-description":
+      "Notify participants when they reach 25%, 50%, 75%, and 100%",
+  "create-challenge-button": "Create Challenge",
+  "challenge-created-successfully": "Challenge created successfully!",
+  "error-creating-challenge": "Failed to create challenge",
+
+  // Challenge List
+  "no-active-challenges": "No active challenges yet",
+  "no-upcoming-challenges": "No upcoming challenges",
+  "no-completed-challenges": "No completed challenges yet",
+  "error-loading-challenges": "Failed to load challenges",
+  "participant": "Participant",
+  "ending-soon": "Ending Soon",
+  "challenge-not-found": "Challenge not found",
+
+  // Challenge Detail
+  "challenge-stats": "Challenge Statistics",
+  "avg-progress": "Avg Progress",
+  "your-progress": "Your Progress",
+  "no-participants-yet": "No participants yet",
+  "all-participants": "All Participants",
+
+  // Challenge Actions
+  "join-challenge": "Join Challenge",
+  "leave-challenge": "Leave Challenge",
+  "update-progress": "Update Progress",
+  "confirm-leave-challenge":
+      "Are you sure you want to leave this challenge? Your progress will be saved.",
+  "challenge-joined": "You've joined the challenge!",
+  "challenge-left": "You've left the challenge",
+  "progress-updated": "Progress updated successfully",
+  "new-value": "New Value",
+  "enter-new-value": "Enter new progress value",
+
+  // Challenge Results/Errors
+  "challenge-full": "This challenge is full",
+  "already-joined": "You've already joined this challenge",
+  "late-join-not-allowed": "Late joining is not allowed for this challenge",
+  "challenge-not-active": "This challenge is not active",
+  "error-loading-leaderboard": "Failed to load leaderboard",
+
+  // Challenge Status
+  "cancelled": "Cancelled",
+  "failed": "Failed",
+
+  // Challenge Validation Messages
+  "title-required": "Title is required",
+  "title-too-long": "Title must be 60 characters or less",
+  "challenge-description-too-long":
+      "Description must be 500 characters or less",
+  "start-date-required": "Start date is required",
+  "end-date-required": "End date is required",
+  "end-date-before-start": "End date must be after start date",
+  "goal-type-required": "Goal type is required",
+  "goal-target-required": "Goal target is required",
+  "goal-target-must-be-positive": "Goal target must be greater than 0",
 };

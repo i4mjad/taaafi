@@ -47,6 +47,11 @@ import 'package:reboot_app_3/features/groups/presentation/screens/group_chat_scr
 import 'package:reboot_app_3/features/groups/presentation/screens/group_challenge_screen.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/group_updates_screen.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/group_settings_screen.dart';
+import 'package:reboot_app_3/features/groups/presentation/screens/challenges/challenges_list_screen.dart';
+import 'package:reboot_app_3/features/groups/presentation/screens/challenges/select_challenge_type_screen.dart';
+import 'package:reboot_app_3/features/groups/presentation/screens/challenges/create_challenge_screen.dart';
+import 'package:reboot_app_3/features/groups/presentation/screens/challenges/challenge_detail_screen.dart';
+import 'package:reboot_app_3/features/groups/presentation/screens/challenges/challenge_leaderboard_screen.dart';
 import 'package:reboot_app_3/features/community/presentation/challenges/global_challenge_list_screen.dart';
 import 'package:reboot_app_3/features/community/presentation/profile/community_profile_settings_screen.dart';
 import 'package:reboot_app_3/features/direct_messaging/presentation/screens/community_chats_screen.dart';
@@ -624,6 +629,59 @@ GoRouter goRouter(Ref<GoRouter> ref) {
                     pageBuilder: (context, state) => MaterialPage<void>(
                       name: RouteNames.groupSettings.name,
                       child: const GroupSettingsScreen(),
+                    ),
+                  ),
+                  // Challenge routes
+                  GoRoute(
+                    path: 'groups/:groupId/challenges',
+                    name: RouteNames.groupChallenges.name,
+                    pageBuilder: (context, state) => MaterialPage<void>(
+                      name: RouteNames.groupChallenges.name,
+                      child: ChallengesListScreen(
+                        groupId: state.pathParameters['groupId']!,
+                      ),
+                    ),
+                  ),
+                  GoRoute(
+                    path: 'groups/:groupId/challenges/select-type',
+                    name: RouteNames.selectChallengeType.name,
+                    pageBuilder: (context, state) => MaterialPage<void>(
+                      name: RouteNames.selectChallengeType.name,
+                      child: SelectChallengeTypeScreen(
+                        groupId: state.pathParameters['groupId']!,
+                      ),
+                    ),
+                  ),
+                  GoRoute(
+                    path: 'groups/:groupId/challenges/create',
+                    name: RouteNames.createChallenge.name,
+                    pageBuilder: (context, state) => MaterialPage<void>(
+                      name: RouteNames.createChallenge.name,
+                      child: CreateChallengeScreen(
+                        groupId: state.pathParameters['groupId']!,
+                      ),
+                    ),
+                  ),
+                  GoRoute(
+                    path: 'groups/:groupId/challenges/:challengeId',
+                    name: RouteNames.challengeDetail.name,
+                    pageBuilder: (context, state) => MaterialPage<void>(
+                      name: RouteNames.challengeDetail.name,
+                      child: ChallengeDetailScreen(
+                        groupId: state.pathParameters['groupId']!,
+                        challengeId: state.pathParameters['challengeId']!,
+                      ),
+                    ),
+                  ),
+                  GoRoute(
+                    path: 'groups/:groupId/challenges/:challengeId/leaderboard',
+                    name: RouteNames.challengeLeaderboard.name,
+                    pageBuilder: (context, state) => MaterialPage<void>(
+                      name: RouteNames.challengeLeaderboard.name,
+                      child: ChallengeLeaderboardScreen(
+                        groupId: state.pathParameters['groupId']!,
+                        challengeId: state.pathParameters['challengeId']!,
+                      ),
                     ),
                   ),
                 ],

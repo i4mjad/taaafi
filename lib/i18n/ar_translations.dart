@@ -3551,4 +3551,97 @@ const Map<String, String> kAr = {
   'refreshing': 'جاري التحديث...',
   'reply-sent': 'تم إرسال الرد',
   'quick-reply': 'رد سريع',
+
+  // Challenges (Sprint 5) - التحديات
+  'challenge': 'تحدي',
+  'create-challenge': 'إنشاء تحدي',
+  'challenge-details': 'تفاصيل التحدي',
+  'select-challenge-type': 'اختر نوع التحدي',
+  'choose-challenge-type': 'اختر نوع التحدي المناسب',
+  'challenge-type': 'نوع التحدي',
+  'challenge-type-description': 'اختر نوع التحدي الذي يناسب أهدافك',
+  'duration-challenge': 'تحدي المدة',
+  'duration-challenge-desc': 'أكمل نشاطاً لعدد محدد من الأيام',
+  'goal-challenge': 'تحدي الهدف',
+  'goal-challenge-desc': 'اصل إلى هدف أو إنجاز محدد',
+  'team-challenge': 'تحدي جماعي',
+  'team-challenge-desc': 'اعملوا معاً لتحقيق هدف المجموعة',
+  'recurring-challenge': 'تحدي متكرر',
+  'recurring-challenge-desc': 'تسجيلات دخول منتظمة حسب جدول زمني',
+
+  // Challenge Creation - إنشاء التحدي
+  'basic-information': 'المعلومات الأساسية',
+  'challenge-title': 'عنوان التحدي',
+  'enter-challenge-title': 'أدخل عنواناً جذاباً للتحدي',
+  'describe-your-challenge': 'صِف موضوع هذا التحدي',
+  'duration-and-dates': 'المدة والتواريخ',
+  'ends-on': 'ينتهي في',
+  'goal-settings': 'إعدادات الهدف',
+  'goal-type': 'نوع الهدف',
+  'target-value': 'قيمة الهدف',
+  'enter-goal-target': 'أدخل قيمة الهدف المطلوب',
+  'challenge-type-message-count': 'إرسال X رسالة',
+  'challenge-type-active-days': 'النشاط X يوم',
+  'challenge-type-custom': 'هدف مخصص',
+  'challenge-settings': 'إعدادات التحدي',
+  'max-participants': 'الحد الأقصى للمشاركين',
+  'leave-empty-for-unlimited': 'اتركه فارغاً لعدد غير محدود',
+  'allow-late-join': 'السماح بالانضمام المتأخر',
+  'allow-late-join-description': 'السماح للأعضاء بالانضمام بعد بدء التحدي',
+  'milestone-notifications': 'إشعارات المراحل',
+  'milestone-notifications-description':
+      'إرسال إشعار عند الوصول إلى 25% و50% و75% و100%',
+  'create-challenge-button': 'إنشاء التحدي',
+  'challenge-created-successfully': 'تم إنشاء التحدي بنجاح!',
+  'error-creating-challenge': 'فشل إنشاء التحدي',
+
+  // Challenge List - قائمة التحديات
+  'no-active-challenges': 'لا توجد تحديات نشطة حالياً',
+  'no-upcoming-challenges': 'لا توجد تحديات قادمة',
+  'no-completed-challenges': 'لا توجد تحديات مكتملة بعد',
+  'error-loading-challenges': 'فشل تحميل التحديات',
+  'participant': 'مشارك',
+  'ending-soon': 'ينتهي قريباً',
+  'challenge-not-found': 'التحدي غير موجود',
+
+  // Challenge Detail - تفاصيل التحدي
+  'challenge-stats': 'إحصائيات التحدي',
+  'avg-progress': 'متوسط التقدم',
+  'your-progress': 'تقدمك',
+  'no-participants-yet': 'لا يوجد مشاركون بعد',
+  'all-participants': 'جميع المشاركين',
+
+  // Challenge Actions - إجراءات التحدي
+  'join-challenge': 'انضم للتحدي',
+  'leave-challenge': 'مغادرة التحدي',
+  'update-progress': 'تحديث التقدم',
+  'confirm-leave-challenge':
+      'هل أنت متأكد من مغادرة هذا التحدي؟ سيتم حفظ تقدمك.',
+  'challenge-joined': 'لقد انضممت للتحدي!',
+  'challenge-left': 'لقد غادرت التحدي',
+  'progress-updated': 'تم تحديث التقدم بنجاح',
+  'new-value': 'القيمة الجديدة',
+  'enter-new-value': 'أدخل قيمة التقدم الجديدة',
+
+  // Challenge Results/Errors - النتائج والأخطاء
+  'challenge-full': 'هذا التحدي ممتلئ',
+  'already-joined': 'أنت مشترك بالفعل في هذا التحدي',
+  'late-join-not-allowed': 'الانضمام المتأخر غير مسموح لهذا التحدي',
+  'challenge-not-active': 'هذا التحدي غير نشط',
+  'error-loading-leaderboard': 'فشل تحميل لوحة المتصدرين',
+
+  // Challenge Status - حالة التحدي
+  'cancelled': 'ملغي',
+  'failed': 'فشل',
+
+  // Challenge Validation Messages - رسائل التحقق للتحديات
+  'title-required': 'العنوان مطلوب',
+  'title-too-long': 'العنوان يجب ألا يتجاوز 60 حرفاً',
+  'challenge-description-too-long': 'الوصف يجب ألا يتجاوز 500 حرفاً',
+  'start-date-required': 'تاريخ البدء مطلوب',
+  'end-date-required': 'تاريخ الانتهاء مطلوب',
+  'end-date-before-start': 'تاريخ الانتهاء يجب أن يكون بعد تاريخ البدء',
+  'goal-type-required': 'نوع الهدف مطلوب',
+  'goal-target-required': 'قيمة الهدف مطلوبة',
+  'goal-target-must-be-positive': 'قيمة الهدف يجب أن تكون أكبر من 0',
 };

@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
-import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/action_modal.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
@@ -565,9 +564,26 @@ class GroupScreen extends ConsumerWidget {
 
           const SizedBox(height: 8),
 
-          // Bottom row: Settings only (Updates commented for later use)
+          // Second row: Challenges and Settings
           Row(
             children: [
+              // Challenges section
+              Expanded(
+                child: _buildBottomSection(
+                  context: context,
+                  theme: theme,
+                  l10n: l10n,
+                  icon: LucideIcons.trophy,
+                  label: l10n.translate('challenges'),
+                  backgroundColor: theme.success[50]!,
+                  borderColor: theme.success[200]!,
+                  textColor: theme.success[900]!,
+                  onTap: () => _navigateToChallenges(context, groupId),
+                ),
+              ),
+
+              const SizedBox(width: 8),
+
               // Settings section
               Expanded(
                 child: _buildBottomSection(
@@ -582,23 +598,6 @@ class GroupScreen extends ConsumerWidget {
                   onTap: () => _navigateToSettings(context, groupId),
                 ),
               ),
-
-              // Updates section (commented for later use)
-              // const SizedBox(width: 8),
-              //
-              // Expanded(
-              //   child: _buildBottomSection(
-              //     context: context,
-              //     theme: theme,
-              //     l10n: l10n,
-              //     icon: LucideIcons.layers,
-              //     label: l10n.translate('updates'),
-              //     backgroundColor: theme.tint[50]!,
-              //     borderColor: theme.tint[200]!,
-              //     textColor: theme.tint[900]!,
-              //     onTap: () => _navigateToUpdates(context, groupId),
-              //   ),
-              // ),
             ],
           ),
         ],
@@ -666,6 +665,13 @@ class GroupScreen extends ConsumerWidget {
   void _navigateToSettings(BuildContext context, String groupId) {
     context.goNamed(
       RouteNames.groupSettings.name,
+      pathParameters: {'groupId': groupId},
+    );
+  }
+
+  void _navigateToChallenges(BuildContext context, String groupId) {
+    context.goNamed(
+      RouteNames.groupChallenges.name,
       pathParameters: {'groupId': groupId},
     );
   }
