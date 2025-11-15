@@ -34,9 +34,12 @@ class ChallengeHistoryService {
       );
 
       for (final date in taskDates) {
+        // Normalize the scheduled date for comparison
+        final scheduledDate = DateTime(date.year, date.month, date.day);
+        
         final completion = _findCompletionOn(
           task.id,
-          date,
+          scheduledDate,
           participation.taskCompletions,
           task.frequency,
         );
@@ -44,9 +47,9 @@ class ChallengeHistoryService {
         TaskInstanceStatus status;
         if (completion != null) {
           status = TaskInstanceStatus.completed;
-        } else if (_isSameDay(date, today)) {
+        } else if (_isSameDay(scheduledDate, today)) {
           status = TaskInstanceStatus.today;
-        } else if (date.isBefore(today)) {
+        } else if (scheduledDate.isBefore(today)) {
           status = TaskInstanceStatus.missed;
         } else {
           status = TaskInstanceStatus.upcoming;
@@ -54,7 +57,7 @@ class ChallengeHistoryService {
 
         instances.add(ChallengeTaskInstance(
           task: task,
-          scheduledDate: date,
+          scheduledDate: scheduledDate,
           status: status,
           completedAt: completion?.completedAt,
         ));
@@ -83,11 +86,12 @@ class ChallengeHistoryService {
         DateTime current = start;
         // Generate all dates from start to end (inclusive)
         while (!current.isAfter(end)) {
-          dates.add(DateTime(current.year, current.month, current.day));
+          final normalizedDate = DateTime(current.year, current.month, current.day);
+          dates.add(normalizedDate);
           current = current.add(const Duration(days: 1));
         }
         // Explicitly ensure today is included if within range
-        if ((_isSameDay(today, start) || today.isAfter(start)) && 
+        if ((today.isAfter(start) || _isSameDay(today, start)) && 
             (today.isBefore(end) || _isSameDay(today, end))) {
           if (!dates.any((d) => _isSameDay(d, today))) {
             dates.add(today);
