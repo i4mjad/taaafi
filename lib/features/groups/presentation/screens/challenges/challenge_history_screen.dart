@@ -81,7 +81,8 @@ class ChallengeHistoryScreen extends ConsumerWidget {
                   padding: const EdgeInsets.only(bottom: 8),
                   child: _buildTaskInstanceWidget(theme, l10n, instance),
                 ),
-                order: GroupedListOrder.DESC, // Newest first
+                // DON'T sort here - we already sorted by distance from today in the service
+                sort: false,
               ),
             ),
           );
