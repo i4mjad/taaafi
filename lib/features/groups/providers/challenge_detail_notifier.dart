@@ -15,6 +15,7 @@ class ChallengeDetailState {
   final ChallengeStatsEntity? stats;
   final ChallengeParticipationEntity? userParticipation;
   final bool isLoading;
+  final String? completingTaskId; // Track which task is being completed
   final String? error;
   final String? successMessage;
 
@@ -24,6 +25,7 @@ class ChallengeDetailState {
     this.stats,
     this.userParticipation,
     this.isLoading = false,
+    this.completingTaskId,
     this.error,
     this.successMessage,
   });
@@ -34,6 +36,7 @@ class ChallengeDetailState {
     ChallengeStatsEntity? stats,
     ChallengeParticipationEntity? userParticipation,
     bool? isLoading,
+    String? completingTaskId,
     String? error,
     String? successMessage,
   }) {
@@ -43,6 +46,7 @@ class ChallengeDetailState {
       stats: stats ?? this.stats,
       userParticipation: userParticipation ?? this.userParticipation,
       isLoading: isLoading ?? this.isLoading,
+      completingTaskId: completingTaskId,
       error: error,
       successMessage: successMessage,
     );
@@ -185,8 +189,11 @@ class ChallengeDetailNotifier extends _$ChallengeDetailNotifier {
     final profile = await ref.read(currentCommunityProfileProvider.future);
     if (profile == null) return;
 
-    // Set loading state
-    state = AsyncValue.data(currentState.copyWith(isLoading: true));
+    // Set loading state for this specific task
+    state = AsyncValue.data(currentState.copyWith(
+      isLoading: true,
+      completingTaskId: taskId,
+    ));
 
     try {
       final service = ref.read(challengesServiceProvider);
@@ -209,17 +216,20 @@ class ChallengeDetailNotifier extends _$ChallengeDetailNotifier {
 
         state = AsyncValue.data(currentState.copyWith(
           isLoading: false,
+          completingTaskId: null,
           successMessage: message,
         ));
       } else {
         state = AsyncValue.data(currentState.copyWith(
           isLoading: false,
+          completingTaskId: null,
           error: result.errorMessage ?? 'Failed to complete task',
         ));
       }
     } catch (e) {
       state = AsyncValue.data(currentState.copyWith(
         isLoading: false,
+        completingTaskId: null,
         error: e.toString(),
       ));
     }

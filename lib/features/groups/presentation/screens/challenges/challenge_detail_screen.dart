@@ -117,7 +117,7 @@ class ChallengeDetailScreen extends ConsumerWidget {
 
                   // Tasks Checklist
                   _buildTasksSection(
-                      context, ref, theme, l10n, challenge, userParticipation),
+                      context, ref, theme, l10n, challenge, userParticipation, state),
 
                   verticalSpace(Spacing.points16),
 
@@ -253,7 +253,7 @@ class ChallengeDetailScreen extends ConsumerWidget {
   }
 
   Widget _buildTasksSection(BuildContext context, WidgetRef ref, theme,
-      AppLocalizations l10n, ChallengeEntity challenge, userParticipation) {
+      AppLocalizations l10n, ChallengeEntity challenge, userParticipation, ChallengeDetailState state) {
     return WidgetsContainer(
       backgroundColor: theme.backgroundColor,
       borderRadius: BorderRadius.circular(12),
@@ -313,6 +313,8 @@ class ChallengeDetailScreen extends ConsumerWidget {
               }
             }
 
+            final isCompleting = state.completingTaskId == task.id;
+
             return _buildTaskItem(
               context,
               ref,
@@ -322,6 +324,7 @@ class ChallengeDetailScreen extends ConsumerWidget {
               index + 1,
               isCompletedToday,
               canComplete,
+              isCompleting,
             );
           }).toList(),
         ],
@@ -338,6 +341,7 @@ class ChallengeDetailScreen extends ConsumerWidget {
     int number,
     bool isCompleted,
     bool canComplete,
+    bool isCompleting,
   ) {
     final frequencyLabel = _getFrequencyLabel(l10n, task.frequency);
 
@@ -350,7 +354,7 @@ class ChallengeDetailScreen extends ConsumerWidget {
           // Checkbox (only for participants)
           if (isParticipating)
             GestureDetector(
-              onTap: canComplete
+              onTap: canComplete && !isCompleting
                   ? () {
                       ref
                           .read(challengeDetailNotifierProvider(challengeId)
@@ -369,13 +373,24 @@ class ChallengeDetailScreen extends ConsumerWidget {
                     width: 2,
                   ),
                 ),
-                child: isCompleted
-                    ? const Icon(
-                        Icons.check,
-                        color: Colors.white,
-                        size: 20,
+                child: isCompleting
+                    ? SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            theme.primary[600]!,
+                          ),
+                        ),
                       )
-                    : null,
+                    : isCompleted
+                        ? const Icon(
+                            Icons.check,
+                            color: Colors.white,
+                            size: 20,
+                          )
+                        : null,
               ),
             ),
 

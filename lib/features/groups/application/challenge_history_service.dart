@@ -21,10 +21,16 @@ class ChallengeHistoryService {
     );
 
     for (final task in challenge.tasks) {
+      // For one-time tasks, use challenge start date (createdAt)
+      // For daily/weekly, use join date
+      final startDate = task.frequency == TaskFrequency.oneTime
+          ? challenge.createdAt
+          : participation.joinedAt;
+      
       final taskDates = _generateDatesForTask(
         task.frequency,
-        participation.joinedAt,
-        endDate, // Changed from 'today' to 'endDate'
+        startDate,
+        endDate,
       );
 
       for (final date in taskDates) {
