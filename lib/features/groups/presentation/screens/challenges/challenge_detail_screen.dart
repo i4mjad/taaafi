@@ -28,8 +28,7 @@ class ChallengeDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
     final l10n = AppLocalizations.of(context);
-    final detailAsync =
-        ref.watch(challengeDetailNotifierProvider(challengeId));
+    final detailAsync = ref.watch(challengeDetailNotifierProvider(challengeId));
 
     return Scaffold(
       backgroundColor: theme.backgroundColor,
@@ -65,7 +64,9 @@ class ChallengeDetailScreen extends ConsumerWidget {
 
           return RefreshIndicator(
             onRefresh: () async {
-              ref.read(challengeDetailNotifierProvider(challengeId).notifier).refresh();
+              ref
+                  .read(challengeDetailNotifierProvider(challengeId).notifier)
+                  .refresh();
             },
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(16),
@@ -79,7 +80,8 @@ class ChallengeDetailScreen extends ConsumerWidget {
 
                   // Stats Card
                   if (isParticipating)
-                    _buildUserProgressCard(theme, l10n, challenge, userParticipation),
+                    _buildUserProgressCard(
+                        theme, l10n, challenge, userParticipation),
 
                   verticalSpace(Spacing.points16),
 
@@ -90,8 +92,8 @@ class ChallengeDetailScreen extends ConsumerWidget {
                   verticalSpace(Spacing.points16),
 
                   // Leaderboard Preview
-                  _buildLeaderboardPreview(
-                      context, theme, l10n, state.leaderboard, userParticipation),
+                  _buildLeaderboardPreview(context, theme, l10n,
+                      state.leaderboard, userParticipation),
 
                   verticalSpace(Spacing.points16),
 
@@ -116,9 +118,11 @@ class ChallengeDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeaderCard(theme, AppLocalizations l10n, ChallengeEntity challenge) {
+  Widget _buildHeaderCard(
+      theme, AppLocalizations l10n, ChallengeEntity challenge) {
     return WidgetsContainer(
-      backgroundColor: _getColorValue(theme, challenge.color).withValues(alpha: 0.1),
+      backgroundColor:
+          _getColorValue(theme, challenge.color).withValues(alpha: 0.1),
       borderRadius: BorderRadius.circular(16),
       borderSide: BorderSide(
         color: _getColorValue(theme, challenge.color).withValues(alpha: 0.3),
@@ -159,9 +163,11 @@ class ChallengeDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildUserProgressCard(theme, AppLocalizations l10n, ChallengeEntity challenge, userParticipation) {
+  Widget _buildUserProgressCard(theme, AppLocalizations l10n,
+      ChallengeEntity challenge, userParticipation) {
     final totalPoints = challenge.getTotalPossiblePoints();
-    final progressPercent = userParticipation.getProgressPercentage(totalPoints);
+    final progressPercent =
+        userParticipation.getProgressPercentage(totalPoints);
 
     return WidgetsContainer(
       backgroundColor: theme.success[50],
@@ -206,13 +212,8 @@ class ChallengeDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildTasksSection(
-      BuildContext context,
-      WidgetRef ref,
-      theme,
-      AppLocalizations l10n,
-      ChallengeEntity challenge,
-      userParticipation) {
+  Widget _buildTasksSection(BuildContext context, WidgetRef ref, theme,
+      AppLocalizations l10n, ChallengeEntity challenge, userParticipation) {
     return WidgetsContainer(
       backgroundColor: theme.backgroundColor,
       borderRadius: BorderRadius.circular(12),
@@ -274,7 +275,8 @@ class ChallengeDetailScreen extends ConsumerWidget {
             onTap: canComplete
                 ? () {
                     ref
-                        .read(challengeDetailNotifierProvider(challengeId).notifier)
+                        .read(challengeDetailNotifierProvider(challengeId)
+                            .notifier)
                         .completeTask(task.id, task.points);
                   }
                 : null,
@@ -282,12 +284,10 @@ class ChallengeDetailScreen extends ConsumerWidget {
               width: 28,
               height: 28,
               decoration: BoxDecoration(
-                color:
-                    isCompleted ? theme.success[600] : theme.backgroundColor,
+                color: isCompleted ? theme.success[600] : theme.backgroundColor,
                 borderRadius: BorderRadius.circular(6),
                 border: Border.all(
-                  color:
-                      isCompleted ? theme.success[600]! : theme.grey[400]!,
+                  color: isCompleted ? theme.success[600]! : theme.grey[400]!,
                   width: 2,
                 ),
               ),
@@ -332,8 +332,8 @@ class ChallengeDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildLeaderboardPreview(
-      BuildContext context, theme, AppLocalizations l10n, leaderboard, userParticipation) {
+  Widget _buildLeaderboardPreview(BuildContext context, theme,
+      AppLocalizations l10n, leaderboard, userParticipation) {
     return WidgetsContainer(
       backgroundColor: theme.backgroundColor,
       borderRadius: BorderRadius.circular(12),
@@ -426,7 +426,9 @@ class ChallengeDetailScreen extends ConsumerWidget {
           const SizedBox(width: 16),
           Expanded(
             child: Text(
-              isCurrentUser ? l10n.translate('you') : l10n.translate('participant'),
+              isCurrentUser
+                  ? l10n.translate('you')
+                  : l10n.translate('participant'),
               style: TextStyles.body.copyWith(
                 color: theme.grey[900],
                 fontWeight: isCurrentUser ? FontWeight.bold : FontWeight.normal,
@@ -444,14 +446,21 @@ class ChallengeDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildActionButtons(BuildContext context, WidgetRef ref, theme,
-      AppLocalizations l10n, ChallengeEntity challenge, bool isParticipating, bool isLoading) {
+  Widget _buildActionButtons(
+      BuildContext context,
+      WidgetRef ref,
+      theme,
+      AppLocalizations l10n,
+      ChallengeEntity challenge,
+      bool isParticipating,
+      bool isLoading) {
     if (isParticipating) {
       return SizedBox(
         width: double.infinity,
         child: OutlinedButton.icon(
-          onPressed:
-              isLoading ? null : () => _confirmLeaveChallenge(context, ref, l10n),
+          onPressed: isLoading
+              ? null
+              : () => _confirmLeaveChallenge(context, ref, l10n),
           style: OutlinedButton.styleFrom(
             side: BorderSide(color: theme.error[600]!, width: 1.5),
             padding: const EdgeInsets.symmetric(vertical: 16),
