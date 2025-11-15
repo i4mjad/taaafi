@@ -3635,6 +3635,7 @@ const Map<String, String> kEn = {
   "add-challenge": "Add Challenge",
   "challenge-name": "Challenge Name",
   "challenge-name-hint": "Example: Daily Diary Challenge",
+  "challenge-description-hint": "Optional: Describe the challenge goals",
   "challenge-end-date": "Challenge End Date",
   "color": "Color",
   "task": "Task",

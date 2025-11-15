@@ -3559,6 +3559,7 @@ const Map<String, String> kAr = {
   'add-challenge': 'إضافة تحدي',
   'challenge-name': 'اسم التحدي',
   'challenge-name-hint': 'مثال: تحدي كتابة المذكرات اليومية',
+  'challenge-description-hint': 'اختياري: اوصف أهداف التحدي',
   'challenge-end-date': 'تاريخ انتهاء التحدي',
   'color': 'اللون',
   'task': 'مهمة',
