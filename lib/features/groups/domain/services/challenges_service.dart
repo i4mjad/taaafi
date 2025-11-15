@@ -244,9 +244,6 @@ class ChallengesService {
           case TaskFrequency.weekly:
             errorMessage = 'Task already completed this week';
             break;
-          case TaskFrequency.oneTime:
-            errorMessage = 'Task already completed';
-            break;
         }
         return UpdateProgressResult.failure(
           UpdateProgressError.invalidValue,

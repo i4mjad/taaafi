@@ -67,9 +67,6 @@ class ChallengeParticipationEntity {
       case TaskFrequency.weekly:
         // Check if completed this week
         return !completions.any((c) => c.isCompletedThisWeek());
-      case TaskFrequency.oneTime:
-        // Can only complete once
-        return completions.isEmpty;
     }
   }
 

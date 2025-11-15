@@ -37,33 +37,38 @@ class ChallengeHistoryService {
     for (final task in challenge.tasks) {
       // Use join date for all tasks
       final startDate = participation.joinedAt;
-      
+
       // Normalize start date
       final normalizedStartDate = DateTime(
         startDate.year,
         startDate.month,
         startDate.day,
       );
-      
+
       final taskDates = _generateDatesForTask(
         task.frequency,
         normalizedStartDate,
         endDate,
       );
-      
+
       print('🔸 Task: "${task.name}" (${task.frequency.name})');
       print('   Start: $normalizedStartDate');
       print('   Generated ${taskDates.length} dates');
       if (taskDates.length <= 10) {
-        print('   Dates: ${taskDates.map((d) => '${d.month}/${d.day}').join(', ')}');
+        print(
+            '   Dates: ${taskDates.map((d) => '${d.month}/${d.day}').join(', ')}');
       } else {
-        print('   First 5: ${taskDates.take(5).map((d) => '${d.month}/${d.day}').join(', ')}...');
-        print('   Last 5: ${taskDates.skip(taskDates.length - 5).map((d) => '${d.month}/${d.day}').join(', ')}');
+        print(
+            '   First 5: ${taskDates.take(5).map((d) => '${d.month}/${d.day}').join(', ')}...');
+        print(
+            '   Last 5: ${taskDates.skip(taskDates.length - 5).map((d) => '${d.month}/${d.day}').join(', ')}');
       }
-      print('   Today (${today.month}/${today.day}) in dates? ${taskDates.any((d) => _isSameDay(d, today))}');
-      
+      print(
+          '   Today (${today.month}/${today.day}) in dates? ${taskDates.any((d) => _isSameDay(d, today))}');
+
       // Debug: Ensure today is included for tasks if it's in range
-      final shouldIncludeToday = (today.isAfter(normalizedStartDate) || _isSameDay(today, normalizedStartDate)) &&
+      final shouldIncludeToday = (today.isAfter(normalizedStartDate) ||
+              _isSameDay(today, normalizedStartDate)) &&
           (today.isBefore(endDate) || _isSameDay(today, endDate));
       print('   Should include today? $shouldIncludeToday');
       if (shouldIncludeToday) {
@@ -76,7 +81,7 @@ class ChallengeHistoryService {
       for (final date in taskDates) {
         // Normalize the scheduled date for comparison
         final scheduledDate = DateTime(date.year, date.month, date.day);
-        
+
         final completion = _findCompletionOn(
           task.id,
           scheduledDate,
@@ -109,26 +114,27 @@ class ChallengeHistoryService {
     instances.sort((a, b) {
       final aIsToday = _isSameDay(a.scheduledDate, today);
       final bIsToday = _isSameDay(b.scheduledDate, today);
-      
+
       // Today's tasks always first
       if (aIsToday && !bIsToday) return -1;
       if (bIsToday && !aIsToday) return 1;
-      
+
       // For non-today tasks, sort by absolute distance from today
       final aDiff = a.scheduledDate.difference(today).inDays.abs();
       final bDiff = b.scheduledDate.difference(today).inDays.abs();
-      
+
       // If same distance (e.g., yesterday and tomorrow), prefer past over future
       if (aDiff == bDiff) {
         return a.scheduledDate.isBefore(today) ? -1 : 1;
       }
-      
+
       // Otherwise, closer dates first
       return aDiff.compareTo(bDiff);
     });
 
     print('\n📊 Total Instances Generated: ${instances.length}');
-    print('🔍 First 5 dates after sort: ${instances.take(5).map((i) => '${i.scheduledDate.month}/${i.scheduledDate.day}/${i.scheduledDate.year} (${i.status.name})').join(', ')}');
+    print(
+        '🔍 First 5 dates after sort: ${instances.take(5).map((i) => '${i.scheduledDate.month}/${i.scheduledDate.day}/${i.scheduledDate.year} (${i.status.name})').join(', ')}');
     print('🔍 ============ END DEBUG ============\n');
 
     return instances;
@@ -179,17 +185,17 @@ class ChallengeHistoryService {
   ) {
     // Normalize the target date to just year/month/day
     final targetDate = DateTime(date.year, date.month, date.day);
-    
+
     for (final completion in completions) {
       if (completion.taskId != taskId) continue;
-      
+
       // Match by date (normalize both dates for comparison)
       final completionDate = DateTime(
         completion.completedAt.year,
         completion.completedAt.month,
         completion.completedAt.day,
       );
-      
+
       if (_isSameDay(completionDate, targetDate)) {
         return completion;
       }
@@ -202,4 +208,3 @@ class ChallengeHistoryService {
     return a.year == b.year && a.month == b.month && a.day == b.day;
   }
 }
-

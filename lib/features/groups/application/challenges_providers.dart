@@ -1,4 +1,3 @@
-import 'package:reboot_app_3/features/groups/domain/entities/challenge_task_entity.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../domain/repositories/challenges_repository.dart';
 import '../domain/services/challenges_service.dart';
