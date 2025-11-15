@@ -311,10 +311,19 @@ class ChallengesRepositoryImpl implements ChallengesRepository {
   }) async {
     try {
       final participationId = '${challengeId}_$cpId';
+      final now = DateTime.now();
+      
+      // Create completion record with timestamp
+      final completionRecord = {
+        'taskId': taskId,
+        'completedAt': now.toIso8601String(),
+        'pointsEarned': pointsEarned,
+      };
+
       await _participationsCollection.doc(participationId).update({
         'earnedPoints': FieldValue.increment(pointsEarned),
-        'completedTaskIds': FieldValue.arrayUnion([taskId]),
-        'lastUpdateAt': Timestamp.fromDate(DateTime.now()),
+        'taskCompletions': FieldValue.arrayUnion([completionRecord]),
+        'lastUpdateAt': Timestamp.fromDate(now),
       });
     } catch (e, stackTrace) {
       log('Error completing task: $e', stackTrace: stackTrace);
