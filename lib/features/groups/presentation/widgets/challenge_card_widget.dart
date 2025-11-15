@@ -33,13 +33,17 @@ class ChallengeCardWidget extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header Row: Type Badge + Status
+            // Header Row: Status + Days Remaining
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Type Badge
-                _buildTypeBadge(theme, l10n),
-
+                Text(
+                  challenge.name,
+                  style: TextStyles.h5.copyWith(
+                    color: theme.grey[900],
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 // Status/Days Remaining
                 _buildStatusBadge(theme, l10n),
               ],
@@ -47,33 +51,7 @@ class ChallengeCardWidget extends StatelessWidget {
 
             const SizedBox(height: 12),
 
-            // Title
-            Text(
-              challenge.title,
-              style: TextStyles.h5.copyWith(
-                color: theme.grey[900],
-                fontWeight: FontWeight.bold,
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-
-            const SizedBox(height: 8),
-
-            // Description
-            if (challenge.description.isNotEmpty)
-              Text(
-                challenge.description,
-                style: TextStyles.small.copyWith(
-                  color: theme.grey[700],
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-
-            const SizedBox(height: 12),
-
-            // Participant Info
+            // Participant and Task Info
             Row(
               children: [
                 Icon(
@@ -93,13 +71,13 @@ class ChallengeCardWidget extends StatelessWidget {
                 const SizedBox(width: 16),
 
                 Icon(
-                  LucideIcons.calendar,
+                  LucideIcons.checkSquare,
                   size: 16,
                   color: theme.grey[600],
                 ),
                 const SizedBox(width: 6),
                 Text(
-                  '${challenge.durationDays} ${l10n.translate('days')}',
+                  '${challenge.tasks.length} ${l10n.translate('tasks')}',
                   style: TextStyles.caption.copyWith(
                     color: theme.grey[700],
                     fontWeight: FontWeight.w500,
@@ -109,62 +87,6 @@ class ChallengeCardWidget extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildTypeBadge(CustomThemeData theme, AppLocalizations l10n) {
-    Color badgeColor;
-    IconData badgeIcon;
-    String labelKey;
-
-    switch (challenge.type) {
-      case ChallengeType.duration:
-        badgeColor = theme.primary[100]!;
-        badgeIcon = LucideIcons.clock;
-        labelKey = 'duration-challenge';
-        break;
-      case ChallengeType.goal:
-        badgeColor = theme.success[100]!;
-        badgeIcon = LucideIcons.target;
-        labelKey = 'goal-challenge';
-        break;
-      case ChallengeType.team:
-        badgeColor = theme.secondary[100]!;
-        badgeIcon = LucideIcons.users;
-        labelKey = 'team-challenge';
-        break;
-      case ChallengeType.recurring:
-        badgeColor = theme.warn[100]!;
-        badgeIcon = LucideIcons.repeat;
-        labelKey = 'recurring-challenge';
-        break;
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: badgeColor,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            badgeIcon,
-            size: 14,
-            color: theme.grey[900],
-          ),
-          const SizedBox(width: 4),
-          Text(
-            l10n.translate(labelKey),
-            style: TextStyles.caption.copyWith(
-              color: theme.grey[900],
-              fontWeight: FontWeight.w600,
-              fontSize: 11,
-            ),
-          ),
-        ],
       ),
     );
   }
