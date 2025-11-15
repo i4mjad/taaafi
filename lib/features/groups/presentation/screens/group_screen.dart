@@ -11,6 +11,9 @@ import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/features/groups/providers/group_membership_provider.dart';
+import 'package:reboot_app_3/features/groups/application/challenges_providers.dart';
+import 'package:reboot_app_3/features/groups/domain/entities/challenge_task_instance.dart';
+import 'package:reboot_app_3/features/groups/providers/challenge_detail_notifier.dart';
 import 'package:share_plus/share_plus.dart';
 
 /// Model for update items in the group
@@ -101,6 +104,11 @@ class GroupScreen extends ConsumerWidget {
                 // Expanded(
                 //   child: _buildContent(context, theme, l10n),
                 // ),
+
+                // Today Tasks section
+                _buildTodayTasksSection(context, ref, theme, l10n, membership.group.id),
+
+                const SizedBox(height: 16),
 
                 // Bottom sections
                 _buildBottomSections(context, theme, l10n, membership.group.id),
@@ -273,72 +281,254 @@ class GroupScreen extends ConsumerWidget {
             ),
             textAlign: TextAlign.center,
           ),
+        ],
+      ),
+    );
+  }
 
-          const SizedBox(height: 24),
+  Widget _buildTodayTasksSection(
+    BuildContext context,
+    WidgetRef ref,
+    CustomThemeData theme,
+    AppLocalizations l10n,
+    String groupId,
+  ) {
+    final todayTasksAsync = ref.watch(groupTodayTasksProvider(groupId));
 
-          // Coming soon cards section
-          Row(
-            children: [
-              // Shared Updates card (centered)
-              Expanded(
-                child: _buildComingSoonCard(
-                  context: context,
-                  theme: theme,
-                  l10n: l10n,
-                  title: l10n.translate('shared-challenges'),
-                  subtitle: l10n.translate('join-exciting-challenges'),
-                  icon: LucideIcons.heart,
-                  features: [
-                    ComingSoonFeature(
-                      icon: LucideIcons.trendingUp,
-                      title: l10n.translate('daily-goals'),
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l10n.translate('your-tasks-today'),
+            style: TextStyles.h5.copyWith(
+              color: theme.grey[900],
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 16),
+          todayTasksAsync.when(
+            data: (tasks) {
+              if (tasks.isEmpty) {
+                return WidgetsContainer(
+                  backgroundColor: theme.grey[50],
+                  borderSide: BorderSide(
+                    color: theme.grey[200]!,
+                    width: 1,
+                  ),
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Text(
+                        l10n.translate('no-tasks-today'),
+                        style: TextStyles.body.copyWith(
+                          color: theme.grey[600],
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
-                    ComingSoonFeature(
-                      icon: LucideIcons.flag,
-                      title: l10n.translate('community-support'),
-                    ),
-                    ComingSoonFeature(
-                      icon: LucideIcons.heart,
-                      title: l10n.translate('achievements-rewards'),
-                    ),
-                  ],
-                  cardColor: theme.primary[50]!,
-                  borderColor: theme.primary[200]!,
+                  ),
+                );
+              }
+              
+              return Column(
+                children: tasks.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final taskInstance = entry.value;
+                  return _buildTodayTaskItem(
+                    context,
+                    ref,
+                    theme,
+                    l10n,
+                    taskInstance,
+                    index + 1,
+                    groupId,
+                  );
+                }).toList(),
+              );
+            },
+            loading: () => const Center(
+              child: Padding(
+                padding: EdgeInsets.all(24),
+                child: CircularProgressIndicator(),
+              ),
+            ),
+            error: (error, stack) => WidgetsContainer(
+              backgroundColor: theme.error[50],
+              borderSide: BorderSide(
+                color: theme.error[200]!,
+                width: 1,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text(
+                  '${l10n.translate('error')}: ${error.toString()}',
+                  style: TextStyles.small.copyWith(
+                    color: theme.error[600],
+                  ),
                 ),
               ),
-              horizontalSpace(Spacing.points8),
-
-              Expanded(
-                child: _buildComingSoonCard(
-                  context: context,
-                  theme: theme,
-                  l10n: l10n,
-                  title: l10n.translate('shared-updates'),
-                  subtitle: l10n.translate('share-updates-with-members'),
-                  icon: LucideIcons.heart,
-                  features: [
-                    ComingSoonFeature(
-                      icon: LucideIcons.trendingUp,
-                      title: l10n.translate('progress-sharing'),
-                    ),
-                    ComingSoonFeature(
-                      icon: LucideIcons.flag,
-                      title: l10n.translate('milestone-updates'),
-                    ),
-                    ComingSoonFeature(
-                      icon: LucideIcons.heart,
-                      title: l10n.translate('encouragement-posts'),
-                    ),
-                  ],
-                  cardColor: theme.primary[50]!,
-                  borderColor: theme.primary[200]!,
-                ),
-              ),
-            ],
+            ),
           ),
         ],
       ),
     );
+  }
+
+  Widget _buildTodayTaskItem(
+    BuildContext context,
+    WidgetRef ref,
+    CustomThemeData theme,
+    AppLocalizations l10n,
+    ChallengeTaskInstance taskInstance,
+    int number,
+    String groupId,
+  ) {
+    final task = taskInstance.task;
+    final isCompleted = taskInstance.status == TaskInstanceStatus.completed;
+    
+    // Calculate time remaining until end of day
+    final now = DateTime.now();
+    final endOfDay = DateTime(now.year, now.month, now.day, 23, 59, 59);
+    final timeRemaining = endOfDay.difference(now);
+    
+    String timeRemainingText;
+    Color timeRemainingColor;
+    
+    if (isCompleted) {
+      timeRemainingText = '✓ ${l10n.translate('completed')}';
+      timeRemainingColor = theme.success[600]!;
+    } else if (timeRemaining.inHours > 0) {
+      timeRemainingText = '${timeRemaining.inHours} ${l10n.translate('hours-left')}';
+      timeRemainingColor = theme.warn[600]!;
+    } else if (timeRemaining.inMinutes > 0) {
+      timeRemainingText = '${timeRemaining.inMinutes} ${l10n.translate('minutes-left')}';
+      timeRemainingColor = theme.error[600]!;
+    } else {
+      timeRemainingText = l10n.translate('task-expired');
+      timeRemainingColor = theme.grey[500]!;
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: WidgetsContainer(
+        backgroundColor: theme.backgroundColor,
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+        borderSide: BorderSide(color: theme.grey[600]!, width: 0.5),
+        child: Row(
+          children: [
+            // Task content (left side)
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    task.name,
+                    style: TextStyles.footnoteSelected.copyWith(
+                      color: theme.grey[900],
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${task.points} ${l10n.translate('points')}',
+                    style: TextStyles.small.copyWith(
+                      color: theme.grey[700],
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    timeRemainingText,
+                    style: TextStyles.small.copyWith(
+                      color: timeRemainingColor,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(width: 12),
+
+            // Number and checkbox (right side)
+            Row(
+              children: [
+                // Number
+                Container(
+                  width: 24,
+                  height: 24,
+                  decoration: BoxDecoration(
+                    color: theme.primary[100],
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Center(
+                    child: Text(
+                      '$number',
+                      style: TextStyles.small.copyWith(
+                        color: theme.primary[700],
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(width: 8),
+
+                // Checkbox
+                GestureDetector(
+                  onTap: isCompleted ? null : () {
+                    _completeTodayTask(ref, taskInstance, groupId);
+                  },
+                  child: Container(
+                    width: 24,
+                    height: 24,
+                    decoration: BoxDecoration(
+                      color: isCompleted
+                          ? theme.success[500]
+                          : Colors.transparent,
+                      border: Border.all(
+                        color: isCompleted
+                            ? theme.success[500]!
+                            : theme.grey[400]!,
+                        width: 2,
+                      ),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: isCompleted
+                        ? const Icon(
+                            Icons.check,
+                            color: Colors.white,
+                            size: 16,
+                          )
+                        : null,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _completeTodayTask(WidgetRef ref, ChallengeTaskInstance taskInstance, String groupId) {
+    // We need to find the challenge ID from the task instance
+    final challengesAsync = ref.read(activeChallengesProvider(groupId));
+    
+    challengesAsync.whenData((challenges) {
+      // Find the challenge that contains this task
+      for (final challenge in challenges) {
+        if (challenge.tasks.any((t) => t.id == taskInstance.task.id)) {
+          // Found the challenge, complete the task
+          ref.read(challengeDetailNotifierProvider(challenge.id).notifier).completeTask(
+            taskInstance.task.id,
+            taskInstance.task.points,
+            taskInstance.task.frequency,
+          );
+          break;
+        }
+      }
+    });
   }
 
   Widget _buildComingSoonCard({
