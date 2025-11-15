@@ -159,7 +159,6 @@ class ChallengesRepositoryImpl implements ChallengesRepository {
     required String challengeId,
     required String cpId,
     required String groupId,
-    required int goalValue,
   }) async {
     try {
       // Use transaction to ensure atomic operations
@@ -175,7 +174,6 @@ class ChallengesRepositoryImpl implements ChallengesRepository {
           challengeId: challengeId,
           cpId: cpId,
           groupId: groupId,
-          goalValue: goalValue,
           joinedAt: now,
           lastUpdateAt: now,
         );
@@ -301,44 +299,25 @@ class ChallengesRepositoryImpl implements ChallengesRepository {
   }
 
   // ============================================
-  // Progress Operations
+  // Task Completion Operations
   // ============================================
 
   @override
-  Future<void> updateProgress({
+  Future<void> completeTask({
     required String challengeId,
     required String cpId,
-    required int newCurrentValue,
-    required int newProgress,
+    required String taskId,
+    required int pointsEarned,
   }) async {
     try {
       final participationId = '${challengeId}_$cpId';
       await _participationsCollection.doc(participationId).update({
-        'currentValue': newCurrentValue,
-        'progress': newProgress,
+        'earnedPoints': FieldValue.increment(pointsEarned),
+        'completedTaskIds': FieldValue.arrayUnion([taskId]),
         'lastUpdateAt': Timestamp.fromDate(DateTime.now()),
       });
     } catch (e, stackTrace) {
-      log('Error updating progress: $e', stackTrace: stackTrace);
-      rethrow;
-    }
-  }
-
-  @override
-  Future<void> recordDailyActivity({
-    required String challengeId,
-    required String cpId,
-  }) async {
-    try {
-      final participationId = '${challengeId}_$cpId';
-      final now = DateTime.now();
-
-      await _participationsCollection.doc(participationId).update({
-        'dailyLog': FieldValue.arrayUnion([Timestamp.fromDate(now)]),
-        'lastUpdateAt': Timestamp.fromDate(now),
-      });
-    } catch (e, stackTrace) {
-      log('Error recording daily activity: $e', stackTrace: stackTrace);
+      log('Error completing task: $e', stackTrace: stackTrace);
       rethrow;
     }
   }
@@ -353,7 +332,6 @@ class ChallengesRepositoryImpl implements ChallengesRepository {
       await _participationsCollection.doc(participationId).update({
         'status': 'completed',
         'completedAt': Timestamp.fromDate(DateTime.now()),
-        'progress': 100,
       });
     } catch (e, stackTrace) {
       log('Error completing participation: $e', stackTrace: stackTrace);
@@ -374,7 +352,7 @@ class ChallengesRepositoryImpl implements ChallengesRepository {
       final querySnapshot = await _participationsCollection
           .where('challengeId', isEqualTo: challengeId)
           .where('status', isEqualTo: 'active')
-          .orderBy('progress', descending: true)
+          .orderBy('earnedPoints', descending: true)
           .limit(limit)
           .get();
 
@@ -390,9 +368,9 @@ class ChallengesRepositoryImpl implements ChallengesRepository {
   @override
   Future<void> updateRankings(String challengeId) async {
     try {
-      // Get all active participants sorted by progress
+      // Get all active participants sorted by earnedPoints
       final participants = await getActiveParticipants(challengeId);
-      participants.sort((a, b) => b.progress.compareTo(a.progress));
+      participants.sort((a, b) => b.earnedPoints.compareTo(a.earnedPoints));
 
       // Update rank for each participant
       final batch = _firestore.batch();
@@ -432,12 +410,12 @@ class ChallengesRepositoryImpl implements ChallengesRepository {
       final completionRate =
           totalCount > 0 ? (completedCount / totalCount) * 100 : 0.0;
 
-      // Calculate average progress
+      // Calculate average progress (based on earned points)
       double averageProgress = 0.0;
       if (activeParticipants.isNotEmpty) {
-        final totalProgress =
-            activeParticipants.fold<int>(0, (sum, p) => sum + p.progress);
-        averageProgress = totalProgress / activeParticipants.length;
+        final totalEarnedPoints =
+            activeParticipants.fold<int>(0, (sum, p) => sum + p.earnedPoints);
+        averageProgress = totalEarnedPoints / activeParticipants.length;
       }
 
       // Get top 5 participants
@@ -479,9 +457,9 @@ class ChallengesRepositoryImpl implements ChallengesRepository {
       final participants = await getActiveParticipants(challengeId);
       if (participants.isEmpty) return 0.0;
 
-      final totalProgress =
-          participants.fold<int>(0, (sum, p) => sum + p.progress);
-      return totalProgress / participants.length;
+      final totalEarnedPoints =
+          participants.fold<int>(0, (sum, p) => sum + p.earnedPoints);
+      return totalEarnedPoints / participants.length;
     } catch (e, stackTrace) {
       log('Error getting average progress: $e', stackTrace: stackTrace);
       rethrow;

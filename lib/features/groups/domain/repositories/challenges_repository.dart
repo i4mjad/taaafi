@@ -52,7 +52,6 @@ abstract class ChallengesRepository {
     required String challengeId,
     required String cpId,
     required String groupId,
-    required int goalValue,
   });
 
   /// Leave a challenge
@@ -85,21 +84,15 @@ abstract class ChallengesRepository {
   );
 
   // ============================================
-  // Progress Operations
+  // Task Completion Operations
   // ============================================
 
-  /// Update progress for a participant
-  Future<void> updateProgress({
+  /// Complete a task and award points
+  Future<void> completeTask({
     required String challengeId,
     required String cpId,
-    required int newCurrentValue,
-    required int newProgress,
-  });
-
-  /// Record daily activity for streak tracking
-  Future<void> recordDailyActivity({
-    required String challengeId,
-    required String cpId,
+    required String taskId,
+    required int pointsEarned,
   });
 
   /// Mark participation as completed
