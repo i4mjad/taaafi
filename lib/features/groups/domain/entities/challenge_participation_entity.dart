@@ -1,3 +1,6 @@
+import 'task_completion_record_entity.dart';
+import 'challenge_task_entity.dart';
+
 /// Domain entity for challenge participation
 ///
 /// Tracks an individual participant's progress in a challenge
@@ -9,7 +12,7 @@ class ChallengeParticipationEntity {
 
   // Points & Progress
   final int earnedPoints; // Total points earned from completed tasks
-  final List<String> completedTaskIds; // IDs of completed tasks
+  final List<TaskCompletionRecord> taskCompletions; // All task completions with timestamps
 
   // Status
   final ParticipationStatus status;
@@ -28,7 +31,7 @@ class ChallengeParticipationEntity {
     required this.cpId,
     required this.groupId,
     this.earnedPoints = 0,
-    this.completedTaskIds = const [],
+    this.taskCompletions = const [],
     this.status = ParticipationStatus.active,
     this.completedAt,
     required this.joinedAt,
@@ -43,9 +46,30 @@ class ChallengeParticipationEntity {
     return percentage > 100 ? 100.0 : percentage;
   }
 
-  /// Check if participant has completed a specific task
-  bool hasCompletedTask(String taskId) {
-    return completedTaskIds.contains(taskId);
+  /// Check if participant can complete a task based on frequency
+  bool canCompleteTask(String taskId, TaskFrequency frequency) {
+    final completions = taskCompletions.where((c) => c.taskId == taskId);
+
+    if (completions.isEmpty) return true; // Never completed
+
+    switch (frequency) {
+      case TaskFrequency.daily:
+        // Check if completed today
+        return !completions.any((c) => c.isCompletedToday());
+      case TaskFrequency.weekly:
+        // Check if completed this week
+        return !completions.any((c) => c.isCompletedThisWeek());
+      case TaskFrequency.oneTime:
+        // Can only complete once
+        return completions.isEmpty;
+    }
+  }
+
+  /// Check if task was completed today (for UI display)
+  bool isTaskCompletedToday(String taskId) {
+    return taskCompletions
+        .where((c) => c.taskId == taskId)
+        .any((c) => c.isCompletedToday());
   }
 
   /// Check if challenge is completed by this participant
@@ -64,7 +88,7 @@ class ChallengeParticipationEntity {
     String? cpId,
     String? groupId,
     int? earnedPoints,
-    List<String>? completedTaskIds,
+    List<TaskCompletionRecord>? taskCompletions,
     ParticipationStatus? status,
     DateTime? completedAt,
     DateTime? joinedAt,
@@ -77,7 +101,7 @@ class ChallengeParticipationEntity {
       cpId: cpId ?? this.cpId,
       groupId: groupId ?? this.groupId,
       earnedPoints: earnedPoints ?? this.earnedPoints,
-      completedTaskIds: completedTaskIds ?? this.completedTaskIds,
+      taskCompletions: taskCompletions ?? this.taskCompletions,
       status: status ?? this.status,
       completedAt: completedAt ?? this.completedAt,
       joinedAt: joinedAt ?? this.joinedAt,
