@@ -80,7 +80,7 @@ class ChallengeHistoryService {
         break;
 
       case TaskFrequency.weekly:
-        DateTime current = start.add(const Duration(days: 7));
+        DateTime current = start; // Start from join date, not 7 days later!
         while (current.isBefore(end) || current.isAtSameMomentAs(end)) {
           dates.add(current);
           current = current.add(const Duration(days: 7));
