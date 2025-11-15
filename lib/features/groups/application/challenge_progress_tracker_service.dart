@@ -1,5 +1,4 @@
 import 'dart:developer';
-import '../domain/entities/challenge_entity.dart';
 import '../domain/repositories/challenges_repository.dart';
 
 /// Service for automatically tracking challenge progress based on user activities
