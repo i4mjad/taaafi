@@ -167,6 +167,18 @@ class _AddTaskModalState extends State<AddTaskModal> {
                         ),
                       ],
                     ),
+
+                    verticalSpace(Spacing.points16),
+
+                    // Allow Retroactive Completion
+                    PlatformSwitch(
+                      value: _allowRetroactive,
+                      onChanged: (value) {
+                        setState(() => _allowRetroactive = value);
+                      },
+                      label: l10n.translate('allow-late-completion'),
+                      subtitle: l10n.translate('allow-late-completion-desc'),
+                    ),
                   ],
                 ),
               ),
