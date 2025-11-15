@@ -638,32 +638,4 @@ class _GroupChallengeScreenState extends ConsumerState<GroupChallengeScreen> {
     ];
   }
 
-  List<CurrentTask> _getDemoCurrentTasks() {
-    final theme = AppTheme.of(context);
-
-    return [
-      CurrentTask(
-        id: '1',
-        title: 'اكتب مذكرتك اليومية',
-        subtitle: 'تحدي كتابة المذكرات',
-        isCompleted: true,
-      ),
-      CurrentTask(
-        id: '2',
-        title: 'أضف المتابعة اليومية',
-        subtitle: 'تحدي المتابعة اليومية',
-        isCompleted: false,
-        statusText: 'متبقي 8 ساعات و 28 دقيقة',
-        statusColor: theme.warn[600],
-      ),
-      CurrentTask(
-        id: '3',
-        title: 'أضف المتابعة اليومية',
-        subtitle: 'تحدي المتابعة اليومية',
-        isCompleted: false,
-        statusText: 'متبقي ساعتان و 28 دقيقة',
-        statusColor: theme.error[500],
-      ),
-    ];
-  }
 }
