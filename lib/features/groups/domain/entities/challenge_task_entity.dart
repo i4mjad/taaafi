@@ -7,6 +7,7 @@ class ChallengeTaskEntity {
   final int points;
   final TaskFrequency frequency;
   final int order;
+  final bool allowRetroactiveCompletion; // Allow completing after deadline
 
   const ChallengeTaskEntity({
     required this.id,
@@ -14,6 +15,7 @@ class ChallengeTaskEntity {
     required this.points,
     required this.frequency,
     this.order = 0,
+    this.allowRetroactiveCompletion = true, // Default: flexible
   });
 
   /// Calculate maximum possible points for this task
@@ -38,6 +40,7 @@ class ChallengeTaskEntity {
     int? points,
     TaskFrequency? frequency,
     int? order,
+    bool? allowRetroactiveCompletion,
   }) {
     return ChallengeTaskEntity(
       id: id ?? this.id,
@@ -45,6 +48,8 @@ class ChallengeTaskEntity {
       points: points ?? this.points,
       frequency: frequency ?? this.frequency,
       order: order ?? this.order,
+      allowRetroactiveCompletion:
+          allowRetroactiveCompletion ?? this.allowRetroactiveCompletion,
     );
   }
 }

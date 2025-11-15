@@ -7,6 +7,7 @@ class ChallengeTaskModel extends ChallengeTaskEntity {
     required super.points,
     required super.frequency,
     super.order,
+    super.allowRetroactiveCompletion,
   });
 
   /// Create from Firestore map
@@ -17,6 +18,7 @@ class ChallengeTaskModel extends ChallengeTaskEntity {
       points: data['points'] as int,
       frequency: TaskFrequencyExtension.fromFirestore(data['frequency'] as String),
       order: data['order'] as int? ?? 0,
+      allowRetroactiveCompletion: data['allowRetroactiveCompletion'] as bool? ?? true,
     );
   }
 
@@ -27,6 +29,7 @@ class ChallengeTaskModel extends ChallengeTaskEntity {
       'points': points,
       'frequency': frequency.toFirestore(),
       'order': order,
+      'allowRetroactiveCompletion': allowRetroactiveCompletion,
     };
   }
 
@@ -38,6 +41,7 @@ class ChallengeTaskModel extends ChallengeTaskEntity {
       points: entity.points,
       frequency: entity.frequency,
       order: entity.order,
+      allowRetroactiveCompletion: entity.allowRetroactiveCompletion,
     );
   }
 
