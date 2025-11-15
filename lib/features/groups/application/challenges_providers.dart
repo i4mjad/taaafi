@@ -206,15 +206,21 @@ Future<List<ChallengeTaskInstance>> groupTodayTasks(
   ref,
   String groupId,
 ) async {
+  print('🔍 ============ GROUP TODAY TASKS DEBUG ============');
+  print('📋 Loading tasks for group: $groupId');
+  
   // Get current user profile
   final profile = await ref.watch(currentCommunityProfileProvider.future);
 
   if (profile == null) {
+    print('❌ No profile found');
     return [];
   }
+  print('✅ Profile found: ${profile.id}');
 
   // Get all active challenges in this group
   final challenges = await ref.watch(activeChallengesProvider(groupId).future);
+  print('📊 Found ${challenges.length} active challenges');
 
   final todayTasks = <ChallengeTaskInstance>[];
   final now = DateTime.now();
@@ -222,12 +228,20 @@ Future<List<ChallengeTaskInstance>> groupTodayTasks(
 
   // For each challenge, get the user's task instances and filter for today
   for (final challenge in challenges) {
+    print('\n🎯 Challenge: "${challenge.name}" (${challenge.id})');
+    print('   Tasks in challenge: ${challenge.tasks.length}');
+    
     // Get user's participation
     final participation = await ref.watch(
       userChallengeParticipationProvider(challenge.id, profile.id).future,
     );
 
-    if (participation == null) continue; // Skip if not participating
+    if (participation == null) {
+      print('   ⚠️ User not participating in this challenge');
+      continue;
+    }
+    print('   ✅ User is participating');
+    print('   Completions: ${participation.taskCompletions.length}');
 
     // Generate task instances
     final historyService = ChallengeHistoryService();
@@ -235,22 +249,32 @@ Future<List<ChallengeTaskInstance>> groupTodayTasks(
       challenge: challenge,
       participation: participation,
     );
+    print('   Generated ${instances.length} task instances');
 
     // Filter for today's tasks
     final todayInstances = instances.where((instance) {
       // For one-time tasks: show if not completed (regardless of date)
       if (instance.task.frequency == TaskFrequency.oneTime) {
-        return instance.status != TaskInstanceStatus.completed;
+        final isCompleted = instance.status == TaskInstanceStatus.completed;
+        print('   🔸 One-time task: "${instance.task.name}" - Completed: $isCompleted');
+        return !isCompleted;
       }
 
       // For daily/weekly tasks: show only if scheduled for today
-      return instance.scheduledDate.year == today.year &&
+      final isToday = instance.scheduledDate.year == today.year &&
           instance.scheduledDate.month == today.month &&
           instance.scheduledDate.day == today.day;
+      if (isToday) {
+        print('   🔸 ${instance.task.frequency.name} task: "${instance.task.name}" - Status: ${instance.status.name}');
+      }
+      return isToday;
     }).toList();
 
+    print('   ➡️ Filtered to ${todayInstances.length} tasks for today');
     todayTasks.addAll(todayInstances);
   }
 
+  print('\n✅ Total tasks for today: ${todayTasks.length}');
+  print('🔍 ============ END DEBUG ============\n');
   return todayTasks;
 }

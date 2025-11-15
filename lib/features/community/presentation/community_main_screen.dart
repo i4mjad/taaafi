@@ -391,10 +391,10 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
                               ? TextStyles.footnoteSelected
                               : TextStyles.footnote)
                           .copyWith(
-                        color: _tabController!.index == 1
-                            ? theme.primary[600]
-                            : theme.grey[600],
-                      ),
+                              color: _tabController!.index == 1
+                                  ? theme.primary[600]
+                                  : theme.grey[600],
+                              fontSize: 12),
                     ),
                   ],
                 ),
@@ -417,10 +417,10 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
                               ? TextStyles.footnoteSelected
                               : TextStyles.footnote)
                           .copyWith(
-                        color: _tabController!.index == 2
-                            ? theme.primary[600]
-                            : theme.grey[600],
-                      ),
+                              color: _tabController!.index == 2
+                                  ? theme.primary[600]
+                                  : theme.grey[600],
+                              fontSize: 12),
                     ),
                   ],
                 ),
