@@ -3707,6 +3707,7 @@ const Map<String, String> kEn = {
   "late-join-not-allowed": "Late joining is not allowed for this challenge",
   "challenge-not-active": "This challenge is not active",
   "error-loading-leaderboard": "Failed to load leaderboard",
+  "only-admins-create-challenges": "Only group admins can create challenges",
 
   // Challenge Status
   "cancelled": "Cancelled",

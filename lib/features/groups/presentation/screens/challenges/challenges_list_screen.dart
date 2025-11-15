@@ -9,6 +9,7 @@ import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/groups/providers/challenges_notifier.dart';
 import 'package:reboot_app_3/features/groups/presentation/widgets/challenge_card_widget.dart';
+import 'package:reboot_app_3/features/groups/application/group_chat_providers.dart';
 
 class ChallengesListScreen extends ConsumerStatefulWidget {
   final String groupId;
@@ -45,6 +46,8 @@ class _ChallengesListScreenState extends ConsumerState<ChallengesListScreen>
     final l10n = AppLocalizations.of(context);
     final challengesAsync =
         ref.watch(challengesNotifierProvider(widget.groupId));
+    final isAdminAsync = ref.watch(isCurrentUserGroupAdminProvider(widget.groupId));
+    final isAdmin = isAdminAsync.valueOrNull ?? false;
 
     return Scaffold(
       backgroundColor: theme.backgroundColor,
@@ -236,27 +239,29 @@ class _ChallengesListScreenState extends ConsumerState<ChallengesListScreen>
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _navigateToCreateChallenge(context),
-        backgroundColor: theme.primary[600],
-        label: Row(
-          children: [
-            Icon(
-              LucideIcons.plus,
-              color: Colors.white,
-              size: 20,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              l10n.translate('create-challenge'),
-              style: TextStyles.small.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
+      floatingActionButton: isAdmin
+          ? FloatingActionButton.extended(
+              onPressed: () => _navigateToCreateChallenge(context),
+              backgroundColor: theme.primary[600],
+              label: Row(
+                children: [
+                  Icon(
+                    LucideIcons.plus,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    l10n.translate('create-challenge'),
+                    style: TextStyles.small.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ],
-        ),
-      ),
+            )
+          : null,
     );
   }
 

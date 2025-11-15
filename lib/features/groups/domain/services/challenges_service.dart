@@ -5,14 +5,16 @@ import '../entities/challenge_stats_entity.dart';
 import '../entities/challenge_result_entities.dart';
 import '../entities/challenge_update_entity.dart';
 import '../repositories/challenges_repository.dart';
+import '../repositories/groups_repository.dart';
 
 /// Service for challenge business logic
 ///
 /// Handles validation, orchestration, and business rules for challenges
 class ChallengesService {
   final ChallengesRepository _repository;
+  final GroupsRepository _groupsRepository;
 
-  const ChallengesService(this._repository);
+  const ChallengesService(this._repository, this._groupsRepository);
 
   // ============================================
   // Challenge Management
@@ -37,6 +39,22 @@ class ChallengesService {
     int pointsReward = 0,
   }) async {
     try {
+      // Authorization: Check if creator is admin
+      final membership = await _groupsRepository.getCurrentMembership(creatorCpId);
+      if (membership == null || membership.groupId != groupId) {
+        return const CreateChallengeResult.failure(
+          CreateChallengeError.notGroupMember,
+          'You must be a member of this group',
+        );
+      }
+
+      if (membership.role != 'admin') {
+        return const CreateChallengeResult.failure(
+          CreateChallengeError.notAuthorized,
+          'Only group admins can create challenges',
+        );
+      }
+
       // Validation: Title
       if (title.trim().isEmpty) {
         return const CreateChallengeResult.failure(

@@ -25,7 +25,7 @@ final challengesRepositoryProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef ChallengesRepositoryRef = AutoDisposeProviderRef<ChallengesRepository>;
-String _$challengesServiceHash() => r'723a39c8facfec5741dccaac6d232760c85c65ea';
+String _$challengesServiceHash() => r'af0f9e9f5bf2dcc6aac8477bacee5c53e6ed009e';
 
 /// See also [challengesService].
 @ProviderFor(challengesService)

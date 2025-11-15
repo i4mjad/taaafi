@@ -1,5 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../domain/repositories/challenges_repository.dart';
+import '../domain/repositories/groups_repository.dart';
 import '../domain/services/challenges_service.dart';
 import '../domain/entities/challenge_entity.dart';
 import '../domain/entities/challenge_participation_entity.dart';
@@ -29,7 +30,8 @@ ChallengesRepository challengesRepository(ref) {
 @riverpod
 ChallengesService challengesService(ref) {
   final repository = ref.watch(challengesRepositoryProvider);
-  return ChallengesService(repository);
+  final groupsRepository = ref.watch(groupsRepositoryProvider);
+  return ChallengesService(repository, groupsRepository);
 }
 
 @riverpod

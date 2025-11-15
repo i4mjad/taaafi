@@ -3629,6 +3629,7 @@ const Map<String, String> kAr = {
   'late-join-not-allowed': 'الانضمام المتأخر غير مسموح لهذا التحدي',
   'challenge-not-active': 'هذا التحدي غير نشط',
   'error-loading-leaderboard': 'فشل تحميل لوحة المتصدرين',
+  'only-admins-create-challenges': 'المسؤولون فقط يمكنهم إنشاء التحديات',
 
   // Challenge Status - حالة التحدي
   'cancelled': 'ملغي',
