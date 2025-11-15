@@ -315,6 +315,7 @@ class _ChallengesListScreenState extends ConsumerState<ChallengesListScreen>
   }
 
   void _navigateToCreateChallenge(BuildContext context) {
+    // Navigate directly to create challenge screen (no type selection)
     context.pushNamed(
       RouteNames.createChallenge.name,
       pathParameters: {'groupId': widget.groupId},

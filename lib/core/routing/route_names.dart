@@ -55,7 +55,6 @@ enum RouteNames {
   globalChallengeList,
   // Challenge routes
   groupChallenges,
-  selectChallengeType,
   createChallenge,
   challengeDetail,
   challengeLeaderboard,
