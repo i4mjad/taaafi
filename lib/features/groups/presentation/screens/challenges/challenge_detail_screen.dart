@@ -264,9 +264,10 @@ class ChallengeDetailScreen extends ConsumerWidget {
           ...challenge.tasks.asMap().entries.map((entry) {
             final index = entry.key;
             final task = entry.value;
-            final isCompleted =
-                userParticipation?.hasCompletedTask(task.id) ?? false;
-            final canComplete = userParticipation != null && !isCompleted;
+            final isCompletedToday =
+                userParticipation?.isTaskCompletedToday(task.id) ?? false;
+            final canComplete = userParticipation != null &&
+                userParticipation.canCompleteTask(task.id, task.frequency);
 
             return _buildTaskItem(
               context,
@@ -275,7 +276,7 @@ class ChallengeDetailScreen extends ConsumerWidget {
               l10n,
               task,
               index + 1,
-              isCompleted,
+              isCompletedToday,
               canComplete,
             );
           }).toList(),
