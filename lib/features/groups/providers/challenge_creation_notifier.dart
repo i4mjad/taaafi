@@ -10,6 +10,7 @@ part 'challenge_creation_notifier.g.dart';
 class ChallengeCreationState {
   // Basic info
   final String name;
+  final String description;
   final DateTime? endDate;
   final String color;
   final List<ChallengeTaskEntity> tasks;
@@ -21,6 +22,7 @@ class ChallengeCreationState {
 
   const ChallengeCreationState({
     this.name = '',
+    this.description = '',
     this.endDate,
     this.color = 'blue',
     this.tasks = const [],
@@ -31,6 +33,7 @@ class ChallengeCreationState {
 
   ChallengeCreationState copyWith({
     String? name,
+    String? description,
     DateTime? endDate,
     String? color,
     List<ChallengeTaskEntity>? tasks,
@@ -40,6 +43,7 @@ class ChallengeCreationState {
   }) {
     return ChallengeCreationState(
       name: name ?? this.name,
+      description: description ?? this.description,
       endDate: endDate ?? this.endDate,
       color: color ?? this.color,
       tasks: tasks ?? this.tasks,
@@ -87,6 +91,11 @@ class ChallengeCreationNotifier extends _$ChallengeCreationNotifier {
   /// Update challenge name
   void setName(String name) {
     state = state.copyWith(name: name);
+  }
+
+  /// Update challenge description
+  void setDescription(String description) {
+    state = state.copyWith(description: description);
   }
 
   /// Update end date
@@ -149,6 +158,7 @@ class ChallengeCreationNotifier extends _$ChallengeCreationNotifier {
         groupId: groupId,
         creatorCpId: profile.id,
         name: state.name,
+        description: state.description,
         endDate: state.endDate!,
         color: state.color,
         tasks: state.tasks,
