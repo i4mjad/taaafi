@@ -27,11 +27,28 @@ class ChallengeHistoryService {
           ? challenge.createdAt
           : participation.joinedAt;
       
+      // Normalize start date
+      final normalizedStartDate = DateTime(
+        startDate.year,
+        startDate.month,
+        startDate.day,
+      );
+      
       final taskDates = _generateDatesForTask(
         task.frequency,
-        startDate,
+        normalizedStartDate,
         endDate,
       );
+      
+      // Debug: Ensure today is included for daily/weekly tasks if it's in range
+      if (task.frequency != TaskFrequency.oneTime) {
+        if ((today.isAfter(normalizedStartDate) || _isSameDay(today, normalizedStartDate)) &&
+            (today.isBefore(endDate) || _isSameDay(today, endDate))) {
+          if (!taskDates.any((d) => _isSameDay(d, today))) {
+            taskDates.add(today);
+          }
+        }
+      }
 
       for (final date in taskDates) {
         // Normalize the scheduled date for comparison
