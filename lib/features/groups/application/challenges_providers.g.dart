@@ -1640,5 +1640,153 @@ class _ChallengeTaskInstancesProviderElement
   String get challengeId =>
       (origin as ChallengeTaskInstancesProvider).challengeId;
 }
+
+String _$groupTodayTasksHash() => r'e864b53b3dd0d5600868da943add6b138b2b4026';
+
+/// Get today's task instances across all challenges in a group (for the current user)
+///
+/// Copied from [groupTodayTasks].
+@ProviderFor(groupTodayTasks)
+const groupTodayTasksProvider = GroupTodayTasksFamily();
+
+/// Get today's task instances across all challenges in a group (for the current user)
+///
+/// Copied from [groupTodayTasks].
+class GroupTodayTasksFamily
+    extends Family<AsyncValue<List<ChallengeTaskInstance>>> {
+  /// Get today's task instances across all challenges in a group (for the current user)
+  ///
+  /// Copied from [groupTodayTasks].
+  const GroupTodayTasksFamily();
+
+  /// Get today's task instances across all challenges in a group (for the current user)
+  ///
+  /// Copied from [groupTodayTasks].
+  GroupTodayTasksProvider call(
+    String groupId,
+  ) {
+    return GroupTodayTasksProvider(
+      groupId,
+    );
+  }
+
+  @override
+  GroupTodayTasksProvider getProviderOverride(
+    covariant GroupTodayTasksProvider provider,
+  ) {
+    return call(
+      provider.groupId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'groupTodayTasksProvider';
+}
+
+/// Get today's task instances across all challenges in a group (for the current user)
+///
+/// Copied from [groupTodayTasks].
+class GroupTodayTasksProvider
+    extends AutoDisposeFutureProvider<List<ChallengeTaskInstance>> {
+  /// Get today's task instances across all challenges in a group (for the current user)
+  ///
+  /// Copied from [groupTodayTasks].
+  GroupTodayTasksProvider(
+    String groupId,
+  ) : this._internal(
+          (ref) => groupTodayTasks(
+            ref as GroupTodayTasksRef,
+            groupId,
+          ),
+          from: groupTodayTasksProvider,
+          name: r'groupTodayTasksProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$groupTodayTasksHash,
+          dependencies: GroupTodayTasksFamily._dependencies,
+          allTransitiveDependencies:
+              GroupTodayTasksFamily._allTransitiveDependencies,
+          groupId: groupId,
+        );
+
+  GroupTodayTasksProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.groupId,
+  }) : super.internal();
+
+  final String groupId;
+
+  @override
+  Override overrideWith(
+    FutureOr<List<ChallengeTaskInstance>> Function(GroupTodayTasksRef provider)
+        create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: GroupTodayTasksProvider._internal(
+        (ref) => create(ref as GroupTodayTasksRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        groupId: groupId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<List<ChallengeTaskInstance>>
+      createElement() {
+    return _GroupTodayTasksProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is GroupTodayTasksProvider && other.groupId == groupId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, groupId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin GroupTodayTasksRef
+    on AutoDisposeFutureProviderRef<List<ChallengeTaskInstance>> {
+  /// The parameter `groupId` of this provider.
+  String get groupId;
+}
+
+class _GroupTodayTasksProviderElement
+    extends AutoDisposeFutureProviderElement<List<ChallengeTaskInstance>>
+    with GroupTodayTasksRef {
+  _GroupTodayTasksProviderElement(super.provider);
+
+  @override
+  String get groupId => (origin as GroupTodayTasksProvider).groupId;
+}
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

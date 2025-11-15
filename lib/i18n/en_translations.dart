@@ -2290,6 +2290,7 @@ const Map<String, String> kEn = {
   "hours-left": "hours left",
   "minutes-left": "minutes left",
   "task-expired": "Task expired",
+  "no-tasks-today": "No tasks for today! Take a break or check back tomorrow.",
   // Smart Alerts Plus Feature
   "smart-alerts-plus-required-title": "Ta'aafi Plus Required",
   "smart-alerts-plus-required-description":

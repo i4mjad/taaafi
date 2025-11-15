@@ -199,3 +199,51 @@ Future<List<ChallengeTaskInstance>> challengeTaskInstances(
   );
 }
 
+/// Get today's task instances across all challenges in a group (for the current user)
+@riverpod
+Future<List<ChallengeTaskInstance>> groupTodayTasks(
+  ref,
+  String groupId,
+) async {
+  // Get current user profile
+  final profile = await ref.watch(currentCommunityProfileProvider.future);
+  
+  if (profile == null) {
+    return [];
+  }
+
+  // Get all active challenges in this group
+  final challenges = await ref.watch(activeChallengesProvider(groupId).future);
+  
+  final todayTasks = <ChallengeTaskInstance>[];
+  final today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+  
+  // For each challenge, get the user's task instances and filter for today
+  for (final challenge in challenges) {
+    // Get user's participation
+    final participation = await ref.watch(
+      userChallengeParticipationProvider(challenge.id, profile.id).future,
+    );
+    
+    if (participation == null) continue; // Skip if not participating
+    
+    // Generate task instances
+    final historyService = ChallengeHistoryService();
+    final instances = historyService.generateTaskInstances(
+      challenge: challenge,
+      participation: participation,
+    );
+    
+    // Filter for today's tasks only
+    final todayInstances = instances.where((instance) {
+      return instance.scheduledDate.year == today.year &&
+          instance.scheduledDate.month == today.month &&
+          instance.scheduledDate.day == today.day;
+    }).toList();
+    
+    todayTasks.addAll(todayInstances);
+  }
+  
+  return todayTasks;
+}
+

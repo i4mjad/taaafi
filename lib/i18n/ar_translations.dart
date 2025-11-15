@@ -1892,6 +1892,7 @@ const Map<String, String> kAr = {
   "hours-left": "ساعات متبقية",
   "minutes-left": "دقائق متبقية",
   "task-expired": "انتهى وقت المهمة",
+  "no-tasks-today": "لا توجد مهام لليوم! خذ قسطاً من الراحة أو تحقق غداً.",
   // Privacy Settings
   "show-identity-description":
       "تفعيل هذا الخيار يجعل بياناتك الأساسية (الاسم والنوع) مرئية لأعضاء الزمالة، ويعطيل الخيار لإبقاء كمجهول",

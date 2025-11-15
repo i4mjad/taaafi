@@ -7,6 +7,9 @@ import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
+import 'package:reboot_app_3/features/groups/application/challenges_providers.dart';
+import 'package:reboot_app_3/features/groups/domain/entities/challenge_task_instance.dart';
+import 'package:reboot_app_3/features/groups/providers/challenge_detail_notifier.dart';
 
 /// Model for leaderboard participant
 class LeaderboardParticipant {
@@ -337,7 +340,7 @@ class _GroupChallengeScreenState extends ConsumerState<GroupChallengeScreen> {
     CustomThemeData theme,
     AppLocalizations l10n,
   ) {
-    final tasks = _getDemoCurrentTasks();
+    final todayTasksAsync = ref.watch(groupTodayTasksProvider(widget.groupId));
 
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: Spacing.points16.value),
@@ -345,30 +348,110 @@ class _GroupChallengeScreenState extends ConsumerState<GroupChallengeScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            AppLocalizations.of(context).translate('my_tasks'),
+            l10n.translate('your-tasks-today'),
             style: TextStyles.h6.copyWith(
               color: theme.grey[900],
             ),
           ),
           verticalSpace(Spacing.points16),
-          Column(
-            children: tasks.asMap().entries.map((entry) {
-              final index = entry.key;
-              final task = entry.value;
-              return _buildCurrentTaskItem(context, theme, task, index + 1);
-            }).toList(),
+          todayTasksAsync.when(
+            data: (tasks) {
+              if (tasks.isEmpty) {
+                return WidgetsContainer(
+                  backgroundColor: theme.grey[50],
+                  borderSide: BorderSide(
+                    color: theme.grey[200]!,
+                    width: 1,
+                  ),
+                  child: Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(Spacing.points24.value),
+                      child: Text(
+                        l10n.translate('no-tasks-today'),
+                        style: TextStyles.body.copyWith(
+                          color: theme.grey[600],
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                );
+              }
+              
+              return Column(
+                children: tasks.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final taskInstance = entry.value;
+                  return _buildTodayTaskItem(
+                    context,
+                    theme,
+                    l10n,
+                    taskInstance,
+                    index + 1,
+                  );
+                }).toList(),
+              );
+            },
+            loading: () => Center(
+              child: Padding(
+                padding: EdgeInsets.all(Spacing.points24.value),
+                child: CircularProgressIndicator(),
+              ),
+            ),
+            error: (error, stack) => WidgetsContainer(
+              backgroundColor: theme.error[50],
+              borderSide: BorderSide(
+                color: theme.error[200]!,
+                width: 1,
+              ),
+              child: Padding(
+                padding: EdgeInsets.all(Spacing.points16.value),
+                child: Text(
+                  '${l10n.translate('error')}: ${error.toString()}',
+                  style: TextStyles.small.copyWith(
+                    color: theme.error[600],
+                  ),
+                ),
+              ),
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildCurrentTaskItem(
+  Widget _buildTodayTaskItem(
     BuildContext context,
     CustomThemeData theme,
-    CurrentTask task,
+    AppLocalizations l10n,
+    ChallengeTaskInstance taskInstance,
     int number,
   ) {
+    final task = taskInstance.task;
+    final isCompleted = taskInstance.status == TaskInstanceStatus.completed;
+    
+    // Calculate time remaining until end of day
+    final now = DateTime.now();
+    final endOfDay = DateTime(now.year, now.month, now.day, 23, 59, 59);
+    final timeRemaining = endOfDay.difference(now);
+    
+    String timeRemainingText;
+    Color timeRemainingColor;
+    
+    if (isCompleted) {
+      timeRemainingText = '✓ ${l10n.translate('completed')}';
+      timeRemainingColor = theme.success[600]!;
+    } else if (timeRemaining.inHours > 0) {
+      timeRemainingText = '${timeRemaining.inHours} ${l10n.translate('hours-left')}';
+      timeRemainingColor = theme.warn[600]!;
+    } else if (timeRemaining.inMinutes > 0) {
+      timeRemainingText = '${timeRemaining.inMinutes} ${l10n.translate('minutes-left')}';
+      timeRemainingColor = theme.error[600]!;
+    } else {
+      timeRemainingText = l10n.translate('task-expired');
+      timeRemainingColor = theme.grey[500]!;
+    }
+
     return Container(
       margin: EdgeInsets.only(bottom: Spacing.points12.value),
       child: WidgetsContainer(
@@ -378,36 +461,36 @@ class _GroupChallengeScreenState extends ConsumerState<GroupChallengeScreen> {
         child: Row(
           children: [
             // Task content (left side)
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  task.title,
-                  style: TextStyles.footnoteSelected.copyWith(
-                    color: theme.grey[900],
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    task.name,
+                    style: TextStyles.footnoteSelected.copyWith(
+                      color: theme.grey[900],
+                    ),
                   ),
-                ),
-                verticalSpace(Spacing.points4),
-                Text(
-                  task.subtitle,
-                  style: TextStyles.small.copyWith(
-                    color: theme.grey[700],
-                  ),
-                ),
-                if (task.statusText != null) ...[
                   verticalSpace(Spacing.points4),
                   Text(
-                    task.statusText!,
+                    '${task.points} ${l10n.translate('points')}',
                     style: TextStyles.small.copyWith(
-                      color: task.statusColor ?? theme.warn[600],
+                      color: theme.grey[700],
+                    ),
+                  ),
+                  verticalSpace(Spacing.points4),
+                  Text(
+                    timeRemainingText,
+                    style: TextStyles.small.copyWith(
+                      color: timeRemainingColor,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],
-              ],
+              ),
             ),
 
-            Spacer(),
+            horizontalSpace(Spacing.points12),
 
             // Number and checkbox (right side)
             Row(
@@ -434,28 +517,36 @@ class _GroupChallengeScreenState extends ConsumerState<GroupChallengeScreen> {
                 horizontalSpace(Spacing.points8),
 
                 // Checkbox
-                Container(
-                  width: 24,
-                  height: 24,
-                  decoration: BoxDecoration(
-                    color: task.isCompleted
-                        ? theme.success[500]
-                        : Colors.transparent,
-                    border: Border.all(
-                      color: task.isCompleted
-                          ? theme.success[500]!
-                          : theme.grey[400]!,
-                      width: 2,
+                GestureDetector(
+                  onTap: isCompleted ? null : () {
+                    // Complete the task
+                    // We need to get the challenge ID to complete this task
+                    // This will require getting the challenge from the task instance
+                    _completeTodayTask(taskInstance);
+                  },
+                  child: Container(
+                    width: 24,
+                    height: 24,
+                    decoration: BoxDecoration(
+                      color: isCompleted
+                          ? theme.success[500]
+                          : Colors.transparent,
+                      border: Border.all(
+                        color: isCompleted
+                            ? theme.success[500]!
+                            : theme.grey[400]!,
+                        width: 2,
+                      ),
+                      borderRadius: BorderRadius.circular(4),
                     ),
-                    borderRadius: BorderRadius.circular(4),
+                    child: isCompleted
+                        ? Icon(
+                            Icons.check,
+                            color: Colors.white,
+                            size: 16,
+                          )
+                        : null,
                   ),
-                  child: task.isCompleted
-                      ? Icon(
-                          Icons.check,
-                          color: Colors.white,
-                          size: 16,
-                        )
-                      : null,
                 ),
               ],
             ),
@@ -463,6 +554,28 @@ class _GroupChallengeScreenState extends ConsumerState<GroupChallengeScreen> {
         ),
       ),
     );
+  }
+
+  void _completeTodayTask(ChallengeTaskInstance taskInstance) {
+    // We need to find the challenge ID from the task instance
+    // The challenge entity is not directly in the task instance, so we need to
+    // get it from the challenges list in the group
+    final challengesAsync = ref.read(activeChallengesProvider(widget.groupId));
+    
+    challengesAsync.whenData((challenges) {
+      // Find the challenge that contains this task
+      for (final challenge in challenges) {
+        if (challenge.tasks.any((t) => t.id == taskInstance.task.id)) {
+          // Found the challenge, complete the task
+          ref.read(challengeDetailNotifierProvider(challenge.id).notifier).completeTask(
+            taskInstance.task.id,
+            taskInstance.task.points,
+            taskInstance.task.frequency,
+          );
+          break;
+        }
+      }
+    });
   }
 
   List<LeaderboardParticipant> _getDemoLeaderboard() {
