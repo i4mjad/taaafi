@@ -3630,7 +3630,6 @@ const Map<String, String> kEn = {
   "quick-reply": "Quick Reply",
 
   // Challenges (Sprint 5)
-  "challenges": "Challenges",
   "challenge": "Challenge",
   "create-challenge": "Create Challenge",
   "add-challenge": "Add Challenge",

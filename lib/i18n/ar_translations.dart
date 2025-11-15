@@ -3554,7 +3554,6 @@ const Map<String, String> kAr = {
   'quick-reply': 'رد سريع',
 
   // Challenges (Sprint 5) - التحديات
-  'challenges': 'التحديات',
   'challenge': 'تحدي',
   "create-challenge": "إنشاء تحدي",
   'add-challenge': 'إضافة تحدي',
