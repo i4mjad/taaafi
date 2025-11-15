@@ -3634,7 +3634,6 @@ const Map<String, String> kEn = {
   "create-challenge": "Create Challenge",
   "add-challenge": "Add Challenge",
   "edit-challenge": "Edit Challenge",
-  "save-changes": "Save Changes",
   "challenge-updated-successfully": "Challenge updated successfully!",
   "error-updating-challenge": "Failed to update challenge",
   "challenge-name": "Challenge Name",

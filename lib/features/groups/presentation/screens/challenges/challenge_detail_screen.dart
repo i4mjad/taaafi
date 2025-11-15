@@ -30,6 +30,8 @@ class ChallengeDetailScreen extends ConsumerWidget {
     final theme = AppTheme.of(context);
     final l10n = AppLocalizations.of(context);
     final detailAsync = ref.watch(challengeDetailNotifierProvider(challengeId));
+    final isAdminAsync = ref.watch(isCurrentUserGroupAdminProvider(groupId));
+    final isAdmin = isAdminAsync.valueOrNull ?? false;
 
     return Scaffold(
       backgroundColor: theme.backgroundColor,

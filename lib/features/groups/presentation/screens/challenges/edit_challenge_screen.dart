@@ -8,7 +8,6 @@ import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
-import 'package:reboot_app_3/features/groups/domain/entities/challenge_entity.dart';
 import 'package:reboot_app_3/features/groups/domain/entities/challenge_task_entity.dart';
 import 'package:reboot_app_3/features/groups/application/challenges_providers.dart';
 import 'package:reboot_app_3/features/groups/presentation/widgets/add_task_modal.dart';

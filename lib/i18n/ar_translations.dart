@@ -3558,7 +3558,6 @@ const Map<String, String> kAr = {
   "create-challenge": "إنشاء تحدي",
   'add-challenge': 'إضافة تحدي',
   'edit-challenge': 'تعديل التحدي',
-  'save-changes': 'حفظ التغييرات',
   'challenge-updated-successfully': 'تم تحديث التحدي بنجاح!',
   'error-updating-challenge': 'فشل تحديث التحدي',
   'challenge-name': 'اسم التحدي',
