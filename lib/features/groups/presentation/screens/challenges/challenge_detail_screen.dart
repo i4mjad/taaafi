@@ -534,16 +534,6 @@ class ChallengeDetailScreen extends ConsumerWidget {
     );
   }
 
-  void _navigateToLeaderboard(BuildContext context) {
-    context.pushNamed(
-      RouteNames.challengeLeaderboard.name,
-      pathParameters: {
-        'groupId': groupId,
-        'challengeId': challengeId,
-      },
-    );
-  }
-
   Future<void> _joinChallenge(
       BuildContext context, WidgetRef ref, AppLocalizations l10n) async {
     await ref
