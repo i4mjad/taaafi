@@ -199,9 +199,12 @@ class ChallengeDetailScreen extends ConsumerWidget {
 
   Widget _buildUserProgressCard(theme, AppLocalizations l10n,
       ChallengeEntity challenge, userParticipation) {
-    final totalPoints = challenge.getTotalPossiblePoints();
-    final progressPercent =
-        userParticipation.getProgressPercentage(totalPoints);
+    final totalTasks = challenge.tasks.length;
+    final progressPercent = userParticipation.getProgressPercentage(totalTasks);
+    final completedTasksCount = userParticipation.taskCompletions
+        .map((c) => c.taskId)
+        .toSet()
+        .length;
 
     return WidgetsContainer(
       backgroundColor: theme.success[50],
