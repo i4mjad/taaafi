@@ -2,6 +2,7 @@
 // This file is maintained manually. Keep keys in sync with other language maps.
 
 const Map<String, String> kEn = {
+  "add": "Add",
   "founder": "Founder",
   "daily": "Daily",
   "weekly": "Weekly",
@@ -3629,13 +3630,14 @@ const Map<String, String> kEn = {
   "quick-reply": "Quick Reply",
 
   // Challenges (Sprint 5)
+  "challenges": "Challenges",
   "challenge": "Challenge",
+  "create-challenge": "Create Challenge",
   "add-challenge": "Add Challenge",
   "challenge-name": "Challenge Name",
   "challenge-name-hint": "Example: Daily Diary Challenge",
   "challenge-end-date": "Challenge End Date",
   "color": "Color",
-  "tasks": "Tasks",
   "task": "Task",
   "add-task": "Add Task",
   "task-name-hint": "Example: Write your daily diary",
@@ -3644,8 +3646,6 @@ const Map<String, String> kEn = {
   "add-exercise": "Add Exercise",
   "challenge-created-successfully": "Challenge created successfully!",
   "error-creating-challenge": "Failed to create challenge",
-  "task-completed": "Task Completed!",
-  "points": "Points",
 
   // Challenge List
   "upcoming": "Upcoming",

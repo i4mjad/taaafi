@@ -33,13 +33,24 @@ class ChallengeDetailScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: theme.backgroundColor,
       appBar: AppBar(
-        title: Text(
-          l10n.translate('challenge-details'),
-          style: TextStyles.screenHeadding.copyWith(color: theme.grey[900]),
+        title: detailAsync.when(
+          data: (state) => Text(
+            state.challenge?.name ?? l10n.translate('challenge'),
+            style: TextStyles.screenHeadding.copyWith(color: theme.grey[900]),
+          ),
+          loading: () => Text(
+            l10n.translate('challenge'),
+            style: TextStyles.screenHeadding.copyWith(color: theme.grey[900]),
+          ),
+          error: (_, __) => Text(
+            l10n.translate('challenge'),
+            style: TextStyles.screenHeadding.copyWith(color: theme.grey[900]),
+          ),
         ),
         backgroundColor: theme.backgroundColor,
         surfaceTintColor: theme.backgroundColor,
         centerTitle: false,
+        titleSpacing: 0,
       ),
       body: detailAsync.when(
         data: (state) {
@@ -153,7 +164,7 @@ class ChallengeDetailScreen extends ConsumerWidget {
               Icon(LucideIcons.calendar, size: 18, color: theme.grey[700]),
               const SizedBox(width: 6),
               Text(
-                '${challenge.getDaysRemaining()} ${l10n.translate('days-left')}',
+                '${challenge.getDaysRemaining()} ${l10n.translate('days')}',
                 style: TextStyles.small.copyWith(color: theme.grey[700]),
               ),
             ],

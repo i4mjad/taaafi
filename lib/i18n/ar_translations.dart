@@ -2,6 +2,7 @@
 // Maintain synchronisation with English map.
 
 const Map<String, String> kAr = {
+  "add": "إضافة",
   "founder": "المؤسس",
   "of": "من",
   "loading-group-members": "جاري عرض أعضاء الزمالة...",
@@ -3553,13 +3554,14 @@ const Map<String, String> kAr = {
   'quick-reply': 'رد سريع',
 
   // Challenges (Sprint 5) - التحديات
+  'challenges': 'التحديات',
   'challenge': 'تحدي',
+  "create-challenge": "إنشاء تحدي",
   'add-challenge': 'إضافة تحدي',
   'challenge-name': 'اسم التحدي',
   'challenge-name-hint': 'مثال: تحدي كتابة المذكرات اليومية',
   'challenge-end-date': 'تاريخ انتهاء التحدي',
   'color': 'اللون',
-  'tasks': 'المهام',
   'task': 'مهمة',
   'add-task': 'إضافة مهمة',
   'task-name-hint': 'مثال: اكتب مذكراتك لهذا اليوم',
@@ -3568,8 +3570,6 @@ const Map<String, String> kAr = {
   'add-exercise': 'إضافة التمرين',
   'challenge-created-successfully': 'تم إنشاء التحدي بنجاح!',
   'error-creating-challenge': 'فشل إنشاء التحدي',
-  'task-completed': 'تم إكمال المهمة!',
-  'points': 'نقاط',
 
   // Challenge List - قائمة التحديات
   'upcoming': 'قادم',

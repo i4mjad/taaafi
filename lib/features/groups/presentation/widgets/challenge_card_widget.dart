@@ -141,7 +141,7 @@ class ChallengeCardWidget extends StatelessWidget {
             ),
             const SizedBox(width: 4),
             Text(
-              '$daysLeft ${l10n.translate('days-left')}',
+              '$daysLeft ${l10n.translate('days')}',
               style: TextStyles.caption.copyWith(
                 color: isEndingSoon ? theme.warn[700] : theme.grey[700],
                 fontWeight: FontWeight.w600,

@@ -349,9 +349,9 @@ class ChallengesRepositoryImpl implements ChallengesRepository {
     int limit = 10,
   }) async {
     try {
+      // Get all participants (active and completed) for leaderboard
       final querySnapshot = await _participationsCollection
           .where('challengeId', isEqualTo: challengeId)
-          .where('status', isEqualTo: 'active')
           .orderBy('earnedPoints', descending: true)
           .limit(limit)
           .get();
