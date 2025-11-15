@@ -629,8 +629,6 @@ class ChallengeDetailScreen extends ConsumerWidget {
         return l10n.translate('daily');
       case TaskFrequency.weekly:
         return l10n.translate('weekly');
-      case TaskFrequency.oneTime:
-        return l10n.translate('one-time');
     }
   }
 
