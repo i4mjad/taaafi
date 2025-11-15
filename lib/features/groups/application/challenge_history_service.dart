@@ -109,10 +109,21 @@ class ChallengeHistoryService {
       }
     }
 
-    // Sort by date descending (newest first)
-    instances.sort((a, b) => b.scheduledDate.compareTo(a.scheduledDate));
+    // Sort by date: today first, then past (descending), then future (ascending)
+    instances.sort((a, b) {
+      final aIsToday = _isSameDay(a.scheduledDate, today);
+      final bIsToday = _isSameDay(b.scheduledDate, today);
+      
+      // Today's tasks always first
+      if (aIsToday && !bIsToday) return -1;
+      if (bIsToday && !aIsToday) return 1;
+      
+      // Both are past or both are future: sort descending (newest first)
+      return b.scheduledDate.compareTo(a.scheduledDate);
+    });
 
     print('\n📊 Total Instances Generated: ${instances.length}');
+    print('🔍 First 5 dates after sort: ${instances.take(5).map((i) => '${i.scheduledDate.month}/${i.scheduledDate.day}/${i.scheduledDate.year} (${i.status.name})').join(', ')}');
     print('🔍 ============ END DEBUG ============\n');
 
     return instances;
