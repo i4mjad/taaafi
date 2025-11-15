@@ -1307,7 +1307,6 @@ const Map<String, String> kEn = {
   "delete-follow-up": "Delete Follow up",
   "edit-emotion": "Edit Emotion",
   "no-tasks-for-date": "No tasks for this date",
-  "no-tasks-today": "No tasks for today",
   "no-ongoing-activities": "No ongoing activities",
   "activities-notifications-settings": "Activity Reminders",
   "allow-notifications": "Allow Notifications",
@@ -3660,7 +3659,8 @@ const Map<String, String> kEn = {
   "task-missed": "Missed",
   "task-pending": "Pending",
   "allow-late-completion": "Allow Late Completion",
-  "allow-late-completion-desc": "Users can complete this task after its deadline",
+  "allow-late-completion-desc":
+      "Users can complete this task after its deadline",
   "can-still-complete": "Can Still Complete",
   "flexible": "Flexible",
   "strict": "Strict",

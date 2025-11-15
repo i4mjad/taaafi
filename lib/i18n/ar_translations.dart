@@ -33,7 +33,6 @@ const Map<String, String> kAr = {
   "linked-activities": "التمارين المرتبطة",
   "library": "المكتبة",
   "no-tasks-for-date": "لا توجد مهام في هذا التاريخ",
-  "no-tasks-today": "لا توجد مهام لهذا اليوم",
   "no-ongoing-activities": "لا توجد تمارين حاليا",
   "not-started": "لم يبدأ بعد",
   "extend-activity": "تمديد التمرين",
