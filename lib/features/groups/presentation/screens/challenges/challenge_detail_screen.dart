@@ -223,7 +223,7 @@ class ChallengeDetailScreen extends ConsumerWidget {
                 ),
               ),
               Text(
-                '${userParticipation.earnedPoints} / $totalPoints ${l10n.translate('points')}',
+                '${progressPercent.toStringAsFixed(0)}%',
                 style: TextStyles.h5.copyWith(
                   color: theme.success[700],
                   fontWeight: FontWeight.bold,
@@ -231,7 +231,7 @@ class ChallengeDetailScreen extends ConsumerWidget {
               ),
             ],
           ),
-          verticalSpace(Spacing.points12),
+          verticalSpace(Spacing.points8),
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
             child: LinearProgressIndicator(
@@ -240,6 +240,11 @@ class ChallengeDetailScreen extends ConsumerWidget {
               backgroundColor: theme.grey[200],
               valueColor: AlwaysStoppedAnimation(theme.success[600]!),
             ),
+          ),
+          verticalSpace(Spacing.points8),
+          Text(
+            '$completedTasksCount / $totalTasks ${l10n.translate('tasks')} • ${userParticipation.earnedPoints} ${l10n.translate('points')}',
+            style: TextStyles.small.copyWith(color: theme.grey[700]),
           ),
         ],
       ),
