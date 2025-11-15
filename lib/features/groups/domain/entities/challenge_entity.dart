@@ -7,6 +7,7 @@ class ChallengeEntity {
   final String id;
   final String groupId;
   final String name;
+  final String description;
   final DateTime endDate;
   final String color; // 'yellow', 'coral', 'blue', 'teal'
   final List<ChallengeTaskEntity> tasks;
@@ -27,6 +28,7 @@ class ChallengeEntity {
     required this.id,
     required this.groupId,
     required this.name,
+    this.description = '',
     required this.endDate,
     required this.color,
     this.tasks = const [],
@@ -79,6 +81,7 @@ class ChallengeEntity {
     String? id,
     String? groupId,
     String? name,
+    String? description,
     DateTime? endDate,
     String? color,
     List<ChallengeTaskEntity>? tasks,
@@ -93,6 +96,7 @@ class ChallengeEntity {
       id: id ?? this.id,
       groupId: groupId ?? this.groupId,
       name: name ?? this.name,
+      description: description ?? this.description,
       endDate: endDate ?? this.endDate,
       color: color ?? this.color,
       tasks: tasks ?? this.tasks,

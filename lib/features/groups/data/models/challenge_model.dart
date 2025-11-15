@@ -8,6 +8,7 @@ class ChallengeModel extends ChallengeEntity {
     required super.id,
     required super.groupId,
     required super.name,
+    super.description,
     required super.endDate,
     required super.color,
     super.tasks,
@@ -42,6 +43,7 @@ class ChallengeModel extends ChallengeEntity {
       id: doc.id,
       groupId: data['groupId'] as String,
       name: data['name'] as String,
+      description: data['description'] as String? ?? '',
       endDate: (data['endDate'] as Timestamp).toDate(),
       color: data['color'] as String? ?? 'blue',
       tasks: tasks,
@@ -62,6 +64,7 @@ class ChallengeModel extends ChallengeEntity {
     return {
       'groupId': groupId,
       'name': name,
+      'description': description,
       'endDate': Timestamp.fromDate(endDate),
       'color': color,
       'tasks': tasks
@@ -82,6 +85,7 @@ class ChallengeModel extends ChallengeEntity {
       id: entity.id,
       groupId: entity.groupId,
       name: entity.name,
+      description: entity.description,
       endDate: entity.endDate,
       color: entity.color,
       tasks: entity.tasks,
