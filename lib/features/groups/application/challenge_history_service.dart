@@ -20,6 +20,20 @@ class ChallengeHistoryService {
       challenge.endDate.day,
     );
 
+    // DEBUG: Print key dates
+    print('🔍 ============ TASK HISTORY DEBUG ============');
+    print('📅 Current DateTime: $now');
+    print('📅 Today (normalized): $today');
+    print('📅 Challenge End Date: $endDate');
+    print('📅 User Joined At: ${participation.joinedAt}');
+    print('📅 Challenge Created At: ${challenge.createdAt}');
+    print('📋 Total Tasks: ${challenge.tasks.length}');
+    print('✅ Total Completions: ${participation.taskCompletions.length}');
+    participation.taskCompletions.forEach((c) {
+      print('   - Task ${c.taskId}: completed at ${c.completedAt}');
+    });
+    print('==========================================\n');
+
     for (final task in challenge.tasks) {
       // For one-time tasks, use challenge start date (createdAt)
       // For daily/weekly, use join date
@@ -40,11 +54,25 @@ class ChallengeHistoryService {
         endDate,
       );
       
+      print('🔸 Task: "${task.name}" (${task.frequency.name})');
+      print('   Start: $normalizedStartDate');
+      print('   Generated ${taskDates.length} dates');
+      if (taskDates.length <= 10) {
+        print('   Dates: ${taskDates.map((d) => '${d.month}/${d.day}').join(', ')}');
+      } else {
+        print('   First 5: ${taskDates.take(5).map((d) => '${d.month}/${d.day}').join(', ')}...');
+        print('   Last 5: ${taskDates.skip(taskDates.length - 5).map((d) => '${d.month}/${d.day}').join(', ')}');
+      }
+      print('   Today (${today.month}/${today.day}) in dates? ${taskDates.any((d) => _isSameDay(d, today))}');
+      
       // Debug: Ensure today is included for daily/weekly tasks if it's in range
       if (task.frequency != TaskFrequency.oneTime) {
-        if ((today.isAfter(normalizedStartDate) || _isSameDay(today, normalizedStartDate)) &&
-            (today.isBefore(endDate) || _isSameDay(today, endDate))) {
+        final shouldIncludeToday = (today.isAfter(normalizedStartDate) || _isSameDay(today, normalizedStartDate)) &&
+            (today.isBefore(endDate) || _isSameDay(today, endDate));
+        print('   Should include today? $shouldIncludeToday');
+        if (shouldIncludeToday) {
           if (!taskDates.any((d) => _isSameDay(d, today))) {
+            print('   ⚠️  Adding today manually!');
             taskDates.add(today);
           }
         }
@@ -83,6 +111,9 @@ class ChallengeHistoryService {
 
     // Sort by date descending (newest first)
     instances.sort((a, b) => b.scheduledDate.compareTo(a.scheduledDate));
+
+    print('\n📊 Total Instances Generated: ${instances.length}');
+    print('🔍 ============ END DEBUG ============\n');
 
     return instances;
   }
