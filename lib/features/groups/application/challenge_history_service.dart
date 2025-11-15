@@ -109,7 +109,8 @@ class ChallengeHistoryService {
       }
     }
 
-    // Sort by date: today first, then past (descending), then future (ascending)
+    // Sort by date: Show today at top, then descending (past first, then future)
+    // Order: Today → Yesterday → 2 days ago → ... → Tomorrow → Day after
     instances.sort((a, b) {
       final aIsToday = _isSameDay(a.scheduledDate, today);
       final bIsToday = _isSameDay(b.scheduledDate, today);
@@ -118,8 +119,20 @@ class ChallengeHistoryService {
       if (aIsToday && !bIsToday) return -1;
       if (bIsToday && !aIsToday) return 1;
       
-      // Both are past or both are future: sort descending (newest first)
-      return b.scheduledDate.compareTo(a.scheduledDate);
+      // For non-today tasks:
+      // - Past tasks: closer to today first (descending)
+      // - Future tasks: appear after past tasks (descending)
+      // This naturally sorts as: today, yesterday, 2 days ago, ..., tomorrow, day after
+      final aIsPast = a.scheduledDate.isBefore(today);
+      final bIsPast = b.scheduledDate.isBefore(today);
+      
+      // Both past or both future: descending (most recent first)
+      if (aIsPast == bIsPast) {
+        return b.scheduledDate.compareTo(a.scheduledDate);
+      }
+      
+      // Past tasks come before future tasks
+      return aIsPast ? -1 : 1;
     });
 
     print('\n📊 Total Instances Generated: ${instances.length}');
