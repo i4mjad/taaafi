@@ -75,21 +75,40 @@ class ChallengeHistoryService {
     final dates = <DateTime>[];
     final start = DateTime(startDate.year, startDate.month, startDate.day);
     final end = DateTime(endDate.year, endDate.month, endDate.day);
+    final today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
 
     switch (frequency) {
       case TaskFrequency.daily:
         DateTime current = start;
-        while (current.isBefore(end) || current.isAtSameMomentAs(end)) {
-          dates.add(current);
+        // Generate all dates from start to end (inclusive)
+        while (!current.isAfter(end)) {
+          dates.add(DateTime(current.year, current.month, current.day));
           current = current.add(const Duration(days: 1));
+        }
+        // Explicitly ensure today is included if within range
+        if ((_isSameDay(today, start) || today.isAfter(start)) && 
+            (today.isBefore(end) || _isSameDay(today, end))) {
+          if (!dates.any((d) => _isSameDay(d, today))) {
+            dates.add(today);
+          }
         }
         break;
 
       case TaskFrequency.weekly:
         DateTime current = start; // Start from join date, not 7 days later!
-        while (current.isBefore(end) || current.isAtSameMomentAs(end)) {
-          dates.add(current);
+        // Generate all weekly dates from start to end (inclusive)
+        while (!current.isAfter(end)) {
+          dates.add(DateTime(current.year, current.month, current.day));
           current = current.add(const Duration(days: 7));
+        }
+        // For weekly tasks, ensure today is included if it matches the pattern
+        // Check if today is on the same weekday and within range
+        final daysSinceStart = today.difference(start).inDays;
+        if (daysSinceStart >= 0 && daysSinceStart % 7 == 0 && 
+            (today.isBefore(end) || _isSameDay(today, end))) {
+          if (!dates.any((d) => _isSameDay(d, today))) {
+            dates.add(today);
+          }
         }
         break;
 
@@ -98,6 +117,8 @@ class ChallengeHistoryService {
         break;
     }
 
+    // Sort dates to ensure proper order
+    dates.sort();
     return dates;
   }
 
