@@ -39,10 +39,18 @@ class ChallengeParticipationEntity {
     this.rank,
   });
 
-  /// Get progress as a percentage (0-100)
-  double getProgressPercentage(int totalPossiblePoints) {
-    if (totalPossiblePoints == 0) return 0.0;
-    final percentage = (earnedPoints / totalPossiblePoints) * 100;
+  /// Get progress as a percentage (0-100) based on task completion
+  /// This measures discipline/commitment, not points
+  double getProgressPercentage(int totalTasks) {
+    if (totalTasks == 0) return 0.0;
+    
+    // Count unique tasks completed (regardless of how many times)
+    final uniqueTasksCompleted = taskCompletions
+        .map((c) => c.taskId)
+        .toSet()
+        .length;
+    
+    final percentage = (uniqueTasksCompleted / totalTasks) * 100;
     return percentage > 100 ? 100.0 : percentage;
   }
 
