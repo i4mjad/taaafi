@@ -216,7 +216,8 @@ Future<List<ChallengeTaskInstance>> groupTodayTasks(
   final challenges = await ref.watch(activeChallengesProvider(groupId).future);
   
   final todayTasks = <ChallengeTaskInstance>[];
-  final today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+  final now = DateTime.now();
+  final today = DateTime(now.year, now.month, now.day);
   
   // For each challenge, get the user's task instances and filter for today
   for (final challenge in challenges) {
@@ -234,8 +235,16 @@ Future<List<ChallengeTaskInstance>> groupTodayTasks(
       participation: participation,
     );
     
-    // Filter for today's tasks only
+    // Filter for today's tasks
     final todayInstances = instances.where((instance) {
+      // For one-time tasks: show if not completed and today is within the challenge period
+      if (instance.task.frequency == TaskFrequency.oneTime) {
+        return instance.status != TaskInstanceStatus.completed &&
+            !today.isBefore(instance.scheduledDate) &&
+            !today.isAfter(DateTime(challenge.endDate.year, challenge.endDate.month, challenge.endDate.day));
+      }
+      
+      // For daily/weekly tasks: show only if scheduled for today
       return instance.scheduledDate.year == today.year &&
           instance.scheduledDate.month == today.month &&
           instance.scheduledDate.day == today.day;
