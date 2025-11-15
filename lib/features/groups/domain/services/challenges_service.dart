@@ -218,6 +218,7 @@ class ChallengesService {
     required String cpId,
     required String taskId,
     required int pointsEarned,
+    required TaskFrequency taskFrequency,
   }) async {
     try {
       // Get participation
@@ -233,11 +234,23 @@ class ChallengesService {
         );
       }
 
-      // Check if task already completed
-      if (participation.hasCompletedTask(taskId)) {
-        return const UpdateProgressResult.failure(
+      // Check if task can be completed based on frequency
+      if (!participation.canCompleteTask(taskId, taskFrequency)) {
+        String errorMessage;
+        switch (taskFrequency) {
+          case TaskFrequency.daily:
+            errorMessage = 'Task already completed today';
+            break;
+          case TaskFrequency.weekly:
+            errorMessage = 'Task already completed this week';
+            break;
+          case TaskFrequency.oneTime:
+            errorMessage = 'Task already completed';
+            break;
+        }
+        return UpdateProgressResult.failure(
           UpdateProgressError.invalidValue,
-          'Task already completed',
+          errorMessage,
         );
       }
 
