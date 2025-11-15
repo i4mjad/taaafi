@@ -175,8 +175,8 @@ class ChallengeDetailNotifier extends _$ChallengeDetailNotifier {
     }
   }
 
-  /// Update progress
-  Future<void> updateProgress(int newValue, {String? note}) async {
+  /// Complete a task
+  Future<void> completeTask(String taskId, int points) async {
     final currentState = await future;
     if (currentState.challenge == null) return;
 
@@ -189,21 +189,18 @@ class ChallengeDetailNotifier extends _$ChallengeDetailNotifier {
 
     try {
       final service = ref.read(challengesServiceProvider);
-      final result = await service.updateProgress(
+      final result = await service.completeTask(
         challengeId: currentState.challenge!.id,
         cpId: profile.id,
-        newValue: newValue,
-        note: note,
+        taskId: taskId,
+        pointsEarned: points,
       );
 
       if (result.success) {
         // Refresh state
         ref.invalidateSelf();
 
-        String message = 'Progress updated!';
-        if (result.milestoneReached != null) {
-          message = 'Milestone reached: ${result.milestoneReached}%!';
-        }
+        String message = 'Task completed! +$points points';
         if (result.isCompleted) {
           message = 'Challenge completed! 🎉';
         }
@@ -215,7 +212,7 @@ class ChallengeDetailNotifier extends _$ChallengeDetailNotifier {
       } else {
         state = AsyncValue.data(currentState.copyWith(
           isLoading: false,
-          error: result.errorMessage ?? 'Failed to update progress',
+          error: result.errorMessage ?? 'Failed to complete task',
         ));
       }
     } catch (e) {
