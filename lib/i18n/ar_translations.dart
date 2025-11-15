@@ -3576,7 +3576,8 @@ const Map<String, String> kAr = {
   'task-history': 'سجل المهام',
   'view-task-history': 'عرض الكل',
   'no-task-history': 'لا يوجد سجل مهام بعد',
-  'missed': 'فائت',
+  'task-missed': 'فائت',
+  'task-pending': 'معلق',
 
   // Challenge List - قائمة التحديات
   'upcoming': 'قادم',
