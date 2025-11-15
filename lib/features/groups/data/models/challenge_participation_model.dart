@@ -7,18 +7,13 @@ class ChallengeParticipationModel extends ChallengeParticipationEntity {
     required super.challengeId,
     required super.cpId,
     required super.groupId,
-    super.progress,
-    super.currentValue,
-    required super.goalValue,
+    super.earnedPoints,
+    super.completedTaskIds,
     super.status,
     super.completedAt,
     required super.joinedAt,
     required super.lastUpdateAt,
-    super.dailyLog,
-    super.streakCount,
-    super.longestStreak,
     super.rank,
-    super.points,
   });
 
   /// Create from Firestore document
@@ -26,23 +21,15 @@ class ChallengeParticipationModel extends ChallengeParticipationEntity {
       DocumentSnapshot<Map<String, dynamic>> doc) {
     final data = doc.data()!;
 
-    // Handle dailyLog conversion
-    List<DateTime> dailyLog = [];
-    if (data['dailyLog'] != null) {
-      final logData = data['dailyLog'] as List;
-      dailyLog = logData
-          .map((timestamp) => (timestamp as Timestamp).toDate())
-          .toList();
-    }
-
     return ChallengeParticipationModel(
       id: doc.id,
       challengeId: data['challengeId'] as String,
       cpId: data['cpId'] as String,
       groupId: data['groupId'] as String,
-      progress: data['progress'] as int? ?? 0,
-      currentValue: data['currentValue'] as int? ?? 0,
-      goalValue: data['goalValue'] as int,
+      earnedPoints: data['earnedPoints'] as int? ?? 0,
+      completedTaskIds: data['completedTaskIds'] != null
+          ? List<String>.from(data['completedTaskIds'] as List)
+          : [],
       status: ParticipationStatusExtension.fromFirestore(
           data['status'] as String),
       completedAt: data['completedAt'] != null
@@ -50,11 +37,7 @@ class ChallengeParticipationModel extends ChallengeParticipationEntity {
           : null,
       joinedAt: (data['joinedAt'] as Timestamp).toDate(),
       lastUpdateAt: (data['lastUpdateAt'] as Timestamp).toDate(),
-      dailyLog: dailyLog,
-      streakCount: data['streakCount'] as int? ?? 0,
-      longestStreak: data['longestStreak'] as int? ?? 0,
       rank: data['rank'] as int?,
-      points: data['points'] as int? ?? 0,
     );
   }
 
@@ -64,19 +47,14 @@ class ChallengeParticipationModel extends ChallengeParticipationEntity {
       'challengeId': challengeId,
       'cpId': cpId,
       'groupId': groupId,
-      'progress': progress,
-      'currentValue': currentValue,
-      'goalValue': goalValue,
+      'earnedPoints': earnedPoints,
+      'completedTaskIds': completedTaskIds,
       'status': status.toFirestore(),
       'completedAt':
           completedAt != null ? Timestamp.fromDate(completedAt!) : null,
       'joinedAt': Timestamp.fromDate(joinedAt),
       'lastUpdateAt': Timestamp.fromDate(lastUpdateAt),
-      'dailyLog': dailyLog.map((date) => Timestamp.fromDate(date)).toList(),
-      'streakCount': streakCount,
-      'longestStreak': longestStreak,
       'rank': rank,
-      'points': points,
     };
   }
 
@@ -88,18 +66,13 @@ class ChallengeParticipationModel extends ChallengeParticipationEntity {
       challengeId: entity.challengeId,
       cpId: entity.cpId,
       groupId: entity.groupId,
-      progress: entity.progress,
-      currentValue: entity.currentValue,
-      goalValue: entity.goalValue,
+      earnedPoints: entity.earnedPoints,
+      completedTaskIds: entity.completedTaskIds,
       status: entity.status,
       completedAt: entity.completedAt,
       joinedAt: entity.joinedAt,
       lastUpdateAt: entity.lastUpdateAt,
-      dailyLog: entity.dailyLog,
-      streakCount: entity.streakCount,
-      longestStreak: entity.longestStreak,
       rank: entity.rank,
-      points: entity.points,
     );
   }
 
