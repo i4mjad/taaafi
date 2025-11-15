@@ -263,12 +263,36 @@ class ChallengeDetailScreen extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            l10n.translate('tasks'),
-            style: TextStyles.h6.copyWith(
-              color: theme.grey[900],
-              fontWeight: FontWeight.bold,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                l10n.translate('tasks'),
+                style: TextStyles.h6.copyWith(
+                  color: theme.grey[900],
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              if (userParticipation != null)
+                GestureDetector(
+                  onTap: () {
+                    context.pushNamed(
+                      RouteNames.challengeHistory.name,
+                      pathParameters: {
+                        'groupId': groupId,
+                        'challengeId': challengeId,
+                      },
+                    );
+                  },
+                  child: Text(
+                    l10n.translate('view-all'),
+                    style: TextStyles.small.copyWith(
+                      color: theme.primary[600],
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+            ],
           ),
           verticalSpace(Spacing.points16),
           ...challenge.tasks.asMap().entries.map((entry) {
