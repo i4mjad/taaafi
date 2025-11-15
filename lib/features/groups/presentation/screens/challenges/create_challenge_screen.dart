@@ -109,6 +109,30 @@ class _CreateChallengeScreenState extends ConsumerState<CreateChallengeScreen> {
 
                   verticalSpace(Spacing.points16),
 
+                  // Challenge Description
+                  _buildSectionLabel(theme, l10n, 'description'),
+                  WidgetsContainer(
+                    backgroundColor: theme.backgroundColor,
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(color: theme.grey[800]!, width: 1),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: TextField(
+                      controller: _descriptionController,
+                      onChanged: (value) {
+                        ref.read(challengeCreationNotifierProvider.notifier).setDescription(value);
+                      },
+                      maxLines: 3,
+                      decoration: InputDecoration(
+                        hintText: l10n.translate('challenge-description-hint'),
+                        hintStyle: TextStyles.caption.copyWith(color: theme.grey[600]),
+                        border: InputBorder.none,
+                      ),
+                      style: TextStyles.caption,
+                    ),
+                  ),
+
+                  verticalSpace(Spacing.points16),
+
                   // End Date
                   _buildSectionLabel(theme, l10n, 'challenge-end-date'),
                   PlatformDatePicker(
