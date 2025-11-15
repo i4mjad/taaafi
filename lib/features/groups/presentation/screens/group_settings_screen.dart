@@ -261,7 +261,6 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
   }
 
   void _navigateToPrivacySettings(BuildContext context) {
-    // TODO: Add GoRouter route for group privacy settings
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => const GroupPrivacySettingsScreen(),

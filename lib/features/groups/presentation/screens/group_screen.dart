@@ -10,6 +10,7 @@ import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
+import 'package:reboot_app_3/features/groups/presentation/widgets/group_overview_card.dart';
 import 'package:reboot_app_3/features/groups/providers/group_membership_provider.dart';
 import 'package:reboot_app_3/features/groups/application/challenges_providers.dart';
 import 'package:reboot_app_3/features/groups/domain/entities/challenge_task_instance.dart';
@@ -93,22 +94,15 @@ class GroupScreen extends ConsumerWidget {
           body: SingleChildScrollView(
             padding: const EdgeInsets.only(bottom: 20), // Add bottom padding
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Descriptive section about groups feature
                 _buildDescriptiveSection(context, theme, l10n, membership),
 
-                // Group header (commented for later use)
-                // _buildGroupHeader(context, theme, l10n, membership),
-
-                // Content (commented for later use)
-                // Expanded(
-                //   child: _buildContent(context, theme, l10n),
-                // ),
-
                 // Today Tasks section
-                _buildTodayTasksSection(context, ref, theme, l10n, membership.group.id),
-
-                const SizedBox(height: 16),
+                _buildTodayTasksSection(
+                    context, ref, theme, l10n, membership.group.id),
 
                 // Bottom sections
                 _buildBottomSections(context, theme, l10n, membership.group.id),
@@ -256,34 +250,8 @@ class GroupScreen extends ConsumerWidget {
   Widget _buildDescriptiveSection(BuildContext context, CustomThemeData theme,
       AppLocalizations l10n, GroupMembership membership) {
     return Padding(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // Group name as title
-          Text(
-            membership.group.name,
-            style: TextStyles.h4.copyWith(
-              color: theme.grey[900],
-              fontWeight: FontWeight.bold,
-            ),
-            textAlign: TextAlign.center,
-          ),
-
-          const SizedBox(height: 16),
-
-          // Description
-          Text(
-            l10n.translate('groups-feature-description'),
-            style: TextStyles.body.copyWith(
-              color: theme.grey[700],
-              height: 1.5,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
+        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8),
+        child: const GroupOverviewCard(isInMainScreen: true));
   }
 
   Widget _buildTodayTasksSection(
@@ -296,42 +264,43 @@ class GroupScreen extends ConsumerWidget {
     final todayTasksAsync = ref.watch(groupTodayTasksProvider(groupId));
 
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             l10n.translate('your-tasks-today'),
-            style: TextStyles.h5.copyWith(
+            style: TextStyles.h6.copyWith(
               color: theme.grey[900],
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 8),
           todayTasksAsync.when(
             data: (tasks) {
               if (tasks.isEmpty) {
-                return WidgetsContainer(
-                  backgroundColor: theme.grey[50],
-                  borderSide: BorderSide(
-                    color: theme.grey[200]!,
-                    width: 1,
-                  ),
-                  child: Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(24),
-                      child: Text(
-                        l10n.translate('no-tasks-today'),
-                        style: TextStyles.body.copyWith(
-                          color: theme.grey[600],
+                return Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      children: [
+                        Text(
+                          "❤️‍🩹",
+                          style: TextStyle(fontSize: 48),
                         ),
-                        textAlign: TextAlign.center,
-                      ),
+                        Text(
+                          l10n.translate('no-tasks-today'),
+                          style: TextStyles.body.copyWith(
+                            color: theme.grey[600],
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
                     ),
                   ),
                 );
               }
-              
+
               return Column(
                 children: tasks.asMap().entries.map((entry) {
                   final index = entry.key;
@@ -387,23 +356,25 @@ class GroupScreen extends ConsumerWidget {
   ) {
     final task = taskInstance.task;
     final isCompleted = taskInstance.status == TaskInstanceStatus.completed;
-    
+
     // Calculate time remaining until end of day
     final now = DateTime.now();
     final endOfDay = DateTime(now.year, now.month, now.day, 23, 59, 59);
     final timeRemaining = endOfDay.difference(now);
-    
+
     String timeRemainingText;
     Color timeRemainingColor;
-    
+
     if (isCompleted) {
       timeRemainingText = '✓ ${l10n.translate('completed')}';
       timeRemainingColor = theme.success[600]!;
     } else if (timeRemaining.inHours > 0) {
-      timeRemainingText = '${timeRemaining.inHours} ${l10n.translate('hours-left')}';
+      timeRemainingText =
+          '${timeRemaining.inHours} ${l10n.translate('hours-left')}';
       timeRemainingColor = theme.warn[600]!;
     } else if (timeRemaining.inMinutes > 0) {
-      timeRemainingText = '${timeRemaining.inMinutes} ${l10n.translate('minutes-left')}';
+      timeRemainingText =
+          '${timeRemaining.inMinutes} ${l10n.translate('minutes-left')}';
       timeRemainingColor = theme.error[600]!;
     } else {
       timeRemainingText = l10n.translate('task-expired');
@@ -476,16 +447,17 @@ class GroupScreen extends ConsumerWidget {
 
                 // Checkbox
                 GestureDetector(
-                  onTap: isCompleted ? null : () {
-                    _completeTodayTask(ref, taskInstance, groupId);
-                  },
+                  onTap: isCompleted
+                      ? null
+                      : () {
+                          _completeTodayTask(ref, taskInstance, groupId);
+                        },
                   child: Container(
                     width: 24,
                     height: 24,
                     decoration: BoxDecoration(
-                      color: isCompleted
-                          ? theme.success[500]
-                          : Colors.transparent,
+                      color:
+                          isCompleted ? theme.success[500] : Colors.transparent,
                       border: Border.all(
                         color: isCompleted
                             ? theme.success[500]!
@@ -511,20 +483,23 @@ class GroupScreen extends ConsumerWidget {
     );
   }
 
-  void _completeTodayTask(WidgetRef ref, ChallengeTaskInstance taskInstance, String groupId) {
+  void _completeTodayTask(
+      WidgetRef ref, ChallengeTaskInstance taskInstance, String groupId) {
     // We need to find the challenge ID from the task instance
     final challengesAsync = ref.read(activeChallengesProvider(groupId));
-    
+
     challengesAsync.whenData((challenges) {
       // Find the challenge that contains this task
       for (final challenge in challenges) {
         if (challenge.tasks.any((t) => t.id == taskInstance.task.id)) {
           // Found the challenge, complete the task
-          ref.read(challengeDetailNotifierProvider(challenge.id).notifier).completeTask(
-            taskInstance.task.id,
-            taskInstance.task.points,
-            taskInstance.task.frequency,
-          );
+          ref
+              .read(challengeDetailNotifierProvider(challenge.id).notifier)
+              .completeTask(
+                taskInstance.task.id,
+                taskInstance.task.points,
+                taskInstance.task.frequency,
+              );
           break;
         }
       }

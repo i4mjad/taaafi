@@ -151,9 +151,35 @@ class _AdminSettingsSheetState extends ConsumerState<AdminSettingsSheet> {
         // Use actual member count from state (fetched via provider)
         final currentMemberCount = state.actualMemberCount ?? state.group!.memberCount;
         final isUserPlus = state.isUserPlus;
-        final maxCapacity = isUserPlus ? 50.0 : 6.0;
+        
+        // Calculate max capacity based on subscription status
+        // If user has Plus: can go up to 50
+        // If user doesn't have Plus but current capacity > 6: can only maintain or decrease (not increase)
+        // If user doesn't have Plus and capacity <= 6: can adjust up to 6
+        final double maxCapacity;
+        if (isUserPlus) {
+          maxCapacity = 50.0;
+        } else if (state.group!.memberCapacity > 6) {
+          // User previously had Plus but cancelled - allow them to manage current capacity
+          // but not increase it beyond what they already have
+          maxCapacity = state.group!.memberCapacity.toDouble();
+        } else {
+          maxCapacity = 6.0;
+        }
 
+        // Calculate the actual minimum capacity (greater of 2 or current member count)
+        final minCapacity = currentMemberCount < 2 ? 2 : currentMemberCount;
+        
+        // Initialize selected capacity and ensure it's within valid bounds
         _selectedCapacity ??= state.group!.memberCapacity;
+        
+        // Clamp the value to ensure it's between minCapacity and maxCapacity
+        if (_selectedCapacity! < minCapacity) {
+          _selectedCapacity = minCapacity;
+        }
+        if (_selectedCapacity! > maxCapacity) {
+          _selectedCapacity = maxCapacity.toInt();
+        }
 
         return Container(
           decoration: BoxDecoration(
@@ -344,11 +370,12 @@ class _AdminSettingsSheetState extends ConsumerState<AdminSettingsSheet> {
                         verticalSpace(Spacing.points20),
 
                         // Capacity Slider
+                        // Minimum is the greater of 2 or current member count
                         PlatformSlider(
                           value: _selectedCapacity!.toDouble(),
-                          min: currentMemberCount.toDouble(),
+                          min: minCapacity.toDouble(),
                           max: maxCapacity,
-                          divisions: (maxCapacity - currentMemberCount).toInt(),
+                          divisions: (maxCapacity - minCapacity).toInt(),
                           label: l10n.translate('new-capacity'),
                           valueFormatter: (value) => '${value.toInt()} ${l10n.translate('members')}',
                           showValue: true,
@@ -364,7 +391,7 @@ class _AdminSettingsSheetState extends ConsumerState<AdminSettingsSheet> {
                           inactiveColor: theme.grey[300],
                         ),
 
-                        // Plus warning/info
+                        // Plus status info banners
                         if (_selectedCapacity! > 6 && isUserPlus)
                           Padding(
                             padding: const EdgeInsets.only(top: 12),
@@ -377,7 +404,21 @@ class _AdminSettingsSheetState extends ConsumerState<AdminSettingsSheet> {
                             ),
                           ),
 
-                        if (!isUserPlus && _selectedCapacity! >= 6)
+                        // User cancelled Plus but still has capacity > 6
+                        if (!isUserPlus && state.group!.memberCapacity > 6)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 12),
+                            child: _buildInfoBanner(
+                              l10n.translate('subscription-cancelled-capacity-locked'),
+                              LucideIcons.alertCircle,
+                              theme.warn[50]!,
+                              theme.warn[600]!,
+                              theme.warn[700]!,
+                            ),
+                          ),
+
+                        // Regular user trying to increase capacity
+                        if (!isUserPlus && _selectedCapacity! >= 6 && state.group!.memberCapacity <= 6)
                           Padding(
                             padding: const EdgeInsets.only(top: 12),
                             child: _buildInfoBanner(

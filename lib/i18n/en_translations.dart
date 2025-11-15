@@ -1887,6 +1887,8 @@ const Map<String, String> kEn = {
   "upgrade-to-plus-for-capacity":
       "Upgrade to Plus to increase capacity beyond 6 members",
   "plus-feature-active": "Plus feature active - capacity up to 50 members",
+  "subscription-cancelled-capacity-locked":
+      "Your Plus subscription has been cancelled. You can maintain or decrease capacity, but cannot increase it beyond the current limit.",
   "manage-group-settings": "Manage group name, description, and capacity",
   "new-capacity": "New Capacity",
   "capacity-warning":
@@ -2284,7 +2286,7 @@ const Map<String, String> kEn = {
   // Leaderboard
   "leaderboard": "Leaderboard",
   "my_tasks": "My Tasks",
-  "your-tasks-today": "Your Tasks for today 🔥",
+  "your-tasks-today": "🔥 Your Tasks for today",
   "hours-left": "hours left",
   "minutes-left": "minutes left",
   "task-expired": "Task expired",
