@@ -341,42 +341,45 @@ class ChallengeDetailScreen extends ConsumerWidget {
   ) {
     final frequencyLabel = _getFrequencyLabel(l10n, task.frequency);
 
+    final isParticipating = canComplete || isCompleted;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       child: Row(
         children: [
-          // Checkbox
-          GestureDetector(
-            onTap: canComplete
-                ? () {
-                    ref
-                        .read(challengeDetailNotifierProvider(challengeId)
-                            .notifier)
-                        .completeTask(task.id, task.points, task.frequency);
-                  }
-                : null,
-            child: Container(
-              width: 28,
-              height: 28,
-              decoration: BoxDecoration(
-                color: isCompleted ? theme.success[600] : theme.backgroundColor,
-                borderRadius: BorderRadius.circular(6),
-                border: Border.all(
-                  color: isCompleted ? theme.success[600]! : theme.grey[400]!,
-                  width: 2,
-                ),
-              ),
-              child: isCompleted
-                  ? const Icon(
-                      Icons.check,
-                      color: Colors.white,
-                      size: 20,
-                    )
+          // Checkbox (only for participants)
+          if (isParticipating)
+            GestureDetector(
+              onTap: canComplete
+                  ? () {
+                      ref
+                          .read(challengeDetailNotifierProvider(challengeId)
+                              .notifier)
+                          .completeTask(task.id, task.points, task.frequency);
+                    }
                   : null,
+              child: Container(
+                width: 28,
+                height: 28,
+                decoration: BoxDecoration(
+                  color: isCompleted ? theme.success[600] : theme.backgroundColor,
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(
+                    color: isCompleted ? theme.success[600]! : theme.grey[400]!,
+                    width: 2,
+                  ),
+                ),
+                child: isCompleted
+                    ? const Icon(
+                        Icons.check,
+                        color: Colors.white,
+                        size: 20,
+                      )
+                    : null,
+              ),
             ),
-          ),
 
-          const SizedBox(width: 12),
+          if (isParticipating) const SizedBox(width: 12),
 
           // Task info
           Expanded(
