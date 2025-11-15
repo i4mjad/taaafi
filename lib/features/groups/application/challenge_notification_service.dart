@@ -9,7 +9,7 @@ class ChallengeNotificationService {
 
   const ChallengeNotificationService(this._repository);
 
-  /// Send daily reminder to update progress
+  /// Send daily reminder to complete tasks
   ///
   /// Should be called by a scheduled notification or Cloud Function
   Future<void> sendDailyReminder({
@@ -23,14 +23,13 @@ class ChallengeNotificationService {
       );
 
       if (participation == null) return;
-      if (participation.hasUpdatedToday()) return;
 
       // TODO: Integrate with your notification service
       // Example:
       // await notificationService.sendNotification(
       //   userId: cpId,
       //   title: 'Challenge Reminder',
-      //   body: 'Don\'t forget to update your progress today!',
+      //   body: 'Don\'t forget to complete your tasks today!',
       // );
 
       log('Daily reminder sent for challenge $challengeId to user $cpId');

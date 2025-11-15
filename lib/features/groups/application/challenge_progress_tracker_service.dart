@@ -12,45 +12,16 @@ class ChallengeProgressTrackerService {
 
   /// Track when a user sends a message
   ///
-  /// Updates progress for challenges with goalType = 'messages'
+  /// In task-based system, this can be used to auto-complete specific tasks
+  /// For now, this is a placeholder for future auto-tracking
   Future<void> trackMessageSent({
     required String cpId,
     required String groupId,
   }) async {
     try {
-      // Get user's active challenges
-      final participations = await _repository.getUserActiveChallenges(cpId);
-
-      for (final participation in participations) {
-        // Get the challenge details
-        final challenge =
-            await _repository.getChallengeById(participation.challengeId);
-
-        if (challenge == null) continue;
-        if (challenge.groupId != groupId) continue;
-
-        // Only update for message-based challenges
-        if (challenge.goalType == GoalType.messages) {
-          final newValue = participation.currentValue + 1;
-          final newProgress =
-              ((newValue / participation.goalValue) * 100).round();
-
-          await _repository.updateProgress(
-            challengeId: participation.challengeId,
-            cpId: cpId,
-            newCurrentValue: newValue,
-            newProgress: newProgress,
-          );
-
-          // Auto-complete if reached goal
-          if (newProgress >= 100) {
-            await _repository.completeParticipation(
-              challengeId: participation.challengeId,
-              cpId: cpId,
-            );
-          }
-        }
-      }
+      // TODO: Implement auto-tracking for message-based tasks
+      // This would check for tasks like "Send X messages" and auto-complete them
+      log('trackMessageSent: Auto-tracking not yet implemented for task-based system');
     } catch (e, stackTrace) {
       log('Error in trackMessageSent: $e', stackTrace: stackTrace);
     }
@@ -58,54 +29,14 @@ class ChallengeProgressTrackerService {
 
   /// Track daily activity
   ///
-  /// Updates progress for challenges with goalType = 'daysActive'
+  /// In task-based system, can auto-complete daily tasks
+  /// For now, this is a placeholder
   Future<void> trackDailyActivity({
     required String cpId,
   }) async {
     try {
-      // Get user's active challenges
-      final participations = await _repository.getUserActiveChallenges(cpId);
-
-      for (final participation in participations) {
-        // Get the challenge details
-        final challenge =
-            await _repository.getChallengeById(participation.challengeId);
-
-        if (challenge == null) continue;
-
-        // Only update for days-active challenges
-        if (challenge.goalType == GoalType.daysActive ||
-            challenge.type == ChallengeType.duration) {
-          // Check if already updated today
-          if (!participation.hasUpdatedToday()) {
-            // Record daily activity
-            await _repository.recordDailyActivity(
-              challengeId: participation.challengeId,
-              cpId: cpId,
-            );
-
-            // Update progress
-            final newValue = participation.dailyLog.length + 1;
-            final newProgress =
-                ((newValue / participation.goalValue) * 100).round();
-
-            await _repository.updateProgress(
-              challengeId: participation.challengeId,
-              cpId: cpId,
-              newCurrentValue: newValue,
-              newProgress: newProgress,
-            );
-
-            // Auto-complete if reached goal
-            if (newProgress >= 100) {
-              await _repository.completeParticipation(
-                challengeId: participation.challengeId,
-                cpId: cpId,
-              );
-            }
-          }
-        }
-      }
+      // TODO: Implement auto-tracking for daily tasks
+      log('trackDailyActivity: Auto-tracking not yet implemented for task-based system');
     } catch (e, stackTrace) {
       log('Error in trackDailyActivity: $e', stackTrace: stackTrace);
     }
