@@ -3581,6 +3581,8 @@ const Map<String, String> kAr = {
   'allow-late-completion': 'السماح بالإكمال المتأخر',
   'allow-late-completion-desc': 'يمكن للمستخدمين إكمال هذه المهمة بعد موعدها',
   'can-still-complete': 'يمكن إكماله',
+  'flexible': 'مرن',
+  'strict': 'صارم',
 
   // Challenge List - قائمة التحديات
   'upcoming': 'قادم',

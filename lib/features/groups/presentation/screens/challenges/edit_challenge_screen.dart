@@ -267,9 +267,31 @@ class _EditChallengeScreenState extends ConsumerState<EditChallengeScreen> {
                       style: TextStyles.body.copyWith(color: theme.grey[900]),
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      '$frequencyLabel • ${task.points} ${l10n.translate('points')}',
-                      style: TextStyles.caption.copyWith(color: theme.grey[600]),
+                    Row(
+                      children: [
+                        Text(
+                          '$frequencyLabel • ${task.points} ${l10n.translate('points')}',
+                          style: TextStyles.caption.copyWith(color: theme.grey[600]),
+                        ),
+                        if (task.allowRetroactiveCompletion) ...[
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: theme.success[100],
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              l10n.translate('flexible'),
+                              style: TextStyles.caption.copyWith(
+                                color: theme.success[700],
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
                   ],
                 ),
