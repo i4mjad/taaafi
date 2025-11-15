@@ -12,7 +12,8 @@ class ChallengeParticipationEntity {
 
   // Points & Progress
   final int earnedPoints; // Total points earned from completed tasks
-  final List<TaskCompletionRecord> taskCompletions; // All task completions with timestamps
+  final List<TaskCompletionRecord>
+      taskCompletions; // All task completions with timestamps
 
   // Status
   final ParticipationStatus status;
@@ -43,13 +44,11 @@ class ChallengeParticipationEntity {
   /// This measures discipline/commitment, not points
   double getProgressPercentage(int totalTasks) {
     if (totalTasks == 0) return 0.0;
-    
+
     // Count unique tasks completed (regardless of how many times)
-    final uniqueTasksCompleted = taskCompletions
-        .map((c) => c.taskId)
-        .toSet()
-        .length;
-    
+    final uniqueTasksCompleted =
+        taskCompletions.map((c) => c.taskId).toSet().length;
+
     final percentage = (uniqueTasksCompleted / totalTasks) * 100;
     return percentage > 100 ? 100.0 : percentage;
   }
@@ -154,4 +153,3 @@ extension ParticipationStatusExtension on ParticipationStatus {
     }
   }
 }
-
