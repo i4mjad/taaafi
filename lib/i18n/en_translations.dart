@@ -3652,8 +3652,8 @@ const Map<String, String> kEn = {
   "task-history": "Task History",
   "view-task-history": "View All",
   "no-task-history": "No task history yet",
-  "missed": "Missed",
-  "pending": "Pending",
+  "task-missed": "Missed",
+  "task-pending": "Pending",
 
   // Challenge List
   "upcoming": "Upcoming",

@@ -147,14 +147,14 @@ class ChallengeHistoryScreen extends ConsumerWidget {
         borderColor = theme.error[200]!;
         textColor = theme.error[700]!;
         icon = LucideIcons.xCircle;
-        statusText = l10n.translate('missed');
+        statusText = l10n.translate('task-missed');
         break;
       case TaskInstanceStatus.today:
         backgroundColor = theme.primary[50]!;
         borderColor = theme.primary[200]!;
         textColor = theme.primary[700]!;
         icon = LucideIcons.clock;
-        statusText = l10n.translate('pending');
+        statusText = l10n.translate('task-pending');
         break;
       case TaskInstanceStatus.upcoming:
         backgroundColor = theme.grey[50]!;
