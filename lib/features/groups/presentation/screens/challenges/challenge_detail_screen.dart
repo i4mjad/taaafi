@@ -201,10 +201,8 @@ class ChallengeDetailScreen extends ConsumerWidget {
       ChallengeEntity challenge, userParticipation) {
     final totalTasks = challenge.tasks.length;
     final progressPercent = userParticipation.getProgressPercentage(totalTasks);
-    final completedTasksCount = userParticipation.taskCompletions
-        .map((c) => c.taskId)
-        .toSet()
-        .length;
+    final completedTasksCount =
+        userParticipation.taskCompletions.map((c) => c.taskId).toSet().length;
 
     return WidgetsContainer(
       backgroundColor: theme.success[50],
