@@ -27,12 +27,12 @@ class EditChallengeScreen extends ConsumerStatefulWidget {
 }
 
 class _EditChallengeScreenState extends ConsumerState<EditChallengeScreen> {
-  late TextEditingController _nameController;
-  late TextEditingController _descriptionController;
-  late DateTime? _endDate;
-  late String _color;
-  late List<ChallengeTaskEntity> _tasks;
-  bool _isLoading = false;
+  TextEditingController? _nameController;
+  TextEditingController? _descriptionController;
+  DateTime? _endDate;
+  String _color = 'blue';
+  List<ChallengeTaskEntity> _tasks = [];
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -49,14 +49,17 @@ class _EditChallengeScreenState extends ConsumerState<EditChallengeScreen> {
         _endDate = challenge.endDate;
         _color = challenge.color;
         _tasks = List.from(challenge.tasks);
+        _isLoading = false;
       });
+    } else if (mounted) {
+      setState(() => _isLoading = false);
     }
   }
 
   @override
   void dispose() {
-    _nameController.dispose();
-    _descriptionController.dispose();
+    _nameController?.dispose();
+    _descriptionController?.dispose();
     super.dispose();
   }
 
@@ -64,13 +67,6 @@ class _EditChallengeScreenState extends ConsumerState<EditChallengeScreen> {
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
     final l10n = AppLocalizations.of(context);
-
-    if (_endDate == null) {
-      return Scaffold(
-        backgroundColor: theme.backgroundColor,
-        body: const Center(child: CircularProgressIndicator()),
-      );
-    }
 
     return Scaffold(
       backgroundColor: theme.backgroundColor,
@@ -83,7 +79,7 @@ class _EditChallengeScreenState extends ConsumerState<EditChallengeScreen> {
         surfaceTintColor: theme.backgroundColor,
         centerTitle: false,
       ),
-      body: _isLoading
+      body: _isLoading || _nameController == null
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
               padding: const EdgeInsets.all(16),
@@ -98,7 +94,7 @@ class _EditChallengeScreenState extends ConsumerState<EditChallengeScreen> {
                     borderSide: BorderSide(color: theme.grey[800]!, width: 1),
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                     child: TextField(
-                      controller: _nameController,
+                      controller: _nameController!,
                       decoration: InputDecoration(
                         hintText: l10n.translate('challenge-name-hint'),
                         hintStyle: TextStyles.caption.copyWith(color: theme.grey[600]),
@@ -118,7 +114,7 @@ class _EditChallengeScreenState extends ConsumerState<EditChallengeScreen> {
                     borderSide: BorderSide(color: theme.grey[800]!, width: 1),
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: TextField(
-                      controller: _descriptionController,
+                      controller: _descriptionController!,
                       maxLines: 3,
                       decoration: InputDecoration(
                         hintText: l10n.translate('challenge-description-hint'),
@@ -349,7 +345,9 @@ class _EditChallengeScreenState extends ConsumerState<EditChallengeScreen> {
   }
 
   Future<void> _handleSave() async {
-    final name = _nameController.text.trim();
+    if (_nameController == null || _endDate == null) return;
+    
+    final name = _nameController!.text.trim();
     if (name.isEmpty || _tasks.isEmpty) {
       getErrorSnackBar(context, 'error-creating-challenge');
       return;
@@ -364,7 +362,7 @@ class _EditChallengeScreenState extends ConsumerState<EditChallengeScreen> {
       if (challenge != null) {
         final updatedChallenge = challenge.copyWith(
           name: name,
-          description: _descriptionController.text.trim(),
+          description: _descriptionController!.text.trim(),
           endDate: _endDate!,
           color: _color,
           tasks: _tasks,
