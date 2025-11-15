@@ -532,6 +532,40 @@ class ChallengeDetailScreen extends ConsumerWidget {
     );
   }
 
+  Widget _buildHistoryButton(BuildContext context, theme, AppLocalizations l10n) {
+    return GestureDetector(
+      onTap: () {
+        context.pushNamed(
+          RouteNames.challengeHistory.name,
+          pathParameters: {
+            'groupId': groupId,
+            'challengeId': challengeId,
+          },
+        );
+      },
+      child: WidgetsContainer(
+        backgroundColor: theme.primary[50],
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: theme.primary[200]!, width: 1),
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(LucideIcons.history, size: 20, color: theme.primary[700]),
+            const SizedBox(width: 8),
+            Text(
+              l10n.translate('view-task-history'),
+              style: TextStyles.body.copyWith(
+                color: theme.primary[700],
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Future<void> _joinChallenge(
       BuildContext context, WidgetRef ref, AppLocalizations l10n) async {
     await ref

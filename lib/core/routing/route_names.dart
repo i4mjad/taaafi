@@ -58,6 +58,7 @@ enum RouteNames {
   createChallenge,
   editChallenge,
   challengeDetail,
+  challengeHistory,
   challengeLeaderboard,
   communityProfile,
   userReports,

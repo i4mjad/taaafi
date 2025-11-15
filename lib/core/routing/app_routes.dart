@@ -51,6 +51,7 @@ import 'package:reboot_app_3/features/groups/presentation/screens/challenges/cha
 import 'package:reboot_app_3/features/groups/presentation/screens/challenges/create_challenge_screen.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/challenges/edit_challenge_screen.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/challenges/challenge_detail_screen.dart';
+import 'package:reboot_app_3/features/groups/presentation/screens/challenges/challenge_history_screen.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/challenges/challenge_leaderboard_screen.dart';
 import 'package:reboot_app_3/features/community/presentation/challenges/global_challenge_list_screen.dart';
 import 'package:reboot_app_3/features/community/presentation/profile/community_profile_settings_screen.dart';
@@ -658,6 +659,17 @@ GoRouter goRouter(Ref<GoRouter> ref) {
                     pageBuilder: (context, state) => MaterialPage<void>(
                       name: RouteNames.editChallenge.name,
                       child: EditChallengeScreen(
+                        groupId: state.pathParameters['groupId']!,
+                        challengeId: state.pathParameters['challengeId']!,
+                      ),
+                    ),
+                  ),
+                  GoRoute(
+                    path: 'groups/:groupId/challenges/:challengeId/history',
+                    name: RouteNames.challengeHistory.name,
+                    pageBuilder: (context, state) => MaterialPage<void>(
+                      name: RouteNames.challengeHistory.name,
+                      child: ChallengeHistoryScreen(
                         groupId: state.pathParameters['groupId']!,
                         challengeId: state.pathParameters['challengeId']!,
                       ),
