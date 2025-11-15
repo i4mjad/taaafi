@@ -62,16 +62,14 @@ class ChallengeHistoryService {
       }
       print('   Today (${today.month}/${today.day}) in dates? ${taskDates.any((d) => _isSameDay(d, today))}');
       
-      // Debug: Ensure today is included for daily/weekly tasks if it's in range
-      if (task.frequency != TaskFrequency.oneTime) {
-        final shouldIncludeToday = (today.isAfter(normalizedStartDate) || _isSameDay(today, normalizedStartDate)) &&
-            (today.isBefore(endDate) || _isSameDay(today, endDate));
-        print('   Should include today? $shouldIncludeToday');
-        if (shouldIncludeToday) {
-          if (!taskDates.any((d) => _isSameDay(d, today))) {
-            print('   ⚠️  Adding today manually!');
-            taskDates.add(today);
-          }
+      // Debug: Ensure today is included for tasks if it's in range
+      final shouldIncludeToday = (today.isAfter(normalizedStartDate) || _isSameDay(today, normalizedStartDate)) &&
+          (today.isBefore(endDate) || _isSameDay(today, endDate));
+      print('   Should include today? $shouldIncludeToday');
+      if (shouldIncludeToday) {
+        if (!taskDates.any((d) => _isSameDay(d, today))) {
+          print('   ⚠️  Adding today manually!');
+          taskDates.add(today);
         }
       }
 
@@ -165,13 +163,6 @@ class ChallengeHistoryService {
           current = current.add(const Duration(days: 7));
         }
         break;
-
-      case TaskFrequency.oneTime:
-        // One-time task shows on challenge start date
-        if (start.isBefore(end) || start.isAtSameMomentAs(end)) {
-          dates.add(start);
-        }
-        break;
     }
 
     return dates;
@@ -192,12 +183,7 @@ class ChallengeHistoryService {
     for (final completion in completions) {
       if (completion.taskId != taskId) continue;
       
-      // For one-time tasks, any completion counts (regardless of date)
-      if (frequency == TaskFrequency.oneTime) {
-        return completion;
-      }
-      
-      // For daily/weekly, match by date (normalize both dates for comparison)
+      // Match by date (normalize both dates for comparison)
       final completionDate = DateTime(
         completion.completedAt.year,
         completion.completedAt.month,

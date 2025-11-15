@@ -1641,7 +1641,7 @@ class _ChallengeTaskInstancesProviderElement
       (origin as ChallengeTaskInstancesProvider).challengeId;
 }
 
-String _$groupTodayTasksHash() => r'e864b53b3dd0d5600868da943add6b138b2b4026';
+String _$groupTodayTasksHash() => r'9baf0eb96870f1b71810382b321f60bb6c951a51';
 
 /// Get today's task instances across all challenges in a group (for the current user)
 ///
