@@ -2,6 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../domain/entities/challenge_entity.dart';
 import '../domain/entities/challenge_participation_entity.dart';
 import '../domain/entities/challenge_stats_entity.dart';
+import '../domain/entities/challenge_task_entity.dart';
 import '../application/challenges_providers.dart';
 import '../../community/presentation/providers/community_providers_new.dart';
 
@@ -176,7 +177,7 @@ class ChallengeDetailNotifier extends _$ChallengeDetailNotifier {
   }
 
   /// Complete a task
-  Future<void> completeTask(String taskId, int points) async {
+  Future<void> completeTask(String taskId, int points, TaskFrequency frequency) async {
     final currentState = await future;
     if (currentState.challenge == null) return;
 
@@ -194,6 +195,7 @@ class ChallengeDetailNotifier extends _$ChallengeDetailNotifier {
         cpId: profile.id,
         taskId: taskId,
         pointsEarned: points,
+        taskFrequency: frequency,
       );
 
       if (result.success) {
