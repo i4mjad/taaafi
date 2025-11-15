@@ -49,6 +49,7 @@ import 'package:reboot_app_3/features/groups/presentation/screens/group_updates_
 import 'package:reboot_app_3/features/groups/presentation/screens/group_settings_screen.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/challenges/challenges_list_screen.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/challenges/create_challenge_screen.dart';
+import 'package:reboot_app_3/features/groups/presentation/screens/challenges/edit_challenge_screen.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/challenges/challenge_detail_screen.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/challenges/challenge_leaderboard_screen.dart';
 import 'package:reboot_app_3/features/community/presentation/challenges/global_challenge_list_screen.dart';
@@ -648,6 +649,17 @@ GoRouter goRouter(Ref<GoRouter> ref) {
                       name: RouteNames.createChallenge.name,
                       child: CreateChallengeScreen(
                         groupId: state.pathParameters['groupId']!,
+                      ),
+                    ),
+                  ),
+                  GoRoute(
+                    path: 'groups/:groupId/challenges/:challengeId/edit',
+                    name: RouteNames.editChallenge.name,
+                    pageBuilder: (context, state) => MaterialPage<void>(
+                      name: RouteNames.editChallenge.name,
+                      child: EditChallengeScreen(
+                        groupId: state.pathParameters['groupId']!,
+                        challengeId: state.pathParameters['challengeId']!,
                       ),
                     ),
                   ),

@@ -13,6 +13,7 @@ import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/groups/domain/entities/challenge_entity.dart';
 import 'package:reboot_app_3/features/groups/domain/entities/challenge_task_entity.dart';
 import 'package:reboot_app_3/features/groups/providers/challenge_detail_notifier.dart';
+import 'package:reboot_app_3/features/groups/application/group_chat_providers.dart';
 
 class ChallengeDetailScreen extends ConsumerWidget {
   final String groupId;
@@ -51,6 +52,22 @@ class ChallengeDetailScreen extends ConsumerWidget {
         surfaceTintColor: theme.backgroundColor,
         centerTitle: false,
         titleSpacing: 0,
+        actions: isAdmin
+            ? [
+                IconButton(
+                  icon: const Icon(Icons.edit),
+                  onPressed: () {
+                    context.pushNamed(
+                      RouteNames.editChallenge.name,
+                      pathParameters: {
+                        'groupId': groupId,
+                        'challengeId': challengeId,
+                      },
+                    );
+                  },
+                ),
+              ]
+            : null,
       ),
       body: detailAsync.when(
         data: (state) {
