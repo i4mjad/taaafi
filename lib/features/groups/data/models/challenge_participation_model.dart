@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../domain/entities/challenge_participation_entity.dart';
+import '../../domain/entities/task_completion_record_entity.dart';
 
 class ChallengeParticipationModel extends ChallengeParticipationEntity {
   const ChallengeParticipationModel({
@@ -8,7 +9,7 @@ class ChallengeParticipationModel extends ChallengeParticipationEntity {
     required super.cpId,
     required super.groupId,
     super.earnedPoints,
-    super.completedTaskIds,
+    super.taskCompletions,
     super.status,
     super.completedAt,
     required super.joinedAt,
@@ -21,15 +22,22 @@ class ChallengeParticipationModel extends ChallengeParticipationEntity {
       DocumentSnapshot<Map<String, dynamic>> doc) {
     final data = doc.data()!;
 
+    // Parse task completions
+    List<TaskCompletionRecord> completions = [];
+    if (data['taskCompletions'] != null) {
+      final completionsData = data['taskCompletions'] as List;
+      completions = completionsData
+          .map((item) => TaskCompletionRecord.fromFirestore(item as Map<String, dynamic>))
+          .toList();
+    }
+
     return ChallengeParticipationModel(
       id: doc.id,
       challengeId: data['challengeId'] as String,
       cpId: data['cpId'] as String,
       groupId: data['groupId'] as String,
       earnedPoints: data['earnedPoints'] as int? ?? 0,
-      completedTaskIds: data['completedTaskIds'] != null
-          ? List<String>.from(data['completedTaskIds'] as List)
-          : [],
+      taskCompletions: completions,
       status: ParticipationStatusExtension.fromFirestore(
           data['status'] as String),
       completedAt: data['completedAt'] != null
@@ -48,7 +56,7 @@ class ChallengeParticipationModel extends ChallengeParticipationEntity {
       'cpId': cpId,
       'groupId': groupId,
       'earnedPoints': earnedPoints,
-      'completedTaskIds': completedTaskIds,
+      'taskCompletions': taskCompletions.map((c) => c.toFirestore()).toList(),
       'status': status.toFirestore(),
       'completedAt':
           completedAt != null ? Timestamp.fromDate(completedAt!) : null,
@@ -67,7 +75,7 @@ class ChallengeParticipationModel extends ChallengeParticipationEntity {
       cpId: entity.cpId,
       groupId: entity.groupId,
       earnedPoints: entity.earnedPoints,
-      completedTaskIds: entity.completedTaskIds,
+      taskCompletions: entity.taskCompletions,
       status: entity.status,
       completedAt: entity.completedAt,
       joinedAt: entity.joinedAt,
