@@ -365,10 +365,10 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
                               ? TextStyles.footnoteSelected
                               : TextStyles.footnote)
                           .copyWith(
-                        color: _tabController!.index == 0
-                            ? theme.primary[600]
-                            : theme.grey[600],
-                      ),
+                              color: _tabController!.index == 0
+                                  ? theme.primary[600]
+                                  : theme.grey[600],
+                              fontSize: 12),
                     ),
                   ],
                 ),
@@ -386,8 +386,7 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      AppLocalizations.of(context)
-                          .translate('community-chats'),
+                      AppLocalizations.of(context).translate('community-chats'),
                       style: (_tabController!.index == 1
                               ? TextStyles.footnoteSelected
                               : TextStyles.footnote)

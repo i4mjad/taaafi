@@ -1,3 +1,4 @@
+import 'package:reboot_app_3/features/groups/domain/entities/challenge_task_entity.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../domain/repositories/challenges_repository.dart';
 import '../domain/services/challenges_service.dart';
@@ -170,14 +171,14 @@ Future<List<ChallengeTaskInstance>> challengeTaskInstances(
 ) async {
   // Get challenge
   final challenge = await ref.watch(challengeByIdProvider(challengeId).future);
-  
+
   if (challenge == null) {
     return [];
   }
 
   // Get current user profile
   final profile = await ref.watch(currentCommunityProfileProvider.future);
-  
+
   if (profile == null) {
     return [];
   }
@@ -207,52 +208,49 @@ Future<List<ChallengeTaskInstance>> groupTodayTasks(
 ) async {
   // Get current user profile
   final profile = await ref.watch(currentCommunityProfileProvider.future);
-  
+
   if (profile == null) {
     return [];
   }
 
   // Get all active challenges in this group
   final challenges = await ref.watch(activeChallengesProvider(groupId).future);
-  
+
   final todayTasks = <ChallengeTaskInstance>[];
   final now = DateTime.now();
   final today = DateTime(now.year, now.month, now.day);
-  
+
   // For each challenge, get the user's task instances and filter for today
   for (final challenge in challenges) {
     // Get user's participation
     final participation = await ref.watch(
       userChallengeParticipationProvider(challenge.id, profile.id).future,
     );
-    
+
     if (participation == null) continue; // Skip if not participating
-    
+
     // Generate task instances
     final historyService = ChallengeHistoryService();
     final instances = historyService.generateTaskInstances(
       challenge: challenge,
       participation: participation,
     );
-    
+
     // Filter for today's tasks
     final todayInstances = instances.where((instance) {
-      // For one-time tasks: show if not completed and today is within the challenge period
+      // For one-time tasks: show if not completed (regardless of date)
       if (instance.task.frequency == TaskFrequency.oneTime) {
-        return instance.status != TaskInstanceStatus.completed &&
-            !today.isBefore(instance.scheduledDate) &&
-            !today.isAfter(DateTime(challenge.endDate.year, challenge.endDate.month, challenge.endDate.day));
+        return instance.status != TaskInstanceStatus.completed;
       }
-      
+
       // For daily/weekly tasks: show only if scheduled for today
       return instance.scheduledDate.year == today.year &&
           instance.scheduledDate.month == today.month &&
           instance.scheduledDate.day == today.day;
     }).toList();
-    
+
     todayTasks.addAll(todayInstances);
   }
-  
+
   return todayTasks;
 }
-
