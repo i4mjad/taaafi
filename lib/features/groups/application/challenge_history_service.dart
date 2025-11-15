@@ -94,57 +94,37 @@ class ChallengeHistoryService {
     DateTime endDate,
   ) {
     final dates = <DateTime>[];
+    // Normalize all dates to midnight (year/month/day only)
     final start = DateTime(startDate.year, startDate.month, startDate.day);
     final end = DateTime(endDate.year, endDate.month, endDate.day);
-    final today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
 
     switch (frequency) {
       case TaskFrequency.daily:
-        DateTime current = start;
         // Generate all dates from start to end (inclusive)
-        while (!current.isAfter(end)) {
-          final normalizedDate = DateTime(current.year, current.month, current.day);
-          dates.add(normalizedDate);
+        DateTime current = start;
+        while (current.isBefore(end) || current.isAtSameMomentAs(end)) {
+          dates.add(DateTime(current.year, current.month, current.day));
           current = current.add(const Duration(days: 1));
-        }
-        // Explicitly ensure today is included if within range
-        if ((today.isAfter(start) || _isSameDay(today, start)) && 
-            (today.isBefore(end) || _isSameDay(today, end))) {
-          if (!dates.any((d) => _isSameDay(d, today))) {
-            dates.add(today);
-          }
         }
         break;
 
       case TaskFrequency.weekly:
-        DateTime current = start; // Start from join date, not 7 days later!
-        // Generate all weekly dates from start to end (inclusive)
-        while (!current.isAfter(end)) {
+        // Generate weekly dates from start date onwards
+        DateTime current = start;
+        while (current.isBefore(end) || current.isAtSameMomentAs(end)) {
           dates.add(DateTime(current.year, current.month, current.day));
           current = current.add(const Duration(days: 7));
-        }
-        // For weekly tasks, ensure today is included if it matches the pattern
-        // Check if today is on the same weekday and within range
-        final daysSinceStart = today.difference(start).inDays;
-        if (daysSinceStart >= 0 && daysSinceStart % 7 == 0 && 
-            (today.isBefore(end) || _isSameDay(today, end))) {
-          if (!dates.any((d) => _isSameDay(d, today))) {
-            dates.add(today);
-          }
         }
         break;
 
       case TaskFrequency.oneTime:
-        // For one-time tasks, always show on the challenge start date
-        // Only include if it's before or equal to the end date
-        if (!start.isAfter(end)) {
+        // One-time task shows on challenge start date
+        if (start.isBefore(end) || start.isAtSameMomentAs(end)) {
           dates.add(start);
         }
         break;
     }
 
-    // Sort dates to ensure proper order
-    dates.sort();
     return dates;
   }
 
