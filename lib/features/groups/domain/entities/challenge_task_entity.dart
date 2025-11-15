@@ -16,17 +16,17 @@ class ChallengeTaskEntity {
     this.order = 0,
   });
 
-  /// Calculate maximum possible points for this task given challenge duration
-  int getMaxPoints(DateTime challengeEndDate) {
-    final now = DateTime.now();
-    final daysRemaining = challengeEndDate.difference(now).inDays + 1;
+  /// Calculate maximum possible points for this task
+  /// Based on challenge total duration (createdAt to endDate)
+  int getMaxPoints(DateTime challengeCreatedAt, DateTime challengeEndDate) {
+    final totalDays = challengeEndDate.difference(challengeCreatedAt).inDays + 1;
 
     switch (frequency) {
       case TaskFrequency.daily:
-        return points * daysRemaining;
+        return points * totalDays;
       case TaskFrequency.weekly:
-        final weeksRemaining = (daysRemaining / 7).ceil();
-        return points * weeksRemaining;
+        final totalWeeks = (totalDays / 7).ceil();
+        return points * totalWeeks;
       case TaskFrequency.oneTime:
         return points;
     }

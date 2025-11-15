@@ -72,7 +72,7 @@ class ChallengeEntity {
 
   /// Get total possible points from all tasks
   int getTotalPossiblePoints() {
-    return tasks.fold(0, (sum, task) => sum + task.getMaxPoints(endDate));
+    return tasks.fold(0, (sum, task) => sum + task.getMaxPoints(createdAt, endDate));
   }
 
   ChallengeEntity copyWith({
