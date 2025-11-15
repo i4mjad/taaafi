@@ -7,7 +7,7 @@ part of 'challenge_creation_notifier.dart';
 // **************************************************************************
 
 String _$challengeCreationNotifierHash() =>
-    r'e83166204a4c67cc788831b09f812f32277566bd';
+    r'90def82f7d0b58ea7abc5a6083591673c29d5df6';
 
 /// Notifier for challenge creation form
 ///

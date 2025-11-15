@@ -1,5 +1,6 @@
 import 'dart:developer';
 import '../entities/challenge_entity.dart';
+import '../entities/challenge_task_entity.dart';
 import '../entities/challenge_participation_entity.dart';
 import '../entities/challenge_stats_entity.dart';
 import '../entities/challenge_result_entities.dart';
@@ -148,21 +149,7 @@ class ChallengesService {
         );
       }
 
-      // Check if challenge is full
-      if (challenge.isFull()) {
-        return const JoinChallengeResult.failure(
-          JoinChallengeError.challengeFull,
-          'Challenge is at maximum capacity',
-        );
-      }
-
-      // Check if late join is allowed
-      if (challenge.hasStarted() && !challenge.allowLateJoin) {
-        return const JoinChallengeResult.failure(
-          JoinChallengeError.lateJoinNotAllowed,
-          'Late joining is not allowed for this challenge',
-        );
-      }
+      // No capacity or late join restrictions in simplified system
 
       // Join challenge
       final participationId = await _repository.joinChallenge(

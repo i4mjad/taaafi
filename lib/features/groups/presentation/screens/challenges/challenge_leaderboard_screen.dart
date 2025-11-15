@@ -321,7 +321,7 @@ class ChallengeLeaderboardScreen extends ConsumerWidget {
                     ),
                     const SizedBox(width: 12),
                     Text(
-                      '${participant.earnedPoints} ${AppLocalizations.of(context).translate('points')}',
+                      '${participant.earnedPoints} ${l10n.translate('points')}',
                       style: TextStyles.smallBold.copyWith(
                         color: theme.success[700],
                       ),

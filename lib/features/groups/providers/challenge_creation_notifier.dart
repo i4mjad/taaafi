@@ -1,5 +1,4 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import '../domain/entities/challenge_entity.dart';
 import '../domain/entities/challenge_task_entity.dart';
 import '../domain/entities/challenge_result_entities.dart';
 import '../application/challenges_providers.dart';

@@ -50,12 +50,12 @@ class ChallengesNotifier extends _$ChallengesNotifier {
       final active = challenges
           .where((c) => c.status == ChallengeStatus.active)
           .toList()
-        ..sort((a, b) => a.startDate.compareTo(b.startDate));
+        ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
 
       final upcoming = challenges
           .where((c) => c.status == ChallengeStatus.draft)
           .toList()
-        ..sort((a, b) => a.startDate.compareTo(b.startDate));
+        ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
 
       final completed = challenges
           .where((c) => c.status == ChallengeStatus.completed)
