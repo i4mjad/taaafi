@@ -163,11 +163,15 @@ class ChallengeDetailScreen extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Description (if exists, otherwise show name)
           Text(
-            challenge.name,
-            style: TextStyles.h3.copyWith(
+            challenge.description.isNotEmpty
+                ? challenge.description
+                : challenge.name,
+            style: TextStyles.body.copyWith(
               color: theme.grey[900],
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w500,
+              height: 1.5,
             ),
           ),
           verticalSpace(Spacing.points12),
@@ -374,29 +378,14 @@ class ChallengeDetailScreen extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                l10n.translate('leaderboard'),
-                style: TextStyles.h6.copyWith(
-                  color: theme.grey[900],
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              if (leaderboard.isNotEmpty)
-                TextButton(
-                  onPressed: () => _navigateToLeaderboard(context),
-                  child: Text(
-                    l10n.translate('view-all'),
-                    style: TextStyles.small.copyWith(
-                      color: theme.primary[600],
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-            ],
+          Text(
+            l10n.translate('leaderboard'),
+            style: TextStyles.h6.copyWith(
+              color: theme.grey[900],
+              fontWeight: FontWeight.bold,
+            ),
           ),
+          verticalSpace(Spacing.points8),
           if (leaderboard.isEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 16),
