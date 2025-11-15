@@ -188,9 +188,9 @@ class ChallengeLeaderboardScreen extends ConsumerWidget {
 
         verticalSpace(Spacing.points8),
 
-        // Progress
+        // Points
         Text(
-          '${participant.progress}%',
+          '${participant.earnedPoints}',
           style: TextStyles.h5.copyWith(
             color: theme.grey[900],
             fontWeight: FontWeight.bold,
@@ -304,29 +304,13 @@ class ChallengeLeaderboardScreen extends ConsumerWidget {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                const SizedBox(height: 4),
-                // Progress Bar
-                Row(
-                  children: [
-                    Expanded(
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(4),
-                        child: LinearProgressIndicator(
-                          value: participant.progress / 100,
-                          minHeight: 6,
-                          backgroundColor: theme.grey[200],
-                          valueColor: AlwaysStoppedAnimation(theme.success[600]!),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Text(
-                      '${participant.earnedPoints} ${l10n.translate('points')}',
-                      style: TextStyles.smallBold.copyWith(
-                        color: theme.success[700],
-                      ),
-                    ),
-                  ],
+                    const SizedBox(height: 4),
+                // Points display
+                Text(
+                  '${participant.earnedPoints} ${l10n.translate('points')}',
+                  style: TextStyles.smallBold.copyWith(
+                    color: theme.success[700],
+                  ),
                 ),
               ],
             ),
