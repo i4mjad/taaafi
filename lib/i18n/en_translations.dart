@@ -3649,6 +3649,11 @@ const Map<String, String> kEn = {
   "add-exercise": "Add Exercise",
   "challenge-created-successfully": "Challenge created successfully!",
   "error-creating-challenge": "Failed to create challenge",
+  "task-history": "Task History",
+  "view-task-history": "View All",
+  "no-task-history": "No task history yet",
+  "missed": "Missed",
+  "pending": "Pending",
 
   // Challenge List
   "upcoming": "Upcoming",

@@ -3573,6 +3573,11 @@ const Map<String, String> kAr = {
   'add-exercise': 'إضافة التمرين',
   'challenge-created-successfully': 'تم إنشاء التحدي بنجاح!',
   'error-creating-challenge': 'فشل إنشاء التحدي',
+  'task-history': 'سجل المهام',
+  'view-task-history': 'عرض الكل',
+  'no-task-history': 'لا يوجد سجل مهام بعد',
+  'missed': 'فائت',
+  'pending': 'معلق',
 
   // Challenge List - قائمة التحديات
   'upcoming': 'قادم',
