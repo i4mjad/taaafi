@@ -7,7 +7,7 @@ part of 'challenges_providers.dart';
 // **************************************************************************
 
 String _$challengesRepositoryHash() =>
-    r'62a0cd0bbc566d31a663d0bb1a48939c806032a7';
+    r'59c82d0d752c0605a13c0ad0c8e7a99607a276ee';
 
 /// See also [challengesRepository].
 @ProviderFor(challengesRepository)
@@ -25,7 +25,7 @@ final challengesRepositoryProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef ChallengesRepositoryRef = AutoDisposeProviderRef<ChallengesRepository>;
-String _$challengesServiceHash() => r'af0f9e9f5bf2dcc6aac8477bacee5c53e6ed009e';
+String _$challengesServiceHash() => r'd8aeef7842745f66c23f6095f8f5e680e728946d';
 
 /// See also [challengesService].
 @ProviderFor(challengesService)
@@ -1481,6 +1481,164 @@ class _ChallengeUpdatesProviderElement
   String get challengeId => (origin as ChallengeUpdatesProvider).challengeId;
   @override
   int get limit => (origin as ChallengeUpdatesProvider).limit;
+}
+
+String _$challengeTaskInstancesHash() =>
+    r'acdd944abd61274a4cadfb3976d0a7a4af5c3f7b';
+
+/// Get task instances for a challenge (for the current user)
+/// Loads challenge, user participation, and generates task instances
+///
+/// Copied from [challengeTaskInstances].
+@ProviderFor(challengeTaskInstances)
+const challengeTaskInstancesProvider = ChallengeTaskInstancesFamily();
+
+/// Get task instances for a challenge (for the current user)
+/// Loads challenge, user participation, and generates task instances
+///
+/// Copied from [challengeTaskInstances].
+class ChallengeTaskInstancesFamily
+    extends Family<AsyncValue<List<ChallengeTaskInstance>>> {
+  /// Get task instances for a challenge (for the current user)
+  /// Loads challenge, user participation, and generates task instances
+  ///
+  /// Copied from [challengeTaskInstances].
+  const ChallengeTaskInstancesFamily();
+
+  /// Get task instances for a challenge (for the current user)
+  /// Loads challenge, user participation, and generates task instances
+  ///
+  /// Copied from [challengeTaskInstances].
+  ChallengeTaskInstancesProvider call(
+    String challengeId,
+  ) {
+    return ChallengeTaskInstancesProvider(
+      challengeId,
+    );
+  }
+
+  @override
+  ChallengeTaskInstancesProvider getProviderOverride(
+    covariant ChallengeTaskInstancesProvider provider,
+  ) {
+    return call(
+      provider.challengeId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'challengeTaskInstancesProvider';
+}
+
+/// Get task instances for a challenge (for the current user)
+/// Loads challenge, user participation, and generates task instances
+///
+/// Copied from [challengeTaskInstances].
+class ChallengeTaskInstancesProvider
+    extends AutoDisposeFutureProvider<List<ChallengeTaskInstance>> {
+  /// Get task instances for a challenge (for the current user)
+  /// Loads challenge, user participation, and generates task instances
+  ///
+  /// Copied from [challengeTaskInstances].
+  ChallengeTaskInstancesProvider(
+    String challengeId,
+  ) : this._internal(
+          (ref) => challengeTaskInstances(
+            ref as ChallengeTaskInstancesRef,
+            challengeId,
+          ),
+          from: challengeTaskInstancesProvider,
+          name: r'challengeTaskInstancesProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$challengeTaskInstancesHash,
+          dependencies: ChallengeTaskInstancesFamily._dependencies,
+          allTransitiveDependencies:
+              ChallengeTaskInstancesFamily._allTransitiveDependencies,
+          challengeId: challengeId,
+        );
+
+  ChallengeTaskInstancesProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.challengeId,
+  }) : super.internal();
+
+  final String challengeId;
+
+  @override
+  Override overrideWith(
+    FutureOr<List<ChallengeTaskInstance>> Function(
+            ChallengeTaskInstancesRef provider)
+        create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: ChallengeTaskInstancesProvider._internal(
+        (ref) => create(ref as ChallengeTaskInstancesRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        challengeId: challengeId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<List<ChallengeTaskInstance>>
+      createElement() {
+    return _ChallengeTaskInstancesProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is ChallengeTaskInstancesProvider &&
+        other.challengeId == challengeId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, challengeId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin ChallengeTaskInstancesRef
+    on AutoDisposeFutureProviderRef<List<ChallengeTaskInstance>> {
+  /// The parameter `challengeId` of this provider.
+  String get challengeId;
+}
+
+class _ChallengeTaskInstancesProviderElement
+    extends AutoDisposeFutureProviderElement<List<ChallengeTaskInstance>>
+    with ChallengeTaskInstancesRef {
+  _ChallengeTaskInstancesProviderElement(super.provider);
+
+  @override
+  String get challengeId =>
+      (origin as ChallengeTaskInstancesProvider).challengeId;
 }
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

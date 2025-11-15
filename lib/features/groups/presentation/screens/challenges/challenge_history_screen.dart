@@ -9,10 +9,8 @@ import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/groups/application/challenges_providers.dart';
-import 'package:reboot_app_3/features/groups/application/challenge_history_service.dart';
 import 'package:reboot_app_3/features/groups/domain/entities/challenge_task_instance.dart';
 import 'package:reboot_app_3/features/groups/domain/entities/challenge_task_entity.dart';
-import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 
 class ChallengeHistoryScreen extends ConsumerWidget {
   final String groupId;
@@ -29,6 +27,9 @@ class ChallengeHistoryScreen extends ConsumerWidget {
     final theme = AppTheme.of(context);
     final l10n = AppLocalizations.of(context);
     final locale = ref.watch(localeNotifierProvider);
+    
+    // Load task instances for this challenge and user
+    final taskInstancesAsync = ref.watch(challengeTaskInstancesProvider(challengeId));
 
     return Scaffold(
       backgroundColor: theme.backgroundColor,
@@ -41,24 +42,8 @@ class ChallengeHistoryScreen extends ConsumerWidget {
         surfaceTintColor: theme.backgroundColor,
         centerTitle: false,
       ),
-      body: FutureBuilder(
-        future: _loadHistory(ref),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (snapshot.hasError) {
-            return Center(
-              child: Text(
-                '${l10n.translate('error')}: ${snapshot.error}',
-                style: TextStyles.body.copyWith(color: theme.error[600]),
-              ),
-            );
-          }
-
-          final instances = snapshot.data ?? [];
-
+      body: taskInstancesAsync.when(
+        data: (instances) {
           if (instances.isEmpty) {
             return Center(
               child: Text(
@@ -68,58 +53,60 @@ class ChallengeHistoryScreen extends ConsumerWidget {
             );
           }
 
-          return Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-            child: GroupedListView<ChallengeTaskInstance, DateTime>(
-              elements: instances,
-              groupBy: (instance) => DateTime(
-                instance.scheduledDate.year,
-                instance.scheduledDate.month,
-                instance.scheduledDate.day,
-              ),
-              useStickyGroupSeparators: true,
-              groupSeparatorBuilder: (DateTime date) => Container(
-                color: theme.backgroundColor,
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: Text(
-                  getDisplayDate(date, locale!.languageCode),
-                  style: TextStyles.footnoteSelected.copyWith(
-                    color: theme.grey[900],
+          return RefreshIndicator(
+            onRefresh: () async {
+              ref.invalidate(challengeTaskInstancesProvider(challengeId));
+            },
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+              child: GroupedListView<ChallengeTaskInstance, DateTime>(
+                elements: instances,
+                groupBy: (instance) => DateTime(
+                  instance.scheduledDate.year,
+                  instance.scheduledDate.month,
+                  instance.scheduledDate.day,
+                ),
+                useStickyGroupSeparators: true,
+                groupSeparatorBuilder: (DateTime date) => Container(
+                  color: theme.backgroundColor,
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Text(
+                    getDisplayDate(date, locale!.languageCode),
+                    style: TextStyles.footnoteSelected.copyWith(
+                      color: theme.grey[900],
+                    ),
                   ),
                 ),
+                itemBuilder: (context, instance) => Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: _buildTaskInstanceWidget(theme, l10n, instance),
+                ),
+                order: GroupedListOrder.DESC, // Newest first
               ),
-              itemBuilder: (context, instance) => Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: _buildTaskInstanceWidget(theme, l10n, instance),
-              ),
-              order: GroupedListOrder.DESC, // Newest first
             ),
           );
         },
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, stackTrace) => Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                '${l10n.translate('error')}: ${error.toString()}',
+                style: TextStyles.body.copyWith(color: theme.error[600]),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  ref.invalidate(challengeTaskInstancesProvider(challengeId));
+                },
+                child: Text(l10n.translate('retry')),
+              ),
+            ],
+          ),
+        ),
       ),
-    );
-  }
-
-  Future<List<ChallengeTaskInstance>> _loadHistory(WidgetRef ref) async {
-    final challenge = await ref.read(challengeByIdProvider(challengeId).future);
-    final profile = await ref.read(
-        currentCommunityProfileProvider.future);
-
-    if (challenge == null || profile == null) {
-      return [];
-    }
-
-    final participation = await ref.read(
-        userChallengeParticipationProvider(challengeId, profile.id).future);
-
-    if (participation == null) {
-      return [];
-    }
-
-    final historyService = ChallengeHistoryService();
-    return historyService.generateTaskInstances(
-      challenge: challenge,
-      participation: participation,
     );
   }
 

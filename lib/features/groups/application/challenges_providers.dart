@@ -5,10 +5,13 @@ import '../domain/entities/challenge_entity.dart';
 import '../domain/entities/challenge_participation_entity.dart';
 import '../domain/entities/challenge_stats_entity.dart';
 import '../domain/entities/challenge_update_entity.dart';
+import '../domain/entities/challenge_task_instance.dart';
 import '../data/repositories/challenges_repository_impl.dart';
 import 'challenge_progress_tracker_service.dart';
 import 'challenge_notification_service.dart';
-import 'groups_providers.dart';
+import 'challenge_history_service.dart';
+import 'groups_providers.dart' as groups;
+import '../../community/presentation/providers/community_providers_new.dart';
 
 part 'challenges_providers.g.dart';
 
@@ -18,7 +21,7 @@ part 'challenges_providers.g.dart';
 
 @riverpod
 ChallengesRepository challengesRepository(ref) {
-  final firestore = ref.watch(firestoreProvider);
+  final firestore = ref.watch(groups.firestoreProvider);
   return ChallengesRepositoryImpl(firestore);
 }
 
@@ -29,7 +32,7 @@ ChallengesRepository challengesRepository(ref) {
 @riverpod
 ChallengesService challengesService(ref) {
   final repository = ref.watch(challengesRepositoryProvider);
-  final groupsRepository = ref.watch(groupsRepositoryProvider);
+  final groupsRepository = ref.watch(groups.groupsRepositoryProvider);
   return ChallengesService(repository, groupsRepository);
 }
 
@@ -151,6 +154,48 @@ Future<List<ChallengeUpdateEntity>> challengeUpdates(
   return await service.getChallengeUpdates(
     challengeId: challengeId,
     limit: limit,
+  );
+}
+
+// ============================================
+// Task History Providers
+// ============================================
+
+/// Get task instances for a challenge (for the current user)
+/// Loads challenge, user participation, and generates task instances
+@riverpod
+Future<List<ChallengeTaskInstance>> challengeTaskInstances(
+  ref,
+  String challengeId,
+) async {
+  // Get challenge
+  final challenge = await ref.watch(challengeByIdProvider(challengeId).future);
+  
+  if (challenge == null) {
+    return [];
+  }
+
+  // Get current user profile
+  final profile = await ref.watch(currentCommunityProfileProvider.future);
+  
+  if (profile == null) {
+    return [];
+  }
+
+  // Get user's participation in this challenge
+  final participation = await ref.watch(
+    userChallengeParticipationProvider(challengeId, profile.id).future,
+  );
+
+  if (participation == null) {
+    return [];
+  }
+
+  // Generate task instances using the history service
+  final historyService = ChallengeHistoryService();
+  return historyService.generateTaskInstances(
+    challenge: challenge,
+    participation: participation,
   );
 }
 
