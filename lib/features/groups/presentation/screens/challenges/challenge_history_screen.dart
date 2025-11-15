@@ -11,6 +11,7 @@ import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/groups/application/challenges_providers.dart';
 import 'package:reboot_app_3/features/groups/application/challenge_history_service.dart';
 import 'package:reboot_app_3/features/groups/domain/entities/challenge_task_instance.dart';
+import 'package:reboot_app_3/features/groups/domain/entities/challenge_task_entity.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 
 class ChallengeHistoryScreen extends ConsumerWidget {
@@ -56,7 +57,7 @@ class ChallengeHistoryScreen extends ConsumerWidget {
             );
           }
 
-          final instances = snapshot.data as List<ChallengeTaskInstance>? ?? [];
+          final instances = snapshot.data ?? [];
 
           if (instances.isEmpty) {
             return Center(

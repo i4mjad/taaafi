@@ -127,6 +127,12 @@ class ChallengeDetailScreen extends ConsumerWidget {
 
                   verticalSpace(Spacing.points16),
 
+                  // View History Button (if participating)
+                  if (isParticipating) ...[
+                    _buildHistoryButton(context, theme, l10n),
+                    verticalSpace(Spacing.points16),
+                  ],
+
                   // Action Buttons
                   _buildActionButtons(context, ref, theme, l10n, challenge,
                       isParticipating, state.isLoading),
