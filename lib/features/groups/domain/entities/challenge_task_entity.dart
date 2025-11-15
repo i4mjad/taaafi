@@ -29,8 +29,6 @@ class ChallengeTaskEntity {
       case TaskFrequency.weekly:
         final totalWeeks = (totalDays / 7).ceil();
         return points * totalWeeks;
-      case TaskFrequency.oneTime:
-        return points;
     }
   }
 
@@ -58,7 +56,6 @@ class ChallengeTaskEntity {
 enum TaskFrequency {
   daily, // Can be completed once per day
   weekly, // Can be completed once per week
-  oneTime, // Can be completed only once
 }
 
 /// Extension for string conversion
@@ -69,8 +66,6 @@ extension TaskFrequencyExtension on TaskFrequency {
         return 'daily';
       case TaskFrequency.weekly:
         return 'weekly';
-      case TaskFrequency.oneTime:
-        return 'one_time';
     }
   }
 
@@ -80,10 +75,8 @@ extension TaskFrequencyExtension on TaskFrequency {
         return TaskFrequency.daily;
       case 'weekly':
         return TaskFrequency.weekly;
-      case 'one_time':
-        return TaskFrequency.oneTime;
       default:
-        return TaskFrequency.oneTime;
+        return TaskFrequency.daily; // Default to daily for backward compatibility
     }
   }
 }

@@ -35,11 +35,8 @@ class ChallengeHistoryService {
     print('==========================================\n');
 
     for (final task in challenge.tasks) {
-      // For one-time tasks, use challenge start date (createdAt)
-      // For daily/weekly, use join date
-      final startDate = task.frequency == TaskFrequency.oneTime
-          ? challenge.createdAt
-          : participation.joinedAt;
+      // Use join date for all tasks
+      final startDate = participation.joinedAt;
       
       // Normalize start date
       final normalizedStartDate = DateTime(

@@ -208,7 +208,7 @@ Future<List<ChallengeTaskInstance>> groupTodayTasks(
 ) async {
   print('🔍 ============ GROUP TODAY TASKS DEBUG ============');
   print('📋 Loading tasks for group: $groupId');
-  
+
   // Get current user profile
   final profile = await ref.watch(currentCommunityProfileProvider.future);
 
@@ -230,7 +230,7 @@ Future<List<ChallengeTaskInstance>> groupTodayTasks(
   for (final challenge in challenges) {
     print('\n🎯 Challenge: "${challenge.name}" (${challenge.id})');
     print('   Tasks in challenge: ${challenge.tasks.length}');
-    
+
     // Get user's participation
     final participation = await ref.watch(
       userChallengeParticipationProvider(challenge.id, profile.id).future,
@@ -251,21 +251,14 @@ Future<List<ChallengeTaskInstance>> groupTodayTasks(
     );
     print('   Generated ${instances.length} task instances');
 
-    // Filter for today's tasks
+    // Filter for today's tasks (daily/weekly only)
     final todayInstances = instances.where((instance) {
-      // For one-time tasks: show if not completed (regardless of date)
-      if (instance.task.frequency == TaskFrequency.oneTime) {
-        final isCompleted = instance.status == TaskInstanceStatus.completed;
-        print('   🔸 One-time task: "${instance.task.name}" - Completed: $isCompleted');
-        return !isCompleted;
-      }
-
-      // For daily/weekly tasks: show only if scheduled for today
       final isToday = instance.scheduledDate.year == today.year &&
           instance.scheduledDate.month == today.month &&
           instance.scheduledDate.day == today.day;
       if (isToday) {
-        print('   🔸 ${instance.task.frequency.name} task: "${instance.task.name}" - Status: ${instance.status.name}');
+        print(
+            '   🔸 ${instance.task.frequency.name} task: "${instance.task.name}" - Status: ${instance.status.name}');
       }
       return isToday;
     }).toList();

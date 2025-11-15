@@ -150,10 +150,6 @@ class _AddTaskModalState extends State<AddTaskModal> {
                                 value: TaskFrequency.weekly,
                                 label: l10n.translate('weekly'),
                               ),
-                              PlatformDropdownItem(
-                                value: TaskFrequency.oneTime,
-                                label: l10n.translate('one-time'),
-                              ),
                             ],
                             onChanged: (value) {
                               if (value != null) {
