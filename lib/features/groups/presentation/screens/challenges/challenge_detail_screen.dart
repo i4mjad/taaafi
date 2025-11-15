@@ -308,7 +308,7 @@ class ChallengeDetailScreen extends ConsumerWidget {
                     ref
                         .read(challengeDetailNotifierProvider(challengeId)
                             .notifier)
-                        .completeTask(task.id, task.points);
+                        .completeTask(task.id, task.points, task.frequency);
                   }
                 : null,
             child: Container(

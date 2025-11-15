@@ -272,7 +272,7 @@ class ChallengesService {
       final challenge = await _repository.getChallengeById(challengeId);
       if (challenge != null && updatedParticipation != null) {
         final allTasksCompleted =
-            updatedParticipation.completedTaskIds.length == challenge.tasks.length;
+            updatedParticipation.taskCompletions.length >= challenge.tasks.length;
 
         if (allTasksCompleted) {
           await _repository.completeParticipation(
