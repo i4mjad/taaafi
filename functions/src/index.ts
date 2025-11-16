@@ -1574,3 +1574,7 @@ export const onInteractionUpdate = onDocumentUpdated(
     }
   }
 );
+
+// ==================== GROUP UPDATES NOTIFICATIONS ====================
+// Export group update notification functions
+export { sendUpdateNotification, sendCommentNotification } from './groupUpdateNotifications';
