@@ -67,6 +67,7 @@ enum RouteNames {
   userProfile,
   banned,
   allPosts,
+  categoriesList,
   categoryPosts,
   // Direct Messaging routes
   communityChats,

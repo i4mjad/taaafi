@@ -26,8 +26,8 @@ class CategoriesListScreen extends ConsumerWidget {
         context,
         ref,
         'community_categories',
-        true,
         false,
+        true,
       ),
       body: categoriesAsync.when(
         data: (categories) {
@@ -170,4 +170,3 @@ class CategoriesListScreen extends ConsumerWidget {
     }
   }
 }
-

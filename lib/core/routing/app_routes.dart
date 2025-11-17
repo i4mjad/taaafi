@@ -18,6 +18,7 @@ import 'package:reboot_app_3/features/account/presentation/user_profile_screen.d
 import 'package:reboot_app_3/features/plus/presentation/taaafi_plus_features_list_screen.dart';
 import 'package:reboot_app_3/features/plus/presentation/plus_features_guide_screen.dart';
 import 'package:reboot_app_3/features/community/presentation/posts_list_screen.dart';
+import 'package:reboot_app_3/features/community/presentation/categories_list_screen.dart';
 import 'package:reboot_app_3/features/community/presentation/category_posts_screen.dart';
 import 'package:reboot_app_3/features/community/data/models/post_category.dart';
 import 'package:reboot_app_3/features/home/presentation/reports/user_reports_screen.dart';
@@ -453,6 +454,14 @@ GoRouter goRouter(Ref<GoRouter> ref) {
                     pageBuilder: (context, state) => MaterialPage<void>(
                       name: RouteNames.allPosts.name,
                       child: PostsListScreen(),
+                    ),
+                  ),
+                  GoRoute(
+                    path: 'categories',
+                    name: RouteNames.categoriesList.name,
+                    pageBuilder: (context, state) => MaterialPage<void>(
+                      name: RouteNames.categoriesList.name,
+                      child: CategoriesListScreen(),
                     ),
                   ),
                   GoRoute(
