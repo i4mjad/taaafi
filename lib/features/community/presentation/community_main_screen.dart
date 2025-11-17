@@ -15,7 +15,7 @@ import 'package:reboot_app_3/features/community/presentation/widgets/threads_pos
 import 'package:reboot_app_3/features/community/presentation/providers/forum_providers.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/avatar_with_anonymity.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
-import 'package:reboot_app_3/features/community/data/models/post_category.dart';
+import 'package:reboot_app_3/features/community/data/models/post.dart';
 import 'package:reboot_app_3/features/account/presentation/widgets/feature_access_guard.dart';
 import 'package:reboot_app_3/features/authentication/application/user_subscription_sync_service.dart';
 import 'package:reboot_app_3/features/community/presentation/community_onboarding_screen.dart';
@@ -49,6 +49,8 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
   late String _selectedFilter;
   final ScrollController _scrollController = ScrollController();
   TabController? _tabController;
+  bool _pinnedExpanded = true;
+  bool _newsExpanded = true;
 
   @override
   void initState() {
@@ -105,20 +107,18 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
     // Check current user and profile status
     _checkUserStatus();
 
-    // Load different types of posts based on initial filter
-    if (_selectedFilter == 'pinned') {
-      ref
-          .read(pinnedPostsPaginationProvider.notifier)
-          .loadPosts(isPinned: true);
-    } else if (_selectedFilter == 'news') {
-      ref
-          .read(newsPostsPaginationProvider.notifier)
-          .loadPosts(category: 'aqOhcyOg1z8tcij0y1S4');
-    } else {
-      ref
-          .read(postsPaginationProvider.notifier)
-          .loadPosts(category: _getFilterCategory());
-    }
+    // Always load pinned and news posts for the sections above tabs
+    ref
+        .read(pinnedPostsPaginationProvider.notifier)
+        .loadPosts(isPinned: true);
+    ref
+        .read(newsPostsPaginationProvider.notifier)
+        .loadPosts(category: 'aqOhcyOg1z8tcij0y1S4');
+
+    // Load posts based on initial filter
+    ref
+        .read(postsPaginationProvider.notifier)
+        .loadPosts(category: _getFilterCategory());
   }
 
   @override
@@ -469,43 +469,74 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
       controller: _scrollController,
       physics: const AlwaysScrollableScrollPhysics(),
       slivers: [
-        // Filter chips - sticky
+        // Pinned Posts Section (above tabs)
+        SliverToBoxAdapter(
+          child: _buildPinnedSection(),
+        ),
+
+        // News Posts Section (above tabs)
+        SliverToBoxAdapter(
+          child: _buildNewsSection(),
+        ),
+
+        // Header row with Latest Posts and actions
         SliverPersistentHeader(
           pinned: true,
           delegate: _FilterChipsDelegate(
             filterChips: Container(
-              height: 35,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: ListView(
-                scrollDirection: Axis.horizontal,
+              height: 40,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
                 children: [
-                  _buildFilterChip(
-                    AppLocalizations.of(context).translate('community_pinned'),
-                    'pinned',
-                    LucideIcons.pin,
-                    const Color(0xFFF59E0B),
+                  // Latest Posts with icon
+                  Icon(
+                    LucideIcons.trendingUp,
+                    size: 16,
+                    color: AppTheme.of(context).grey[700],
                   ),
-                  const SizedBox(width: 8),
-                  _buildFilterChip(
-                    AppLocalizations.of(context).translate('community_news'),
-                    'news',
-                    LucideIcons.newspaper,
-                    const Color(0xFF10B981),
+                  const SizedBox(width: 6),
+                  Text(
+                    AppLocalizations.of(context).translate('latest_posts'),
+                    style: TextStyles.footnoteSelected.copyWith(
+                      color: AppTheme.of(context).grey[900],
+                    ),
                   ),
-                  const SizedBox(width: 8),
-                  _buildFilterChip(
-                    AppLocalizations.of(context).translate('community_posts'),
-                    'posts',
-                    LucideIcons.messageSquare,
-                    const Color(0xFF3B82F6),
+                  const Spacer(),
+                  // View All
+                  GestureDetector(
+                    onTap: () {
+                      context.goNamed(RouteNames.allPosts.name);
+                    },
+                    child: Text(
+                      AppLocalizations.of(context).translate('see_all'),
+                      style: TextStyles.caption.copyWith(
+                        color: AppTheme.of(context).primary[600],
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
-                  const SizedBox(width: 8),
-                  _buildFilterChip(
-                    AppLocalizations.of(context)
-                        .translate('community_categories'),
-                    'categories',
-                    LucideIcons.layoutGrid,
-                    const Color(0xFF8B5CF6),
+                  // Dot separator
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Text(
+                      '•',
+                      style: TextStyles.caption.copyWith(
+                        color: AppTheme.of(context).grey[400],
+                      ),
+                    ),
+                  ),
+                  // Categories
+                  GestureDetector(
+                    onTap: () {
+                      context.push('/community/categories');
+                    },
+                    child: Text(
+                      AppLocalizations.of(context).translate('community_categories'),
+                      style: TextStyles.caption.copyWith(
+                        color: AppTheme.of(context).primary[600],
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -524,26 +555,16 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
     if (shouldEnableRefresh) {
       return RefreshIndicator(
         onRefresh: () async {
-          // Refresh based on selected filter
-          switch (_selectedFilter) {
-            case 'posts':
-              await ref.read(postsPaginationProvider.notifier).refresh();
-              break;
-            case 'pinned':
-              // Fix: Call refresh method instead of just invalidating
-              await ref
-                  .read(pinnedPostsPaginationProvider.notifier)
-                  .refresh(isPinned: true);
-              break;
-            case 'news':
-              // Fix: Call refresh method instead of just invalidating
-              await ref
-                  .read(newsPostsPaginationProvider.notifier)
-                  .refresh(category: 'aqOhcyOg1z8tcij0y1S4');
-              break;
-            default:
-              await ref.read(postsPaginationProvider.notifier).refresh();
-          }
+          // Refresh pinned and news sections
+          await ref
+              .read(pinnedPostsPaginationProvider.notifier)
+              .refresh(isPinned: true);
+          await ref
+              .read(newsPostsPaginationProvider.notifier)
+              .refresh(category: 'aqOhcyOg1z8tcij0y1S4');
+          
+          // Refresh posts
+          await ref.read(postsPaginationProvider.notifier).refresh();
         },
         child: scrollView,
       );
@@ -553,41 +574,143 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
   }
 
   Widget _buildMainContent() {
-    switch (_selectedFilter) {
-      case 'pinned':
-        return _buildPinnedView();
-      case 'posts':
-        return _buildPostsView();
-
-      case 'news':
-        return _buildNewsView();
-      case 'categories':
-        return _buildCategoriesView();
-      default:
-        return _buildPostsView();
-    }
+    return _buildPostsView();
   }
 
-  Widget _buildPinnedView() {
+  /// Build the pinned posts section that appears above the tabs
+  Widget _buildPinnedSection() {
     final theme = AppTheme.of(context);
     final localizations = AppLocalizations.of(context);
     final postsState = ref.watch(pinnedPostsPaginationProvider);
+    final isRTL = Directionality.of(context) == TextDirection.rtl;
+
+    // Don't show section if loading initially or if there are no pinned posts
+    if (postsState.posts.isEmpty && postsState.isLoading) {
+      return const SizedBox.shrink();
+    }
+
+    if (postsState.posts.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    final pinnedPosts = postsState.posts.take(6).toList(); // Show max 6 pinned posts
 
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Description for pinned section
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Text(
-            localizations.translate('pinned_section_description'),
-            style: TextStyles.body.copyWith(
-              color: theme.grey[700],
-              height: 1.4,
+        const SizedBox(height: 12),
+        // Section header with icon and expand/collapse
+        GestureDetector(
+          onTap: () {
+            setState(() {
+              _pinnedExpanded = !_pinnedExpanded;
+            });
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: [
+                Icon(
+                  LucideIcons.pin,
+                  size: 16,
+                  color: const Color(0xFFF59E0B),
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  localizations.translate('community_pinned'),
+                  style: TextStyles.footnoteSelected.copyWith(
+                    color: theme.grey[900],
+                  ),
+                ),
+                const Spacer(),
+                Icon(
+                  _pinnedExpanded
+                      ? LucideIcons.chevronUp
+                      : LucideIcons.chevronDown,
+                  size: 16,
+                  color: theme.grey[600],
+                ),
+              ],
             ),
           ),
         ),
-        _buildPinnedPostsContent(postsState, localizations, theme),
+        if (_pinnedExpanded) ...[
+          const SizedBox(height: 4),
+          // Horizontal scrollable cards
+          SizedBox(
+            height: 114, // Increased to give shadows space to breathe
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
+              itemCount: pinnedPosts.length,
+              itemBuilder: (context, index) {
+                final post = pinnedPosts[index];
+                return Padding(
+                  padding: EdgeInsets.only(
+                    right: isRTL ? 0 : (index < pinnedPosts.length - 1 ? 12 : 0),
+                    left: isRTL ? (index < pinnedPosts.length - 1 ? 12 : 0) : 0,
+                  ),
+                  child: _buildPinnedPostCard(post, theme, localizations),
+                );
+              },
+            ),
+          ),
+        ],
+        const SizedBox(height: 4),
       ],
+    );
+  }
+
+  /// Build a square card for pinned posts
+  Widget _buildPinnedPostCard(
+      Post post, dynamic theme, AppLocalizations localizations) {
+    // Get first 50 characters of body
+    final bodyPreview = post.body.length > 50
+        ? '${post.body.substring(0, 50)}...'
+        : post.body;
+
+    return GestureDetector(
+      onTap: () {
+        context.goNamed(RouteNames.postDetail.name,
+            pathParameters: {'postId': post.id});
+      },
+      child: WidgetsContainer(
+        width: 100,
+        height: 100,
+        padding: const EdgeInsets.all(8),
+        backgroundColor: theme.backgroundColor,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: Shadows.mainShadows,
+        borderSide: BorderSide.none,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Title
+            Text(
+              post.title,
+              style: TextStyles.bodyTiny.copyWith(
+                color: theme.grey[900],
+                fontWeight: FontWeight.w600,
+                height: 1.2,
+              ),
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 4),
+            // Body preview
+            Text(
+              bodyPreview,
+              style: TextStyles.tiny.copyWith(
+                color: theme.grey[600],
+                height: 1.2,
+              ),
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -597,221 +720,137 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
     // Use the pagination provider instead of stream for better performance
     final postsState = ref.watch(postsPaginationProvider);
 
-    return Column(
-      children: [
-        // Header with trend icon, "Latest Posts" text, count, and "See All" button
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Row(
-            children: [
-              Icon(
-                LucideIcons.trendingUp,
-                color: theme.primary[500],
-                size: 20,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                localizations.translate('latest_posts'),
-                style: TextStyles.caption.copyWith(
-                  color: theme.grey[900],
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(width: 4),
-              Text(
-                '(${localizations.translate('latest_50')})',
-                style: TextStyles.caption.copyWith(
-                  color: theme.grey[600],
-                  fontWeight: FontWeight.normal,
-                ),
-              ),
-              const Spacer(),
-              GestureDetector(
-                onTap: () {
-                  // Navigate to the full posts list screen
-                  context.goNamed(RouteNames.allPosts.name);
-                },
-                child: Text(
-                  localizations.translate('see_all'),
-                  style: TextStyles.caption.copyWith(
-                    color: theme.primary[600],
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        _buildPaginatedPostsContent(postsState, localizations, theme),
-      ],
-    );
+    return _buildPaginatedPostsContent(postsState, localizations, theme);
   }
 
-  Widget _buildNewsView() {
+  /// Build the news posts section that appears above the tabs
+  Widget _buildNewsSection() {
     final theme = AppTheme.of(context);
     final localizations = AppLocalizations.of(context);
     final postsState = ref.watch(newsPostsPaginationProvider);
+    final isRTL = Directionality.of(context) == TextDirection.rtl;
+
+    // Don't show section if loading initially or if there are no news posts
+    if (postsState.posts.isEmpty && postsState.isLoading) {
+      return const SizedBox.shrink();
+    }
+
+    if (postsState.posts.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    final newsPosts = postsState.posts.take(6).toList(); // Show max 6 news posts
 
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Description for news section
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Text(
-            localizations.translate('news_section_description'),
-            style: TextStyles.body.copyWith(
-              color: theme.grey[700],
-              height: 1.4,
-            ),
-          ),
-        ),
-        _buildNewsPostsContent(postsState, localizations, theme),
-      ],
-    );
-  }
-
-  Widget _buildCategoriesView() {
-    final theme = AppTheme.of(context);
-    final localizations = AppLocalizations.of(context);
-    final categoriesAsync = ref.watch(postCategoriesProvider);
-
-    return Column(
-      children: [
-        // Description for categories section
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Text(
-            localizations.translate('categories_section_description'),
-            style: TextStyles.body.copyWith(
-              color: theme.grey[700],
-              height: 1.4,
-            ),
-          ),
-        ),
-        // Categories content
-        categoriesAsync.when(
-          data: (categories) {
-            // Filter out any categories with missing required data
-            final validCategories = categories.where((category) {
-              return category.id.isNotEmpty &&
-                  category.name.isNotEmpty &&
-                  category.isActive;
-            }).toList();
-
-            if (validCategories.isEmpty) {
-              return Center(
-                child: Text(
-                  localizations.translate('no_categories_found'),
-                  style: TextStyles.body.copyWith(
-                    color: theme.grey[600],
-                  ),
-                ),
-              );
-            }
-
-            return Padding(
-              padding: const EdgeInsets.all(16),
-              child: GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  childAspectRatio: 1.5,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                ),
-                itemCount: validCategories.length,
-                itemBuilder: (context, index) {
-                  final category = validCategories[index];
-                  return _buildCategoryCard(category, localizations);
-                },
-              ),
-            );
+        const SizedBox(height: 12),
+        // Section header with icon and expand/collapse
+        GestureDetector(
+          onTap: () {
+            setState(() {
+              _newsExpanded = !_newsExpanded;
+            });
           },
-          loading: () => Container(
-            width: double.infinity,
-            height: 200,
-            child: const Center(
-              child: Spinner(),
-            ),
-          ),
-          error: (error, stackTrace) => Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
               children: [
+                Icon(
+                  LucideIcons.newspaper,
+                  size: 16,
+                  color: const Color(0xFF10B981),
+                ),
+                const SizedBox(width: 6),
                 Text(
-                  localizations.translate('error_loading_categories'),
-                  style: TextStyles.body.copyWith(
-                    color: theme.error[500],
+                  localizations.translate('community_news'),
+                  style: TextStyles.footnoteSelected.copyWith(
+                    color: theme.grey[900],
                   ),
                 ),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () {
-                    ref.refresh(postCategoriesProvider);
-                  },
-                  child: Text(localizations.translate('retry')),
+                const Spacer(),
+                Icon(
+                  _newsExpanded
+                      ? LucideIcons.chevronUp
+                      : LucideIcons.chevronDown,
+                  size: 16,
+                  color: theme.grey[600],
                 ),
               ],
             ),
           ),
         ),
+        if (_newsExpanded) ...[
+          const SizedBox(height: 4),
+          // Horizontal scrollable cards
+          SizedBox(
+            height: 94, // Increased to give shadows space to breathe
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
+              itemCount: newsPosts.length,
+              itemBuilder: (context, index) {
+                final post = newsPosts[index];
+                return Padding(
+                  padding: EdgeInsets.only(
+                    right: isRTL ? 0 : (index < newsPosts.length - 1 ? 12 : 0),
+                    left: isRTL ? (index < newsPosts.length - 1 ? 12 : 0) : 0,
+                  ),
+                  child: _buildNewsPostCard(post, theme, localizations),
+                );
+              },
+            ),
+          ),
+        ],
+        const SizedBox(height: 4),
       ],
     );
   }
 
-  Widget _buildCategoryCard(
-      PostCategory category, AppLocalizations localizations) {
-    final theme = AppTheme.of(context);
-
-    // Safe fallbacks for potentially null values
-    final categoryColor = category.color;
-    final categoryIcon = category.icon;
-    final displayName = _getSafeCategoryName(category, localizations);
+  /// Build a rectangular card for news posts (similar to community cards in home)
+  Widget _buildNewsPostCard(
+      Post post, dynamic theme, AppLocalizations localizations) {
+    // Get first 50 characters of body
+    final bodyPreview = post.body.length > 50
+        ? '${post.body.substring(0, 50)}...'
+        : post.body;
 
     return GestureDetector(
       onTap: () {
-        // Navigate to category posts screen
-        final categoryId = Uri.encodeComponent(category.id);
-        final categoryName = Uri.encodeComponent(category.name);
-        final categoryNameAr = Uri.encodeComponent(category.nameAr);
-        final categoryIcon = Uri.encodeComponent(category.iconName);
-        final categoryColor = Uri.encodeComponent(category.colorHex);
-
-        context.pushNamed(
-          RouteNames.categoryPosts.name,
-          pathParameters: {
-            'categoryId': categoryId,
-            'categoryName': categoryName,
-            'categoryNameAr': categoryNameAr,
-            'categoryIcon': categoryIcon,
-            'categoryColor': categoryColor,
-          },
-        );
+        context.goNamed(RouteNames.postDetail.name,
+            pathParameters: {'postId': post.id});
       },
       child: WidgetsContainer(
-        backgroundColor: categoryColor.withValues(alpha: 0.1),
-        borderSide: BorderSide(
-          color: categoryColor.withValues(alpha: 0.3),
-          width: 1.5,
-        ),
-        cornerSmoothing: 0.8,
+        width: 240,
+        height: 80,
+        padding: const EdgeInsets.all(10),
+        backgroundColor: theme.backgroundColor,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: Shadows.mainShadows,
+        borderSide: BorderSide.none,
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              categoryIcon,
-              size: 28,
-              color: categoryColor,
-            ),
-            const SizedBox(height: 8),
+            // Title
             Text(
-              displayName,
-              style: TextStyles.body.copyWith(
-                color: categoryColor,
+              post.title,
+              style: TextStyles.small.copyWith(
+                color: theme.grey[900],
                 fontWeight: FontWeight.w600,
+                height: 1.2,
               ),
-              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 4),
+            // Body preview
+            Text(
+              bodyPreview,
+              style: TextStyles.bodyTiny.copyWith(
+                color: theme.grey[600],
+                height: 1.3,
+              ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
@@ -821,25 +860,6 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
     );
   }
 
-  String _getSafeCategoryName(
-      PostCategory category, AppLocalizations localizations) {
-    try {
-      // Check if locale is Arabic and use nameAr, otherwise use name
-      final isArabic = localizations.locale.languageCode == 'ar';
-
-      if (isArabic && category.nameAr.isNotEmpty) {
-        return category.nameAr;
-      } else if (category.name.isNotEmpty) {
-        return category.name;
-      } else {
-        // Fallback to ID if both names are empty
-        return category.id;
-      }
-    } catch (e) {
-      // Ultimate fallback - return category ID
-      return category.id.isNotEmpty ? category.id : 'Unknown';
-    }
-  }
 
   Widget _buildPaginatedPostsContent(
       dynamic postsState, AppLocalizations localizations, theme) {
@@ -896,158 +916,15 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
       );
     }
 
-    return Column(
-      children: [
-        // Posts list
-        ListView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: posts.length,
-          itemBuilder: (context, index) {
-            // Safe index access to prevent range errors
-            if (index >= posts.length) return Container();
-
-            final post = posts[index];
-            return ThreadsPostCard(
-              post: post,
-              onTap: () {
-                context.goNamed(RouteNames.postDetail.name,
-                    pathParameters: {'postId': post.id});
-              },
-            );
-          },
-        ),
-
-        // Show All button at the end
-        if (posts.length >=
-            20) // Show button when there are enough posts to warrant "Show All"
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-            child: ElevatedButton(
-              onPressed: () {
-                context.goNamed(RouteNames.allPosts.name);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: theme.primary[500],
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    localizations.translate('show_all_posts'),
-                    style: TextStyles.body.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Icon(
-                    Directionality.of(context) == TextDirection.rtl
-                        ? LucideIcons.arrowLeft
-                        : LucideIcons.arrowRight,
-                    size: 18,
-                    color: Colors.white,
-                  ),
-                ],
-              ),
-            ),
-          ),
-      ],
-    );
-  }
-
-  Widget _buildPinnedPostsContent(
-      dynamic postsState, AppLocalizations localizations, theme) {
-    if (postsState.posts.isEmpty && postsState.isLoading) {
-      return Container(
-        width: double.infinity,
-        height: 200,
-        child: const Center(
-          child: Spinner(),
-        ),
-      );
-    }
-
-    if (postsState.posts.isEmpty && postsState.error != null) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              localizations.translate('error_loading_posts'),
-              style: TextStyles.body.copyWith(
-                color: theme.error[500],
-              ),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                ref
-                    .read(pinnedPostsPaginationProvider.notifier)
-                    .refresh(isPinned: true);
-              },
-              child: Text(localizations.translate('retry')),
-            ),
-          ],
-        ),
-      );
-    }
-
-    if (postsState.posts.isEmpty) {
-      return Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 80, horizontal: 32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Icon(
-              LucideIcons.pin,
-              size: 64,
-              color: theme.grey[400],
-            ),
-            const SizedBox(height: 24),
-            Text(
-              localizations.translate('no_pinned_posts_title'),
-              style: TextStyles.h5.copyWith(
-                color: theme.grey[700],
-                fontWeight: FontWeight.w600,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 12),
-            Text(
-              localizations.translate('no_pinned_posts_message'),
-              style: TextStyles.caption.copyWith(
-                color: theme.grey[600],
-                height: 1.4,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      );
-    }
-
-    // Show only first 5 posts as preview with safe access
-    final allPosts = postsState.posts ?? [];
-    final previewPosts = allPosts.take(5).toList();
-
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      itemCount: previewPosts.length,
+      itemCount: posts.length,
       itemBuilder: (context, index) {
         // Safe index access to prevent range errors
-        if (index >= previewPosts.length) return Container();
+        if (index >= posts.length) return Container();
 
-        final post = previewPosts[index];
+        final post = posts[index];
         return ThreadsPostCard(
           post: post,
           onTap: () {
@@ -1059,164 +936,7 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
     );
   }
 
-  Widget _buildNewsPostsContent(
-      dynamic postsState, AppLocalizations localizations, theme) {
-    if (postsState.posts.isEmpty && postsState.isLoading) {
-      return Container(
-        width: double.infinity,
-        height: 200,
-        child: const Center(
-          child: Spinner(),
-        ),
-      );
-    }
 
-    if (postsState.posts.isEmpty && postsState.error != null) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              localizations.translate('error_loading_posts'),
-              style: TextStyles.body.copyWith(
-                color: theme.error[500],
-              ),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                ref
-                    .read(newsPostsPaginationProvider.notifier)
-                    .refresh(category: 'aqOhcyOg1z8tcij0y1S4');
-              },
-              child: Text(localizations.translate('retry')),
-            ),
-          ],
-        ),
-      );
-    }
-
-    if (postsState.posts.isEmpty) {
-      return Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 80, horizontal: 32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Icon(
-              LucideIcons.newspaper,
-              size: 64,
-              color: theme.grey[400],
-            ),
-            const SizedBox(height: 24),
-            Text(
-              localizations.translate('no_news_posts_title'),
-              style: TextStyles.h5.copyWith(
-                color: theme.grey[700],
-                fontWeight: FontWeight.w600,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 12),
-            Text(
-              localizations.translate('no_news_posts_message'),
-              style: TextStyles.caption.copyWith(
-                color: theme.grey[600],
-                height: 1.4,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      );
-    }
-
-    // Show only first 5 posts as preview with safe access
-    final allPosts = postsState.posts ?? [];
-    final previewPosts = allPosts.take(5).toList();
-
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: previewPosts.length,
-      itemBuilder: (context, index) {
-        // Safe index access to prevent range errors
-        if (index >= previewPosts.length) return Container();
-
-        final post = previewPosts[index];
-        return ThreadsPostCard(
-          post: post,
-          onTap: () {
-            context.goNamed(RouteNames.postDetail.name,
-                pathParameters: {'postId': post.id});
-          },
-        );
-      },
-    );
-  }
-
-  Widget _buildFilterChip(
-      String label, String filterValue, IconData icon, Color color) {
-    final theme = AppTheme.of(context);
-    final isSelected = _selectedFilter == filterValue;
-
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _selectedFilter = filterValue;
-        });
-
-        // Load appropriate data based on filter
-        switch (filterValue) {
-          case 'pinned':
-            ref
-                .read(pinnedPostsPaginationProvider.notifier)
-                .refresh(isPinned: true);
-            break;
-          case 'news':
-            ref
-                .read(newsPostsPaginationProvider.notifier)
-                .refresh(category: 'aqOhcyOg1z8tcij0y1S4');
-            break;
-          case 'posts':
-            ref.read(postsPaginationProvider.notifier).refresh();
-            break;
-          case 'categories':
-            // No additional loading needed for this tab
-            break;
-        }
-      },
-      child: WidgetsContainer(
-        padding: const EdgeInsets.only(left: 8, right: 8, top: 2, bottom: 2),
-        backgroundColor: isSelected
-            ? color.withValues(alpha: 0.15)
-            : color.withValues(alpha: 0.1),
-        borderSide: BorderSide(
-          color: isSelected ? color : theme.grey[200]!,
-          width: isSelected ? 2.0 : 1.0, // Thicker border for selected
-        ),
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              size: 14,
-              color: isSelected ? color : theme.grey[600],
-            ),
-            const SizedBox(width: 4),
-            Text(
-              label,
-              style: TextStyles.caption.copyWith(
-                fontSize: 12,
-                color: isSelected ? color : theme.grey[900],
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
   /// Determines if Shorebird update status should block the entire screen
   bool _shouldBlockForShorebirdUpdate(AppUpdateStatus status) {
@@ -1240,16 +960,15 @@ class _FilterChipsDelegate extends SliverPersistentHeaderDelegate {
     final theme = AppTheme.of(context);
     return Container(
       color: theme.backgroundColor,
-      padding: const EdgeInsets.only(top: 8, bottom: 8),
       child: filterChips,
     );
   }
 
   @override
-  double get maxExtent => 51; // 35 + 8 + 8 padding
+  double get maxExtent => 40;
 
   @override
-  double get minExtent => 51;
+  double get minExtent => 40;
 
   @override
   bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) {
