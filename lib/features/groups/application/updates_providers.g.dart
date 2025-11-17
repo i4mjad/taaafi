@@ -1879,7 +1879,7 @@ class _UpdateSuggestionsProviderElement
 }
 
 String _$postUpdateControllerHash() =>
-    r'ff8ebed4d1f59d7a7dabadb64c1ffbdb7c87775b';
+    r'94f72d7990f7c5acbbe77280f4edd2df3afada4f';
 
 /// Controller for posting updates
 ///

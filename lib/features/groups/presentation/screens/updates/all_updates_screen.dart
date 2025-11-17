@@ -4,6 +4,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
+import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/features/groups/application/updates_providers.dart';
 import 'package:reboot_app_3/features/groups/presentation/widgets/updates/update_card_widget.dart';
 import 'package:reboot_app_3/features/groups/domain/entities/group_update_entity.dart';
@@ -31,6 +32,26 @@ class _AllUpdatesScreenState extends ConsumerState<AllUpdatesScreen> {
     super.initState();
     _scrollController.addListener(_onScroll);
     _loadInitialUpdates();
+
+    // Listen for provider changes (e.g., after adding/deleting updates)
+    Future.microtask(() {
+      ref.listenManual(
+        recentUpdatesProvider(widget.groupId, limit: 20),
+        (previous, next) {
+          next.whenData((updates) {
+            if (mounted) {
+              setState(() {
+                _allUpdates = updates;
+                if (updates.isNotEmpty) {
+                  _lastUpdateTime = updates.last.createdAt;
+                }
+                _hasMore = updates.length == 20;
+              });
+            }
+          });
+        },
+      );
+    });
   }
 
   @override
@@ -95,11 +116,19 @@ class _AllUpdatesScreenState extends ConsumerState<AllUpdatesScreen> {
   }
 
   Future<void> _onRefresh() async {
+    // Invalidate all providers to force a fresh fetch
+    ref.invalidate(latestUpdatesProvider(widget.groupId));
+    ref.invalidate(recentUpdatesProvider(widget.groupId));
+    ref.invalidate(groupUpdatesProvider(widget.groupId));
+
+    // Reset local state
     setState(() {
       _allUpdates = [];
       _lastUpdateTime = null;
       _hasMore = true;
     });
+
+    // Reload from provider
     await _loadInitialUpdates();
   }
 
@@ -110,16 +139,12 @@ class _AllUpdatesScreenState extends ConsumerState<AllUpdatesScreen> {
 
     return Scaffold(
       backgroundColor: theme.backgroundColor,
-      appBar: AppBar(
-        title: Text(l10n.translate('updates')),
-        backgroundColor: theme.backgroundColor,
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(LucideIcons.plus),
-            onPressed: () => _showPostUpdateModal(context),
-          ),
-        ],
+      appBar: appBar(
+        context,
+        ref,
+        'updates',
+        false,
+        true,
       ),
       body: RefreshIndicator(
         onRefresh: _onRefresh,
@@ -127,7 +152,6 @@ class _AllUpdatesScreenState extends ConsumerState<AllUpdatesScreen> {
             ? _buildEmptyState(context, theme, l10n)
             : ListView.builder(
                 controller: _scrollController,
-                padding: const EdgeInsets.all(16),
                 itemCount: _allUpdates.length + (_isLoadingMore ? 1 : 0),
                 itemBuilder: (context, index) {
                   if (index == _allUpdates.length) {
@@ -214,4 +238,3 @@ class _AllUpdatesScreenState extends ConsumerState<AllUpdatesScreen> {
     // For now, comments are shown inline in the card
   }
 }
-

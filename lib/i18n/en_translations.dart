@@ -3751,47 +3751,93 @@ const Map<String, String> kEn = {
   'use-preset': 'Use Quick Message',
   'choose-preset': 'Choose a preset',
   'preset-need-help-title': 'I Need Help',
-  'preset-need-help-content': 'I\'m struggling right now and could use some support from the group. Please keep me in your prayers.',
+  'preset-need-help-content':
+      'I\'m struggling right now and could use some support from the group. Please keep me in your prayers.',
   'preset-need-support-title': 'Need Support',
-  'preset-need-support-content': 'Going through a difficult time and would appreciate your support and encouragement.',
+  'preset-need-support-content':
+      'Going through a difficult time and would appreciate your support and encouragement.',
   'preset-feeling-weak-title': 'Feeling Weak',
-  'preset-feeling-weak-content': 'Not feeling my strongest today. Any advice or words of encouragement would help.',
+  'preset-feeling-weak-content':
+      'Not feeling my strongest today. Any advice or words of encouragement would help.',
   'preset-urges-title': 'Fighting Urges',
-  'preset-urges-content': 'Dealing with strong urges right now. Please make dua for me.',
+  'preset-urges-content':
+      'Dealing with strong urges right now. Please make dua for me.',
   'preset-doing-well-title': 'Doing Well',
-  'preset-doing-well-content': 'Alhamdulillah, things are going well. Staying strong and focused on my goals.',
+  'preset-doing-well-content':
+      'Alhamdulillah, things are going well. Staying strong and focused on my goals.',
   'preset-milestone-title': 'Milestone Reached',
-  'preset-milestone-content': 'Alhamdulillah, I reached an important milestone in my journey! Thank you all for your support.',
+  'preset-milestone-content':
+      'Alhamdulillah, I reached an important milestone in my journey! Thank you all for your support.',
   'preset-clean-streak-title': 'Clean Streak',
-  'preset-clean-streak-content': 'Alhamdulillah, maintaining my clean streak. One day at a time.',
+  'preset-clean-streak-content':
+      'Alhamdulillah, maintaining my clean streak. One day at a time.',
   'preset-daily-checkin-title': 'Daily Check-in',
-  'preset-daily-checkin-content': 'Checking in for today. Still committed to the journey.',
+  'preset-daily-checkin-content':
+      'Checking in for today. Still committed to the journey.',
   'preset-weekly-checkin-title': 'Weekly Check-in',
-  'preset-weekly-checkin-content': 'This week has been... [Share your experience]',
+  'preset-weekly-checkin-content':
+      'This week has been... [Share your experience]',
   'preset-encourage-title': 'Words of Encouragement',
-  'preset-encourage-content': 'Remember brothers, every day is a new opportunity. Keep pushing forward!',
+  'preset-encourage-content-male':
+      'Remember brothers, every day is a new opportunity. Keep going!',
+  'preset-encourage-content-female':
+      'Remember sisters, every day is a new opportunity. Keep going!',
   'preset-share-tip-title': 'Helpful Tip',
-  'preset-share-tip-content': 'Here\'s something that helped me: [Share your tip]',
+  'preset-share-tip-content':
+      'Here\'s something that helped me: [Share your tip]',
   'preset-grateful-title': 'Feeling Grateful',
-  'preset-grateful-content': 'Alhamdulillah for this group and all the support. Grateful for each of you.',
+  'preset-grateful-content':
+      'Alhamdulillah for this group and all the support. Grateful for each of you.',
   'preset-victory-title': 'Small Victory',
-  'preset-victory-content': 'Celebrated a small victory today! Every step counts.',
+  'preset-victory-content':
+      'Celebrated a small victory today! Every step counts.',
   'update-from-followup': 'Update from Follow-up',
-  'relapse-update-content': 'I experienced a setback. Please support your brother as I work to move forward.',
-  'porn-only-update-content': 'I slipped with viewing. Working on getting back on track. Please keep me in your duas.',
-  'mast-only-update-content': 'I had a moment of weakness. Recommitting to my goals. Your support means a lot.',
-  'slip-up-update-content': 'Had a minor slip-up. Not giving up - just refocusing and moving forward.',
+  'relapse-update-content-male':
+      'I experienced a setback. Please support your brother as I work to move forward.',
+  'relapse-update-content-female':
+      'I experienced a setback. Please support your sister as I work to move forward.',
+  'porn-only-update-content':
+      'I slipped with viewing. Working on getting back on track. Please keep me in your duas.',
+  'mast-only-update-content':
+      'I had a moment of weakness. Recommitting to my goals. Your support means a lot.',
+  'slip-up-update-content':
+      'Had a minor slip-up. Not giving up - just refocusing and moving forward.',
+  'general-update-content': 'Sharing an update with the group.',
+  'invalid-gender-error':
+      'Unable to share update: valid gender required in profile.',
   'view-all-comments': 'View all {count} comments',
   'add-comment': 'Add a comment...',
   'send-comment': 'Send',
   'comment-added': 'Comment added',
   'delete-comment-update': 'Delete Comment',
-  'delete-update': 'Delete Update',
-  'update-deleted': 'Update deleted',
   'linked-to-challenge': 'Linked to challenge',
   'just-now-time': 'just now',
   'minutes-short-time': 'm',
   'hours-short-time': 'h',
   'days-short-time': 'd',
   'view-all-updates': 'View All',
+
+  // Sprint 6: Followup Integration
+  'share-to-group': 'Share to group',
+  'sharing-to': 'Sharing to',
+  'select-group': 'Select Group',
+  'share-anonymously': 'Share anonymously',
+  'create-community-profile-to-share':
+      'Create a community profile to share with groups',
+  'join-group-to-share': 'Join a group to share your updates',
+  'update-preview': 'Preview',
+  'update-preview-will-appear-below': 'Preview will appear below',
+
+  // Update posting messages
+  'please-add-content': 'Please add content or select a preset',
+  'update-posted-successfully': 'Update posted successfully!',
+  'failed-to-post-update': 'Failed to post update',
+  'error-posting-update': 'Error posting update',
+
+  // Update deletion messages
+  'delete-update': 'Delete Update',
+  'delete-update-confirmation':
+      'Are you sure you want to delete this update? This action cannot be undone.',
+  'update-deleted-successfully': 'Update deleted successfully',
+  'error-deleting-update': 'Error deleting update',
 };

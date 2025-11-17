@@ -10,6 +10,7 @@ import '../domain/services/update_preset_templates.dart';
 import '../data/repositories/updates_repository_impl.dart';
 import 'package:reboot_app_3/features/vault/data/follow_up/follow_up_repository.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
+import 'package:reboot_app_3/features/shared/models/follow_up.dart';
 
 part 'updates_providers.g.dart';
 
@@ -289,6 +290,34 @@ class PostUpdateController extends _$PostUpdateController {
       // You'll need to implement this based on your followup service
       
       return PostUpdateResult.failure('Followup integration pending');
+    } finally {
+      state = false;
+    }
+  }
+  
+  /// Post update from a followup model (used in followup sheet)
+  Future<PostUpdateResult> postUpdateFromFollowup({
+    required String groupId,
+    required FollowUpModel followup,
+    bool isAnonymous = false,
+  }) async {
+    state = true;
+
+    try {
+      final service = ref.read(updatesServiceProvider);
+      final currentProfile =
+          await ref.read(currentCommunityProfileProvider.future);
+
+      if (currentProfile == null) {
+        return PostUpdateResult.failure('User profile not found');
+      }
+
+      return await service.createUpdateFromFollowup(
+        groupId: groupId,
+        authorCpId: currentProfile.id,
+        followup: followup,
+        isAnonymous: isAnonymous,
+      );
     } finally {
       state = false;
     }

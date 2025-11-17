@@ -165,23 +165,20 @@ class _UpdateCommentsSectionState extends ConsumerState<UpdateCommentsSection> {
                           comment.isAnonymous
                               ? l10n.translate('anonymous-member')
                               : author.displayName ?? 'Unknown',
-                          style: TextStyles.footnoteSelected.copyWith(
+                          style: TextStyles.small.copyWith(
                             color: theme.grey[900],
-                            fontSize: 12,
                           ),
                         ),
                         loading: () => Text(
                           'Loading...',
-                          style: TextStyles.footnoteSelected.copyWith(
+                          style: TextStyles.small.copyWith(
                             color: theme.grey[900],
-                            fontSize: 12,
                           ),
                         ),
                         error: (_, __) => Text(
                           'Member',
-                          style: TextStyles.footnoteSelected.copyWith(
+                          style: TextStyles.small.copyWith(
                             color: theme.grey[900],
-                            fontSize: 12,
                           ),
                         ),
                       ),
@@ -202,9 +199,8 @@ class _UpdateCommentsSectionState extends ConsumerState<UpdateCommentsSection> {
                   children: [
                     Text(
                       _formatTime(comment.createdAt, l10n),
-                      style: TextStyles.caption.copyWith(
+                      style: TextStyles.bodyTiny.copyWith(
                         color: theme.grey[600],
-                        fontSize: 10,
                       ),
                     ),
                     if (isOwnComment) ...[
@@ -213,9 +209,8 @@ class _UpdateCommentsSectionState extends ConsumerState<UpdateCommentsSection> {
                         onTap: () => _deleteComment(ref, comment.id),
                         child: Text(
                           l10n.translate('delete-comment-update'),
-                          style: TextStyles.caption.copyWith(
+                          style: TextStyles.bodyTiny.copyWith(
                             color: theme.error[600],
-                            fontSize: 10,
                           ),
                         ),
                       ),

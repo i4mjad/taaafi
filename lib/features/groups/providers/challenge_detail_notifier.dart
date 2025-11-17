@@ -4,6 +4,8 @@ import '../domain/entities/challenge_participation_entity.dart';
 import '../domain/entities/challenge_stats_entity.dart';
 import '../domain/entities/challenge_task_entity.dart';
 import '../application/challenges_providers.dart';
+import '../application/updates_providers.dart';
+import '../domain/entities/group_update_entity.dart';
 import '../../community/presentation/providers/community_providers_new.dart';
 
 part 'challenge_detail_notifier.g.dart';
@@ -219,6 +221,9 @@ class ChallengeDetailNotifier extends _$ChallengeDetailNotifier {
           completingTaskId: null,
           successMessage: message,
         ));
+        
+        // Automatically share to group
+        _shareTaskCompletionToGroup(currentState.challenge!, taskId, points, profile.id);
       } else {
         state = AsyncValue.data(currentState.copyWith(
           isLoading: false,
@@ -250,6 +255,37 @@ class ChallengeDetailNotifier extends _$ChallengeDetailNotifier {
         ));
       }
     });
+  }
+  
+  /// Automatically share task completion to group
+  Future<void> _shareTaskCompletionToGroup(
+    ChallengeEntity challenge,
+    String taskId,
+    int points,
+    String cpId,
+  ) async {
+    try {
+      // Get current community profile to use isAnonymous setting
+      final profile = await ref.read(currentCommunityProfileProvider.future);
+      if (profile == null) return;
+      
+      // Find the task
+      final task = challenge.tasks.firstWhere((t) => t.id == taskId);
+      
+      // Post update using profile's isAnonymous setting
+      final controller = ref.read(postUpdateControllerProvider.notifier);
+      await controller.postUpdate(
+        groupId: challenge.groupId,
+        type: UpdateType.celebration,
+        title: '',
+        content: 'Just completed "${task.name}" in ${challenge.name}! 🎯 (+$points points)',
+        linkedChallengeId: challenge.id,
+        isAnonymous: profile.isAnonymous,
+      );
+    } catch (e) {
+      // Silently fail - task is already completed, sharing is optional
+      print('Failed to share task completion: $e');
+    }
   }
 }
 

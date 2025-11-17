@@ -84,14 +84,15 @@ class UpdatePresetTemplates {
         category: PresetCategory.checkin,
       ),
 
-      // Encouragement
+      // Encouragement (gender-aware)
       UpdatePresetTemplate(
         id: 'encourage_others',
         type: UpdateType.encouragement,
         titleKey: 'preset-encourage-title',
-        contentKey: 'preset-encourage-content',
+        contentKey: 'preset-encourage-content', // Will be suffixed with -male/-female
         icon: '💚',
         category: PresetCategory.encouragement,
+        isGenderAware: true,
       ),
       UpdatePresetTemplate(
         id: 'share_tip',
@@ -167,9 +168,10 @@ class UpdatePresetTemplate {
   final String id;
   final UpdateType type;
   final String titleKey; // Localization key for title
-  final String contentKey; // Localization key for content
+  final String contentKey; // Localization key for content (will have -male/-female suffix if isGenderAware)
   final String icon; // Emoji icon
   final PresetCategory category;
+  final bool isGenderAware; // If true, contentKey will be suffixed with -male/-female
 
   const UpdatePresetTemplate({
     required this.id,
@@ -178,6 +180,7 @@ class UpdatePresetTemplate {
     required this.contentKey,
     required this.icon,
     required this.category,
+    this.isGenderAware = false,
   });
 }
 

@@ -557,6 +557,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen>
             showModalBottomSheet<void>(
               context: context,
               isScrollControlled: true,
+              useSafeArea: true,
               builder: (BuildContext context) {
                 return FollowUpSheet(DateTime.now());
               },

@@ -4,7 +4,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
-import 'package:reboot_app_3/core/shared_widgets/container.dart';
+import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/features/groups/domain/entities/group_update_entity.dart';
 import 'package:reboot_app_3/features/groups/application/updates_providers.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
@@ -32,29 +32,31 @@ class UpdateCardWidget extends ConsumerWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        child: WidgetsContainer(
-          backgroundColor: theme.backgroundColor,
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: theme.grey[300]!, width: 1),
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header
-              _buildHeader(context, ref, theme, l10n),
-              const SizedBox(height: 12),
-              
-              // Content
-              _buildContent(context, theme, l10n),
-              
-              if (!isCompact) ...[
-                const SizedBox(height: 12),
-                // Engagement bar
-                _buildEngagementBar(context, ref, theme, l10n),
-              ],
-            ],
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(
+              color: theme.grey[200]!,
+              width: 0.5,
+            ),
           ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header
+            _buildHeader(context, ref, theme, l10n),
+            const SizedBox(height: 12),
+            
+            // Content
+            _buildContent(context, theme, l10n),
+            
+            if (!isCompact) ...[
+              const SizedBox(height: 12),
+              // Engagement bar
+              _buildEngagementBar(context, ref, theme, l10n),
+            ],
+          ],
         ),
       ),
     );
@@ -67,6 +69,13 @@ class UpdateCardWidget extends ConsumerWidget {
     AppLocalizations l10n,
   ) {
     final authorAsync = ref.watch(communityProfileByIdProvider(update.authorCpId));
+    final currentProfileAsync = ref.watch(currentCommunityProfileProvider);
+    
+    // Check if current user is the author
+    final isCurrentUser = currentProfileAsync.maybeWhen(
+      data: (profile) => profile?.id == update.authorCpId,
+      orElse: () => false,
+    );
 
     return Row(
       children: [
@@ -81,7 +90,7 @@ class UpdateCardWidget extends ConsumerWidget {
           child: Center(
             child: Text(
               update.type.icon,
-              style: TextStyle(fontSize: 20),
+              style: const TextStyle(fontSize: 20),
             ),
           ),
         ),
@@ -91,30 +100,19 @@ class UpdateCardWidget extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              authorAsync.when(
-                data: (author) => Text(
-                  update.isAnonymous
-                      ? l10n.translate('anonymous-member')
-                      : author?.displayName ?? 'Unknown',
-                  style: TextStyles.footnoteSelected.copyWith(
-                    color: theme.grey[900],
-                  ),
-                ),
-                loading: () => Text(
-                  update.isAnonymous
-                      ? l10n.translate('anonymous-member')
-                      : 'Loading...',
-                  style: TextStyles.footnoteSelected.copyWith(
-                    color: theme.grey[900],
-                  ),
-                ),
-                error: (_, __) => Text(
-                  update.isAnonymous
-                      ? l10n.translate('anonymous-member')
-                      : 'Member',
-                  style: TextStyles.footnoteSelected.copyWith(
-                    color: theme.grey[900],
-                  ),
+              Text(
+                update.isAnonymous
+                    ? l10n.translate('anonymous-member')
+                    : isCurrentUser
+                        ? l10n.translate('you')
+                        : authorAsync.when(
+                            data: (author) =>
+                                author != null ? author.displayName : 'Unknown',
+                            loading: () => 'Loading...',
+                            error: (_, __) => 'Member',
+                          ),
+                style: TextStyles.footnoteSelected.copyWith(
+                  color: theme.grey[900],
                 ),
               ),
               Text(
@@ -128,6 +126,16 @@ class UpdateCardWidget extends ConsumerWidget {
         ),
         // Type badge
         _buildTypeBadge(theme, l10n),
+        const SizedBox(width: 8),
+        // More options button
+        GestureDetector(
+          onTap: () => _showOptionsMenu(context, ref),
+          child: Icon(
+            LucideIcons.moreVertical,
+            size: 16,
+            color: theme.grey[600],
+          ),
+        ),
       ],
     );
   }
@@ -141,9 +149,8 @@ class UpdateCardWidget extends ConsumerWidget {
       ),
       child: Text(
         l10n.translate('update-type-${update.type.toFirestore()}'),
-        style: TextStyles.caption.copyWith(
+        style: TextStyles.bodyTiny.copyWith(
           color: theme.grey[700],
-          fontSize: 10,
           fontWeight: FontWeight.w600,
         ),
       ),
@@ -160,7 +167,7 @@ class UpdateCardWidget extends ConsumerWidget {
       children: [
         if (update.title.isNotEmpty) ...[
           Text(
-            l10n.translate(update.title),
+            update.title,
             style: TextStyles.footnoteSelected.copyWith(
               color: theme.grey[900],
               fontWeight: FontWeight.bold,
@@ -170,8 +177,8 @@ class UpdateCardWidget extends ConsumerWidget {
         ],
         Text(
           isCompact && update.content.length > 100
-              ? '${l10n.translate(update.content).substring(0, 100)}...'
-              : l10n.translate(update.content),
+              ? '${update.content.substring(0, 100)}...'
+              : update.content,
           style: TextStyles.small.copyWith(
             color: theme.grey[800],
             height: 1.4,
@@ -193,9 +200,8 @@ class UpdateCardWidget extends ConsumerWidget {
                 const SizedBox(width: 4),
                 Text(
                   l10n.translate('linked-to-challenge'),
-                  style: TextStyles.caption.copyWith(
+                  style: TextStyles.bodyTiny.copyWith(
                     color: theme.success[700],
-                    fontSize: 10,
                   ),
                 ),
               ],
@@ -313,6 +319,163 @@ class UpdateCardWidget extends ConsumerWidget {
           updateId: update.id,
           emoji: emoji,
         );
+  }
+
+  void _showOptionsMenu(BuildContext context, WidgetRef ref) {
+    final theme = AppTheme.of(context);
+    final l10n = AppLocalizations.of(context);
+    
+    // Check if current user is the author
+    final currentProfileAsync = ref.watch(currentCommunityProfileProvider);
+    final isAuthor = currentProfileAsync.maybeWhen(
+      data: (profile) => profile?.id == update.authorCpId,
+      orElse: () => false,
+    );
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: theme.backgroundColor,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: theme.backgroundColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (isAuthor)
+              ListTile(
+                leading: Icon(LucideIcons.trash2, color: theme.error[600]),
+                title: Text(
+                  l10n.translate('delete-update'),
+                  style: TextStyles.body.copyWith(color: theme.error[600]),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  _confirmDelete(context, ref, l10n, theme);
+                },
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _confirmDelete(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+    dynamic theme,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: theme.backgroundColor,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: theme.backgroundColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Title
+            Text(
+              l10n.translate('delete-update'),
+              style: TextStyles.h6.copyWith(
+                color: theme.grey[900],
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            // Content
+            Text(
+              l10n.translate('delete-update-confirmation'),
+              style: TextStyles.body.copyWith(
+                color: theme.grey[700],
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            // Actions
+            Row(
+              children: [
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      decoration: BoxDecoration(
+                        color: theme.grey[100],
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Center(
+                        child: Text(
+                          l10n.translate('cancel'),
+                          style: TextStyles.body.copyWith(
+                            color: theme.grey[800],
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () async {
+                      Navigator.pop(context);
+                      await _deleteUpdate(context, ref);
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      decoration: BoxDecoration(
+                        color: theme.error[600],
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Center(
+                        child: Text(
+                          l10n.translate('delete'),
+                          style: TextStyles.body.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _deleteUpdate(BuildContext context, WidgetRef ref) async {
+    try {
+      final controller = ref.read(updateManagementControllerProvider.notifier);
+      await controller.deleteUpdate(
+        updateId: update.id,
+        isAdmin: false, // User is deleting their own update
+      );
+      
+      // Refresh all update providers
+      ref.invalidate(latestUpdatesProvider(groupId));
+      ref.invalidate(recentUpdatesProvider(groupId));
+      ref.invalidate(groupUpdatesProvider(groupId));
+      
+      if (context.mounted) {
+        getSuccessSnackBar(context, 'update-deleted-successfully');
+      }
+    } catch (e) {
+      if (context.mounted) {
+        getErrorSnackBar(context, 'error-deleting-update');
+      }
+    }
   }
 }
 

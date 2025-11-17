@@ -17,6 +17,7 @@ import 'package:reboot_app_3/features/groups/domain/entities/challenge_task_inst
 import 'package:reboot_app_3/features/groups/providers/challenge_detail_notifier.dart';
 import 'package:reboot_app_3/features/groups/application/updates_providers.dart';
 import 'package:reboot_app_3/features/groups/presentation/modals/post_update_modal.dart';
+import 'package:reboot_app_3/features/groups/presentation/widgets/updates/update_card_widget.dart';
 import 'package:share_plus/share_plus.dart';
 
 /// Model for update items in the group
@@ -269,13 +270,13 @@ class GroupScreen extends ConsumerWidget {
   ) {
     final latestUpdatesAsync = ref.watch(latestUpdatesProvider(groupId));
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header with "View All" button
-          Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Header with "View All" button
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
@@ -285,8 +286,8 @@ class GroupScreen extends ConsumerWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              TextButton(
-                onPressed: () {
+              GestureDetector(
+                onTap: () {
                   context.goNamed(
                     RouteNames.groupUpdates.name,
                     pathParameters: {'groupId': groupId},
@@ -302,196 +303,80 @@ class GroupScreen extends ConsumerWidget {
               ),
             ],
           ),
-          const SizedBox(height: 8),
-          latestUpdatesAsync.when(
-              data: (updates) {
-                if (updates.isEmpty) {
-                  return Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(24),
-                      child: Column(
-                        children: [
-                          Text(
-                            "📢",
-                            style: TextStyle(fontSize: 48),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            l10n.translate('no-updates-yet'),
-                            style: TextStyles.body.copyWith(
-                              color: theme.grey[600],
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 8),
-                          TextButton(
-                            onPressed: () {
-                              // TODO: Open post update modal
-                              _showPostUpdateModal(context, ref, groupId);
-                            },
-                            child: Text(
-                              l10n.translate('be-first-to-share'),
-                              style: TextStyles.small.copyWith(
-                                color: theme.primary[700],
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                }
-
-                return Column(
-                  children: updates.map((update) {
-                    return _buildUpdatePreviewCard(
-                      context,
-                      ref,
-                      theme,
-                      l10n,
-                      update,
-                      groupId,
-                    );
-                  }).toList(),
-                );
-              },
-              loading: () => const Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(24),
-                      child: CircularProgressIndicator(),
-                    ),
-                  ),
-              error: (error, stack) {
-                print(error);
-                return Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Text(
-                      '${l10n.translate('error-loading-updates')}: ${error.toString()}',
-                      style: TextStyles.small.copyWith(
-                        color: theme.error[600],
-                      ),
-                    ),
-                  ),
-                );
-              }),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildUpdatePreviewCard(
-    BuildContext context,
-    WidgetRef ref,
-    CustomThemeData theme,
-    AppLocalizations l10n,
-    dynamic update,
-    String groupId,
-  ) {
-    // TODO: Replace with actual UpdateCardWidget
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: WidgetsContainer(
-        backgroundColor: theme.backgroundColor,
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: theme.grey[300]!, width: 1),
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header
-            Row(
-              children: [
-                Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    color: theme.primary[100],
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: Text(
-                      update.type.icon,
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
+        ),
+        latestUpdatesAsync.when(
+          data: (updates) {
+            if (updates.isEmpty) {
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        update.isAnonymous
-                            ? l10n.translate('anonymous-member')
-                            : 'Member', // TODO: Get actual name
-                        style: TextStyles.footnoteSelected.copyWith(
-                          color: theme.grey[900],
-                        ),
+                        "📢",
+                        style: TextStyle(fontSize: 48),
                       ),
+                      const SizedBox(height: 8),
                       Text(
-                        _formatUpdateTime(update.createdAt),
-                        style: TextStyles.caption.copyWith(
+                        l10n.translate('no-updates-yet'),
+                        style: TextStyles.body.copyWith(
                           color: theme.grey[600],
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 8),
+                      TextButton(
+                        onPressed: () {
+                          // TODO: Open post update modal
+                          _showPostUpdateModal(context, ref, groupId);
+                        },
+                        child: Text(
+                          l10n.translate('be-first-to-share'),
+                          style: TextStyles.small.copyWith(
+                            color: theme.primary[700],
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     ],
                   ),
                 ),
-              ],
+              );
+            }
+
+            return Column(
+              children: updates.map((update) {
+                return UpdateCardWidget(
+                  update: update,
+                  groupId: groupId,
+                  isCompact: true,
+                );
+              }).toList(),
+            );
+          },
+          loading: () => const Center(
+            child: Padding(
+              padding: EdgeInsets.all(24),
+              child: CircularProgressIndicator(),
             ),
-            const SizedBox(height: 12),
-            // Content preview (first 100 chars)
-            Text(
-              update.content.length > 100
-                  ? '${update.content.substring(0, 100)}...'
-                  : update.content,
-              style: TextStyles.small.copyWith(
-                color: theme.grey[800],
+          ),
+          error: (error, stack) {
+            print(error);
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text(
+                  '${l10n.translate('error-loading-updates')}: ${error.toString()}',
+                  style: TextStyles.small.copyWith(
+                    color: theme.error[600],
+                  ),
+                ),
               ),
-            ),
-            const SizedBox(height: 12),
-            // Engagement bar
-            Row(
-              children: [
-                Icon(LucideIcons.heart, size: 16, color: theme.grey[600]),
-                const SizedBox(width: 4),
-                Text(
-                  '${update.supportCount}',
-                  style: TextStyles.caption.copyWith(color: theme.grey[700]),
-                ),
-                const SizedBox(width: 16),
-                Icon(LucideIcons.messageCircle,
-                    size: 16, color: theme.grey[600]),
-                const SizedBox(width: 4),
-                Text(
-                  '${update.commentCount}',
-                  style: TextStyles.caption.copyWith(color: theme.grey[700]),
-                ),
-              ],
-            ),
-          ],
+            );
+          },
         ),
-      ),
+      ],
     );
-  }
-
-  String _formatUpdateTime(DateTime time) {
-    final now = DateTime.now();
-    final difference = now.difference(time);
-
-    if (difference.inMinutes < 1) {
-      return 'just-now';
-    } else if (difference.inMinutes < 60) {
-      return '${difference.inMinutes}m ago';
-    } else if (difference.inHours < 24) {
-      return '${difference.inHours}h ago';
-    } else if (difference.inDays < 7) {
-      return '${difference.inDays}d ago';
-    } else {
-      return '${time.day}/${time.month}';
-    }
   }
 
   void _showPostUpdateModal(
@@ -749,133 +634,6 @@ class GroupScreen extends ConsumerWidget {
         }
       }
     });
-  }
-
-  Widget _buildComingSoonCard({
-    required BuildContext context,
-    required CustomThemeData theme,
-    required AppLocalizations l10n,
-    required String title,
-    required String subtitle,
-    required IconData icon,
-    required List<ComingSoonFeature> features,
-    required Color cardColor,
-    required Color borderColor,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Header with icon and "Soon" badge
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            WidgetsContainer(
-              backgroundColor: theme.backgroundColor,
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: borderColor, width: 1),
-              cornerSmoothing: 0.6,
-              padding: const EdgeInsets.all(8),
-              child: Icon(
-                icon,
-                size: 24,
-                color: theme.grey[700],
-              ),
-            ),
-            const Spacer(),
-            WidgetsContainer(
-              backgroundColor: theme.grey[200]!,
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
-              cornerSmoothing: 0.8,
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              child: Text(
-                l10n.translate('coming-soon'),
-                style: TextStyles.caption.copyWith(
-                  color: theme.grey[700],
-                  fontSize: 10,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-          ],
-        ),
-
-        const SizedBox(height: 12), // Reduced spacing
-
-        // Title
-        Text(
-          title,
-          style: TextStyles.h5.copyWith(
-            color: theme.grey[900],
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-
-        const SizedBox(height: 6), // Reduced spacing
-
-        // Subtitle
-        Text(
-          subtitle,
-          style: TextStyles.smallBold.copyWith(
-            color: theme.grey[600],
-            height: 1.3, // Reduced line height
-          ),
-        ),
-
-        const SizedBox(height: 16), // Reduced spacing
-
-        // What's Coming section
-        WidgetsContainer(
-          backgroundColor: theme.grey[50],
-          borderRadius: BorderRadius.circular(12),
-          borderSide:
-              BorderSide(color: borderColor.withValues(alpha: 0.3), width: 1),
-          cornerSmoothing: 0.8,
-          padding: const EdgeInsets.all(10), // Reduced padding
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                l10n.translate('whats-coming'),
-                style: TextStyles.caption.copyWith(
-                  color: theme.grey[700],
-                  fontWeight: FontWeight.w600,
-                  fontSize: 12,
-                ),
-              ),
-              const SizedBox(height: 6), // Reduced spacing
-              // Features list
-              ...features
-                  .map((feature) => Padding(
-                        padding:
-                            const EdgeInsets.only(bottom: 4), // Reduced spacing
-                        child: Row(
-                          children: [
-                            Icon(
-                              feature.icon,
-                              size: 16,
-                              color: theme.grey[600],
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                feature.title,
-                                style: TextStyles.caption.copyWith(
-                                  color: theme.grey[700],
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ))
-                  .toList(),
-            ],
-          ),
-        ),
-      ],
-    );
   }
 
   // Commented for later use
