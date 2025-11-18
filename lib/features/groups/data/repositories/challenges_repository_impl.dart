@@ -102,7 +102,7 @@ class ChallengesRepositoryImpl implements ChallengesRepository {
       final querySnapshot = await _challengesCollection
           .where('groupId', isEqualTo: groupId)
           .where('status', isEqualTo: 'active')
-          .orderBy('startDate', descending: false)
+          .orderBy('createdAt', descending: false)
           .get();
 
       return querySnapshot.docs

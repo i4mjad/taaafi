@@ -620,6 +620,9 @@ class ChallengeDetailScreen extends ConsumerWidget {
         context,
         'challenge-left',
       );
+
+      // Navigate back to challenges list
+      context.pop();
     }
   }
 

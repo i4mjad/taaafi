@@ -189,12 +189,9 @@ class ChallengesService {
         );
       }
 
-      if (participation.isCompleted()) {
-        return const LeaveChallengeResult.failure(
-          LeaveChallengeError.challengeCompleted,
-          'Cannot leave a completed challenge',
-        );
-      }
+      // Allow leaving even if participation is marked as "completed"
+      // Users should be able to leave challenges at any time
+      // The "completed" check was too restrictive
 
       // Leave challenge
       await _repository.leaveChallenge(
@@ -265,17 +262,42 @@ class ChallengesService {
         cpId: cpId,
       );
 
-      // Check if all tasks are now completed
+      // Check if ALL task instances (not just tasks) are completed
+      // For daily/weekly tasks, this means checking if all scheduled instances are done
+      // Don't mark as completed just because each task was done once!
       final challenge = await _repository.getChallengeById(challengeId);
       if (challenge != null && updatedParticipation != null) {
-        final allTasksCompleted =
-            updatedParticipation.taskCompletions.length >= challenge.tasks.length;
-
-        if (allTasksCompleted) {
-          await _repository.completeParticipation(
-            challengeId: challengeId,
-            cpId: cpId,
+        // Only mark participation as completed if:
+        // 1. The challenge has ended, OR
+        // 2. All tasks are one-time tasks and all are completed
+        
+        final now = DateTime.now();
+        final challengeEnded = now.isAfter(challenge.endDate);
+        
+        // For now, don't auto-complete participation
+        // Let users complete it manually or when challenge ends
+        // This ensures daily/weekly tasks continue to show up
+        
+        if (challengeEnded) {
+          // Check if all required tasks are done
+          final hasRecurringTasks = challenge.tasks.any(
+            (task) => task.frequency == TaskFrequency.daily || 
+                      task.frequency == TaskFrequency.weekly
           );
+          
+          // Only mark as completed if challenge ended and no recurring tasks
+          // or if all instances are completed
+          if (!hasRecurringTasks) {
+            final allTasksCompleted =
+                updatedParticipation.taskCompletions.length >= challenge.tasks.length;
+            
+            if (allTasksCompleted) {
+              await _repository.completeParticipation(
+                challengeId: challengeId,
+                cpId: cpId,
+              );
+            }
+          }
         }
       }
 

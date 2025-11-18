@@ -3868,4 +3868,9 @@ const Map<String, String> kEn = {
       'Are you sure you want to delete this update? This action cannot be undone.',
   'update-deleted-successfully': 'Update deleted successfully',
   'error-deleting-update': 'Error deleting update',
+
+  // Challenge Overview Screen
+  'your-current-tasks': 'Your Current Tasks',
+  'remaining': 'Remaining',
+  'and': 'and'
 };

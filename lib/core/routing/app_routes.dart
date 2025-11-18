@@ -48,7 +48,6 @@ import 'package:reboot_app_3/features/groups/presentation/screens/group_chat_scr
 import 'package:reboot_app_3/features/groups/presentation/screens/group_challenge_screen.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/updates/all_updates_screen.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/group_settings_screen.dart';
-import 'package:reboot_app_3/features/groups/presentation/screens/challenges/challenges_list_screen.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/challenges/create_challenge_screen.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/challenges/edit_challenge_screen.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/challenges/challenge_detail_screen.dart';
@@ -650,7 +649,7 @@ GoRouter goRouter(Ref<GoRouter> ref) {
                     name: RouteNames.groupChallenges.name,
                     pageBuilder: (context, state) => MaterialPage<void>(
                       name: RouteNames.groupChallenges.name,
-                      child: ChallengesListScreen(
+                      child: GroupChallengeScreen(
                         groupId: state.pathParameters['groupId']!,
                       ),
                     ),

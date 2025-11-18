@@ -3781,4 +3781,9 @@ const Map<String, String> kAr = {
       'هل أنت متأكد من حذف هذا التحديث؟ لا يمكن التراجع عن هذا الإجراء.',
   'update-deleted-successfully': 'تم حذف التحديث بنجاح',
   'error-deleting-update': 'خطأ في حذف التحديث',
+
+  // Challenge Overview Screen
+  'your-current-tasks': 'مهامك الحالية',
+  'remaining': 'متبقي',
+  'and': 'و'
 };

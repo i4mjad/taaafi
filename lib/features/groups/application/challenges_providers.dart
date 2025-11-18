@@ -239,7 +239,14 @@ Future<List<ChallengeTaskInstance>> groupTodayTasks(
       print('   ⚠️ User not participating in this challenge');
       continue;
     }
-    print('   ✅ User is participating');
+    
+    // Skip if user quit the challenge
+    if (participation.hasQuit()) {
+      print('   ⚠️ User has quit this challenge');
+      continue;
+    }
+    
+    print('   ✅ User is participating (status: ${participation.status.name})');
     print('   Completions: ${participation.taskCompletions.length}');
 
     // Generate task instances

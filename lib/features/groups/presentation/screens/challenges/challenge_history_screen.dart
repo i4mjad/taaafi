@@ -5,12 +5,14 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
+import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/groups/application/challenges_providers.dart';
 import 'package:reboot_app_3/features/groups/domain/entities/challenge_task_instance.dart';
 import 'package:reboot_app_3/features/groups/domain/entities/challenge_task_entity.dart';
+import 'package:reboot_app_3/features/groups/providers/challenge_detail_notifier.dart';
 
 class ChallengeHistoryScreen extends ConsumerWidget {
   final String groupId;
@@ -79,10 +81,10 @@ class ChallengeHistoryScreen extends ConsumerWidget {
                 ),
                 itemBuilder: (context, instance) => Padding(
                   padding: const EdgeInsets.only(bottom: 8),
-                  child: _buildTaskInstanceWidget(theme, l10n, instance),
+                  child: _buildTaskInstanceWidget(context, ref, theme, l10n, instance),
                 ),
-                // DON'T sort here - we already sorted by distance from today in the service
-                sort: false,
+                // Sort by date descending (most recent first within each group)
+                order: GroupedListOrder.DESC,
               ),
             ),
           );
@@ -112,6 +114,8 @@ class ChallengeHistoryScreen extends ConsumerWidget {
   }
 
   Widget _buildTaskInstanceWidget(
+    BuildContext context,
+    WidgetRef ref,
     theme,
     AppLocalizations l10n,
     ChallengeTaskInstance instance,
@@ -162,6 +166,11 @@ class ChallengeHistoryScreen extends ConsumerWidget {
         break;
     }
 
+    // Determine if task can be completed
+    final canComplete = instance.status == TaskInstanceStatus.today ||
+        (instance.status == TaskInstanceStatus.missed &&
+            instance.task.allowRetroactiveCompletion);
+
     return WidgetsContainer(
       backgroundColor: backgroundColor,
       borderRadius: BorderRadius.circular(8),
@@ -169,12 +178,36 @@ class ChallengeHistoryScreen extends ConsumerWidget {
       padding: const EdgeInsets.all(12),
       child: Row(
         children: [
-          // Status Icon
-          Icon(
-            icon,
-            size: 20,
-            color: textColor,
-          ),
+          // Status Icon or Checkbox
+          if (canComplete)
+            GestureDetector(
+              onTap: () {
+                _completeTask(context, ref, instance);
+              },
+              child: Container(
+                width: 28,
+                height: 28,
+                decoration: BoxDecoration(
+                  color: theme.backgroundColor,
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(
+                    color: theme.primary[600]!,
+                    width: 2,
+                  ),
+                ),
+                child: Icon(
+                  LucideIcons.check,
+                  color: theme.primary[600],
+                  size: 16,
+                ),
+              ),
+            )
+          else
+            Icon(
+              icon,
+              size: 20,
+              color: textColor,
+            ),
           horizontalSpace(Spacing.points12),
           // Task Info
           Expanded(
@@ -217,6 +250,27 @@ class ChallengeHistoryScreen extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  void _completeTask(
+      BuildContext context, WidgetRef ref, ChallengeTaskInstance instance) {
+    // Complete the task using the challenge detail notifier
+    ref
+        .read(challengeDetailNotifierProvider(challengeId).notifier)
+        .completeTask(
+          instance.task.id,
+          instance.task.points,
+          instance.task.frequency,
+        );
+
+    // Show success message
+    getSuccessSnackBar(
+      context,
+      'task-completed',
+    );
+
+    // Refresh the task instances
+    ref.invalidate(challengeTaskInstancesProvider(challengeId));
   }
 
   String _getFrequencyLabel(AppLocalizations l10n, TaskFrequency frequency) {
