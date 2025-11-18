@@ -61,6 +61,7 @@ abstract class CommunityService {
     bool? isPlusUser,
     bool? shareRelapseStreaks,
     NotificationPreferences? notificationPreferences,
+    bool? allowDirectMessages,
   });
 
   /// Checks if the current user has a community profile

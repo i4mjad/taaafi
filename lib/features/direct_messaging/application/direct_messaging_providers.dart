@@ -162,6 +162,82 @@ Future<bool> isAnyBlockBetween(Ref ref, String otherCpId) async {
   return iBlocked || blockedMe;
 }
 
+/// Get the actual last visible message for a conversation
+/// This fetches the most recent message that should be visible to the current user
+@riverpod
+Future<String?> conversationLastVisibleMessage(
+  Ref ref,
+  String conversationId,
+) async {
+  try {
+    final currentProfile =
+        await ref.read(currentCommunityProfileProvider.future);
+    if (currentProfile == null) return null;
+
+    // Fetch the last few messages to find the last visible one
+    final querySnapshot = await FirebaseFirestore.instance
+        .collection('direct_messages')
+        .where('conversationId', isEqualTo: conversationId)
+        .orderBy('createdAt', descending: true)
+        .limit(10) // Check last 10 messages to find a visible one
+        .get();
+
+    if (querySnapshot.docs.isEmpty) return null;
+
+    // Find the first message that's visible to the current user
+    for (final doc in querySnapshot.docs) {
+      try {
+        final messageData = doc.data();
+        
+        // Check if deleted
+        if (messageData['isDeleted'] == true) continue;
+        
+        // Check if hidden
+        if (messageData['isHidden'] == true) continue;
+        
+        // Check moderation status
+        final moderation = messageData['moderation'] as Map<String, dynamic>?;
+        final status = moderation?['status'] as String?;
+        
+        // Skip blocked and pending messages
+        if (status == 'blocked' || status == 'pending') continue;
+        
+        // For manual_review, check confidence
+        if (status == 'manual_review') {
+          final finalDecision = moderation?['finalDecision'] as Map<String, dynamic>?;
+          final confidence = finalDecision?['confidence'];
+          
+          double normalizedConfidence = 0.0;
+          if (confidence is int) {
+            normalizedConfidence = confidence > 1 ? confidence / 100.0 : confidence.toDouble();
+          } else if (confidence is double) {
+            normalizedConfidence = confidence > 1.0 ? confidence / 100.0 : confidence;
+          }
+          
+          // If high confidence (>= 85%), only show to sender
+          if (normalizedConfidence >= 0.85) {
+            final senderCpId = messageData['senderCpId'] as String?;
+            if (senderCpId != currentProfile.id) {
+              continue; // Skip for non-sender
+            }
+          }
+        }
+        
+        // This message is visible, return its body
+        return messageData['body'] as String?;
+      } catch (e) {
+        // Skip malformed messages
+        continue;
+      }
+    }
+
+    return null; // No visible messages found
+  } catch (error) {
+    print('Error fetching last visible message: $error');
+    return null;
+  }
+}
+
 // ==================== ACCESS CONTROL ====================
 
 /// Provider to check if user can access a direct chat conversation
@@ -352,8 +428,7 @@ class BlockController extends _$BlockController {
   @override
   bool build() => false; // Busy state
 
-  Future<void> blockUser(String blockedCpId, String blockedUid,
-      {String? reason}) async {
+  Future<void> blockUser(String blockedCpId, {String? reason}) async {
     if (state) return;
 
     try {
@@ -370,6 +445,15 @@ class BlockController extends _$BlockController {
       if (currentUser == null) {
         throw Exception('User must be authenticated');
       }
+
+      // Fetch blockedUid from the blocked user's community profile
+      final blockedProfile =
+          await ref.read(communityProfileByIdProvider(blockedCpId).future);
+      if (blockedProfile == null) {
+        throw Exception('Blocked user profile not found');
+      }
+
+      final blockedUid = blockedProfile.userUID;
 
       final blockId =
           UserBlockEntity.generateBlockId(currentProfile.id, blockedCpId);
@@ -390,7 +474,7 @@ class BlockController extends _$BlockController {
       ref.invalidate(didIBlockUserProvider(blockedCpId));
       ref.invalidate(isAnyBlockBetweenProvider(blockedCpId));
 
-      print('User blocked successfully: $blockedCpId');
+      print('User blocked successfully: $blockedCpId (UID: $blockedUid)');
     } catch (error) {
       print('Error blocking user: $error');
       rethrow;

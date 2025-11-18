@@ -360,9 +360,37 @@ const Map<String, String> kAr = {
   "unblock-user-confirmation": "هل أنت متأكد أنك تريد إلغاء حظر هذا المستخدم؟",
   "user-blocked-successfully": "تم حظر المستخدم بنجاح",
   "user-unblocked-successfully": "تم إلغاء حظر المستخدم بنجاح",
+  "error-blocking-user": "خطأ في حظر المستخدم",
+  "error-unblocking-user": "خطأ في إلغاء حظر المستخدم",
+  "error-checking-block-status": "خطأ في فحص حالة الحظر",
+  "user-not-accepting-messages": "هذا المستخدم لا يقبل الرسائل حاليًا",
+  "error-checking-messaging-preferences": "خطأ في فحص إعدادات المراسلة",
+  "privacy-settings": "إعدادات الخصوصية",
+  "allow-direct-messages": "السماح باستقبال الرسائل الخاصة",
+  "allow-direct-messages-description":
+      "السماح للمستخدمين الآخرين بإرسال رسائل خاصة لك",
+  "report": "إبلاغ",
+  "submit-report": "إرسال البلاغ",
+  "report-user": "الإبلاغ عن المستخدم",
+  "report-user-confirmation": "هل تريد الإبلاغ عن هذا المستخدم للمشرفين؟",
+  "user-reported-successfully": "تم الإبلاغ عن المستخدم بنجاح",
+  "error-reporting-user": "خطأ في الإبلاغ عن المستخدم",
+  "report-message": "الإبلاغ عن الرسالة",
+  "report-message-confirmation": "هل تريد الإبلاغ عن هذه الرسالة للمشرفين؟",
+  "report-inappropriate-message": "الإبلاغ عن رسالة غير لائقة",
+  "message-reported-successfully": "تم الإبلاغ عن الرسالة بنجاح",
+  "error-reporting-message": "خطأ في الإبلاغ عن الرسالة",
   "delete-conversation": "حذف المحادثة",
   "delete-conversation-confirmation": "هل أنت متأكد أنك تريد حذف هذه المحادثة؟",
   "conversation-deleted": "تم حذف المحادثة",
+  "error-deleting-conversation": "خطأ في حذف المحادثة",
+  "direct-messaging-completely-restricted":
+      "تم تقييد استخدامك للمراسلة المباشرة",
+  "start-conversation-restricted": "تم تقييد بدء محادثات جديدة لحسابك",
+  "send-message-restricted": "تم تقييد إرسال الرسائل لحسابك",
+  "feature-restricted": "هذه الميزة مقيدة حالياً لحسابك",
+  "error-checking-permissions": "خطأ في فحص الصلاحيات",
+  "reason": "السبب",
   "mute-conversation": "كتم",
   "unmute-conversation": "إلغاء الكتم",
   "conversation-muted-success": "تم كتم المحادثة",
@@ -1158,8 +1186,10 @@ const Map<String, String> kAr = {
   "years": "سنوات",
   "warning-details": "تفاصيل التحذير",
   "ban-details": "تفاصيل الحظر",
-  "reason": "السبب",
   "description": "الوصف",
+  "message-under-review":
+      "هذه الرسالة قيد المراجعة بسبب اشتباه في مخالفة القواعد",
+  "message-under-review-short": "قيد المراجعة",
   "warning-information": "معلومات التحذير",
   "ban-information": "معلومات الحظر",
   "warning-type": "نوع التحذير",
@@ -1488,7 +1518,6 @@ const Map<String, String> kAr = {
   "report-data-error": "إبلاغ عن خطأ في البيانات",
   "report-data-error-description":
       "بعد التحديث قد تفقد بعض البيانات، إذا كنت تشعر أن هذا هو الحال مع أرقامك، أنشئ تقريراً وسنقوم بمراجعته.",
-  "submit-report": "إرسال التقرير",
   "check-your-inquiry": "تحقق من استفسارك",
   "user-justification": "مبرر المستخدم",
   "user-justification-placeholder": "اشرح المشكلة بالتفصيل (220 حرف كحد أقصى)",
@@ -1814,7 +1843,6 @@ const Map<String, String> kAr = {
   "group-settings": "إعدادات الزمالة",
   "notification-settings": "إعدادات الإشعارات",
   "member-settings": "إعدادات الأعضاء",
-  "privacy-settings": "إعدادات الخصوصية",
 
   // Group Capacity Settings
   "admin-settings": "إعدادات المشرف",
@@ -3025,7 +3053,6 @@ const Map<String, String> kAr = {
   "group-member": "عضو",
 
   "error-loading-member": "فشل في تحميل العضو",
-  "report-user": "الإبلاغ عن المستخدم",
   "report-inappropriate-behavior": "الإبلاغ عن سلوك غير لائق",
   "promote-to-admin": "ترقية إلى مدير",
   "grant-admin-privileges": "منح صلاحيات الإدارة",
@@ -3127,7 +3154,6 @@ const Map<String, String> kAr = {
   "report-user-subtitle": "الإبلاغ عن سلوك غير لائق",
   "report-user-placeholder": "صف المشكلة التي تريد الإبلاغ عنها...",
   "user-reported": "تم الإبلاغ عن المستخدم بنجاح",
-  "error-reporting-user": "خطأ في الإبلاغ عن المستخدم",
   "profile-actions": "إجراءات الملف الشخصي",
   "error_loading_stats": "خطأ في تحميل الإحصائيات",
   "cannot-restore-multiple-profiles":
@@ -3170,7 +3196,6 @@ const Map<String, String> kAr = {
   //Guard
 
   // Report Message
-  "report-message": "الإبلاغ عن الرسالة",
   "report-reason": "لماذا تقوم بالإبلاغ عن هذه الرسالة؟",
   "report-inappropriate-content": "محتوى غير مناسب",
   "report-inappropriate-content-subtitle": "محتوى جنسي أو عنيف أو مؤذي",

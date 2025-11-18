@@ -53,6 +53,9 @@ class CommunityProfileModel {
   /// User's notification preferences for community features
   final NotificationPreferences? notificationPreferences;
 
+  /// Privacy settings - Allow receiving direct messages
+  final bool allowDirectMessages;
+
   // Sprint 4 - Group-specific profile fields
   /// Bio specific to the group context (max 200 chars)
   final String? groupBio;
@@ -79,6 +82,7 @@ class CommunityProfileModel {
     required this.createdAt,
     this.updatedAt,
     this.notificationPreferences,
+    this.allowDirectMessages = true, // Default to true
     // Sprint 4 fields
     this.groupBio,
     this.interests = const [],
@@ -125,6 +129,7 @@ class CommunityProfileModel {
           ? NotificationPreferences.fromJson(
               json['notificationPreferences'] as Map<String, dynamic>)
           : null,
+      allowDirectMessages: json['allowDirectMessages'] as bool? ?? true,
       // Sprint 4 fields
       groupBio: json['groupBio'] as String?,
       interests: json['interests'] != null 
@@ -163,6 +168,7 @@ class CommunityProfileModel {
           ? NotificationPreferences.fromJson(
               data['notificationPreferences'] as Map<String, dynamic>)
           : null,
+      allowDirectMessages: data['allowDirectMessages'] as bool? ?? true,
       // Sprint 4 fields
       groupBio: data['groupBio'] as String?,
       interests: data['interests'] != null 
@@ -192,6 +198,7 @@ class CommunityProfileModel {
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
       notificationPreferences: entity.notificationPreferences,
+      allowDirectMessages: entity.allowDirectMessages,
       // Sprint 4 fields
       groupBio: entity.groupBio,
       interests: entity.interests,
@@ -216,6 +223,7 @@ class CommunityProfileModel {
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
       'notificationPreferences': notificationPreferences?.toJson(),
+      'allowDirectMessages': allowDirectMessages,
       // Sprint 4 fields
       'groupBio': groupBio,
       'interests': interests,
@@ -239,6 +247,7 @@ class CommunityProfileModel {
       'createdAt': Timestamp.fromDate(createdAt),
       'updatedAt': updatedAt != null ? Timestamp.fromDate(updatedAt!) : null,
       'notificationPreferences': notificationPreferences?.toJson(),
+      'allowDirectMessages': allowDirectMessages,
       // Sprint 4 fields
       'groupBio': groupBio,
       'interests': interests,
@@ -264,6 +273,7 @@ class CommunityProfileModel {
       createdAt: createdAt,
       updatedAt: updatedAt,
       notificationPreferences: notificationPreferences,
+      allowDirectMessages: allowDirectMessages,
       // Sprint 4 fields
       groupBio: groupBio,
       interests: interests,
@@ -288,6 +298,7 @@ class CommunityProfileModel {
     DateTime? createdAt,
     DateTime? updatedAt,
     NotificationPreferences? notificationPreferences,
+    bool? allowDirectMessages,
     // Sprint 4 fields
     String? groupBio,
     List<String>? interests,
@@ -310,6 +321,7 @@ class CommunityProfileModel {
       updatedAt: updatedAt ?? this.updatedAt,
       notificationPreferences:
           notificationPreferences ?? this.notificationPreferences,
+      allowDirectMessages: allowDirectMessages ?? this.allowDirectMessages,
       // Sprint 4 fields
       groupBio: groupBio ?? this.groupBio,
       interests: interests ?? this.interests,

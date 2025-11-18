@@ -38,6 +38,7 @@ class DirectMessageModel extends DirectMessageEntity {
       moderation: ModerationStatus(
         status: _parseModerationStatus(moderationData['status'] as String?),
         reason: moderationData['reason'] as String?,
+        confidence: _parseConfidence(moderationData),
       ),
       createdAt: (data['createdAt'] as Timestamp).toDate(),
     );
@@ -58,6 +59,7 @@ class DirectMessageModel extends DirectMessageEntity {
       'moderation': {
         'status': _moderationStatusToString(moderation.status),
         'reason': moderation.reason,
+        if (moderation.confidence != null) 'confidence': moderation.confidence,
       },
       'createdAt': Timestamp.fromDate(createdAt),
     };
@@ -88,6 +90,8 @@ class DirectMessageModel extends DirectMessageEntity {
         return ModerationStatusType.pending;
       case 'blocked':
         return ModerationStatusType.blocked;
+      case 'manual_review':
+        return ModerationStatusType.manual_review;
       case 'approved':
       default:
         return ModerationStatusType.approved;
@@ -103,7 +107,38 @@ class DirectMessageModel extends DirectMessageEntity {
         return 'approved';
       case ModerationStatusType.blocked:
         return 'blocked';
+      case ModerationStatusType.manual_review:
+        return 'manual_review';
     }
+  }
+  
+  /// Parse confidence score from moderation data
+  /// Confidence is stored as 0.0-1.0, we convert to 0-100 for storage
+  static int? _parseConfidence(Map<String, dynamic> moderationData) {
+    // Try to get confidence from finalDecision first
+    final finalDecision = moderationData['finalDecision'] as Map<String, dynamic>?;
+    if (finalDecision != null && finalDecision['confidence'] != null) {
+      final confidence = finalDecision['confidence'];
+      if (confidence is int) {
+        // If already 0-100 scale, use as-is
+        return confidence > 1 ? confidence : (confidence * 100).round();
+      }
+      if (confidence is double) {
+        // If 0.0-1.0 scale, convert to 0-100
+        return confidence > 1.0 ? confidence.round() : (confidence * 100).round();
+      }
+    }
+    
+    // Fallback to direct confidence field
+    final directConfidence = moderationData['confidence'];
+    if (directConfidence is int) {
+      return directConfidence > 1 ? directConfidence : (directConfidence * 100).round();
+    }
+    if (directConfidence is double) {
+      return directConfidence > 1.0 ? directConfidence.round() : (directConfidence * 100).round();
+    }
+    
+    return null;
   }
 }
 

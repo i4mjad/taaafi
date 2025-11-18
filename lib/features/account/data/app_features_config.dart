@@ -12,8 +12,15 @@ class AppFeaturesConfig {
   static const String postCreation = 'post_creation';
   static const String commentCreation = 'comment_creation';
 
-  // Quick action guard
+  // Messaging features
+  /// Used for sending messages in groups
+  /// Also checked for direct messaging (shared permission)
   static const String sendMessage = 'sending_in_groups';
+
+  /// Used for starting new direct message conversations
+  /// Checked when user clicks "message" button on profile or tries to create new DM
+  static const String startConversation = 'start_conversation';
+
   // Feature access guard
   static const String createPoll = 'create_a_poll';
   static const String shareMedia = 'share_a_media';

@@ -46,6 +46,7 @@ class _EditCommunityProfileModalState
   late bool _isAnonymous;
   late String _selectedGender;
   late bool _shareRelapseStreaks;
+  late bool _allowDirectMessages;
   bool _isLoading = false;
   String _imageOption = 'none'; // 'default', 'none'
   String? _currentUserImageUrl;
@@ -63,6 +64,7 @@ class _EditCommunityProfileModalState
     _isAnonymous = widget.profile.isAnonymous;
     _selectedGender = widget.profile.gender;
     _shareRelapseStreaks = widget.profile.shareRelapseStreaks;
+    _allowDirectMessages = widget.profile.allowDirectMessages;
 
     // Set initial image option based on current profile
     _imageOption = widget.profile.avatarUrl != null ? 'default' : 'none';
@@ -389,6 +391,12 @@ class _EditCommunityProfileModalState
                                       ),
                                     ],
                                   ),
+
+                                verticalSpace(Spacing.points16),
+                                
+                                // Privacy Settings Section
+                                _buildPrivacySettingsSection(
+                                    context, theme, localizations),
 
                                 verticalSpace(Spacing.points16),
                                 // 4. Plus Features Section (Premium features at the end)
@@ -881,6 +889,56 @@ class _EditCommunityProfileModalState
     }
   }
 
+  Widget _buildPrivacySettingsSection(BuildContext context, CustomThemeData theme,
+      AppLocalizations localizations) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Privacy Settings Title
+        Row(
+          children: [
+            Icon(
+              LucideIcons.shield,
+              size: 20,
+              color: theme.primary[600],
+            ),
+            const SizedBox(width: 8),
+            Text(
+              localizations.translate('privacy-settings'),
+              style: TextStyles.h6.copyWith(
+                color: theme.grey[900],
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        
+        // Direct Messages Toggle
+        WidgetsContainer(
+          padding: const EdgeInsets.all(16),
+          backgroundColor: theme.grey[50],
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: theme.grey[200]!, width: 1),
+          child: PlatformSwitch(
+            value: _allowDirectMessages,
+            onChanged: _isLoading
+                ? null
+                : (value) {
+                    setState(() {
+                      _allowDirectMessages = value;
+                    });
+                  },
+            label: localizations.translate('allow-direct-messages'),
+            subtitle: localizations.translate('allow-direct-messages-description'),
+            activeColor: theme.primary[500],
+            padding: EdgeInsets.zero,
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildPlusFeatureSection(BuildContext context, CustomThemeData theme,
       AppLocalizations localizations) {
     final themeController = ref.watch(customThemeProvider);
@@ -1091,6 +1149,7 @@ class _EditCommunityProfileModalState
         isAnonymous: _isAnonymous,
         avatarUrl: avatarUrl,
         shareRelapseStreaks: _shareRelapseStreaks,
+        allowDirectMessages: _allowDirectMessages,
       );
 
       if (mounted) {

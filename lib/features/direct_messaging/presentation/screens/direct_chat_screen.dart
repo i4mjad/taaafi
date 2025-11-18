@@ -11,13 +11,16 @@ import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/core/shared_widgets/platform_action_sheet.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
+import 'package:reboot_app_3/core/shared_widgets/custom_textarea.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/core/theming/chat_text_size_provider.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/direct_messaging/application/direct_messaging_providers.dart';
+import 'package:reboot_app_3/features/direct_messaging/application/direct_messaging_ban_providers.dart';
 import 'package:reboot_app_3/features/direct_messaging/domain/entities/direct_message_entity.dart';
+import 'package:reboot_app_3/features/shared/data/notifiers/user_reports_notifier.dart';
 
 class DirectChatScreen extends ConsumerStatefulWidget {
   final String conversationId;
@@ -38,6 +41,8 @@ class _DirectChatScreenState extends ConsumerState<DirectChatScreen>
   DirectMessageEntity? _replyToMessage;
   bool _isAtBottom = true;
   bool _isSubmitting = false;
+  bool _hasMarkedAsRead = false; // Track if we've already marked as read
+  bool _hasAutoScrolled = false; // Track if we've already auto-scrolled
 
   // Animation for reply preview dismissal
   late AnimationController _replyPreviewController;
@@ -47,6 +52,16 @@ class _DirectChatScreenState extends ConsumerState<DirectChatScreen>
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
+    
+    // Mark conversation as read once when screen loads
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_hasMarkedAsRead && mounted) {
+        ref
+            .read(conversationActionsControllerProvider.notifier)
+            .markAsRead(widget.conversationId);
+        _hasMarkedAsRead = true;
+      }
+    });
     _messageController.addListener(() {
       setState(() {}); // Rebuild for send button visibility
     });
@@ -73,8 +88,8 @@ class _DirectChatScreenState extends ConsumerState<DirectChatScreen>
 
   void _onScroll() {
     if (_scrollController.hasClients) {
-      final isAtBottom = _scrollController.position.pixels >=
-          _scrollController.position.maxScrollExtent - 50;
+      // For reversed list, position 0 is the bottom (latest messages)
+      final isAtBottom = _scrollController.position.pixels <= 50;
       if (isAtBottom != _isAtBottom) {
         setState(() => _isAtBottom = isAtBottom);
       }
@@ -83,8 +98,9 @@ class _DirectChatScreenState extends ConsumerState<DirectChatScreen>
 
   void _scrollToBottom() {
     if (_scrollController.hasClients) {
+      // For reversed list, scroll to position 0 (bottom/latest messages)
       _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent,
+        0,
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeOut,
       );
@@ -97,6 +113,25 @@ class _DirectChatScreenState extends ConsumerState<DirectChatScreen>
 
     final theme = AppTheme.of(context);
     final localizations = AppLocalizations.of(context);
+
+    // Check if user is banned from sending messages
+    try {
+      final canSend = await ref.read(canSendDirectMessageProvider.future);
+      
+      if (!canSend) {
+        if (mounted) {
+          final dmAccess = await ref.read(directMessagingAccessNotifierProvider.future);
+          getErrorSnackBar(context, dmAccess.errorMessageKey);
+        }
+        return;
+      }
+    } catch (e) {
+      print('Error checking send permission: $e');
+      if (mounted) {
+        getErrorSnackBar(context, 'error-checking-permissions');
+      }
+      return;
+    }
 
     // Show loader immediately so the user gets instant feedback
     setState(() {
@@ -175,8 +210,7 @@ class _DirectChatScreenState extends ConsumerState<DirectChatScreen>
               Navigator.of(dialogContext).pop();
               try {
                 final controller = ref.read(blockControllerProvider.notifier);
-                await controller.blockUser(
-                    blockedCpId, ''); // blockedUid will be fetched
+                await controller.blockUser(blockedCpId);
                 if (context.mounted) {
                   getSuccessSnackBar(context, 'user-blocked-successfully');
                 }
@@ -245,6 +279,352 @@ class _DirectChatScreenState extends ConsumerState<DirectChatScreen>
     );
   }
 
+  void _showReportUserDialog(
+      BuildContext context, String reportedCpId, String reporterCpId) {
+    final theme = AppTheme.of(context);
+    final localizations = AppLocalizations.of(context);
+    final TextEditingController reportController = TextEditingController();
+    bool isSubmitting = false;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (sheetContext) => StatefulBuilder(
+        builder: (context, setState) => Container(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          decoration: BoxDecoration(
+            color: theme.backgroundColor,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      localizations.translate('report-user'),
+                      style: TextStyles.h6.copyWith(color: theme.grey[900]),
+                    ),
+                    GestureDetector(
+                      onTap: () => Navigator.of(sheetContext).pop(),
+                      child: Icon(
+                        LucideIcons.x,
+                        size: 20,
+                        color: theme.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                // Description
+                Text(
+                  localizations.translate('report-user-subtitle'),
+                  style: TextStyles.body.copyWith(color: theme.grey[700]),
+                ),
+                const SizedBox(height: 16),
+
+                // Text Area
+                CustomTextArea(
+                  controller: reportController,
+                  hint: localizations.translate('report-user-placeholder'),
+                  prefixIcon: LucideIcons.messageCircle,
+                  enabled: !isSubmitting,
+                  height: 120,
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return localizations.translate('field-required');
+                    }
+                    if (value.length > 1500) {
+                      return localizations.translate('character-limit-exceeded');
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20),
+
+                // Submit Button
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: isSubmitting
+                        ? null
+                        : () async {
+                          final message = reportController.text.trim();
+                          if (message.isEmpty) {
+                            getErrorSnackBar(
+                                context, 'field-required');
+                            return;
+                          }
+                          if (message.length > 1500) {
+                            getErrorSnackBar(
+                                context, 'character-limit-exceeded');
+                            return;
+                          }
+
+                          setState(() => isSubmitting = true);
+
+                          try {
+                            final reportsNotifier =
+                                ref.read(userReportsNotifierProvider.notifier);
+                            await reportsNotifier.submitUserReport(
+                              communityProfileId: reportedCpId,
+                              userMessage: message,
+                            );
+                            if (sheetContext.mounted) {
+                              Navigator.of(sheetContext).pop();
+                            }
+                            if (context.mounted) {
+                              getSuccessSnackBar(
+                                  context, 'user-reported-successfully');
+                            }
+                          } catch (e) {
+                            String errorKey = 'error-reporting-user';
+                            if (e.toString().contains('Exception: ')) {
+                              final extractedKey =
+                                  e.toString().replaceFirst('Exception: ', '');
+                              if ([
+                                'max-active-reports-reached',
+                                'message-cannot-be-empty',
+                                'message-exceeds-character-limit'
+                              ].contains(extractedKey)) {
+                                errorKey = extractedKey;
+                              }
+                            }
+                            if (context.mounted) {
+                              getErrorSnackBar(context, errorKey);
+                            }
+                          } finally {
+                            if (mounted) {
+                              setState(() => isSubmitting = false);
+                            }
+                          }
+                        },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: theme.error[600],
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    icon: isSubmitting
+                        ? SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: Spinner(
+                              strokeWidth: 2,
+                              valueColor: theme.grey[50],
+                            ),
+                          )
+                        : Icon(LucideIcons.flag, size: 20),
+                    label: Text(
+                      localizations.translate('submit-report'),
+                      style: TextStyles.body.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showReportMessageDialog(BuildContext context, DirectMessageEntity message) {
+    final theme = AppTheme.of(context);
+    final localizations = AppLocalizations.of(context);
+    final TextEditingController reportController = TextEditingController();
+    bool isSubmitting = false;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (sheetContext) => StatefulBuilder(
+        builder: (context, setState) => Container(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          decoration: BoxDecoration(
+            color: theme.backgroundColor,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      localizations.translate('report-message'),
+                      style: TextStyles.h6.copyWith(color: theme.grey[900]),
+                    ),
+                    GestureDetector(
+                      onTap: () => Navigator.of(sheetContext).pop(),
+                      child: Icon(
+                        LucideIcons.x,
+                        size: 20,
+                        color: theme.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                // Message Preview
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: theme.grey[100],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    message.body.length > 100
+                        ? '${message.body.substring(0, 100)}...'
+                        : message.body,
+                    style: TextStyles.small.copyWith(color: theme.grey[700]),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Description
+                Text(
+                  localizations.translate('report-message-confirmation'),
+                  style: TextStyles.body.copyWith(color: theme.grey[700]),
+                ),
+                const SizedBox(height: 16),
+
+                // Text Area
+                CustomTextArea(
+                  controller: reportController,
+                  hint: localizations.translate('report-user-placeholder'),
+                  prefixIcon: LucideIcons.messageCircle,
+                  enabled: !isSubmitting,
+                  height: 120,
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return localizations.translate('field-required');
+                    }
+                    if (value.length > 1500) {
+                      return localizations.translate('character-limit-exceeded');
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20),
+
+                // Submit Button
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: isSubmitting
+                        ? null
+                        : () async {
+                          final reportMessage = reportController.text.trim();
+                          if (reportMessage.isEmpty) {
+                            getErrorSnackBar(
+                                context, 'field-required');
+                            return;
+                          }
+                          if (reportMessage.length > 1500) {
+                            getErrorSnackBar(
+                                context, 'character-limit-exceeded');
+                            return;
+                          }
+
+                          setState(() => isSubmitting = true);
+
+                          try {
+                            final reportsNotifier =
+                                ref.read(userReportsNotifierProvider.notifier);
+                            await reportsNotifier.submitMessageReport(
+                              messageId: message.id,
+                              groupId: widget.conversationId,
+                              userMessage: reportMessage,
+                              messageSender: message.senderCpId,
+                              messageContent: message.body,
+                            );
+                            if (sheetContext.mounted) {
+                              Navigator.of(sheetContext).pop();
+                            }
+                            if (context.mounted) {
+                              getSuccessSnackBar(
+                                  context, 'message-reported-successfully');
+                            }
+                          } catch (e) {
+                            String errorKey = 'error-reporting-message';
+                            if (e.toString().contains('Exception: ')) {
+                              final extractedKey =
+                                  e.toString().replaceFirst('Exception: ', '');
+                              if ([
+                                'max-active-reports-reached',
+                                'message-cannot-be-empty',
+                                'message-exceeds-character-limit'
+                              ].contains(extractedKey)) {
+                                errorKey = extractedKey;
+                              }
+                            }
+                            if (context.mounted) {
+                              getErrorSnackBar(context, errorKey);
+                            }
+                          } finally {
+                            if (mounted) {
+                              setState(() => isSubmitting = false);
+                            }
+                          }
+                        },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: theme.error[600],
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    icon: isSubmitting
+                        ? SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: Spinner(
+                              strokeWidth: 2,
+                              valueColor: theme.grey[50],
+                            ),
+                          )
+                        : Icon(LucideIcons.flag, size: 20),
+                    label: Text(
+                      localizations.translate('submit-report'),
+                      style: TextStyles.body.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
@@ -257,7 +637,7 @@ class _DirectChatScreenState extends ConsumerState<DirectChatScreen>
 
     return PopScope(
       canPop: false,
-      onPopInvoked: (bool didPop) async {
+      onPopInvokedWithResult: (bool didPop, dynamic result) async {
         if (didPop) return;
 
         final shouldPop = await _onWillPop();
@@ -421,6 +801,14 @@ class _DirectChatScreenState extends ConsumerState<DirectChatScreen>
                           color: theme.grey[900]),
                       items: [
                         PlatformActionItem(
+                          icon: LucideIcons.flag,
+                          title: localizations.translate('report-user'),
+                          isDestructive: false,
+                          onTap: () {
+                            _showReportUserDialog(context, otherCpId, currentProfile.id);
+                          },
+                        ),
+                        PlatformActionItem(
                           icon: isBlocked
                               ? LucideIcons.userCheck
                               : LucideIcons.userX,
@@ -518,30 +906,73 @@ class _DirectChatScreenState extends ConsumerState<DirectChatScreen>
               );
             }
 
-            // Mark conversation as read
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              ref
-                  .read(conversationActionsControllerProvider.notifier)
-                  .markAsRead(widget.conversationId);
-            });
+            // Filter messages based on current user's visibility
+            final visibleMessages = messages
+                .where((msg) => msg.isVisibleToUser(currentProfile.id))
+                .toList();
 
-            return ListView.builder(
-              controller: _scrollController,
-              padding: const EdgeInsets.all(16),
-              itemCount: messages.length,
-              itemBuilder: (context, index) {
-                final message = messages[index];
-                final isCurrentUser = message.senderCpId == currentProfile.id;
+            // Sort messages by creation time (latest first for reverse ListView)
+            final sortedMessages = List<DirectMessageEntity>.from(visibleMessages);
+            sortedMessages.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
-                return _buildMessageBubble(
-                  context,
-                  theme,
-                  localizations,
-                  message,
-                  isCurrentUser,
-                  chatTextSize,
-                );
+            // Auto-scroll to bottom when messages first load (only once)
+            if (!_hasAutoScrolled && sortedMessages.isNotEmpty) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (_scrollController.hasClients && mounted) {
+                  _scrollController.jumpTo(0); // Jump to bottom (latest messages)
+                  _hasAutoScrolled = true;
+                }
+              });
+            }
+
+            return NotificationListener<ScrollNotification>(
+              onNotification: (ScrollNotification scrollInfo) {
+                // Load more messages when scrolling to the top (older messages)
+                if (scrollInfo.metrics.pixels >=
+                    scrollInfo.metrics.maxScrollExtent * 0.9) {
+                  // TODO: Implement pagination for DM messages
+                  // _loadMoreMessages();
+                }
+                return false;
               },
+              child: ListView.builder(
+                controller: _scrollController,
+                reverse: true, // Latest messages at bottom
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: EdgeInsets.symmetric(
+                  horizontal: (MediaQuery.of(context).size.width * 0.04).clamp(12.0, 20.0),
+                  vertical: (MediaQuery.of(context).size.height * 0.01).clamp(6.0, 12.0),
+                ),
+                itemCount: sortedMessages.length,
+                itemBuilder: (context, index) {
+                  final message = sortedMessages[index];
+                  final nextMessage = index < sortedMessages.length - 1
+                      ? sortedMessages[index + 1]
+                      : null;
+                  final isCurrentUser = message.senderCpId == currentProfile.id;
+
+                  return Column(
+                    children: [
+                      // Show date separator - fixed logic for reverse ListView
+                      // We want the separator ABOVE the first message of each day (chronologically)
+                      // In reverse ListView: last index = chronologically first message of the day
+                      if (index == sortedMessages.length - 1 || // Last item (chronologically first)
+                          (nextMessage != null &&
+                              !_isSameDay(message.createdAt, nextMessage.createdAt)))
+                        _buildDateSeparator(context, theme, localizations, message.createdAt),
+
+                      _buildMessageBubble(
+                        context,
+                        theme,
+                        localizations,
+                        message,
+                        isCurrentUser,
+                        chatTextSize,
+                      ),
+                    ],
+                  );
+                },
+              ),
             );
           },
         );
@@ -718,7 +1149,19 @@ class _DirectChatScreenState extends ConsumerState<DirectChatScreen>
                   if (message.replyToMessageId != null)
                     _buildMessageReplyPreview(context, theme, message),
 
-                  // Message content
+                  // Message content or under review placeholder
+                  if (message.isUnderHighConfidenceReview)
+                    // Show "under review" placeholder for high-confidence flagged messages
+                    Text(
+                      localizations.translate('message-under-review-short'),
+                      style: TextStyles.small.copyWith(
+                        color: theme.grey[500],
+                        fontStyle: FontStyle.italic,
+                        fontSize: 13,
+                      ),
+                    )
+                  else
+                    // Show normal message content
                   Text(
                     message.body,
                     style: _getMessageTextStyle(theme, chatTextSize),
@@ -768,6 +1211,60 @@ class _DirectChatScreenState extends ConsumerState<DirectChatScreen>
         _replyToMessage = null;
       });
     });
+  }
+
+  /// Check if two dates are on the same day
+  bool _isSameDay(DateTime date1, DateTime date2) {
+    return date1.year == date2.year &&
+        date1.month == date2.month &&
+        date1.day == date2.day;
+  }
+
+  /// Build date separator widget
+  Widget _buildDateSeparator(BuildContext context, CustomThemeData theme,
+      AppLocalizations localizations, DateTime date) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final yesterday = today.subtract(const Duration(days: 1));
+    final localDate = date.toLocal();
+    final messageDate =
+        DateTime(localDate.year, localDate.month, localDate.day);
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    String dateText;
+    if (messageDate == today) {
+      dateText = localizations.translate('today');
+    } else if (messageDate == yesterday) {
+      dateText = localizations.translate('yesterday');
+    } else {
+      dateText = DateFormat('dd/MM/yyyy').format(localDate);
+    }
+
+    return Container(
+      margin: EdgeInsets.symmetric(
+          vertical: (screenHeight * 0.02).clamp(12.0, 20.0)),
+      child: Center(
+        child: Container(
+          padding: EdgeInsets.symmetric(
+            horizontal:
+                (MediaQuery.of(context).size.width * 0.03).clamp(10.0, 16.0),
+            vertical: (screenHeight * 0.008).clamp(4.0, 8.0),
+          ),
+          decoration: BoxDecoration(
+            color: theme.grey[100],
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Text(
+            dateText,
+            style: TextStyles.caption.copyWith(
+              color: theme.grey[600],
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _buildReplyPreview(
@@ -835,6 +1332,16 @@ class _DirectChatScreenState extends ConsumerState<DirectChatScreen>
                           ],
                         ),
                         const SizedBox(height: 4),
+                        if (replyMessage.isUnderHighConfidenceReview)
+                          Text(
+                            l10n.translate('message-under-review-short'),
+                            style: TextStyles.caption.copyWith(
+                              color: theme.grey[500],
+                              fontStyle: FontStyle.italic,
+                              fontSize: 12,
+                            ),
+                          )
+                        else
                         Text(
                           replyMessage.body,
                           style: TextStyles.caption.copyWith(
@@ -959,6 +1466,16 @@ class _DirectChatScreenState extends ConsumerState<DirectChatScreen>
               ],
             ),
             const SizedBox(height: 2),
+            if (originalMessage.isUnderHighConfidenceReview)
+              Text(
+                AppLocalizations.of(context).translate('message-under-review-short'),
+                style: TextStyles.small.copyWith(
+                  color: theme.grey[500],
+                  fontStyle: FontStyle.italic,
+                  fontSize: 11,
+                ),
+              )
+            else
             Text(
               originalMessage.body,
               style: TextStyles.small.copyWith(
@@ -1094,6 +1611,15 @@ class _DirectChatScreenState extends ConsumerState<DirectChatScreen>
                     const SizedBox(height: 12),
 
                     // Message content
+                    if (originalMessage.isUnderHighConfidenceReview)
+                      Text(
+                        AppLocalizations.of(context).translate('message-under-review-short'),
+                        style: TextStyles.body.copyWith(
+                          color: theme.grey[500],
+                          fontStyle: FontStyle.italic,
+                        ),
+                      )
+                    else
                     Text(
                       originalMessage.body,
                       style: TextStyles.body.copyWith(
@@ -1363,6 +1889,15 @@ class _DirectChatScreenState extends ConsumerState<DirectChatScreen>
                       ),
                     ),
                     const SizedBox(height: 4),
+                    if (message.isUnderHighConfidenceReview)
+                      Text(
+                        localizations.translate('message-under-review-short'),
+                        style: TextStyles.body.copyWith(
+                          color: theme.grey[500],
+                          fontStyle: FontStyle.italic,
+                        ),
+                      )
+                    else
                     Text(
                       message.body,
                       style: TextStyles.body.copyWith(
@@ -1407,6 +1942,20 @@ class _DirectChatScreenState extends ConsumerState<DirectChatScreen>
                       onTap: () => _deleteMessage(message),
                       isDestructive: true,
                     ),
+
+                  // Report message action (only for other users' messages)
+                  if (!isCurrentUser) ...[
+                    const SizedBox(height: 8),
+                    _buildActionItem(
+                      context,
+                      theme,
+                      icon: LucideIcons.flag,
+                      title: localizations.translate('report-message'),
+                      subtitle: localizations.translate('report-inappropriate-message'),
+                      onTap: () => _showReportMessageDialog(context, message),
+                      isDestructive: true,
+                    ),
+                  ],
                 ],
               ),
             ),

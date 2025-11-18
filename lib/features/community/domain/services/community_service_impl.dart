@@ -111,6 +111,7 @@ class CommunityServiceImpl implements CommunityService {
     bool? isPlusUser,
     bool? shareRelapseStreaks,
     NotificationPreferences? notificationPreferences,
+    bool? allowDirectMessages,
   }) async {
     final user = _auth.currentUser;
     if (user == null) {
@@ -133,6 +134,8 @@ class CommunityServiceImpl implements CommunityService {
             shareRelapseStreaks ?? currentProfile.shareRelapseStreaks,
         notificationPreferences:
             notificationPreferences ?? currentProfile.notificationPreferences,
+        allowDirectMessages:
+            allowDirectMessages ?? currentProfile.allowDirectMessages,
         updatedAt: DateTime.now(),
       );
 

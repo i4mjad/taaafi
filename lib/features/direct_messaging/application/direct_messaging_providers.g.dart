@@ -892,6 +892,162 @@ class _IsAnyBlockBetweenProviderElement
   String get otherCpId => (origin as IsAnyBlockBetweenProvider).otherCpId;
 }
 
+String _$conversationLastVisibleMessageHash() =>
+    r'885036bbb18e663d020e228c9b463c7e6621ea16';
+
+/// Get the actual last visible message for a conversation
+/// This fetches the most recent message that should be visible to the current user
+///
+/// Copied from [conversationLastVisibleMessage].
+@ProviderFor(conversationLastVisibleMessage)
+const conversationLastVisibleMessageProvider =
+    ConversationLastVisibleMessageFamily();
+
+/// Get the actual last visible message for a conversation
+/// This fetches the most recent message that should be visible to the current user
+///
+/// Copied from [conversationLastVisibleMessage].
+class ConversationLastVisibleMessageFamily extends Family<AsyncValue<String?>> {
+  /// Get the actual last visible message for a conversation
+  /// This fetches the most recent message that should be visible to the current user
+  ///
+  /// Copied from [conversationLastVisibleMessage].
+  const ConversationLastVisibleMessageFamily();
+
+  /// Get the actual last visible message for a conversation
+  /// This fetches the most recent message that should be visible to the current user
+  ///
+  /// Copied from [conversationLastVisibleMessage].
+  ConversationLastVisibleMessageProvider call(
+    String conversationId,
+  ) {
+    return ConversationLastVisibleMessageProvider(
+      conversationId,
+    );
+  }
+
+  @override
+  ConversationLastVisibleMessageProvider getProviderOverride(
+    covariant ConversationLastVisibleMessageProvider provider,
+  ) {
+    return call(
+      provider.conversationId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'conversationLastVisibleMessageProvider';
+}
+
+/// Get the actual last visible message for a conversation
+/// This fetches the most recent message that should be visible to the current user
+///
+/// Copied from [conversationLastVisibleMessage].
+class ConversationLastVisibleMessageProvider
+    extends AutoDisposeFutureProvider<String?> {
+  /// Get the actual last visible message for a conversation
+  /// This fetches the most recent message that should be visible to the current user
+  ///
+  /// Copied from [conversationLastVisibleMessage].
+  ConversationLastVisibleMessageProvider(
+    String conversationId,
+  ) : this._internal(
+          (ref) => conversationLastVisibleMessage(
+            ref as ConversationLastVisibleMessageRef,
+            conversationId,
+          ),
+          from: conversationLastVisibleMessageProvider,
+          name: r'conversationLastVisibleMessageProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$conversationLastVisibleMessageHash,
+          dependencies: ConversationLastVisibleMessageFamily._dependencies,
+          allTransitiveDependencies:
+              ConversationLastVisibleMessageFamily._allTransitiveDependencies,
+          conversationId: conversationId,
+        );
+
+  ConversationLastVisibleMessageProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.conversationId,
+  }) : super.internal();
+
+  final String conversationId;
+
+  @override
+  Override overrideWith(
+    FutureOr<String?> Function(ConversationLastVisibleMessageRef provider)
+        create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: ConversationLastVisibleMessageProvider._internal(
+        (ref) => create(ref as ConversationLastVisibleMessageRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        conversationId: conversationId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<String?> createElement() {
+    return _ConversationLastVisibleMessageProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is ConversationLastVisibleMessageProvider &&
+        other.conversationId == conversationId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, conversationId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin ConversationLastVisibleMessageRef
+    on AutoDisposeFutureProviderRef<String?> {
+  /// The parameter `conversationId` of this provider.
+  String get conversationId;
+}
+
+class _ConversationLastVisibleMessageProviderElement
+    extends AutoDisposeFutureProviderElement<String?>
+    with ConversationLastVisibleMessageRef {
+  _ConversationLastVisibleMessageProviderElement(super.provider);
+
+  @override
+  String get conversationId =>
+      (origin as ConversationLastVisibleMessageProvider).conversationId;
+}
+
 String _$canAccessDirectChatHash() =>
     r'707820ddd987ba7448597589297df24b0d1db25e';
 
@@ -1220,7 +1376,7 @@ final conversationActionsControllerProvider =
 );
 
 typedef _$ConversationActionsController = AutoDisposeNotifier<bool>;
-String _$blockControllerHash() => r'94f97101976cb43845b558e3612bb38ef2944e0e';
+String _$blockControllerHash() => r'799f53b5f035aefff7104599142828a803aebaa4';
 
 /// Controller for blocking/unblocking users
 ///

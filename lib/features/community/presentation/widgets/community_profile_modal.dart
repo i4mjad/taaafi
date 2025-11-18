@@ -16,6 +16,7 @@ import 'package:reboot_app_3/features/community/presentation/widgets/avatar_with
 import 'package:reboot_app_3/features/community/presentation/widgets/role_chip.dart';
 import 'package:reboot_app_3/features/shared/data/notifiers/user_reports_notifier.dart';
 import 'package:reboot_app_3/features/direct_messaging/application/direct_messaging_providers.dart';
+import 'package:reboot_app_3/features/direct_messaging/application/direct_messaging_ban_providers.dart';
 import 'package:go_router/go_router.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:intl/intl.dart';
@@ -202,6 +203,65 @@ class _CommunityProfileModalState extends ConsumerState<CommunityProfileModal> {
 
             return GestureDetector(
               onTap: () async {
+                // 1. Check if user is banned from starting conversations
+                try {
+                  final canStart =
+                      await ref.read(canStartConversationProvider.future);
+
+                  if (!canStart) {
+                    if (!context.mounted) return;
+                    getErrorSnackBar(context, 'start-conversation-restricted');
+                    Navigator.of(context).pop();
+                    return;
+                  }
+                } catch (e) {
+                  if (!context.mounted) return;
+                  getErrorSnackBar(context, 'error-checking-block-status');
+                  Navigator.of(context).pop();
+                  return;
+                }
+
+                // 2. Check if there's any block between users before proceeding
+                try {
+                  final isBlocked = await ref.read(
+                    isAnyBlockBetweenProvider(widget.communityProfileId).future,
+                  );
+
+                  if (isBlocked) {
+                    if (!context.mounted) return;
+                    getErrorSnackBar(context, 'cannot-message-user-blocked');
+                    Navigator.of(context).pop();
+                    return;
+                  }
+                } catch (e) {
+                  if (!context.mounted) return;
+                  getErrorSnackBar(context, 'error-checking-block-status');
+                  Navigator.of(context).pop();
+                  return;
+                }
+
+                // Check if the target user allows direct messages
+                try {
+                  final targetProfile = await ref.read(
+                    communityProfileByIdProvider(widget.communityProfileId)
+                        .future,
+                  );
+
+                  if (targetProfile != null &&
+                      !targetProfile.allowDirectMessages) {
+                    if (!context.mounted) return;
+                    getErrorSnackBar(context, 'user-not-accepting-messages');
+                    Navigator.of(context).pop();
+                    return;
+                  }
+                } catch (e) {
+                  if (!context.mounted) return;
+                  getErrorSnackBar(
+                      context, 'error-checking-messaging-preferences');
+                  Navigator.of(context).pop();
+                  return;
+                }
+
                 // Close the profile modal first and wait for it to dismiss
                 Navigator.of(context).pop();
 

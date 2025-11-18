@@ -22,6 +22,9 @@ class CommunityProfileEntity {
   final DateTime? updatedAt;
   final NotificationPreferences? notificationPreferences;
   
+  // Privacy settings
+  final bool allowDirectMessages; // Allow receiving direct messages
+  
   // Group-specific fields (Sprint 4 - Feature 4.1)
   final String? groupBio; // Max 200 chars
   final List<String> interests; // Tags/categories
@@ -43,6 +46,7 @@ class CommunityProfileEntity {
     required this.createdAt,
     this.updatedAt,
     this.notificationPreferences,
+    this.allowDirectMessages = true, // Default to true
     this.groupBio,
     this.interests = const [],
     this.groupAchievements = const [],
@@ -88,6 +92,7 @@ class CommunityProfileEntity {
           ? NotificationPreferences.fromJson(
               json['notificationPreferences'] as Map<String, dynamic>)
           : null,
+      allowDirectMessages: json['allowDirectMessages'] as bool? ?? true,
       groupBio: json['groupBio'] as String?,
       interests: json['interests'] != null 
           ? List<String>.from(json['interests'] as List)
@@ -115,6 +120,7 @@ class CommunityProfileEntity {
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
       'notificationPreferences': notificationPreferences?.toJson(),
+      'allowDirectMessages': allowDirectMessages,
       'groupBio': groupBio,
       'interests': interests,
       'groupAchievements': groupAchievements,
@@ -237,6 +243,7 @@ class CommunityProfileEntity {
     DateTime? createdAt,
     DateTime? updatedAt,
     NotificationPreferences? notificationPreferences,
+    bool? allowDirectMessages,
     String? groupBio,
     List<String>? interests,
     List<String>? groupAchievements,
@@ -258,6 +265,7 @@ class CommunityProfileEntity {
       updatedAt: updatedAt ?? this.updatedAt,
       notificationPreferences:
           notificationPreferences ?? this.notificationPreferences,
+      allowDirectMessages: allowDirectMessages ?? this.allowDirectMessages,
       groupBio: groupBio ?? this.groupBio,
       interests: interests ?? this.interests,
       groupAchievements: groupAchievements ?? this.groupAchievements,

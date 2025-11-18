@@ -343,10 +343,44 @@ const Map<String, String> kEn = {
   "unblock-user-confirmation": "Are you sure you want to unblock this user?",
   "user-blocked-successfully": "User blocked successfully",
   "user-unblocked-successfully": "User unblocked successfully",
+  "error-blocking-user": "Error blocking user",
+  "error-unblocking-user": "Error unblocking user",
+  "error-checking-block-status": "Error checking block status",
+  "user-not-accepting-messages": "This user is not accepting messages",
+  "error-checking-messaging-preferences":
+      "Error checking messaging preferences",
+  "privacy-settings": "Privacy Settings",
+  "allow-direct-messages": "Allow direct messages",
+  "allow-direct-messages-description":
+      "Allow other users to send you private messages",
+  "report": "Report",
+  "submit-report": "Submit Report",
+  "report-user": "Report User",
+  "report-user-confirmation": "Do you want to report this user to moderators?",
+  "user-reported-successfully": "User reported successfully",
+  "error-reporting-user": "Error reporting user",
+  "report-message": "Report Message",
+  "report-message-confirmation":
+      "Do you want to report this message to moderators?",
+  "report-inappropriate-message": "Report inappropriate message",
+  "message-reported-successfully": "Message reported successfully",
+  "error-reporting-message": "Error reporting message",
   "delete-conversation": "Delete Conversation",
   "delete-conversation-confirmation":
       "Are you sure you want to delete this conversation?",
   "conversation-deleted": "Conversation deleted",
+  "error-deleting-conversation": "Error deleting conversation",
+  "direct-messaging-completely-restricted":
+      "You are restricted from using direct messaging",
+  "start-conversation-restricted":
+      "You are restricted from starting new conversations",
+  "send-message-restricted": "You are restricted from sending messages",
+  "feature-restricted": "This feature is currently restricted for your account",
+  "error-checking-permissions": "Error checking permissions",
+  "reason": "Reason",
+  "message-under-review":
+      "This message is under review due to a suspicious rule violation",
+  "message-under-review-short": "Under review",
   "mute-conversation": "Mute",
   "unmute-conversation": "Unmute",
   "conversation-muted-success": "Conversation muted",
@@ -796,7 +830,6 @@ const Map<String, String> kEn = {
   "logout-error": "Failed to logout. Please try again.",
   "warning-details": "Warning Details",
   "ban-details": "Ban Details",
-  "reason": "Reason",
   "warning-information": "Warning Information",
   "ban-information": "Ban Information",
   "warning-type": "Warning Type",
@@ -1550,7 +1583,6 @@ const Map<String, String> kEn = {
   "report-data-error": "Report data error",
   "report-data-error-description":
       "After the update some of the data might be lost, if you feel that is the case with your numbers, create a report and we will review it.",
-  "submit-report": "Submit Report",
   "check-your-inquiry": "Check Your Inquiry",
   "user-justification": "User Justification",
   "user-justification-placeholder":
@@ -1869,7 +1901,6 @@ const Map<String, String> kEn = {
   "group-settings": "Group Settings",
   "notification-settings": "Notification Settings",
   "member-settings": "Member Settings",
-  "privacy-settings": "Privacy Settings",
 
   // Group Capacity Settings
   "admin-settings": "Admin Settings",
@@ -3075,7 +3106,6 @@ const Map<String, String> kEn = {
   "group-member": "Member",
 
   "error-loading-member": "Failed to load member",
-  "report-user": "Report User",
   "report-inappropriate-behavior": "Report inappropriate behavior",
   "promote-to-admin": "Promote to Admin",
   "grant-admin-privileges": "Grant admin privileges",
@@ -3183,7 +3213,6 @@ const Map<String, String> kEn = {
   "report-user-subtitle": "Report inappropriate behavior",
   "report-user-placeholder": "Describe the issue you'd like to report...",
   "user-reported": "User reported successfully",
-  "error-reporting-user": "Error reporting user",
   "profile-actions": "Profile Actions",
   "error_loading_stats": "Error loading statistics",
   "cannot-restore-multiple-profiles":
@@ -3246,7 +3275,6 @@ const Map<String, String> kEn = {
   //Guard
 
   // Report Message
-  "report-message": "Report Message",
   "report-reason": "Why are you reporting this message?",
   "report-inappropriate-content": "Inappropriate Content",
   "report-harassment": "Harassment or Bullying",

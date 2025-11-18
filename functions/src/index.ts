@@ -1271,6 +1271,11 @@ import {
   sendDirectMessageNotification 
 } from './directMessageNotifications';
 
+// Import direct message moderation function
+import { 
+  moderateDirectMessage 
+} from './moderateDirectMessage';
+
 // Import groups activity backfill function
 import { 
   backfillMemberActivity 
@@ -1295,6 +1300,11 @@ export {
 // Export direct message notification functions
 export {
   sendDirectMessageNotification
+};
+
+// Export direct message moderation function
+export {
+  moderateDirectMessage
 };
 
 // Export groups activity backfill function

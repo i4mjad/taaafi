@@ -69,9 +69,10 @@ class DirectMessagesFirestoreDataSource implements DirectMessagesDataSource {
         .snapshots()
         .asyncMap((snapshot) async {
       try {
+        // Don't filter by visibility here - let the UI layer handle it with current user context
         final messages = snapshot.docs
             .map((doc) => DirectMessageModel.fromFirestore(doc))
-            .where((msg) => !msg.isDeleted) // Filter out deleted messages
+            .where((msg) => !msg.isDeleted) // Only filter deleted messages
             .toList();
 
         // Cache document snapshots for pagination
@@ -138,7 +139,7 @@ class DirectMessagesFirestoreDataSource implements DirectMessagesDataSource {
       final messages = messageDocs
           .take(params.limit)
           .map((doc) => DirectMessageModel.fromFirestore(doc))
-          .where((msg) => !msg.isDeleted)
+          .where((msg) => !msg.isDeleted) // Only filter deleted, not visibility (handled in UI)
           .toList();
 
       // Cache document references

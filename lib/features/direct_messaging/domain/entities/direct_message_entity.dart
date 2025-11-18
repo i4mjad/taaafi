@@ -1,29 +1,32 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 /// Moderation status for direct messages
 enum ModerationStatusType {
   pending,
   approved,
   blocked,
+  manual_review,
 }
 
 /// Moderation metadata
 class ModerationStatus {
   final ModerationStatusType status;
   final String? reason;
+  final int? confidence; // 0-100 confidence score
 
   const ModerationStatus({
     required this.status,
     this.reason,
+    this.confidence,
   });
 
   ModerationStatus copyWith({
     ModerationStatusType? status,
     String? reason,
+    int? confidence,
   }) {
     return ModerationStatus(
       status: status ?? this.status,
       reason: reason ?? this.reason,
+      confidence: confidence ?? this.confidence,
     );
   }
 }
@@ -62,10 +65,43 @@ class DirectMessageEntity {
   bool get isReply => replyToMessageId != null;
 
   /// Check if message is visible (not deleted/hidden/blocked)
-  bool get isVisible =>
-      !isDeleted &&
-      !isHidden &&
-      moderation.status != ModerationStatusType.blocked;
+  /// This is a basic check - use isVisibleToUser() for user-specific visibility
+  bool get isVisible {
+    if (isDeleted || isHidden) return false;
+    if (moderation.status == ModerationStatusType.blocked) return false;
+    if (moderation.status == ModerationStatusType.pending) return false;
+    return true;
+  }
+  
+  /// Check if message is visible to a specific user
+  /// Recipients can't see high-confidence flagged messages, but senders can
+  bool isVisibleToUser(String viewerCpId) {
+    // Basic visibility checks
+    if (isDeleted || isHidden) return false;
+    if (moderation.status == ModerationStatusType.blocked) return false;
+    if (moderation.status == ModerationStatusType.pending) return false;
+    
+    // For manual_review with high confidence, hide from recipients but show to sender
+    if (moderation.status == ModerationStatusType.manual_review) {
+      final confidence = (moderation.confidence ?? 0) / 100.0;
+      final normalizedConfidence = confidence > 1.5 ? confidence / 100.0 : confidence;
+      
+      if (normalizedConfidence >= 0.85) {
+        // High confidence - only visible to sender
+        return viewerCpId == senderCpId;
+      }
+    }
+    
+    return true;
+  }
+  
+  /// Check if message should show "under review" indicator
+  bool get isUnderHighConfidenceReview {
+    if (moderation.status != ModerationStatusType.manual_review) return false;
+    final confidence = (moderation.confidence ?? 0) / 100.0;
+    final normalizedConfidence = confidence > 1.5 ? confidence / 100.0 : confidence;
+    return normalizedConfidence >= 0.85;
+  }
 
   DirectMessageEntity copyWith({
     String? id,
