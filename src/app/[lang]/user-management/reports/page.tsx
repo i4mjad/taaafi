@@ -70,7 +70,6 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 
 // Import notification payload utilities
 import { createReportUpdatePayload, createNewMessagePayload } from '@/utils/notificationPayloads';
-import MigrationManagementCard from '@/app/[lang]/user-management/users/[uid]/MigrationManagementCard';
 import ReportQuickDialog from './components/ReportQuickDialog';
 
 interface UserReport {
@@ -87,7 +86,7 @@ interface UserReport {
   // User data
   isPlusUser?: boolean;
   userDisplayName?: string;
-  userCreatedAt?: Timestamp;
+  isVerified?: boolean;
 }
 
 interface ReportMessage {
@@ -137,10 +136,6 @@ export default function UserReportsPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [reportToDelete, setReportToDelete] = useState<UserReport | null>(null);
 
-  // Migration dialog state
-  const [migrationDialogOpen, setMigrationDialogOpen] = useState(false);
-  const [migrationDialogUserId, setMigrationDialogUserId] = useState<string | null>(null);
-  const [migrationDialogUser, setMigrationDialogUser] = useState<any | null>(null);
   const [quickDialogOpen, setQuickDialogOpen] = useState(false);
   const [quickDialogReportId, setQuickDialogReportId] = useState<string | null>(null);
 
@@ -149,27 +144,24 @@ export default function UserReportsPage() {
   const [reportsLoading, setReportsLoading] = useState(true);
   const [reportsError, setReportsError] = useState<Error | null>(null);
   const [lastMessagesLoading, setLastMessagesLoading] = useState(false);
-  const userCreatedAtCache = useRef<Map<string, Timestamp>>(new Map());
+  const userVerifiedCache = useRef<Map<string, boolean>>(new Map());
 
-  // Fetch user createdAt from Auth via admin API and cache per session
-  const fetchUserAuthCreatedAt = async (userId: string): Promise<Timestamp | undefined> => {
-    if (userCreatedAtCache.current.has(userId)) {
-      return userCreatedAtCache.current.get(userId);
+  // Fetch user emailVerified status from Auth via admin API and cache per session
+  const fetchUserVerifiedStatus = async (userId: string): Promise<boolean> => {
+    if (userVerifiedCache.current.has(userId)) {
+      return userVerifiedCache.current.get(userId) || false;
     }
     try {
       const resp = await fetch(`/api/admin/users/${userId}`);
-      if (!resp.ok) return undefined;
+      if (!resp.ok) return false;
       const data = await resp.json();
-      const iso = data?.user?.createdAt;
-      if (iso) {
-        const ts = Timestamp.fromDate(new Date(iso));
-        userCreatedAtCache.current.set(userId, ts);
-        return ts;
-      }
+      const isVerified = data?.user?.emailVerified || false;
+      userVerifiedCache.current.set(userId, isVerified);
+      return isVerified;
     } catch (e) {
-      console.warn('Failed to fetch auth createdAt for user', userId, e);
+      console.warn('Failed to fetch verified status for user', userId, e);
     }
-    return undefined;
+    return false;
   };
   
   // Status counts state
@@ -688,24 +680,24 @@ export default function UserReportsPage() {
           
           if (!userSnapshot.empty) {
             const userData = userSnapshot.docs[0].data();
-            const createdAtAuth = await fetchUserAuthCreatedAt(report.uid);
+            const isVerified = await fetchUserVerifiedStatus(report.uid);
             return {
               ...report,
               isPlusUser: userData.isPlusUser || false,
               userDisplayName: userData.displayName || '',
-              userCreatedAt: createdAtAuth || undefined,
+              isVerified: isVerified,
             };
           }
         } catch (error) {
           console.error(`Error fetching user data for ${report.uid}:`, error);
         }
         
-        const createdAtAuth = await fetchUserAuthCreatedAt(report.uid);
+        const isVerified = await fetchUserVerifiedStatus(report.uid);
         return {
           ...report,
           isPlusUser: false,
           userDisplayName: '',
-          userCreatedAt: createdAtAuth || undefined,
+          isVerified: isVerified,
         };
       }));
     }
@@ -745,24 +737,24 @@ export default function UserReportsPage() {
           
           if (!userSnapshot.empty) {
             const userData = userSnapshot.docs[0].data();
-            const createdAtAuth = await fetchUserAuthCreatedAt(reportData.uid);
+            const isVerified = await fetchUserVerifiedStatus(reportData.uid);
             return {
               ...reportData,
               isPlusUser: userData.isPlusUser || false,
               userDisplayName: userData.displayName || '',
-              userCreatedAt: createdAtAuth || undefined,
+              isVerified: isVerified,
             };
           }
         } catch (error) {
           console.error(`Error fetching user data for ${reportData.uid}:`, error);
         }
         
-        const createdAtAuth = await fetchUserAuthCreatedAt(reportData.uid);
+        const isVerified = await fetchUserVerifiedStatus(reportData.uid);
         return {
           ...reportData,
           isPlusUser: false,
           userDisplayName: '',
-          userCreatedAt: createdAtAuth || undefined,
+          isVerified: isVerified,
         };
       }));
 
@@ -977,24 +969,30 @@ export default function UserReportsPage() {
     setPageCache(new Map()); // Clear cache when page size changes
   };
 
-  const getStatusBadge = (status: string) => {
-    const variants = {
-      pending: { variant: 'secondary' as const, icon: Clock, className: 'text-yellow-600' },
-      inProgress: { variant: 'default' as const, icon: AlertCircle, className: 'text-blue-600' },
-      waitingForAdminResponse: { variant: 'default' as const, icon: AlertCircle, className: 'text-orange-600' },
-      closed: { variant: 'outline' as const, icon: CheckCircle, className: 'text-green-600' },
-      finalized: { variant: 'default' as const, icon: XCircle, className: 'text-gray-600' },
+  const getStatusRowColor = (status: string, isPlusUser?: boolean) => {
+    // Base colors for status - lighter versions
+    const baseColors = {
+      pending: 'bg-yellow-50/50 hover:bg-yellow-50 dark:bg-yellow-950/10 dark:hover:bg-yellow-950/15',
+      inProgress: 'bg-blue-50/50 hover:bg-blue-50 dark:bg-blue-950/10 dark:hover:bg-blue-950/15',
+      waitingForAdminResponse: 'bg-orange-50/50 hover:bg-orange-50 dark:bg-orange-950/10 dark:hover:bg-orange-950/15',
+      closed: 'bg-green-50/50 hover:bg-green-50 dark:bg-green-950/10 dark:hover:bg-green-950/15',
+      finalized: 'bg-gray-50/50 hover:bg-gray-50 dark:bg-gray-900/10 dark:hover:bg-gray-900/15',
     };
-
-    const config = variants[status as keyof typeof variants] || variants.pending;
-    const Icon = config.icon;
-
-    return (
-      <Badge variant={config.variant} className={config.className}>
-        <Icon className="h-3 w-3 mr-1" />
-        {t(`modules.userManagement.reports.status${status.charAt(0).toUpperCase() + status.slice(1)}`) || status}
-      </Badge>
-    );
+    
+    // Plus user colors - lighter amber
+    const plusUserColors = {
+      pending: 'bg-amber-50 hover:bg-amber-100 dark:bg-amber-900/15 dark:hover:bg-amber-900/20',
+      inProgress: 'bg-amber-50 hover:bg-amber-100 dark:bg-amber-900/15 dark:hover:bg-amber-900/20',
+      waitingForAdminResponse: 'bg-amber-50 hover:bg-amber-100 dark:bg-amber-900/15 dark:hover:bg-amber-900/20',
+      closed: 'bg-amber-50 hover:bg-amber-100 dark:bg-amber-900/15 dark:hover:bg-amber-900/20',
+      finalized: 'bg-amber-50 hover:bg-amber-100 dark:bg-amber-900/15 dark:hover:bg-amber-900/20',
+    };
+    
+    if (isPlusUser) {
+      return plusUserColors[status as keyof typeof plusUserColors] || plusUserColors.pending;
+    }
+    
+    return baseColors[status as keyof typeof baseColors] || baseColors.pending;
   };
 
   const formatDate = (timestamp: Timestamp) => {
@@ -1005,24 +1003,6 @@ export default function UserReportsPage() {
       hour: '2-digit',
       minute: '2-digit',
     }).format(timestamp.toDate());
-  };
-
-  // Open migration dialog for a given user
-  const openMigrationDialog = async (userId: string) => {
-    try {
-      const userRef = doc(db, 'users', userId);
-      const userSnap = await getDoc(userRef);
-      if (userSnap.exists()) {
-        setMigrationDialogUserId(userId);
-        setMigrationDialogUser(userSnap.data());
-        setMigrationDialogOpen(true);
-      } else {
-        toast.error(t('modules.userManagement.reports.errors.userNotFound') || 'User not found for this report');
-      }
-    } catch (e) {
-      console.error('Error loading user for migration dialog:', e);
-      toast.error(t('modules.userManagement.reports.errors.loadingFailed') || 'Failed to load user');
-    }
   };
 
   const truncateText = (text: string, maxLength: number = 50) => {
@@ -1429,14 +1409,11 @@ export default function UserReportsPage() {
                           </TableHead>
 
                           <TableHead className="hidden md:table-cell">{t('modules.userManagement.reports.reportType') || 'Report Type'}</TableHead>
-                          <TableHead className="hidden xl:table-cell">{t('modules.userManagement.reports.userCreatedAt') || 'User Created'}</TableHead>
-
-                          <TableHead>{t('modules.userManagement.reports.status') || 'Status'}</TableHead>
                           <TableHead className="hidden lg:table-cell">{t('modules.userManagement.reports.submittedDate') || 'Submitted Date'}</TableHead>
                           <TableHead className="hidden xl:table-cell">{t('modules.userManagement.reports.initialMessage') || 'Initial Message'}</TableHead>
                           <TableHead className="hidden sm:table-cell">{t('modules.userManagement.reports.messagesCount') || 'Messages'}</TableHead>
                           <TableHead className="hidden lg:table-cell">{t('modules.userManagement.reports.lastMessageFrom') || 'Last Message From'}</TableHead>
-                          <TableHead className="hidden md:table-cell">{t('modules.userManagement.reports.migration') || 'Migration'}</TableHead>
+                          <TableHead className="hidden md:table-cell">{t('modules.userManagement.reports.verified') || 'Verified'}</TableHead>
                           <TableHead className="text-right">{t('modules.userManagement.reports.actions') || 'Actions'}</TableHead>
                         </TableRow>
                       </TableHeader>
@@ -1447,20 +1424,19 @@ export default function UserReportsPage() {
                             <TableRow key={i}>
                               <TableCell><Skeleton className="h-4 w-4" /></TableCell>
                               <TableCell className="hidden md:table-cell"><Skeleton className="h-4 w-16" /></TableCell>
-                              <TableCell className="hidden xl:table-cell"><Skeleton className="h-4 w-12" /></TableCell>
-                              <TableCell><Skeleton className="h-4 w-16" /></TableCell>
                               <TableCell className="hidden lg:table-cell"><Skeleton className="h-4 w-32" /></TableCell>
                               <TableCell className="hidden xl:table-cell"><Skeleton className="h-4 w-40" /></TableCell>
                               <TableCell className="hidden sm:table-cell"><Skeleton className="h-4 w-12" /></TableCell>
                               <TableCell className="hidden lg:table-cell"><Skeleton className="h-4 w-16" /></TableCell>
-                              <TableCell><Skeleton className="h-4 w-16" /></TableCell>
+                              <TableCell className="hidden md:table-cell"><Skeleton className="h-4 w-16" /></TableCell>
+                              <TableCell className="text-right"><Skeleton className="h-4 w-16" /></TableCell>
                             </TableRow>
                           ))
                         ) : (
                           filteredReports.map((report) => (
                             <TableRow 
                               key={report.id}
-                              className={report.isPlusUser ? 'bg-amber-50 hover:bg-amber-100' : ''}
+                              className={getStatusRowColor(report.status, report.isPlusUser)}
                             >
                               <TableCell>
                                 <Checkbox
@@ -1475,15 +1451,6 @@ export default function UserReportsPage() {
                                   {getReportTypeName(report.reportTypeId)}
                                 </Badge>
                               </TableCell>
-                              <TableCell className="hidden xl:table-cell">
-                                {report.userCreatedAt ? (
-                                  <span className="text-xs sm:text-sm">{formatDate(report.userCreatedAt)}</span>
-                                ) : (
-                                  <span className="text-xs text-muted-foreground">{t('common.unknown') || 'Unknown'}</span>
-                                )}
-                              </TableCell>
-
-                              <TableCell>{getStatusBadge(report.status)}</TableCell>
                               <TableCell className="hidden lg:table-cell">
                                 <span className="text-xs sm:text-sm">{formatDate(report.time)}</span>
                               </TableCell>
@@ -1520,13 +1487,17 @@ export default function UserReportsPage() {
                                 )}
                               </TableCell>
                               <TableCell className="hidden md:table-cell">
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => openMigrationDialog(report.uid)}
-                                >
-                                  {t('modules.userManagement.reports.viewMigrationStatus') || 'Migration Status'}
-                                </Button>
+                                {report.isVerified ? (
+                                  <Badge variant="default" className="bg-green-600 hover:bg-green-700 text-xs">
+                                    <CheckCircle className="h-3 w-3 mr-1" />
+                                    {t('modules.userManagement.reports.verified') || 'Verified'}
+                                  </Badge>
+                                ) : (
+                                  <Badge variant="outline" className="text-xs text-muted-foreground">
+                                    <XCircle className="h-3 w-3 mr-1" />
+                                    {t('modules.userManagement.reports.unverified') || 'Not Verified'}
+                                  </Badge>
+                                )}
                               </TableCell>
                               <TableCell className="text-right">
                                 <DropdownMenu>
@@ -1740,6 +1711,9 @@ export default function UserReportsPage() {
                     <SelectItem value="contactSupport">
                       {locale === 'ar' ? 'تواصل مع الدعم' : 'Contact Support'}
                     </SelectItem>
+                    <SelectItem value="checkSpam">
+                      {locale === 'ar' ? 'تحقق من البريد العشوائي' : 'Check Spam/Junk Folder'}
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -1823,27 +1797,6 @@ export default function UserReportsPage() {
         open={quickDialogOpen}
         onOpenChange={setQuickDialogOpen}
       />
-
-      {/* Migration Status Dialog */}
-      <Dialog open={migrationDialogOpen} onOpenChange={setMigrationDialogOpen}>
-        <DialogContent className="max-w-3xl">
-          <DialogHeader>
-            <DialogTitle>{t('modules.userManagement.reports.viewMigrationStatus') || 'Migration Status'}</DialogTitle>
-            <DialogDescription>
-              {migrationDialogUserId ? (
-                t('modules.userManagement.reports.migrationDialogDescription') || 'Followups migration status for this user'
-              ) : null}
-            </DialogDescription>
-          </DialogHeader>
-          {migrationDialogUserId && migrationDialogUser ? (
-            <MigrationManagementCard userId={migrationDialogUserId} user={migrationDialogUser} />
-          ) : (
-            <div className="py-8">
-              <Skeleton className="h-24 w-full" />
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
     </>
   );
 } 

@@ -30,6 +30,10 @@ import {
   Trophy,
   Eye,
   UserMinus,
+  Clock,
+  Ban,
+  AlertTriangle,
+  Shield,
 } from "lucide-react"
 import { format } from "date-fns"
 
@@ -48,34 +52,56 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { MembershipDetailsModal } from "@/components/membership-details-modal"
 
-interface MembershipData {
-  id: string
+interface CommunityProfileData {
   cpId: string
-  groupId: string
-  groupName: string
-  role: 'admin' | 'member'
-  isActive: boolean
-  joinedAt: Date
-  leftAt?: Date
-  pointsTotal?: number
+  userUID: string
+  displayName: string
+  gender: string
+  isAnonymous: boolean
+  createdAt: Date
+  nextJoinAllowedAt?: Date | null
+  customCooldownDuration?: number | null
+  cooldownReason?: string | null
+  memberships: Array<{
+    id: string
+    groupId: string
+    groupName: string
+    role: 'admin' | 'member'
+    isActive: boolean
+    joinedAt: Date
+    leftAt?: Date
+    pointsTotal: number
+  }>
+  activeBans: Array<{
+    id: string
+    reason: string
+    restrictedFeatures: string[]
+    issuedAt: Date
+  }>
+  activeWarnings: Array<{
+    id: string
+    type: string
+    reason: string
+    severity: string
+    issuedAt: Date
+  }>
 }
 
-interface MembershipsTableProps {
-  data: MembershipData[]
+interface CommunityProfilesTableProps {
+  data: CommunityProfileData[]
   groups: any[]
   dictionary: any
   lang: string
+  onRemoveProfile: (profile: CommunityProfileData) => void
 }
 
 const getColumns = (
   dictionary: any,
   lang: string,
   groups: any[],
-  onViewDetails: (membership: MembershipData) => void,
-  onRemoveMember: (membership: MembershipData) => void
-): ColumnDef<MembershipData>[] => [
+  onRemoveProfile: (profile: CommunityProfileData) => void
+): ColumnDef<CommunityProfileData>[] => [
   {
     id: "select",
     header: ({ table }) => (
@@ -100,108 +126,173 @@ const getColumns = (
     enableHiding: false,
   },
   {
-    accessorKey: "cpId",
-    header: dictionary.headers?.userId || "User ID",
-    cell: ({ row }) => (
-      <div className="font-mono text-sm">
-        {row.original.cpId}
-      </div>
-    ),
-    enableHiding: false,
+    accessorKey: "displayName",
+    header: dictionary.headers?.profileInfo || "Profile Info",
+    cell: ({ row }) => {
+      const profile = row.original
+      return (
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+            <Users className="h-4 w-4" />
+          </div>
+          <div className="min-w-0">
+            <div className="font-medium truncate">{profile.displayName}</div>
+            <div className="text-xs text-muted-foreground font-mono">CP: {profile.cpId}</div>
+            <div className="text-xs text-muted-foreground font-mono">User: {profile.userUID}</div>
+          </div>
+        </div>
+      )
+    },
   },
   {
-    accessorKey: "groupName",
-    header: dictionary.headers?.groupName || "Group",
-    cell: ({ row }) => (
-      <div className="flex items-center gap-2">
-        <Users className="h-4 w-4 text-muted-foreground" />
-        <span className="font-medium">{row.original.groupName}</span>
-      </div>
-    ),
+    accessorKey: "activeMemberships",
+    header: dictionary.headers?.activeMemberships || "Active Memberships",
+    cell: ({ row }) => {
+      const profile = row.original
+      const activeMemberships = profile.memberships.filter(m => m.isActive)
+      
+      return (
+        <div className="space-y-1">
+          {activeMemberships.length === 0 ? (
+            <Badge variant="outline" className="text-xs">{dictionary.memberships?.noActiveMemberships || 'No active memberships'}</Badge>
+          ) : (
+            activeMemberships.map(membership => (
+              <div key={membership.id} className="flex items-center justify-between p-1 bg-green-50 border border-green-200 rounded text-xs">
+                <div className="flex items-center gap-1">
+                  <Badge variant={membership.role === 'admin' ? 'default' : 'secondary'} className="text-xs">
+                    {membership.role === 'admin' && <Crown className="h-2 w-2 mr-1" />}
+                    {dictionary.roles?.[membership.role as keyof typeof dictionary.roles] || membership.role}
+                  </Badge>
+                  <span className="truncate max-w-[100px]" title={membership.groupName}>
+                    {membership.groupName}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Trophy className="h-2 w-2 text-yellow-600" />
+                  <span>{membership.pointsTotal}</span>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      )
+    },
   },
   {
-    accessorKey: "role",
-    header: dictionary.headers?.role || "Role",
-    cell: ({ row }) => (
-      <Badge variant={row.original.role === 'admin' ? 'default' : 'secondary'} className="flex items-center gap-1">
-        {row.original.role === 'admin' && <Crown className="h-3 w-3" />}
-        {row.original.role === 'admin' ? (dictionary.roleLabels?.admin || 'Admin') : (dictionary.roleLabels?.member || 'Member')}
-      </Badge>
-    ),
+    accessorKey: "status",
+    header: dictionary.headers?.status || "Status & Restrictions",
+    cell: ({ row }) => {
+      const profile = row.original
+      const now = new Date()
+      
+      return (
+        <div className="space-y-1">
+          {/* Cooldown Status */}
+          {profile.nextJoinAllowedAt && profile.nextJoinAllowedAt instanceof Date && !isNaN(profile.nextJoinAllowedAt.getTime()) && profile.nextJoinAllowedAt > now ? (
+            <Badge variant="outline" className="text-orange-600 border-orange-300 bg-orange-50 text-xs">
+              <Clock className="h-2 w-2 mr-1" />
+              {dictionary.status?.cooldownUntil || 'Cooldown until'} {format(profile.nextJoinAllowedAt, 'MMM dd')}
+            </Badge>
+          ) : (
+            <Badge variant="outline" className="text-green-600 border-green-300 bg-green-50 text-xs">
+              <Shield className="h-2 w-2 mr-1" />
+              {dictionary.status?.noRestrictions || 'No restrictions'}
+            </Badge>
+          )}
+          
+          {/* Bans */}
+          {profile.activeBans.length > 0 && (
+            <Badge variant="destructive" className="text-xs">
+              <Ban className="h-2 w-2 mr-1" />
+              {profile.activeBans.length} {dictionary.status?.bans || 'bans'}
+            </Badge>
+          )}
+          
+          {/* Warnings */}
+          {profile.activeWarnings.length > 0 && (
+            <Badge variant="outline" className="text-yellow-600 border-yellow-300 bg-yellow-50 text-xs">
+              <AlertTriangle className="h-2 w-2 mr-1" />
+              {profile.activeWarnings.length} {dictionary.status?.warnings || 'warnings'}
+            </Badge>
+          )}
+        </div>
+      )
+    },
   },
   {
-    accessorKey: "isActive",
-    header: dictionary.headers?.status || "Status",
-    cell: ({ row }) => (
-      <Badge variant={row.original.isActive ? 'default' : 'secondary'}>
-        {row.original.isActive ? (dictionary.statusLabels?.active || 'Active') : (dictionary.statusLabels?.inactive || 'Inactive')}
-      </Badge>
-    ),
-  },
-  {
-    accessorKey: "joinedAt",
-    header: dictionary.headers?.joinedAt || "Joined",
-    cell: ({ row }) => (
-      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <Calendar className="h-4 w-4" />
-        {format(row.original.joinedAt, 'MMM dd, yyyy')}
-      </div>
-    ),
-  },
-  {
-    accessorKey: "pointsTotal",
-    header: dictionary.headers?.points || "Points",
-    cell: ({ row }) => (
-      <div className="flex items-center gap-2 text-sm">
-        <Trophy className="h-4 w-4 text-muted-foreground" />
-        {row.original.pointsTotal || 0}
-      </div>
-    ),
+    accessorKey: "membershipStats",
+    header: dictionary.headers?.membershipStats || "Membership Stats",
+    cell: ({ row }) => {
+      const profile = row.original
+      const activeMemberships = profile.memberships.filter(m => m.isActive)
+      const totalPoints = profile.memberships.reduce((sum, m) => sum + (m.pointsTotal || 0), 0)
+      
+      return (
+        <div className="space-y-1 text-sm">
+          <div className="flex items-center gap-2">
+            <Users className="h-3 w-3 text-blue-600" />
+            <span>{activeMemberships.length}/{profile.memberships.length} {dictionary.memberships?.groups || 'groups'}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Trophy className="h-3 w-3 text-yellow-600" />
+            <span>{totalPoints} {dictionary.memberships?.totalPoints || 'total points'}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Calendar className="h-3 w-3 text-muted-foreground" />
+            <span>
+              {profile.createdAt && profile.createdAt instanceof Date && !isNaN(profile.createdAt.getTime()) 
+                ? format(profile.createdAt, 'MMM dd, yyyy') 
+                : (dictionary.status?.unknownDate || 'Unknown date')
+              }
+            </span>
+          </div>
+        </div>
+      )
+    },
   },
   {
     id: "actions",
-    cell: ({ row }) => (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="flex size-8 text-muted-foreground data-[state=open]:bg-muted" size="icon">
-            <MoreVerticalIcon className="h-4 w-4" />
-            <span className="sr-only">Open menu</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align={lang === "ar" ? "start" : "end"} className="w-48">
-          <DropdownMenuItem onClick={() => onViewDetails(row.original)}>
-            <Eye className="mr-2 h-4 w-4" />
-            {dictionary.actions?.viewDetails || 'View Details'}
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem 
-            onClick={() => window.location.href = `/community/groups/${row.original.groupId}/admin`}
-          >
-            <Crown className="mr-2 h-4 w-4" />
-            {dictionary.actions?.manageGroup || 'Manage Group'}
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem 
-            onClick={() => onRemoveMember(row.original)}
-            className="text-red-600 focus:text-red-600"
-          >
-            <UserMinus className="mr-2 h-4 w-4" />
-            {dictionary.actions?.removeMember || 'Remove Member'}
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    ),
+    cell: ({ row }) => {
+      const profile = row.original
+      const hasActiveMemership = profile.memberships.some(m => m.isActive)
+      
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="flex size-8 text-muted-foreground data-[state=open]:bg-muted" size="icon">
+              <MoreVerticalIcon className="h-4 w-4" />
+              <span className="sr-only">{dictionary.actions?.openMenu || 'Open menu'}</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align={lang === "ar" ? "start" : "end"} className="w-48">
+            <DropdownMenuItem onClick={() => {
+              window.location.href = `/${lang}/user-management/users/${profile.userUID}`;
+            }}>
+              <Eye className="mr-2 h-4 w-4" />
+              {dictionary.actions?.viewUserProfile || 'View User Profile'}
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem 
+              onClick={() => onRemoveProfile(profile)}
+              className="text-red-600 focus:text-red-600"
+              disabled={!hasActiveMemership}
+            >
+              <UserMinus className="mr-2 h-4 w-4" />
+              {dictionary.actions?.removeFromGroup || 'Remove from Group'}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )
+    },
   },
 ]
 
-export function MembershipsTable({ data, groups, dictionary, lang }: MembershipsTableProps) {
+export function CommunityProfilesTable({ data, groups, dictionary, lang, onRemoveProfile }: CommunityProfilesTableProps) {
   const [rowSelection, setRowSelection] = React.useState({})
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [globalFilter, setGlobalFilter] = React.useState("")
-  const [selectedMembership, setSelectedMembership] = React.useState<MembershipData | null>(null)
-  const [showDetailsModal, setShowDetailsModal] = React.useState(false)
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
     pageSize: 10,
@@ -211,15 +302,8 @@ export function MembershipsTable({ data, groups, dictionary, lang }: Memberships
     dictionary, 
     lang, 
     groups, 
-    (membership) => {
-      setSelectedMembership(membership)
-      setShowDetailsModal(true)
-    },
-    (membership) => {
-      // Navigate to the specific group detail page for removal
-      window.location.href = `/groups-management/${membership.groupId}`;
-    }
-  ), [dictionary, lang, groups])
+    onRemoveProfile
+  ), [dictionary, lang, groups, onRemoveProfile])
 
   const table = useReactTable({
     data,
@@ -247,8 +331,6 @@ export function MembershipsTable({ data, groups, dictionary, lang }: Memberships
     getFacetedUniqueValues: getFacetedUniqueValues(),
   })
 
-  const selectedGroup = groups.find(g => g.id === selectedMembership?.groupId)
-
   return (
     <>
       <div className="space-y-4">
@@ -256,7 +338,7 @@ export function MembershipsTable({ data, groups, dictionary, lang }: Memberships
         <div className="flex items-center justify-between">
           <div className="flex flex-1 items-center space-x-2">
             <Input
-              placeholder={dictionary.searchPlaceholder || "Search memberships..."}
+              placeholder={dictionary.searchPlaceholder || "Search community profiles..."}
               value={globalFilter}
               onChange={(event) => setGlobalFilter(event.target.value)}
               className="h-8 w-[150px] lg:w-[250px]"
@@ -265,13 +347,13 @@ export function MembershipsTable({ data, groups, dictionary, lang }: Memberships
           <div className="flex items-center gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm">
-                  <ColumnsIcon className="h-4 w-4" />
-                  <span className="hidden lg:inline">{dictionary.columnsText || 'Columns'}</span>
-                  <ChevronDownIcon className="h-4 w-4" />
+                <Button variant="outline" size="sm" className="ml-auto">
+                  <ColumnsIcon className="mr-2 h-4 w-4" />
+                  {dictionary.columnsText || "Columns"}
+                  <ChevronDownIcon className="ml-2 h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align={lang === "ar" ? "start" : "end"} className="w-56">
+              <DropdownMenuContent align="end" className="w-[150px]">
                 {table
                   .getAllColumns()
                   .filter((column) => typeof column.accessorFn !== "undefined" && column.getCanHide())
@@ -300,7 +382,7 @@ export function MembershipsTable({ data, groups, dictionary, lang }: Memberships
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => {
                     return (
-                      <TableHead key={header.id} colSpan={header.colSpan}>
+                      <TableHead key={header.id}>
                         {header.isPlaceholder
                           ? null
                           : flexRender(header.column.columnDef.header, header.getContext())}
@@ -316,11 +398,7 @@ export function MembershipsTable({ data, groups, dictionary, lang }: Memberships
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
-                    className="cursor-pointer hover:bg-muted/50"
-                    onClick={() => {
-                      setSelectedMembership(row.original)
-                      setShowDetailsModal(true)
-                    }}
+                    className="hover:bg-muted/50"
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id} onClick={(e) => {
@@ -336,7 +414,7 @@ export function MembershipsTable({ data, groups, dictionary, lang }: Memberships
               ) : (
                 <TableRow>
                   <TableCell colSpan={columns.length} className="h-24 text-center">
-                    {dictionary.noDataText || 'No memberships found.'}
+                    {dictionary.noDataText || "No community profiles found."}
                   </TableCell>
                 </TableRow>
               )}
@@ -347,12 +425,12 @@ export function MembershipsTable({ data, groups, dictionary, lang }: Memberships
         {/* Pagination */}
         <div className="flex items-center justify-between px-2">
           <div className="flex-1 text-sm text-muted-foreground">
-            {table.getFilteredSelectedRowModel().rows.length} {dictionary.pagination?.of || 'of'}{" "}
-            {table.getFilteredRowModel().rows.length} {dictionary.pagination?.selected || 'row(s) selected.'}
+            {table.getFilteredSelectedRowModel().rows.length} of{" "}
+            {table.getFilteredRowModel().rows.length} {dictionary.pagination?.selected || "row(s) selected."}
           </div>
           <div className="flex items-center space-x-6 lg:space-x-8">
             <div className="flex items-center space-x-2">
-              <p className="text-sm font-medium">{dictionary.pagination?.rowsPerPage || 'Rows per page'}</p>
+              <p className="text-sm font-medium">{dictionary.pagination?.rowsPerPage || "Rows per page"}</p>
               <Select
                 value={`${table.getState().pagination.pageSize}`}
                 onValueChange={(value) => {
@@ -372,7 +450,7 @@ export function MembershipsTable({ data, groups, dictionary, lang }: Memberships
               </Select>
             </div>
             <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-              {dictionary.pagination?.page || 'Page'} {table.getState().pagination.pageIndex + 1} {dictionary.pagination?.of || 'of'}{" "}
+              {dictionary.pagination?.page || "Page"} {table.getState().pagination.pageIndex + 1} {dictionary.pagination?.of || "of"}{" "}
               {table.getPageCount()}
             </div>
             <div className="flex items-center space-x-2">
@@ -416,15 +494,6 @@ export function MembershipsTable({ data, groups, dictionary, lang }: Memberships
           </div>
         </div>
       </div>
-
-      {/* Details Modal */}
-      <MembershipDetailsModal
-        membership={selectedMembership}
-        group={selectedGroup}
-        open={showDetailsModal}
-        onOpenChange={setShowDetailsModal}
-      />
-
     </>
   )
 }

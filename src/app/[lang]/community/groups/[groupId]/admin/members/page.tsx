@@ -12,7 +12,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { 
   Users, 
@@ -58,25 +57,10 @@ export default function GroupMembersPage() {
     });
   }, [filteredMembers]);
 
-  const handleRemoveMember = async () => {
-    if (!selectedMember) return;
-
-    setIsUpdating(true);
-    try {
-      await updateDoc(doc(db, 'group_memberships', selectedMember.id), {
-        isActive: false,
-        leftAt: new Date(),
-      });
-
-      toast.success(t('admin.members.memberRemoved'));
-      setShowRemoveDialog(false);
-      setSelectedMember(null);
-    } catch (error) {
-      console.error('Error removing member:', error);
-      toast.error(t('admin.members.removeMemberError'));
-    } finally {
-      setIsUpdating(false);
-    }
+  const handleRemovalSuccess = () => {
+    // Called when member is successfully removed via the modal
+    setShowRemoveDialog(false);
+    setSelectedMember(null);
   };
 
   const handlePromoteToAdmin = async (member: any) => {
@@ -353,35 +337,6 @@ export default function GroupMembersPage() {
             </CardContent>
           </Card>
 
-          {/* Remove Member Dialog */}
-          <Dialog open={showRemoveDialog} onOpenChange={setShowRemoveDialog}>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>{t('admin.members.removeDialog.title')}</DialogTitle>
-                <DialogDescription>
-                  {t('admin.members.removeDialog.description', { 
-                    member: selectedMember?.cpId || ''
-                  })}
-                </DialogDescription>
-              </DialogHeader>
-              <DialogFooter>
-                <Button 
-                  variant="outline" 
-                  onClick={() => setShowRemoveDialog(false)}
-                  disabled={isUpdating}
-                >
-                  {t('common.cancel')}
-                </Button>
-                <Button 
-                  variant="destructive" 
-                  onClick={handleRemoveMember}
-                  disabled={isUpdating}
-                >
-                  {isUpdating ? t('admin.members.removing') : t('admin.members.removeMember')}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
         </div>
       </AdminLayout>
     </AdminRoute>

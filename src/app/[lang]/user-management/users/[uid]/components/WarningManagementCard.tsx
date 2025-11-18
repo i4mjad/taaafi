@@ -23,6 +23,7 @@ import {
   Eye,
   FileText,
   User,
+  Users,
   Clock,
   Loader2,
   ExternalLink,
@@ -38,6 +39,7 @@ import { useCollection, useDocument } from 'react-firebase-hooks/firestore';
 import { collection, addDoc, query, where, orderBy, serverTimestamp, Timestamp, doc, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { toast } from 'sonner';
+import { createWarningNotificationPayload } from '@/utils/notificationPayloads';
 
 interface RelatedContent {
   type: 'user' | 'report' | 'post' | 'comment' | 'message' | 'group' | 'other';
@@ -421,12 +423,20 @@ export default function WarningManagementCard({ userId, userDisplayName, userDev
   });
 
   const warningTypes = [
-    { value: 'content_violation', labelKey: 'contentViolation' },
-    { value: 'inappropriate_behavior', labelKey: 'inappropriateBehavior' },
-    { value: 'spam', labelKey: 'spam' },
-    { value: 'harassment', labelKey: 'harassment' },
-    { value: 'other', labelKey: 'other' },
+    { value: 'content_violation', labelKey: 'contentViolation', category: 'general' },
+    { value: 'inappropriate_behavior', labelKey: 'inappropriateBehavior', category: 'general' },
+    { value: 'spam', labelKey: 'spam', category: 'general' },
+    { value: 'harassment', labelKey: 'harassment', category: 'general' },
+    { value: 'other', labelKey: 'other', category: 'general' },
+    // Groups-specific warning types
+    { value: 'group_harassment', labelKey: 'groupHarassment', category: 'groups' },
+    { value: 'group_spam', labelKey: 'groupSpam', category: 'groups' },
+    { value: 'group_inappropriate_content', labelKey: 'groupInappropriateContent', category: 'groups' },
+    { value: 'group_disruption', labelKey: 'groupDisruption', category: 'groups' },
   ];
+
+  const groupsWarningTypes = warningTypes.filter(type => type.category === 'groups');
+  const generalWarningTypes = warningTypes.filter(type => type.category === 'general');
 
   const severityLevels = [
     { value: 'low', labelKey: 'low', color: 'text-blue-600' },
@@ -533,6 +543,49 @@ export default function WarningManagementCard({ userId, userDisplayName, userDev
       };
 
       await addDoc(warningsCollection, warningData);
+      
+      // Send notification to user
+      try {
+        // Fetch user data for messaging token and locale
+        const userQuery = query(collection(db, 'users'), where('__name__', '==', userId));
+        const userSnapshot = await getDocs(userQuery);
+        
+        if (!userSnapshot.empty) {
+          const userData = userSnapshot.docs[0].data();
+          const userMessagingToken = userData.messagingToken;
+          const userLocale = userData.locale === 'arabic' ? 'ar' : 'en';
+          
+          if (userMessagingToken) {
+            // Get notification title and body from translations
+            const notificationTitle = t('modules.userManagement.warnings.notification.title');
+            const notificationBody = t(`modules.userManagement.warnings.notification.body.${formData.type}`);
+            
+            const payload = createWarningNotificationPayload(
+              notificationTitle,
+              notificationBody,
+              userId,
+              formData.type,
+              formData.severity,
+              userLocale
+            );
+            
+            await fetch('/api/admin/notifications/send', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                token: userMessagingToken,
+                ...payload
+              }),
+            });
+          }
+        }
+      } catch (notificationError) {
+        console.error('Error sending warning notification:', notificationError);
+        // Don't fail the warning creation if notification fails
+      }
+      
       toast.success(t('modules.userManagement.warnings.createSuccess'));
       setIsCreateDialogOpen(false);
       resetForm();
@@ -705,7 +758,24 @@ export default function WarningManagementCard({ userId, userDisplayName, userDev
                         <SelectValue placeholder={t('modules.userManagement.warnings.type.selectType')} />
                       </SelectTrigger>
                       <SelectContent>
-                        {warningTypes.map((type) => (
+                        {/* Groups Warning Types */}
+                        <div className="px-2 py-1.5 text-xs font-semibold text-orange-700 bg-orange-50">
+                          {t('modules.userManagement.groups-ban.groups-warnings') || 'Groups Warnings'}
+                        </div>
+                        {groupsWarningTypes.map((type) => (
+                          <SelectItem key={type.value} value={type.value}>
+                            <div className="flex items-center gap-2">
+                              <Users className="h-3 w-3 text-orange-600" />
+                              {t(`modules.userManagement.warnings.type.${type.labelKey}`) || type.value}
+                            </div>
+                          </SelectItem>
+                        ))}
+                        
+                        {/* General Warning Types */}
+                        <div className="px-2 py-1.5 text-xs font-semibold text-blue-700 bg-blue-50 mt-1">
+                          {t('modules.userManagement.warnings.generalWarnings') || 'General Warnings'}
+                        </div>
+                        {generalWarningTypes.map((type) => (
                           <SelectItem key={type.value} value={type.value}>
                             {t(`modules.userManagement.warnings.type.${type.labelKey}`)}
                           </SelectItem>

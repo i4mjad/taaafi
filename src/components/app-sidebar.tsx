@@ -91,8 +91,8 @@ export function AppSidebar({ lang, ...props }: AppSidebarProps) {
         url: "#", 
         icon: CrownIcon,
         items: [
-          { titleKey: "allGroups", url: `/${lang}/groups-management`, icon: UsersIcon },
           { titleKey: "adminDashboard", url: `/${lang}/community/groups/admin-overview`, icon: LayoutDashboardIcon },
+          { titleKey: "allGroups", url: `/${lang}/groups-management`, icon: UsersIcon },
           { titleKey: "memberManagement", url: `/${lang}/community/groups/memberships`, icon: UsersIcon },
           { titleKey: "contentModeration", url: `/${lang}/community/groups/admin-content`, icon: MessageSquareIcon },
           { titleKey: "reportsManagement", url: `/${lang}/community/groups/admin-reports`, icon: ShieldIcon },

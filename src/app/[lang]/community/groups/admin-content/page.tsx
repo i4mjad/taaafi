@@ -5,12 +5,12 @@ import { useParams } from 'next/navigation';
 import { useTranslation } from '@/contexts/TranslationContext';
 import { SiteHeader } from '@/components/site-header';
 import { useCollection } from 'react-firebase-hooks/firestore';
-import { collection, query, orderBy, doc, writeBatch } from 'firebase/firestore';
+import { collection, query, orderBy, doc, writeBatch, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MessagesTable } from '@/components/MessagesTable';
+import { MessagesTable, MessageStats } from '@/components/MessagesTable';
 import { 
   MessageSquare, 
   Search, 
@@ -26,6 +26,19 @@ export default function SystemAdminContentPage() {
   const [search, setSearch] = useState('');
   const [groupFilter, setGroupFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [messageStats, setMessageStats] = useState<MessageStats>({
+    total: 0,
+    pending: 0,
+    approved: 0,
+    blocked: 0,
+    manual_review: 0,
+    reported: 0,
+    hidden: 0,
+    deleted: 0,
+    currentPage: 1,
+    totalPages: 1,
+    itemsShown: 0,
+  });
 
   const headerDictionary = {
     documents: t('modules.admin.content.title') || 'Content Moderation',
@@ -56,6 +69,52 @@ export default function SystemAdminContentPage() {
     ).map(doc => doc.data());
   }, [reportsSnapshot]);
 
+  // Handle individual message moderation
+  const handleMessageModeration = async (
+    messageId: string, 
+    action: 'approve' | 'block' | 'hide' | 'delete' | 'unhide', 
+    reason?: string,
+    violationType?: string
+  ) => {
+    try {
+      const messageRef = doc(db, 'group_messages', messageId);
+      const updates: any = {
+        moderation: {
+          status: action === 'approve' || action === 'unhide' ? 'approved' : 'blocked',
+          reason: reason || getLocalizedViolationMessage(violationType),
+          moderatedBy: 'admin', // TODO: Get actual admin ID
+          moderatedAt: new Date(),
+        }
+      };
+
+      // Apply the same logic as cloud function
+      if (action === 'block') {
+        updates.isHidden = true; // Hide from other users like cloud function does
+      } else if (action === 'hide') {
+        updates.isHidden = true;
+      } else if (action === 'delete') {
+        updates.isDeleted = true;
+      } else if (action === 'unhide' || action === 'approve') {
+        updates.isHidden = false; // Unhide the message when approving or explicitly unhiding
+      }
+
+      await updateDoc(messageRef, updates);
+      return true;
+    } catch (error) {
+      console.error('Error moderating message:', error);
+      return false;
+    }
+  };
+
+  // Get localized violation message using translation system
+  const getLocalizedViolationMessage = (violationType?: string): string => {
+    if (!violationType) {
+      return t('modules.admin.content.violationTypes.other');
+    }
+    
+    return t(`modules.admin.content.violationTypes.${violationType}`) || t('modules.admin.content.violationTypes.other');
+  };
+
   // Handle bulk moderation actions
   const handleBulkModeration = async (selectedIds: string[], action: 'approve' | 'hide' | 'delete', reason?: string) => {
     const batch = writeBatch(db);
@@ -66,7 +125,7 @@ export default function SystemAdminContentPage() {
         moderation: {
           status: action === 'approve' ? 'approved' : 'blocked',
           reason: reason || undefined,
-          moderatedBy: 'system-admin', // TODO: Get actual admin ID
+          moderatedBy: 'admin', // TODO: Get actual admin ID
           moderatedAt: new Date(),
         }
       };
@@ -75,6 +134,8 @@ export default function SystemAdminContentPage() {
         updates.isHidden = true;
       } else if (action === 'delete') {
         updates.isDeleted = true;
+      } else if (action === 'approve') {
+        updates.isHidden = false; // Unhide the message when approving
       }
 
       batch.update(messageRef, updates);
@@ -83,18 +144,10 @@ export default function SystemAdminContentPage() {
     await batch.commit();
   };
 
-  // Calculate basic statistics for display
-  const stats = useMemo(() => {
-    return {
-      total: 0, // Will be updated when table loads data
-      pending: 0,
-      approved: 0,
-      blocked: 0,
-      reported: reports.length,
-      hidden: 0,
-      deleted: 0,
-    };
-  }, [reports]);
+  // Handle statistics updates from MessagesTable
+  const handleStatsUpdate = (stats: MessageStats) => {
+    setMessageStats(stats);
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -112,14 +165,14 @@ export default function SystemAdminContentPage() {
         <div className="flex-1 overflow-auto">
           <div className="p-6 space-y-6 max-w-none">
             {/* Statistics */}
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">{t('modules.admin.systemAdmin.totalMessages')}</CardTitle>
                   <MessageSquare className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.total}</div>
+                  <div className="text-2xl font-bold">{messageStats.total}</div>
                   <p className="text-xs text-muted-foreground">{t('modules.admin.systemAdmin.allTime')}</p>
                 </CardContent>
               </Card>
@@ -130,7 +183,18 @@ export default function SystemAdminContentPage() {
                   <AlertTriangle className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.pending}</div>
+                  <div className="text-2xl font-bold">{messageStats.pending}</div>
+                  <p className="text-xs text-muted-foreground">{t('modules.admin.systemAdmin.needAttention')}</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">{t('modules.admin.content.status.manual_review') || 'Manual Review'}</CardTitle>
+                  <AlertTriangle className="h-4 w-4 text-orange-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-orange-600">{messageStats.manual_review}</div>
                   <p className="text-xs text-muted-foreground">{t('modules.admin.systemAdmin.needAttention')}</p>
                 </CardContent>
               </Card>
@@ -141,7 +205,7 @@ export default function SystemAdminContentPage() {
                   <Flag className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.reported}</div>
+                  <div className="text-2xl font-bold">{messageStats.reported}</div>
                   <p className="text-xs text-muted-foreground">{t('modules.admin.systemAdmin.openReports')}</p>
                 </CardContent>
               </Card>
@@ -152,7 +216,7 @@ export default function SystemAdminContentPage() {
                   <CheckCircle className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.blocked + stats.hidden + stats.deleted}</div>
+                  <div className="text-2xl font-bold">{messageStats.blocked + messageStats.hidden + messageStats.deleted}</div>
                   <p className="text-xs text-muted-foreground">{t('modules.admin.systemAdmin.actionsTaken')}</p>
                 </CardContent>
               </Card>
@@ -205,6 +269,7 @@ export default function SystemAdminContentPage() {
                         <SelectItem value="all">{t('modules.admin.systemAdmin.allStatus')}</SelectItem>
                         <SelectItem value="pending">{t('modules.admin.content.status.pending')}</SelectItem>
                         <SelectItem value="approved">{t('modules.admin.content.status.approved')}</SelectItem>
+                        <SelectItem value="manual_review">{t('modules.admin.content.status.manual_review')}</SelectItem>
                         <SelectItem value="blocked">{t('modules.admin.content.status.blocked')}</SelectItem>
                         <SelectItem value="reported">{t('modules.admin.content.status.reported')}</SelectItem>
                       </SelectContent>
@@ -222,6 +287,9 @@ export default function SystemAdminContentPage() {
               groups={groups}
               reports={reports}
               onBulkAction={handleBulkModeration}
+              onMessageModeration={handleMessageModeration}
+              onStatsUpdate={handleStatsUpdate}
+              locale={lang}
             />
           </div>
         </div>

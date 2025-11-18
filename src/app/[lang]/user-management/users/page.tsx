@@ -15,6 +15,7 @@ import {
 } from "@tanstack/react-table";
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -67,12 +68,13 @@ import {
   Search,
   AlertTriangle,
   User,
+  Loader2,
 } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { SiteHeader } from '@/components/site-header';
 import { useTranslation } from "@/contexts/TranslationContext";
-import { useDeletionRequests, useDeletionRequestStats } from '@/hooks/useDeletionRequests';
+import { useDeletionRequests, useDeletionRequestsByStatus, useDeletionRequestStats, useUserDeletion } from '@/hooks/useDeletionRequests';
 
 interface UserProfile {
   uid: string;
@@ -137,9 +139,73 @@ interface UserStats {
 export default function UsersRoute() {
   const { t, locale } = useTranslation();
   
-  // Fetch deletion requests and stats
-  const { deletionRequests, loading: deletionRequestsLoading } = useDeletionRequests();
+  // Deletion requests tab state - for database-level filtering
+  const [activeDeletionTab, setActiveDeletionTab] = useState<'all' | 'pending' | 'processed' | 'canceled'>('all');
+  
+  // Pagination cursors for each tab
+  const [pendingCursor, setPendingCursor] = useState<any>(null);
+  const [processedCursor, setProcessedCursor] = useState<any>(null);
+  const [canceledCursor, setCanceledCursor] = useState<any>(null);
+  
+  // Page size for deletion requests
+  const deletionRequestsPageSize = 50;
+  
+  // Fetch deletion requests based on active tab (database-level filtering)
+  const { 
+    deletionRequests: allDeletionRequests, 
+    loading: allDeletionRequestsLoading,
+    processing: requestProcessing,
+    approveRequest,
+    refetch: refetchAllDeletionRequests
+  } = useDeletionRequests();
+  
+  const { 
+    deletionRequests: pendingDeletionRequests, 
+    loading: pendingDeletionRequestsLoading,
+    lastVisible: pendingLastVisible,
+    hasMore: pendingHasMore
+  } = useDeletionRequestsByStatus('pending', deletionRequestsPageSize, pendingCursor);
+  
+  const { 
+    deletionRequests: processedDeletionRequests, 
+    loading: processedDeletionRequestsLoading,
+    lastVisible: processedLastVisible,
+    hasMore: processedHasMore
+  } = useDeletionRequestsByStatus('processed', deletionRequestsPageSize, processedCursor);
+  
+  const { 
+    deletionRequests: canceledDeletionRequests, 
+    loading: canceledDeletionRequestsLoading,
+    lastVisible: canceledLastVisible,
+    hasMore: canceledHasMore
+  } = useDeletionRequestsByStatus('canceled', deletionRequestsPageSize, canceledCursor);
+  
+  const { executeUserDeletion, processing: deletionProcessing, progress } = useUserDeletion();
   const { stats: deletionStats, loading: statsLoading } = useDeletionRequestStats();
+  
+  // Get active deletion requests based on selected tab
+  const deletionRequests = activeDeletionTab === 'all' ? allDeletionRequests :
+    activeDeletionTab === 'pending' ? pendingDeletionRequests :
+    activeDeletionTab === 'processed' ? processedDeletionRequests :
+    canceledDeletionRequests;
+  
+  const deletionRequestsLoading = activeDeletionTab === 'all' ? allDeletionRequestsLoading :
+    activeDeletionTab === 'pending' ? pendingDeletionRequestsLoading :
+    activeDeletionTab === 'processed' ? processedDeletionRequestsLoading :
+    canceledDeletionRequestsLoading;
+  
+  const hasMoreDeletionRequests = activeDeletionTab === 'pending' ? pendingHasMore :
+    activeDeletionTab === 'processed' ? processedHasMore :
+    activeDeletionTab === 'canceled' ? canceledHasMore :
+    false;
+  
+  const refetchDeletionRequests = async () => {
+    await refetchAllDeletionRequests();
+    // Reset cursors
+    setPendingCursor(null);
+    setProcessedCursor(null);
+    setCanceledCursor(null);
+  };
   
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
@@ -178,14 +244,24 @@ export default function UsersRoute() {
   const [providerFilter, setProviderFilter] = useState('all');
   const [deletionStatusFilter, setDeletionStatusFilter] = useState('all');
   
-  // Deletion requests filters
-  const [deletionRequestStatusFilter, setDeletionRequestStatusFilter] = useState('all');
-  
-  // Deletion requests pagination
-  const [deletionRequestsPagination, setDeletionRequestsPagination] = useState({
-    pageIndex: 0,
-    pageSize: 20,
-  });
+
+  // Deletion requests actions state
+  const [showApproveDeletionDialog, setShowApproveDeletionDialog] = useState(false);
+  const [selectedDeletionRequest, setSelectedDeletionRequest] = useState<AccountDeleteRequest | null>(null);
+  const [adminNotes, setAdminNotes] = useState('');
+
+  // Deletion requests bulk selection and processing
+  const [selectedDeletionRequestIds, setSelectedDeletionRequestIds] = useState<string[]>([]);
+  const [bulkApproveOpen, setBulkApproveOpen] = useState(false);
+  const [bulkAdminNotes, setBulkAdminNotes] = useState('');
+  const [bulkProcessing, setBulkProcessing] = useState(false);
+
+  // Reset pagination cursors when deletion request tab changes
+  useEffect(() => {
+    setPendingCursor(null);
+    setProcessedCursor(null);
+    setCanceledCursor(null);
+  }, [activeDeletionTab]);
 
   const headerDictionary = {
     documents: t('appSidebar.users') || 'Users',
@@ -339,13 +415,6 @@ export default function UsersRoute() {
     // This will trigger loadUsers due to the filter changes
   };
 
-  const handleClearDeletionFilters = () => {
-    setDeletionRequestStatusFilter('all');
-    setDeletionRequestsPagination({
-      pageIndex: 0,
-      pageSize: 20
-    });
-  };
 
   const formatDeletionDate = (date: Date | string | null | undefined) => {
     if (!date) return t('common.never') || 'Never';
@@ -396,35 +465,54 @@ export default function UsersRoute() {
     );
   };
 
-  // Filter deletion requests based on status
-  const filteredDeletionRequests = deletionRequests.filter(request => {
-    if (deletionRequestStatusFilter === 'all') return true;
-    if (deletionRequestStatusFilter === 'pending') return !request.isProcessed && !request.isCanceled;
-    if (deletionRequestStatusFilter === 'processed') return request.isProcessed;
-    if (deletionRequestStatusFilter === 'canceled') return request.isCanceled;
-    return true;
-  });
-
-  // Paginate deletion requests
-  const totalDeletionRequests = filteredDeletionRequests.length;
-  const totalDeletionPages = Math.ceil(totalDeletionRequests / deletionRequestsPagination.pageSize);
-  const paginatedDeletionRequests = filteredDeletionRequests.slice(
-    deletionRequestsPagination.pageIndex * deletionRequestsPagination.pageSize,
-    (deletionRequestsPagination.pageIndex + 1) * deletionRequestsPagination.pageSize
-  );
-
-  const handleDeletionPageChange = (newPageIndex: number) => {
-    setDeletionRequestsPagination(prev => ({
-      ...prev,
-      pageIndex: newPageIndex
-    }));
+  // Deletion requests pagination handlers (cursor-based)
+  const handleDeletionNextPage = () => {
+    if (activeDeletionTab === 'pending' && pendingLastVisible) {
+      setPendingCursor(pendingLastVisible);
+    } else if (activeDeletionTab === 'processed' && processedLastVisible) {
+      setProcessedCursor(processedLastVisible);
+    } else if (activeDeletionTab === 'canceled' && canceledLastVisible) {
+      setCanceledCursor(canceledLastVisible);
+    }
   };
 
-  const handleDeletionPageSizeChange = (newPageSize: number) => {
-    setDeletionRequestsPagination({
-      pageIndex: 0, // Reset to first page
-      pageSize: newPageSize
-    });
+  const handleDeletionResetPagination = () => {
+    if (activeDeletionTab === 'pending') {
+      setPendingCursor(null);
+    } else if (activeDeletionTab === 'processed') {
+      setProcessedCursor(null);
+    } else if (activeDeletionTab === 'canceled') {
+      setCanceledCursor(null);
+    }
+  };
+
+  const isOnFirstPage = (
+    (activeDeletionTab === 'pending' && !pendingCursor) ||
+    (activeDeletionTab === 'processed' && !processedCursor) ||
+    (activeDeletionTab === 'canceled' && !canceledCursor) ||
+    activeDeletionTab === 'all'
+  );
+
+  const openApproveDeletion = (request: AccountDeleteRequest) => {
+    setSelectedDeletionRequest(request);
+    setAdminNotes(request.adminNotes || '');
+    setShowApproveDeletionDialog(true);
+  };
+
+  const confirmApproveDeletion = async () => {
+    if (!selectedDeletionRequest) return;
+    try {
+      await approveRequest(selectedDeletionRequest.id, adminNotes, 'admin-user');
+      await executeUserDeletion(selectedDeletionRequest.userId, 'admin-user');
+      toast.success(t('modules.userManagement.accountDeletion.approveSuccess') || 'Deletion request approved and user deleted successfully');
+      setShowApproveDeletionDialog(false);
+      setSelectedDeletionRequest(null);
+      setAdminNotes('');
+      await refetchDeletionRequests();
+    } catch (error) {
+      console.error('Error approving & deleting user:', error);
+      toast.error(t('modules.userManagement.accountDeletion.approveError') || 'Failed to approve deletion request');
+    }
   };
 
   const handlePageChange = (newPage: number) => {
@@ -1118,30 +1206,62 @@ export default function UsersRoute() {
                           {t('modules.userManagement.accountDeletion.description') || 'Manage account deletion requests from users'}
                         </CardDescription>
                       </div>
+                      {selectedDeletionRequestIds.length > 0 && (
+                        <div className="flex items-center gap-2">
+                          <Button 
+                            variant="destructive" 
+                            size="sm"
+                            onClick={() => setBulkApproveOpen(true)}
+                            disabled={bulkProcessing || requestProcessing || deletionProcessing}
+                          >
+                            <AlertTriangle className="h-4 w-4 mr-2" />
+                            {t('modules.userManagement.accountDeletion.approveRequest') || 'Approve & Delete'} ({selectedDeletionRequestIds.length})
+                          </Button>
+                          <Button variant="ghost" size="sm" onClick={() => setSelectedDeletionRequestIds([])}>
+                            {t('modules.userManagement.clearSelection') || 'Clear selection'}
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   </CardHeader>
                   <CardContent>
-                    {/* Deletion Requests Filters */}
-                    <div className="flex flex-col gap-4 md:flex-row md:items-end mb-6">
-                      <Select value={deletionRequestStatusFilter} onValueChange={setDeletionRequestStatusFilter}>
-                        <SelectTrigger className="w-[200px]">
-                          <SelectValue placeholder={t('modules.userManagement.accountDeletion.filterByStatus') || 'Filter by status'} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">{t('common.all')} {t('modules.userManagement.accountDeletion.statuses') || 'Requests'}</SelectItem>
-                          <SelectItem value="pending">{t('modules.userManagement.accountDeletion.pendingDeletion') || 'Pending'}</SelectItem>
-                          <SelectItem value="processed">{t('modules.userManagement.accountDeletion.isProcessed') || 'Processed'}</SelectItem>
-                          <SelectItem value="canceled">{t('modules.userManagement.accountDeletion.isCanceled') || 'Canceled'}</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <div className="flex gap-2">
-                        {deletionRequestStatusFilter !== 'all' && (
-                          <Button variant="outline" onClick={handleClearDeletionFilters}>
-                            {t('modules.userManagement.clearFilters') || 'Clear Filters'}
-                          </Button>
-                        )}
-                      </div>
-                    </div>
+                    {/* Deletion Requests Status Tabs - Database-level filtering */}
+                    <Tabs value={activeDeletionTab} onValueChange={(value) => setActiveDeletionTab(value as typeof activeDeletionTab)} className="mb-6">
+                      <TabsList className="grid w-full grid-cols-4">
+                        <TabsTrigger value="all">
+                          {t('common.all')}
+                          {!statsLoading && (
+                            <Badge variant="secondary" className="ml-2 text-xs">
+                              {deletionStats.total}
+                            </Badge>
+                          )}
+                        </TabsTrigger>
+                        <TabsTrigger value="pending">
+                          {t('modules.userManagement.accountDeletion.pendingDeletion') || 'Pending'}
+                          {!statsLoading && deletionStats.pending > 0 && (
+                            <Badge variant="destructive" className="ml-2 text-xs">
+                              {deletionStats.pending}
+                            </Badge>
+                          )}
+                        </TabsTrigger>
+                        <TabsTrigger value="processed">
+                          {t('modules.userManagement.accountDeletion.isProcessed') || 'Processed'}
+                          {!statsLoading && deletionStats.processed > 0 && (
+                            <Badge variant="secondary" className="ml-2 text-xs">
+                              {deletionStats.processed}
+                            </Badge>
+                          )}
+                        </TabsTrigger>
+                        <TabsTrigger value="canceled">
+                          {t('modules.userManagement.accountDeletion.isCanceled') || 'Canceled'}
+                          {!statsLoading && deletionStats.canceled > 0 && (
+                            <Badge variant="secondary" className="ml-2 text-xs">
+                              {deletionStats.canceled}
+                            </Badge>
+                          )}
+                        </TabsTrigger>
+                      </TabsList>
+                    </Tabs>
 
                     {/* Deletion Requests Table */}
                     {deletionRequestsLoading ? (
@@ -1150,11 +1270,31 @@ export default function UsersRoute() {
                           <Skeleton key={i} className="h-16 w-full" />
                         ))}
                       </div>
-                    ) : paginatedDeletionRequests.length > 0 ? (
+                    ) : deletionRequests.length > 0 ? (
                       <div className="rounded-md border overflow-x-auto">
                         <Table>
                           <TableHeader>
                             <TableRow>
+                              <TableHead>
+                                <Checkbox
+                                  checked={
+                                    deletionRequests.length > 0 &&
+                                    selectedDeletionRequestIds.length === deletionRequests.filter(r => !r.isProcessed && !r.isCanceled).length
+                                  }
+                                  onCheckedChange={(value) => {
+                                    if (value) {
+                                      setSelectedDeletionRequestIds(
+                                        deletionRequests
+                                          .filter(r => !r.isProcessed && !r.isCanceled)
+                                          .map(r => r.id)
+                                      );
+                                    } else {
+                                      setSelectedDeletionRequestIds([]);
+                                    }
+                                  }}
+                                  aria-label="Select all"
+                                />
+                              </TableHead>
                               <TableHead>{t('modules.userManagement.accountDeletion.requestId') || 'Request ID'}</TableHead>
                               <TableHead>{t('modules.userManagement.user') || 'User'}</TableHead>
                               <TableHead>{t('modules.userManagement.accountDeletion.reasonCategory') || 'Reason'}</TableHead>
@@ -1165,8 +1305,27 @@ export default function UsersRoute() {
                             </TableRow>
                           </TableHeader>
                           <TableBody>
-                            {paginatedDeletionRequests.map((request) => (
+                            {deletionRequests.map((request) => (
                               <TableRow key={request.id}>
+                                <TableCell>
+                                  {!request.isProcessed && !request.isCanceled ? (
+                                    <Checkbox
+                                      checked={selectedDeletionRequestIds.includes(request.id)}
+                                      onCheckedChange={(value) => {
+                                        setSelectedDeletionRequestIds(prev => {
+                                          if (value) {
+                                            return Array.from(new Set([...prev, request.id]));
+                                          } else {
+                                            return prev.filter(id => id !== request.id);
+                                          }
+                                        });
+                                      }}
+                                      aria-label="Select row"
+                                    />
+                                  ) : (
+                                    <div className="w-4" />
+                                  )}
+                                </TableCell>
                                 <TableCell>
                                   <div className="font-mono text-sm max-w-[120px] truncate">
                                     {request.id}
@@ -1231,6 +1390,18 @@ export default function UsersRoute() {
                                           {t('modules.userManagement.viewDetails') || 'View User'}
                                         </Link>
                                       </DropdownMenuItem>
+                                      {!request.isProcessed && !request.isCanceled && (
+                                        <>
+                                          <DropdownMenuSeparator />
+                                          <DropdownMenuItem
+                                            onClick={() => openApproveDeletion(request)}
+                                            className="text-red-600"
+                                          >
+                                            <AlertTriangle className="h-4 w-4 mr-2" />
+                                            {t('modules.userManagement.accountDeletion.approveRequest') || 'Approve & Delete'}
+                                          </DropdownMenuItem>
+                                        </>
+                                      )}
                                     </DropdownMenuContent>
                                   </DropdownMenu>
                                 </TableCell>
@@ -1251,75 +1422,39 @@ export default function UsersRoute() {
                       </div>
                     )}
 
-                    {/* Deletion Requests Pagination */}
-                    {paginatedDeletionRequests.length > 0 && (
+                    {/* Deletion Requests Pagination - Cursor-based */}
+                    {(deletionRequests.length > 0 || !isOnFirstPage) && activeDeletionTab !== 'all' && (
                       <div className="flex items-center justify-between space-x-2 py-4">
                         <div className="text-sm text-muted-foreground">
                           {t('modules.userManagement.showingResults')
-                            ?.replace('{start}', (deletionRequestsPagination.pageIndex * deletionRequestsPagination.pageSize + 1).toString())
-                            ?.replace('{end}', Math.min((deletionRequestsPagination.pageIndex + 1) * deletionRequestsPagination.pageSize, totalDeletionRequests).toString())
-                            ?.replace('{total}', totalDeletionRequests.toString()) || 
-                            `Showing ${deletionRequestsPagination.pageIndex * deletionRequestsPagination.pageSize + 1} to ${Math.min((deletionRequestsPagination.pageIndex + 1) * deletionRequestsPagination.pageSize, totalDeletionRequests)} of ${totalDeletionRequests} results`}
+                            ?.replace('{start}', '1')
+                            ?.replace('{end}', deletionRequests.length.toString())
+                            ?.replace('{total}', 
+                              activeDeletionTab === 'pending' ? deletionStats.pending.toString() :
+                              activeDeletionTab === 'processed' ? deletionStats.processed.toString() :
+                              activeDeletionTab === 'canceled' ? deletionStats.canceled.toString() : '0'
+                            ) || 
+                            `Showing ${deletionRequests.length} records`}
                         </div>
-                        <div className="flex items-center space-x-4">
-                          <div className="flex items-center space-x-2">
-                            <p className="text-sm font-medium">{t('modules.userManagement.rowsPerPage') || 'Rows per page'}</p>
-                            <Select
-                              value={`${deletionRequestsPagination.pageSize}`}
-                              onValueChange={(value) => handleDeletionPageSizeChange(Number(value))}
-                            >
-                              <SelectTrigger className="w-20">
-                                <SelectValue placeholder={deletionRequestsPagination.pageSize} />
-                              </SelectTrigger>
-                              <SelectContent side="top">
-                                {[10, 20, 50, 100].map((pageSize) => (
-                                  <SelectItem key={pageSize} value={`${pageSize}`}>
-                                    {pageSize}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <p className="text-sm font-medium">{t('modules.userManagement.page') || 'Page'}</p>
-                            <span className="text-sm text-muted-foreground">
-                              {deletionRequestsPagination.pageIndex + 1} {t('modules.userManagement.of') || 'of'} {totalDeletionPages}
-                            </span>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleDeletionPageChange(0)}
-                              disabled={deletionRequestsPagination.pageIndex === 0}
-                            >
-                              <ChevronsLeftIcon className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleDeletionPageChange(deletionRequestsPagination.pageIndex - 1)}
-                              disabled={deletionRequestsPagination.pageIndex === 0}
-                            >
-                              <ChevronLeftIcon className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleDeletionPageChange(deletionRequestsPagination.pageIndex + 1)}
-                              disabled={deletionRequestsPagination.pageIndex >= totalDeletionPages - 1}
-                            >
-                              <ChevronRightIcon className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleDeletionPageChange(totalDeletionPages - 1)}
-                              disabled={deletionRequestsPagination.pageIndex >= totalDeletionPages - 1}
-                            >
-                              <ChevronsRightIcon className="h-4 w-4" />
-                            </Button>
-                          </div>
+                        <div className="flex items-center space-x-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleDeletionResetPagination}
+                            disabled={isOnFirstPage}
+                          >
+                            <ChevronsLeftIcon className="h-4 w-4 mr-2" />
+                            {t('common.firstPage') || 'First Page'}
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleDeletionNextPage}
+                            disabled={!hasMoreDeletionRequests || deletionRequestsLoading}
+                          >
+                            {t('common.nextPage') || 'Next Page'}
+                            <ChevronRightIcon className="h-4 w-4 ml-2" />
+                          </Button>
                         </div>
                       </div>
                     )}
@@ -1327,6 +1462,110 @@ export default function UsersRoute() {
                 </Card>
               </TabsContent>
             </Tabs>
+
+            {/* Approve & Delete Deletion Request Dialog */}
+            <Dialog open={showApproveDeletionDialog} onOpenChange={setShowApproveDeletionDialog}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2">
+                    <AlertTriangle className="h-5 w-5 text-destructive" />
+                    {t('modules.userManagement.accountDeletion.approveDeletionTitle') || 'Approve Account Deletion'}
+                  </DialogTitle>
+                  <DialogDescription>
+                    {t('modules.userManagement.accountDeletion.approveDeletionDescription') || "Are you sure you want to approve this account deletion request? This action will permanently delete the user's account and cannot be undone."}
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">
+                      {t('modules.userManagement.accountDeletion.adminNotes') || 'Admin Notes'} ({t('common.optional') || 'Optional'})
+                    </label>
+                    <Textarea
+                      value={adminNotes}
+                      onChange={(e) => setAdminNotes(e.target.value)}
+                      placeholder={t('modules.userManagement.accountDeletion.addNotesPlaceholder') || 'Add any notes about this approval...'}
+                      className="min-h-[80px]"
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setShowApproveDeletionDialog(false)} disabled={requestProcessing || deletionProcessing}>
+                    {t('common.cancel')}
+                  </Button>
+                  <Button 
+                    variant="destructive" 
+                    onClick={confirmApproveDeletion}
+                    disabled={requestProcessing || deletionProcessing}
+                  >
+                    {(requestProcessing || deletionProcessing) && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+                    {t('common.approve') || 'Approve'}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+
+            {/* Bulk Approve & Delete Dialog */}
+            <Dialog open={bulkApproveOpen} onOpenChange={setBulkApproveOpen}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2">
+                    <AlertTriangle className="h-5 w-5 text-destructive" />
+                    {t('modules.userManagement.accountDeletion.approveDeletionTitle') || 'Approve Account Deletion'}
+                  </DialogTitle>
+                  <DialogDescription>
+                    {t('modules.userManagement.deleteUsersConfirmation')
+                      ? t('modules.userManagement.deleteUsersConfirmation').replace('{count}', selectedDeletionRequestIds.length.toString())
+                      : `Approve & delete ${selectedDeletionRequestIds.length} account(s)? This cannot be undone.`}
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">
+                      {t('modules.userManagement.accountDeletion.adminNotes') || 'Admin Notes'} ({t('common.optional') || 'Optional'})
+                    </label>
+                    <Textarea
+                      value={bulkAdminNotes}
+                      onChange={(e) => setBulkAdminNotes(e.target.value)}
+                      placeholder={t('modules.userManagement.accountDeletion.addNotesPlaceholder') || 'Add any notes about this approval...'}
+                      className="min-h-[80px]"
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setBulkApproveOpen(false)} disabled={bulkProcessing || requestProcessing || deletionProcessing}>
+                    {t('common.cancel')}
+                  </Button>
+                  <Button 
+                    variant="destructive" 
+                    onClick={async () => {
+                      try {
+                        setBulkProcessing(true);
+                        for (const requestId of selectedDeletionRequestIds) {
+                          const req = deletionRequests.find(r => r.id === requestId);
+                          if (!req) continue;
+                          await approveRequest(requestId, bulkAdminNotes, 'admin-user');
+                          await executeUserDeletion(req.userId, 'admin-user');
+                        }
+                        toast.success(t('modules.userManagement.accountDeletion.approveSuccess') || 'Deletion requests approved and users deleted successfully');
+                        setSelectedDeletionRequestIds([]);
+                        setBulkAdminNotes('');
+                        setBulkApproveOpen(false);
+                        await refetchDeletionRequests();
+                      } catch (error) {
+                        console.error('Bulk approve & delete error:', error);
+                        toast.error(t('modules.userManagement.accountDeletion.approveError') || 'Bulk approval failed');
+                      } finally {
+                        setBulkProcessing(false);
+                      }
+                    }}
+                    disabled={bulkProcessing || requestProcessing || deletionProcessing || selectedDeletionRequestIds.length === 0}
+                  >
+                    {(bulkProcessing || requestProcessing || deletionProcessing) && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+                    {t('modules.userManagement.accountDeletion.approveRequest') || 'Approve & Delete'}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
 
             {/* Delete Confirmation Dialog */}
             <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
