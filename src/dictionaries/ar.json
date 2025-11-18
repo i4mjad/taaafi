@@ -1985,6 +1985,356 @@
           "score": "النقاط: {score}",
           "detailDateTimeFormat": "dd MMMM, yyyy HH:mm"
         },
+        "directMessages": {
+          "title": "إدارة الرسائل المباشرة",
+          "description": "إدارة ومراجعة الرسائل المباشرة بين أعضاء المجتمع",
+          "tabs": {
+            "dashboard": "لوحة التحكم",
+            "moderationQueue": "قائمة المراجعة",
+            "allConversations": "جميع المحادثات",
+            "allMessages": "جميع الرسائل",
+            "userReports": "بلاغات المستخدمين",
+            "settings": "الإعدادات"
+          },
+          "dashboard": {
+            "title": "نظرة عامة",
+            "description": "المقاييس والإحصائيات الرئيسية للرسائل المباشرة",
+            "metrics": {
+              "totalConversations": "إجمالي المحادثات",
+              "totalMessages": "إجمالي الرسائل",
+              "messagesByStatus": "الرسائل حسب الحالة",
+              "activeReports": "البلاغات النشطة",
+              "avgResponseTime": "متوسط وقت الاستجابة",
+              "topViolations": "أكثر المخالفات"
+            },
+            "timeFilters": {
+              "allTime": "كل الوقت",
+              "last30Days": "آخر 30 يوماً",
+              "last7Days": "آخر 7 أيام",
+              "today": "اليوم"
+            },
+            "charts": {
+              "messagesOverTime": "الرسائل عبر الزمن",
+              "statusDistribution": "توزيع الحالة",
+              "violationTypes": "أنواع المخالفات"
+            }
+          },
+          "moderationQueue": {
+            "title": "قائمة المراجعة",
+            "description": "مراجعة ومراقبة الرسائل المبلغ عنها",
+            "filters": {
+              "status": "الحالة",
+              "priority": "الأولوية",
+              "messageType": "نوع الرسالة",
+              "violationType": "نوع المخالفة",
+              "dateRange": "النطاق الزمني",
+              "sender": "المرسل"
+            },
+            "columns": {
+              "messageId": "معرف الرسالة",
+              "sender": "المرسل",
+              "preview": "معاينة الرسالة",
+              "violationType": "نوع المخالفة",
+              "confidence": "درجة الثقة",
+              "severity": "الخطورة",
+              "priority": "الأولوية",
+              "status": "الحالة",
+              "createdAt": "تاريخ الإنشاء",
+              "actions": "الإجراءات"
+            },
+            "actions": {
+              "viewDetails": "عرض التفاصيل",
+              "approve": "قبول",
+              "reject": "رفض",
+              "dismiss": "تجاهل",
+              "viewConversation": "عرض المحادثة",
+              "viewSender": "عرض المرسل",
+              "banUser": "حظر المستخدم"
+            },
+            "bulkActions": {
+              "title": "الإجراءات الجماعية",
+              "approveSelected": "قبول المحدد",
+              "rejectSelected": "رفض المحدد",
+              "dismissSelected": "تجاهل المحدد",
+              "exportSelected": "تصدير المحدد"
+            },
+            "empty": "لا توجد رسائل في قائمة المراجعة",
+            "loading": "جاري تحميل قائمة المراجعة..."
+          },
+          "conversations": {
+            "title": "جميع المحادثات",
+            "description": "استعراض والبحث في جميع المحادثات المباشرة",
+            "filters": {
+              "status": "الحالة",
+              "dateRange": "النطاق الزمني",
+              "participants": "المشاركون",
+              "hasFlagged": "تحتوي على رسائل مبلغ عنها",
+              "hasReports": "تحتوي على بلاغات"
+            },
+            "columns": {
+              "conversationId": "معرف المحادثة",
+              "participants": "المشاركون",
+              "lastMessage": "آخر رسالة",
+              "lastActivity": "آخر نشاط",
+              "messageCount": "عدد الرسائل",
+              "flaggedCount": "الرسائل المبلغ عنها",
+              "reportsCount": "البلاغات",
+              "createdAt": "تاريخ الإنشاء",
+              "actions": "الإجراءات"
+            },
+            "actions": {
+              "viewMessages": "عرض الرسائل",
+              "viewParticipants": "عرض المشاركين",
+              "deleteConversation": "حذف المحادثة",
+              "exportConversation": "تصدير المحادثة"
+            },
+            "empty": "لم يتم العثور على محادثات",
+            "loading": "جاري تحميل المحادثات..."
+          },
+          "messages": {
+            "title": "جميع الرسائل",
+            "description": "استعراض والبحث في جميع الرسائل المباشرة",
+            "filters": {
+              "moderationStatus": "حالة المراجعة",
+              "dateRange": "النطاق الزمني",
+              "sender": "المرسل",
+              "conversation": "المحادثة",
+              "hasViolations": "تحتوي على مخالفات",
+              "violationType": "نوع المخالفة"
+            },
+            "columns": {
+              "messageId": "معرف الرسالة",
+              "sender": "المرسل",
+              "preview": "المعاينة",
+              "conversationId": "معرف المحادثة",
+              "moderationStatus": "حالة المراجعة",
+              "violationType": "نوع المخالفة",
+              "confidence": "درجة الثقة",
+              "createdAt": "تاريخ الإنشاء",
+              "actions": "الإجراءات"
+            },
+            "actions": {
+              "viewFullMessage": "عرض الرسالة الكاملة",
+              "viewConversation": "عرض المحادثة",
+              "reviewModeration": "مراجعة الاعتدال",
+              "deleteMessage": "حذف الرسالة",
+              "viewSender": "عرض المرسل"
+            },
+            "empty": "لم يتم العثور على رسائل",
+            "loading": "جاري تحميل الرسائل..."
+          },
+          "reports": {
+            "title": "بلاغات المستخدمين",
+            "description": "إدارة البلاغات المقدمة من المستخدمين",
+            "filters": {
+              "reportType": "نوع البلاغ",
+              "status": "الحالة",
+              "dateRange": "النطاق الزمني",
+              "reporter": "المبلِّغ",
+              "reported": "المُبلَّغ عنه"
+            },
+            "columns": {
+              "reportId": "معرف البلاغ",
+              "reportType": "النوع",
+              "reporter": "المبلِّغ",
+              "reported": "المستخدم/الرسالة المُبلَّغ عنها",
+              "description": "الوصف",
+              "status": "الحالة",
+              "createdAt": "تاريخ الإنشاء",
+              "actions": "الإجراءات"
+            },
+            "actions": {
+              "viewDetails": "عرض التفاصيل",
+              "resolve": "حل",
+              "dismiss": "تجاهل",
+              "takeAction": "اتخاذ إجراء"
+            },
+            "statistics": {
+              "totalReports": "إجمالي البلاغات",
+              "activeReports": "البلاغات النشطة",
+              "avgResolutionTime": "متوسط وقت الحل",
+              "mostReported": "المستخدمون الأكثر بلاغاً",
+              "commonViolations": "المخالفات الشائعة"
+            },
+            "empty": "لم يتم العثور على بلاغات",
+            "loading": "جاري تحميل البلاغات..."
+          },
+          "conversationDetail": {
+            "title": "تفاصيل المحادثة",
+            "description": "عرض المحادثة والرسائل",
+            "header": {
+              "conversationId": "معرف المحادثة",
+              "participants": "المشاركون",
+              "created": "تاريخ الإنشاء",
+              "lastActivity": "آخر نشاط",
+              "messageCount": "عدد الرسائل",
+              "flaggedCount": "الرسائل المبلغ عنها",
+              "reportsCount": "البلاغات النشطة"
+            },
+            "actions": {
+              "exportConversation": "تصدير المحادثة",
+              "deleteConversation": "حذف المحادثة",
+              "viewProfiles": "عرض الملفات الشخصية",
+              "viewReports": "عرض البلاغات"
+            },
+            "messagesFilter": {
+              "all": "جميع الرسائل",
+              "flaggedOnly": "المبلغ عنها فقط",
+              "approvedOnly": "المعتمدة فقط"
+            },
+            "searchPlaceholder": "البحث في المحادثة...",
+            "empty": "لا توجد رسائل في هذه المحادثة",
+            "loading": "جاري تحميل المحادثة..."
+          },
+          "senderProfile": {
+            "title": "الملف الشخصي وسجل المرسل",
+            "description": "عرض نشاط الرسائل المباشرة لملف المجتمع",
+            "profile": {
+              "displayName": "الاسم المعروض",
+              "cpId": "معرف ملف المجتمع",
+              "userUID": "معرف المستخدم",
+              "accountCreated": "تاريخ إنشاء الحساب",
+              "dmSettings": "إعدادات الرسائل المباشرة",
+              "allowDirectMessages": "السماح بالرسائل المباشرة"
+            },
+            "statistics": {
+              "totalConversations": "إجمالي المحادثات",
+              "totalMessages": "إجمالي الرسائل المرسلة",
+              "approvedMessages": "الرسائل المعتمدة",
+              "flaggedMessages": "الرسائل المبلغ عنها",
+              "blockedMessages": "الرسائل المحظورة",
+              "reportsReceived": "البلاغات المستلمة",
+              "activeBans": "الحظر النشط"
+            },
+            "sections": {
+              "recentMessages": "الرسائل الأخيرة",
+              "conversations": "المحادثات",
+              "reports": "البلاغات ضد المستخدم",
+              "bans": "الحظر النشط"
+            },
+            "actions": {
+              "banFromStarting": "منع من بدء المحادثات",
+              "banFromSending": "منع من إرسال الرسائل",
+              "appWideBan": "حظر من التطبيق بالكامل",
+              "viewBans": "عرض الحظر الحالي"
+            },
+            "loading": "جاري تحميل الملف الشخصي..."
+          },
+          "modals": {
+            "messageDetail": {
+              "title": "تفاصيل الرسالة",
+              "fullContent": "المحتوى الكامل",
+              "senderInfo": "معلومات المرسل",
+              "conversationInfo": "معلومات المحادثة",
+              "aiAnalysis": "تحليل الذكاء الاصطناعي",
+              "customRules": "القواعد المخصصة المفعَّلة",
+              "adminActions": "إجراءات المدير",
+              "reviewNotes": "ملاحظات المراجعة",
+              "addNotes": "إضافة ملاحظات المراجعة..."
+            },
+            "reportDetail": {
+              "title": "تفاصيل البلاغ",
+              "reporterInfo": "معلومات المُبلِّغ",
+              "reportedContent": "المحتوى المُبلَّغ عنه",
+              "reportDescription": "وصف البلاغ",
+              "resolutionNotes": "ملاحظات الحل",
+              "addResolutionNotes": "إضافة ملاحظات الحل..."
+            },
+            "banUser": {
+              "title": "حظر المستخدم",
+              "selectBanType": "اختر نوع الحظر",
+              "featureBan": "حظر ميزة",
+              "appWideBan": "حظر من التطبيق",
+              "duration": "المدة",
+              "severity": "الخطورة",
+              "reason": "السبب",
+              "additionalNotes": "ملاحظات إضافية"
+            },
+            "deleteConfirm": {
+              "title": "تأكيد الحذف",
+              "messageWarning": "هل أنت متأكد من حذف هذه الرسالة؟",
+              "conversationWarning": "هل أنت متأكد من حذف هذه المحادثة؟",
+              "irreversible": "لا يمكن التراجع عن هذا الإجراء."
+            }
+          },
+          "statuses": {
+            "pending": "قيد المراجعة",
+            "approved": "معتمد",
+            "blocked": "محظور",
+            "manual_review": "مراجعة يدوية",
+            "active": "نشط",
+            "resolved": "محلول",
+            "dismissed": "متجاهل"
+          },
+          "priorities": {
+            "low": "منخفضة",
+            "medium": "متوسطة",
+            "high": "عالية",
+            "critical": "حرجة"
+          },
+          "severities": {
+            "low": "منخفضة",
+            "medium": "متوسطة",
+            "high": "عالية"
+          },
+          "violationTypes": {
+            "social_media_sharing": "مشاركة حسابات التواصل الاجتماعي",
+            "sexual_content": "محتوى جنسي",
+            "cuckoldry_content": "محتوى الدياثة",
+            "homosexuality_content": "محتوى اللواط",
+            "harassment": "تحرش",
+            "spam": "بريد مزعج",
+            "none": "لا يوجد"
+          },
+          "reportTypes": {
+            "user": "بلاغ مستخدم",
+            "message": "بلاغ رسالة"
+          },
+          "messageTypes": {
+            "direct_message": "رسالة مباشرة",
+            "group_message": "رسالة جماعية"
+          },
+          "common": {
+            "search": "بحث...",
+            "filter": "تصفية",
+            "export": "تصدير",
+            "cancel": "إلغاء",
+            "save": "حفظ",
+            "delete": "حذف",
+            "confirm": "تأكيد",
+            "loading": "جاري التحميل...",
+            "noData": "لا توجد بيانات متاحة",
+            "error": "حدث خطأ",
+            "success": "تمت العملية بنجاح",
+            "selected": "{count} محدد",
+            "showMore": "عرض المزيد",
+            "showLess": "عرض أقل",
+            "viewAll": "عرض الكل",
+            "pagination": {
+              "previous": "السابق",
+              "next": "التالي",
+              "page": "صفحة",
+              "of": "من",
+              "showing": "عرض",
+              "to": "إلى",
+              "items": "عناصر",
+              "itemsPerPage": "عدد العناصر في الصفحة"
+            },
+            "confirmDelete": "هل أنت متأكد من أنك تريد حذف هذا؟",
+            "moderationSuccess": "تم إجراء المراجعة بنجاح"
+          },
+          "notifications": {
+            "approved": "تم قبول الرسالة بنجاح",
+            "rejected": "تم رفض الرسالة بنجاح",
+            "dismissed": "تم تجاهل الرسالة من القائمة",
+            "deleted": "تم حذف الرسالة بنجاح",
+            "reportResolved": "تم حل البلاغ بنجاح",
+            "reportDismissed": "تم تجاهل البلاغ بنجاح",
+            "banCreated": "تم حظر المستخدم بنجاح",
+            "exportComplete": "تم التصدير بنجاح",
+            "error": "حدث خطأ. يرجى المحاولة مرة أخرى."
+          }
+        },
         "rules": {
           "no_personal_contact": {
             "title": "ممنوع مشاركة وسائل التواصل",

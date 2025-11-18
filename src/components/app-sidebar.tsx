@@ -81,6 +81,7 @@ export function AppSidebar({ lang, ...props }: AppSidebarProps) {
         icon: HeartHandshakeIcon,
         items: [
           { titleKey: "forum", url: `/${lang}/community/forum`, icon: MessageSquareIcon },
+          { titleKey: "directMessages", url: `/${lang}/community/direct-messages`, icon: MessageCircleIcon },
           { titleKey: "reports", url: `/${lang}/community/reports`, icon: AlertTriangleIcon },
           { titleKey: "settings", url: `/${lang}/community/settings`, icon: SettingsIcon },
         ]
