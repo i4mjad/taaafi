@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -7,10 +8,8 @@ import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/action_modal.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
-import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
-import 'package:reboot_app_3/features/groups/presentation/widgets/group_overview_card.dart';
 import 'package:reboot_app_3/features/groups/providers/group_membership_provider.dart';
 import 'package:reboot_app_3/features/groups/application/challenges_providers.dart';
 import 'package:reboot_app_3/features/groups/domain/entities/challenge_task_instance.dart';
@@ -94,27 +93,52 @@ class GroupScreen extends ConsumerWidget {
 
         return Scaffold(
           backgroundColor: theme.backgroundColor,
-          body: SingleChildScrollView(
-            padding: const EdgeInsets.only(bottom: 20), // Add bottom padding
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Descriptive section about groups feature
-                _buildDescriptiveSection(context, theme, l10n, membership),
+          body: Stack(
+            children: [
+              // Scrollable content
+              SingleChildScrollView(
+                padding: const EdgeInsets.only(
+                    bottom: 100), // Add bottom padding for floating section
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Today Tasks section
+                    _buildTodayTasksSection(
+                        context, ref, theme, l10n, membership.group.id),
 
-                // Today Tasks section
-                _buildTodayTasksSection(
-                    context, ref, theme, l10n, membership.group.id),
+                    // Latest Updates section
+                    _buildLatestUpdatesSection(
+                        context, ref, theme, l10n, membership.group.id),
+                  ],
+                ),
+              ),
 
-                // Latest Updates section
-                _buildLatestUpdatesSection(
-                    context, ref, theme, l10n, membership.group.id),
-
-                // Bottom sections
-                _buildBottomSections(context, theme, l10n, membership.group.id),
-              ],
-            ),
+              // Floating bottom sections with blur
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: ClipRect(
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: theme.backgroundColor.withValues(alpha: 0.8),
+                        border: Border(
+                          top: BorderSide(
+                            color: theme.grey[300]!.withValues(alpha: 0.5),
+                            width: 0.5,
+                          ),
+                        ),
+                      ),
+                      child: _buildBottomSections(
+                          context, theme, l10n, membership.group.id),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         );
       },
@@ -219,47 +243,6 @@ class GroupScreen extends ConsumerWidget {
   //     ),
   //   );
   // }
-
-  // Commented for later use
-  // Widget _buildContent(
-  //     BuildContext context, CustomThemeData theme, AppLocalizations l10n) {
-  //   return Column(
-  //     crossAxisAlignment: CrossAxisAlignment.start,
-  //     children: [
-  //       // Recent updates title
-  //       Padding(
-  //         padding: const EdgeInsets.symmetric(horizontal: 20),
-  //         child: Text(
-  //           l10n.translate('recent-updates'),
-  //           style: TextStyles.h6.copyWith(
-  //             color: theme.grey[900],
-  //           ),
-  //         ),
-  //       ),
-  //
-  //       const SizedBox(height: 16),
-  //
-  //       // Updates list
-  //       Expanded(
-  //         child: ListView.builder(
-  //           padding: const EdgeInsets.symmetric(horizontal: 20),
-  //           itemCount: _getDemoUpdates().length,
-  //           itemBuilder: (context, index) {
-  //             final update = _getDemoUpdates()[index];
-  //             return _buildUpdateItem(context, theme, update, index);
-  //           },
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
-
-  Widget _buildDescriptiveSection(BuildContext context, CustomThemeData theme,
-      AppLocalizations l10n, GroupMembership membership) {
-    return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8),
-        child: const GroupOverviewCard(isInMainScreen: true));
-  }
 
   Widget _buildLatestUpdatesSection(
     BuildContext context,
@@ -394,7 +377,7 @@ class GroupScreen extends ConsumerWidget {
     final todayTasksAsync = ref.watch(groupTodayTasksProvider(groupId));
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -707,66 +690,56 @@ class GroupScreen extends ConsumerWidget {
   Widget _buildBottomSections(BuildContext context, CustomThemeData theme,
       AppLocalizations l10n, String groupId) {
     return Container(
-      padding: const EdgeInsets.all(16),
-      child: Column(
+      padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
+      child: Row(
         children: [
-          // Top row: Chat section only
-          Row(
-            children: [
-              // Chat section
-              Expanded(
-                child: _buildBottomSection(
-                  context: context,
-                  theme: theme,
-                  l10n: l10n,
-                  icon: LucideIcons.messageCircle,
-                  label: l10n.translate('chat'),
-                  backgroundColor: theme.primary[50]!,
-                  borderColor: theme.primary[200]!,
-                  textColor: theme.primary[900]!,
-                  onTap: () => _navigateToChat(context, groupId),
-                ),
-              ),
-            ],
+          // Chat section
+          Expanded(
+            child: _buildBottomSection(
+              context: context,
+              theme: theme,
+              l10n: l10n,
+              icon: LucideIcons.messageCircle,
+              label: l10n.translate('chat'),
+              backgroundColor: theme.primary[50]!,
+              borderColor: theme.primary[200]!,
+              textColor: theme.primary[900]!,
+              onTap: () => _navigateToChat(context, groupId),
+            ),
           ),
 
-          const SizedBox(height: 8),
+          const SizedBox(width: 6),
 
-          // Second row: Challenges and Settings
-          Row(
-            children: [
-              // Challenges section
-              Expanded(
-                child: _buildBottomSection(
-                  context: context,
-                  theme: theme,
-                  l10n: l10n,
-                  icon: LucideIcons.trophy,
-                  label: l10n.translate('challenges'),
-                  backgroundColor: theme.success[50]!,
-                  borderColor: theme.success[200]!,
-                  textColor: theme.success[900]!,
-                  onTap: () => _navigateToChallenges(context, groupId),
-                ),
-              ),
+          // Challenges section
+          Expanded(
+            child: _buildBottomSection(
+              context: context,
+              theme: theme,
+              l10n: l10n,
+              icon: LucideIcons.trophy,
+              label: l10n.translate('challenges'),
+              backgroundColor: theme.success[50]!,
+              borderColor: theme.success[200]!,
+              textColor: theme.success[900]!,
+              onTap: () => _navigateToChallenges(context, groupId),
+            ),
+          ),
 
-              const SizedBox(width: 8),
+          const SizedBox(width: 6),
 
-              // Settings section
-              Expanded(
-                child: _buildBottomSection(
-                  context: context,
-                  theme: theme,
-                  l10n: l10n,
-                  icon: LucideIcons.settings,
-                  label: l10n.translate('settings'),
-                  backgroundColor: theme.grey[50]!,
-                  borderColor: theme.grey[200]!,
-                  textColor: theme.grey[900]!,
-                  onTap: () => _navigateToSettings(context, groupId),
-                ),
-              ),
-            ],
+          // Settings section
+          Expanded(
+            child: _buildBottomSection(
+              context: context,
+              theme: theme,
+              l10n: l10n,
+              icon: LucideIcons.settings,
+              label: l10n.translate('settings'),
+              backgroundColor: theme.grey[50]!,
+              borderColor: theme.grey[200]!,
+              textColor: theme.grey[900]!,
+              onTap: () => _navigateToSettings(context, groupId),
+            ),
           ),
         ],
       ),
@@ -791,22 +764,25 @@ class GroupScreen extends ConsumerWidget {
         borderRadius: BorderRadius.circular(8),
         borderSide: BorderSide(color: borderColor, width: 1),
         cornerSmoothing: 0.6,
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            // Icon positioned at bottom-right
+            // Icon
             Icon(
               icon,
-              size: 25,
+              size: 22,
+              color: textColor,
             ),
-            verticalSpace(Spacing.points8),
-            // Label positioned at bottom-left
+            const SizedBox(height: 6),
+            // Label
             Text(
               label,
-              style: TextStyles.h5.copyWith(
+              style: TextStyles.small.copyWith(
                 color: textColor,
+                fontWeight: FontWeight.w600,
               ),
+              textAlign: TextAlign.center,
               textDirection: TextDirection.rtl,
             ),
           ],
