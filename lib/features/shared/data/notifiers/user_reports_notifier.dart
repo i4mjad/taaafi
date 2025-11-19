@@ -230,6 +230,33 @@ class UserReportsNotifier extends _$UserReportsNotifier {
     }
   }
 
+  /// Submit a new group update report
+  Future<String> submitGroupUpdateReport({
+    required String updateId,
+    required String userMessage,
+  }) async {
+    state = const AsyncValue.loading();
+    try {
+      final result = await service.submitGroupUpdateReport(
+        updateId: updateId,
+        userMessage: userMessage,
+      );
+
+      if (result.isSuccess) {
+        // Refresh the reports after submission
+        state = AsyncValue.data(await service.getUserReports());
+        return result.data ?? '';
+      } else {
+        final errorKey = result.errorKey ?? 'report-submission-failed';
+        state = AsyncValue.error(errorKey, StackTrace.current);
+        throw Exception(errorKey);
+      }
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      rethrow;
+    }
+  }
+
   /// Add a message to an existing report
   Future<void> addMessageToReport({
     required String reportId,

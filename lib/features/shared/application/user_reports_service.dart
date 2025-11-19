@@ -25,6 +25,7 @@ class ReportTypes {
   static const String featureSuggestion = 'JYfdeI6L9Af1LUP0LhtK';
   static const String userReport = 'MhVAEnH7sCR06Rv1JV2y';
   static const String messageReport = 'ASi6Qk1yS8zn1SyGIio6';
+  static const String groupUpdateReport = 'OcFDTLmznnMA9oVWla4V';
 }
 
 /// Service for handling user reports business logic
@@ -155,6 +156,23 @@ class UserReportsService {
 
     return await _submitReport(
       reportTypeId: ReportTypes.messageReport,
+      userMessage: userMessage,
+      relatedContent: relatedContent,
+    );
+  }
+
+  /// Submit a new group update report
+  Future<ReportResult<String>> submitGroupUpdateReport({
+    required String updateId,
+    required String userMessage,
+  }) async {
+    final relatedContent = {
+      'type': 'group_update',
+      'contentId': updateId,
+    };
+
+    return await _submitReport(
+      reportTypeId: ReportTypes.groupUpdateReport,
       userMessage: userMessage,
       relatedContent: relatedContent,
     );

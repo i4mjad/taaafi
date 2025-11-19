@@ -1276,6 +1276,11 @@ import {
   moderateDirectMessage 
 } from './moderateDirectMessage';
 
+// Import group update moderation function
+import { 
+  moderateGroupUpdate 
+} from './moderateGroupUpdate';
+
 // Import groups activity backfill function
 import { 
   backfillMemberActivity 
@@ -1305,6 +1310,11 @@ export {
 // Export direct message moderation function
 export {
   moderateDirectMessage
+};
+
+// Export group update moderation function
+export {
+  moderateGroupUpdate
 };
 
 // Export groups activity backfill function

@@ -7,6 +7,7 @@ import '../application/challenges_providers.dart';
 import '../application/updates_providers.dart';
 import '../domain/entities/group_update_entity.dart';
 import '../../community/presentation/providers/community_providers_new.dart';
+import 'package:reboot_app_3/core/localization/localization.dart';
 
 part 'challenge_detail_notifier.g.dart';
 
@@ -183,12 +184,9 @@ class ChallengeDetailNotifier extends _$ChallengeDetailNotifier {
   }
 
   /// Complete a task
-  Future<void> completeTask(
-    String taskId, 
-    int points, 
-    TaskFrequency frequency,
-    {DateTime? completionDate} // Optional: for retroactive completion
-  ) async {
+  Future<void> completeTask(String taskId, int points, TaskFrequency frequency,
+      {DateTime? completionDate} // Optional: for retroactive completion
+      ) async {
     final currentState = await future;
     if (currentState.challenge == null) return;
 
@@ -227,9 +225,10 @@ class ChallengeDetailNotifier extends _$ChallengeDetailNotifier {
           completingTaskId: null,
           successMessage: message,
         ));
-        
+
         // Automatically share to group
-        _shareTaskCompletionToGroup(currentState.challenge!, taskId, points, profile.id);
+        _shareTaskCompletionToGroup(
+            currentState.challenge!, taskId, points, profile.id);
       } else {
         state = AsyncValue.data(currentState.copyWith(
           isLoading: false,
@@ -262,7 +261,7 @@ class ChallengeDetailNotifier extends _$ChallengeDetailNotifier {
       }
     });
   }
-  
+
   /// Automatically share task completion to group
   Future<void> _shareTaskCompletionToGroup(
     ChallengeEntity challenge,
@@ -274,17 +273,39 @@ class ChallengeDetailNotifier extends _$ChallengeDetailNotifier {
       // Get current community profile to use isAnonymous setting
       final profile = await ref.read(currentCommunityProfileProvider.future);
       if (profile == null) return;
-      
+
       // Find the task
       final task = challenge.tasks.firstWhere((t) => t.id == taskId);
-      
+
+      // Get user's locale for localized content
+      final locale = ref.read(localeNotifierProvider);
+      if (locale == null) return;
+
+      // Create localized content using AppLocalizations
+      // Note: We can't use BuildContext here, so we manually get the translation
+      final Map<String, String> translations = locale.languageCode == 'ar'
+          ? const {
+              'task-completed':
+                  'لقد أكملت "{taskName}" في {challengeName}! 🎯 (+{points} نقطة)',
+            }
+          : const {
+              'task-completed':
+                  'Just completed "{taskName}" in {challengeName}! 🎯 (+{points} points)',
+            };
+
+      final content = translations['task-completed']!
+          .replaceAll('{taskName}', task.name)
+          .replaceAll('{challengeName}', challenge.name)
+          .replaceAll('{points}', points.toString());
+
       // Post update using profile's isAnonymous setting
+      // Note: locale will be automatically detected in PostUpdateController
       final controller = ref.read(postUpdateControllerProvider.notifier);
       await controller.postUpdate(
         groupId: challenge.groupId,
         type: UpdateType.celebration,
         title: '',
-        content: 'Just completed "${task.name}" in ${challenge.name}! 🎯 (+$points points)',
+        content: content,
         linkedChallengeId: challenge.id,
         isAnonymous: profile.isAnonymous,
       );
@@ -294,4 +315,3 @@ class ChallengeDetailNotifier extends _$ChallengeDetailNotifier {
     }
   }
 }
-

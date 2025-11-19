@@ -19,6 +19,8 @@ class GroupUpdateModel {
   final int supportCount;
   final bool isPinned;
   final bool isHidden;
+  final String locale;
+  final Map<String, dynamic>? moderation;
   final Timestamp createdAt;
   final Timestamp updatedAt;
 
@@ -39,6 +41,8 @@ class GroupUpdateModel {
     required this.supportCount,
     required this.isPinned,
     required this.isHidden,
+    required this.locale,
+    this.moderation,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -64,6 +68,8 @@ class GroupUpdateModel {
       supportCount: data['supportCount'] as int? ?? 0,
       isPinned: data['isPinned'] as bool? ?? false,
       isHidden: data['isHidden'] as bool? ?? false,
+      locale: data['locale'] as String? ?? 'en',
+      moderation: data['moderation'] as Map<String, dynamic>?,
       createdAt: data['createdAt'] as Timestamp? ?? Timestamp.now(),
       updatedAt: data['updatedAt'] as Timestamp? ?? Timestamp.now(),
     );
@@ -87,6 +93,8 @@ class GroupUpdateModel {
       'supportCount': supportCount,
       'isPinned': isPinned,
       'isHidden': isHidden,
+      'locale': locale,
+      'moderation': moderation,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
     };
@@ -111,6 +119,10 @@ class GroupUpdateModel {
       supportCount: supportCount,
       isPinned: isPinned,
       isHidden: isHidden,
+      locale: locale,
+      moderation: moderation != null 
+          ? ModerationStatus.fromJson(moderation!)
+          : null,
       createdAt: createdAt.toDate(),
       updatedAt: updatedAt.toDate(),
     );
@@ -135,6 +147,8 @@ class GroupUpdateModel {
       supportCount: entity.supportCount,
       isPinned: entity.isPinned,
       isHidden: entity.isHidden,
+      locale: entity.locale,
+      moderation: entity.moderation?.toJson(),
       createdAt: Timestamp.fromDate(entity.createdAt),
       updatedAt: Timestamp.fromDate(entity.updatedAt),
     );
@@ -175,4 +189,3 @@ class GroupUpdateModel {
     return Map<String, dynamic>.from(reactions);
   }
 }
-

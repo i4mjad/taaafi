@@ -14,6 +14,7 @@ import 'package:reboot_app_3/features/vault/presentation/widgets/calendar/calend
 import 'package:reboot_app_3/features/home/presentation/home/widgets/notification_promoter_widget.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/features/vault/presentation/vault_settings/activities_notifications_settings_screen.dart';
+import 'package:reboot_app_3/core/shared_widgets/warning_notification_banner.dart';
 
 class MainHomeView extends ConsumerWidget {
   const MainHomeView({super.key});
@@ -36,6 +37,9 @@ class MainHomeView extends ConsumerWidget {
             loading: () => const SizedBox.shrink(),
             error: (_, __) => const SizedBox.shrink(),
           ),
+
+          // Warning Banner - show if user has warnings
+          const WarningNotificationBanner(),
 
           // Quick Actions
           const QuickActionsWidget(),

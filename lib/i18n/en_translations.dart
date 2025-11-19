@@ -381,6 +381,8 @@ const Map<String, String> kEn = {
   "message-under-review":
       "This message is under review due to a suspicious rule violation",
   "message-under-review-short": "Under review",
+  "update-under-review":
+      "This update is under review and will be visible once approved",
   "mute-conversation": "Mute",
   "unmute-conversation": "Unmute",
   "conversation-muted-success": "Conversation muted",
@@ -554,6 +556,12 @@ const Map<String, String> kEn = {
   "character_count": "{current}/{max} characters",
   "report_post_submitted": "Post report submitted successfully",
   "report_comment_submitted": "Comment report submitted successfully",
+  "group_update": "Group Update",
+  "report-update": "Report Update",
+  "report_group_update_submitted": "Group update report submitted successfully",
+  "task-completed-in-challenge":
+      "Just completed \"{taskName}\" in {challengeName}! 🎯",
+  "points-earned": "+{points} points",
   "send": "Send",
   "community-anonymous": "Anonymous",
   "community-deleted-user": "Deleted",
@@ -1695,6 +1703,8 @@ const Map<String, String> kEn = {
   "no-profile-data": "No profile data available",
   "profile-details": "Profile Details",
   "warnings": "Warnings",
+  "you-have-warning": "You have 1 active warning",
+  "you-have-warnings": "You have {count} active warnings",
   "bans": "Bans",
   "age": "Age",
   "member-since": "Member Since",

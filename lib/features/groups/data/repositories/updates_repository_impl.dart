@@ -34,7 +34,11 @@ class UpdatesRepositoryImpl implements UpdatesRepository {
       log('Creating update in group ${update.groupId}');
 
       final docRef = _updatesCollection.doc();
-      final model = GroupUpdateModel.fromEntity(update.copyWith(id: docRef.id));
+      // TODO: Get locale from user profile or device
+      final model = GroupUpdateModel.fromEntity(update.copyWith(
+        id: docRef.id,
+        locale: update.locale.isEmpty ? 'en' : update.locale,
+      ));
 
       await docRef.set(model.toFirestore());
 
@@ -145,8 +149,8 @@ class UpdatesRepositoryImpl implements UpdatesRepository {
           .limit(limit);
 
       if (before != null) {
-        query = query.where('createdAt',
-            isLessThan: Timestamp.fromDate(before));
+        query =
+            query.where('createdAt', isLessThan: Timestamp.fromDate(before));
       }
 
       final snapshot = await query.get();
@@ -279,8 +283,7 @@ class UpdatesRepositoryImpl implements UpdatesRepository {
           GroupUpdateModel.fromFirestore(updateDoc).reactions;
 
       // Toggle logic: if user already reacted with this emoji, remove it; otherwise add it
-      final emojiReactions =
-          List<String>.from(currentReactions[emoji] ?? []);
+      final emojiReactions = List<String>.from(currentReactions[emoji] ?? []);
 
       if (emojiReactions.contains(cpId)) {
         emojiReactions.remove(cpId);
@@ -425,8 +428,7 @@ class UpdatesRepositoryImpl implements UpdatesRepository {
           UpdateCommentModel.fromFirestore(commentDoc).reactions;
 
       // Toggle logic
-      final emojiReactions =
-          List<String>.from(currentReactions[emoji] ?? []);
+      final emojiReactions = List<String>.from(currentReactions[emoji] ?? []);
 
       if (emojiReactions.contains(cpId)) {
         emojiReactions.remove(cpId);
@@ -572,4 +574,3 @@ class UpdatesRepositoryImpl implements UpdatesRepository {
     }
   }
 }
-

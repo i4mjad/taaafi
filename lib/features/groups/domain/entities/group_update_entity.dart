@@ -29,6 +29,10 @@ class GroupUpdateEntity {
   // Status
   final bool isPinned;
   final bool isHidden;
+  final String locale;
+
+  // Moderation
+  final ModerationStatus? moderation;
 
   // Timestamps
   final DateTime createdAt;
@@ -51,6 +55,8 @@ class GroupUpdateEntity {
     this.supportCount = 0,
     this.isPinned = false,
     this.isHidden = false,
+    required this.locale,
+    this.moderation,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -102,18 +108,25 @@ class GroupUpdateEntity {
   /// Get most popular emoji (most reactions)
   String? getMostPopularEmoji() {
     if (reactions.isEmpty) return null;
-    
+
     String? mostPopular;
     int maxCount = 0;
-    
+
     reactions.forEach((emoji, cpIds) {
       if (cpIds.length > maxCount) {
         maxCount = cpIds.length;
         mostPopular = emoji;
       }
     });
-    
+
     return mostPopular;
+  }
+
+  /// Check if update should be redacted based on moderation
+  bool shouldBeRedacted() {
+    if (moderation == null) return false;
+    return moderation!.status == 'manual_review' && 
+           (moderation!.finalDecision?.confidence ?? 0) >= 0.85;
   }
 
   GroupUpdateEntity copyWith({
@@ -133,6 +146,8 @@ class GroupUpdateEntity {
     int? supportCount,
     bool? isPinned,
     bool? isHidden,
+    String? locale,
+    ModerationStatus? moderation,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -153,6 +168,8 @@ class GroupUpdateEntity {
       supportCount: supportCount ?? this.supportCount,
       isPinned: isPinned ?? this.isPinned,
       isHidden: isHidden ?? this.isHidden,
+      locale: locale ?? this.locale,
+      moderation: moderation ?? this.moderation,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -176,8 +193,113 @@ class GroupUpdateEntity {
       'supportCount': supportCount,
       'isPinned': isPinned,
       'isHidden': isHidden,
+      'locale': locale,
+      'moderation': moderation?.toJson(),
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
+    };
+  }
+}
+
+/// Moderation status for updates
+class ModerationStatus {
+  final String status; // 'pending', 'approved', 'blocked', 'manual_review'
+  final String? reason;
+  final AIModeration? ai;
+  final FinalDecision? finalDecision;
+
+  const ModerationStatus({
+    required this.status,
+    this.reason,
+    this.ai,
+    this.finalDecision,
+  });
+
+  factory ModerationStatus.fromJson(Map<String, dynamic> json) {
+    return ModerationStatus(
+      status: json['status'] as String? ?? 'pending',
+      reason: json['reason'] as String?,
+      ai: json['ai'] != null 
+          ? AIModeration.fromJson(json['ai'] as Map<String, dynamic>)
+          : null,
+      finalDecision: json['finalDecision'] != null
+          ? FinalDecision.fromJson(json['finalDecision'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'status': status,
+      'reason': reason,
+      'ai': ai?.toJson(),
+      'finalDecision': finalDecision?.toJson(),
+    };
+  }
+}
+
+/// AI moderation details
+class AIModeration {
+  final String reason;
+  final String violationType;
+  final String severity;
+  final double confidence;
+
+  const AIModeration({
+    required this.reason,
+    required this.violationType,
+    required this.severity,
+    required this.confidence,
+  });
+
+  factory AIModeration.fromJson(Map<String, dynamic> json) {
+    return AIModeration(
+      reason: json['reason'] as String? ?? '',
+      violationType: json['violationType'] as String? ?? 'none',
+      severity: json['severity'] as String? ?? 'low',
+      confidence: (json['confidence'] as num?)?.toDouble() ?? 0.0,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'reason': reason,
+      'violationType': violationType,
+      'severity': severity,
+      'confidence': confidence,
+    };
+  }
+}
+
+/// Final moderation decision
+class FinalDecision {
+  final String action;
+  final String reason;
+  final String? violationType;
+  final double confidence;
+
+  const FinalDecision({
+    required this.action,
+    required this.reason,
+    this.violationType,
+    required this.confidence,
+  });
+
+  factory FinalDecision.fromJson(Map<String, dynamic> json) {
+    return FinalDecision(
+      action: json['action'] as String? ?? 'allow',
+      reason: json['reason'] as String? ?? '',
+      violationType: json['violationType'] as String?,
+      confidence: (json['confidence'] as num?)?.toDouble() ?? 0.0,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'action': action,
+      'reason': reason,
+      'violationType': violationType,
+      'confidence': confidence,
     };
   }
 }
@@ -296,4 +418,3 @@ extension UpdateVisibilityExtension on UpdateVisibility {
     }
   }
 }
-

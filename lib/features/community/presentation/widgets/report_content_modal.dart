@@ -13,22 +13,27 @@ import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/shared/data/notifiers/user_reports_notifier.dart';
 import 'package:reboot_app_3/features/community/data/models/post.dart';
 import 'package:reboot_app_3/features/community/data/models/comment.dart';
+import 'package:reboot_app_3/features/groups/domain/entities/group_update_entity.dart';
 
-enum ReportContentType { post, comment }
+enum ReportContentType { post, comment, group_update }
 
 class ReportContentModal extends ConsumerStatefulWidget {
   final ReportContentType contentType;
   final Post? post;
   final Comment? comment;
+  final GroupUpdateEntity? groupUpdate;
 
   const ReportContentModal({
     super.key,
     required this.contentType,
     this.post,
     this.comment,
+    this.groupUpdate,
   }) : assert(
           (contentType == ReportContentType.post && post != null) ||
-              (contentType == ReportContentType.comment && comment != null),
+              (contentType == ReportContentType.comment && comment != null) ||
+              (contentType == ReportContentType.group_update &&
+                  groupUpdate != null),
         );
 
   @override
@@ -71,6 +76,13 @@ class _ReportContentModalState extends ConsumerState<ReportContentModal> {
         return comment.body.length > 150
             ? '${comment.body.substring(0, 150)}...'
             : comment.body;
+      case ReportContentType.group_update:
+        final update = widget.groupUpdate!;
+        final title = update.title.isNotEmpty ? update.title : 'No title';
+        final content = update.content.length > 100
+            ? '${update.content.substring(0, 100)}...'
+            : update.content;
+        return '$title\n\n$content';
     }
   }
 
@@ -80,6 +92,8 @@ class _ReportContentModalState extends ConsumerState<ReportContentModal> {
         return widget.post!.id;
       case ReportContentType.comment:
         return widget.comment!.id;
+      case ReportContentType.group_update:
+        return widget.groupUpdate!.id;
     }
   }
 
@@ -110,6 +124,12 @@ class _ReportContentModalState extends ConsumerState<ReportContentModal> {
             userMessage: justification,
           );
           break;
+        case ReportContentType.group_update:
+          reportId = await reportsNotifier.submitGroupUpdateReport(
+            updateId: _contentId,
+            userMessage: justification,
+          );
+          break;
       }
 
       if (mounted) {
@@ -119,8 +139,11 @@ class _ReportContentModalState extends ConsumerState<ReportContentModal> {
           pathParameters: {'reportId': reportId},
         );
 
-        final contentType =
-            widget.contentType == ReportContentType.post ? 'post' : 'comment';
+        final contentType = widget.contentType == ReportContentType.post
+            ? 'post'
+            : widget.contentType == ReportContentType.comment
+                ? 'comment'
+                : 'group_update';
         getSuccessSnackBar(context, 'report_${contentType}_submitted');
       }
     } catch (e) {
@@ -155,7 +178,9 @@ class _ReportContentModalState extends ConsumerState<ReportContentModal> {
     final localization = AppLocalizations.of(context);
     final contentType = widget.contentType == ReportContentType.post
         ? localization.translate('post')
-        : localization.translate('comment');
+        : widget.contentType == ReportContentType.comment
+            ? localization.translate('comment')
+            : localization.translate('group_update');
 
     return Container(
       decoration: BoxDecoration(
@@ -183,8 +208,9 @@ class _ReportContentModalState extends ConsumerState<ReportContentModal> {
                 children: [
                   Expanded(
                     child: Text(
-                      localization.translate('report_content').replaceAll(
-                          '{type}', localization.translate(contentType)),
+                      localization
+                          .translate('report_content')
+                          .replaceAll('{type}', contentType),
                       style: TextStyles.h5.copyWith(color: theme.grey[900]),
                     ),
                   ),

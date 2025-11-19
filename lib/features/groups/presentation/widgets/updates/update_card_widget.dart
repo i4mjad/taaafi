@@ -8,6 +8,7 @@ import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/features/groups/domain/entities/group_update_entity.dart';
 import 'package:reboot_app_3/features/groups/application/updates_providers.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
+import 'package:reboot_app_3/features/community/presentation/widgets/report_content_modal.dart';
 
 /// Widget for displaying a single update in the feed
 class UpdateCardWidget extends ConsumerWidget {
@@ -47,10 +48,10 @@ class UpdateCardWidget extends ConsumerWidget {
             // Header
             _buildHeader(context, ref, theme, l10n),
             const SizedBox(height: 12),
-            
+
             // Content
             _buildContent(context, theme, l10n),
-            
+
             if (!isCompact) ...[
               const SizedBox(height: 12),
               // Engagement bar
@@ -68,9 +69,10 @@ class UpdateCardWidget extends ConsumerWidget {
     dynamic theme,
     AppLocalizations l10n,
   ) {
-    final authorAsync = ref.watch(communityProfileByIdProvider(update.authorCpId));
+    final authorAsync =
+        ref.watch(communityProfileByIdProvider(update.authorCpId));
     final currentProfileAsync = ref.watch(currentCommunityProfileProvider);
-    
+
     // Check if current user is the author
     final isCurrentUser = currentProfileAsync.maybeWhen(
       data: (profile) => profile?.id == update.authorCpId,
@@ -128,14 +130,15 @@ class UpdateCardWidget extends ConsumerWidget {
         _buildTypeBadge(theme, l10n),
         const SizedBox(width: 8),
         // More options button
-        GestureDetector(
-          onTap: () => _showOptionsMenu(context, ref),
-          child: Icon(
-            LucideIcons.moreVertical,
-            size: 16,
-            color: theme.grey[600],
+        if (!isCompact)
+          GestureDetector(
+            onTap: () => _showOptionsMenu(context, ref),
+            child: Icon(
+              LucideIcons.moreVertical,
+              size: 16,
+              color: theme.grey[600],
+            ),
           ),
-        ),
       ],
     );
   }
@@ -162,10 +165,39 @@ class UpdateCardWidget extends ConsumerWidget {
     dynamic theme,
     AppLocalizations l10n,
   ) {
+    // Check if content should be redacted
+    final bool shouldRedact = update.shouldBeRedacted();
+    
+    if (shouldRedact) {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: theme.warning[50],
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: theme.warning[200]!, width: 1),
+        ),
+        child: Row(
+          children: [
+            Icon(LucideIcons.eye, size: 16, color: theme.warning[700]),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                l10n.translate('update-under-review'),
+                style: TextStyles.small.copyWith(
+                  color: theme.warning[700],
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (update.title.isNotEmpty) ...[
+        if (update.title.isNotEmpty && !isCompact) ...[
           Text(
             update.title,
             style: TextStyles.footnoteSelected.copyWith(
@@ -184,7 +216,7 @@ class UpdateCardWidget extends ConsumerWidget {
             height: 1.4,
           ),
         ),
-        if (update.hasLinkedChallenge()) ...[
+        if (update.hasLinkedChallenge() && !isCompact) ...[
           const SizedBox(height: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -220,7 +252,8 @@ class UpdateCardWidget extends ConsumerWidget {
   ) {
     final currentProfile = ref.watch(currentCommunityProfileProvider).value;
     final hasReacted = currentProfile != null &&
-        update.reactions.values.any((cpIds) => cpIds.contains(currentProfile.id));
+        update.reactions.values
+            .any((cpIds) => cpIds.contains(currentProfile.id));
 
     return Row(
       children: [
@@ -324,7 +357,7 @@ class UpdateCardWidget extends ConsumerWidget {
   void _showOptionsMenu(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
     final l10n = AppLocalizations.of(context);
-    
+
     // Check if current user is the author
     final currentProfileAsync = ref.watch(currentCommunityProfileProvider);
     final isAuthor = currentProfileAsync.maybeWhen(
@@ -354,6 +387,26 @@ class UpdateCardWidget extends ConsumerWidget {
                 onTap: () {
                   Navigator.pop(context);
                   _confirmDelete(context, ref, l10n, theme);
+                },
+              )
+            else
+              ListTile(
+                leading: Icon(LucideIcons.flag, color: theme.grey[700]),
+                title: Text(
+                  l10n.translate('report-update'),
+                  style: TextStyles.body.copyWith(color: theme.grey[900]),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (context) => ReportContentModal(
+                      groupUpdate: update,
+                      contentType: ReportContentType.group_update,
+                    ),
+                  );
                 },
               ),
           ],
@@ -462,12 +515,12 @@ class UpdateCardWidget extends ConsumerWidget {
         updateId: update.id,
         isAdmin: false, // User is deleting their own update
       );
-      
+
       // Refresh all update providers
       ref.invalidate(latestUpdatesProvider(groupId));
       ref.invalidate(recentUpdatesProvider(groupId));
       ref.invalidate(groupUpdatesProvider(groupId));
-      
+
       if (context.mounted) {
         getSuccessSnackBar(context, 'update-deleted-successfully');
       }
@@ -478,4 +531,3 @@ class UpdateCardWidget extends ConsumerWidget {
     }
   }
 }
-

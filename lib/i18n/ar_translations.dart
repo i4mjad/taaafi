@@ -549,6 +549,12 @@ const Map<String, String> kAr = {
   "character_count": "{current}/{max} حرف",
   "report_post_submitted": "تم إرسال بلاغ المنشور بنجاح",
   "report_comment_submitted": "تم إرسال بلاغ التعليق بنجاح",
+  "group_update": "تحديث الزمالة",
+  "report-update": "الإبلاغ عن التحديث",
+  "report_group_update_submitted": "تم إرسال بلاغ تحديث الزمالة بنجاح",
+  "task-completed-in-challenge":
+      "لقد أكمل \"{taskName}\" في {challengeName}! 🎯",
+  "points-earned": "+{points} نقطة",
   "send": "إرسال",
   "community-anonymous": "مجهول",
   "community-deleted-user": "محذوف",
@@ -1191,6 +1197,7 @@ const Map<String, String> kAr = {
   "message-under-review":
       "هذه الرسالة قيد المراجعة بسبب اشتباه في مخالفة القواعد",
   "message-under-review-short": "قيد المراجعة",
+  "update-under-review": "هذا التحديث قيد المراجعة وسيظهر بعد الموافقة عليه",
   "warning-information": "معلومات التحذير",
   "ban-information": "معلومات الحظر",
   "warning-type": "نوع التحذير",
@@ -1627,6 +1634,8 @@ const Map<String, String> kAr = {
   "no-profile-data": "لا توجد بيانات للملف الشخصي",
   "profile-details": "تفاصيل الملف الشخصي",
   "warnings": "التحذيرات",
+  "you-have-warning": "لديك تحذير نشط واحد",
+  "you-have-warnings": "لديك {count} تحذير نشط",
   "bans": "الحظر",
   "age": "العمر",
   "member-since": "عضو منذ",

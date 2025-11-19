@@ -2,7 +2,6 @@ import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
@@ -75,7 +74,6 @@ class _BannedScreenStateful extends ConsumerStatefulWidget {
 }
 
 class _BannedScreenStatefulState extends ConsumerState<_BannedScreenStateful> {
-  bool _isLoggingOut = false;
   bool _isRefreshing = false;
 
   /// Translate security service messages to localized text
@@ -233,12 +231,6 @@ class _BannedScreenStatefulState extends ConsumerState<_BannedScreenStateful> {
 
               // Refresh button for both user and device bans
               _buildRefreshButton(context, ref, theme),
-
-              // Logout button ONLY for user bans (NOT for device bans)
-              if (isUserBan) ...[
-                const SizedBox(height: 16),
-                _buildLogoutButton(context, ref, theme),
-              ],
 
               // For device bans, show a message that logout won't help
               if (isDeviceBan) ...[
@@ -650,33 +642,6 @@ class _BannedScreenStatefulState extends ConsumerState<_BannedScreenStateful> {
     );
   }
 
-  Future<void> _logout(
-      BuildContext context, WidgetRef ref, CustomThemeData theme) async {
-    if (!mounted) return;
-
-    try {
-      setState(() {
-        _isLoggingOut = true;
-      });
-
-      await FirebaseAuth.instance.signOut();
-      // Force the app to re-evaluate startup state, which will redirect to onboarding
-      // since the user is no longer authenticated
-      ref.invalidate(appStartupProvider);
-    } catch (e) {
-      // Handle logout error
-      if (mounted) {
-        getErrorSnackBar(context, "logout-error");
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoggingOut = false;
-        });
-      }
-    }
-  }
-
   Future<void> _refreshBanStatus(
       BuildContext context, WidgetRef ref, CustomThemeData theme) async {
     if (!mounted) return;
@@ -764,38 +729,6 @@ class _BannedScreenStatefulState extends ConsumerState<_BannedScreenStateful> {
         ),
         style: ElevatedButton.styleFrom(
           backgroundColor: theme.primary[600],
-          foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          shape: SmoothRectangleBorder(
-            borderRadius: SmoothBorderRadius(
-              cornerRadius: 8,
-              cornerSmoothing: 1.0,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLogoutButton(
-      BuildContext context, WidgetRef ref, CustomThemeData theme) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton.icon(
-        onPressed: _isLoggingOut ? null : () => _logout(context, ref, theme),
-        icon: Icon(
-          LucideIcons.logOut,
-          color: Colors.white,
-        ),
-        label: Text(
-          AppLocalizations.of(context).translate('logout'),
-          style: TextStyles.body.copyWith(
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: theme.error[600],
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(vertical: 12),
           shape: SmoothRectangleBorder(

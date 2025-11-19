@@ -38,6 +38,7 @@ class UpdatesService {
     String? linkedMilestoneId,
     bool isAnonymous = false,
     UpdateVisibility visibility = UpdateVisibility.membersOnly,
+    String locale = 'en',
   }) async {
     try {
       log('Posting update to group $groupId by user $authorCpId');
@@ -73,6 +74,7 @@ class UpdatesService {
         supportCount: 0,
         isPinned: false,
         isHidden: false,
+        locale: locale,
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
       );
@@ -93,6 +95,7 @@ class UpdatesService {
     required String authorCpId,
     required FollowUpModel followup,
     bool isAnonymous = false,
+    String locale = 'en',
   }) async {
     try {
       log('Creating update from followup: ${followup.id}');
@@ -109,6 +112,7 @@ class UpdatesService {
         content: updateContent.content,
         linkedFollowupId: followup.id,
         isAnonymous: isAnonymous,
+        locale: locale,
       );
     } catch (e, stackTrace) {
       log('Error creating update from followup: $e', stackTrace: stackTrace);
@@ -123,6 +127,7 @@ class UpdatesService {
     required String presetId,
     String? additionalContent,
     bool isAnonymous = false,
+    String locale = 'en',
   }) async {
     try {
       log('Creating update from preset: $presetId');
@@ -144,6 +149,7 @@ class UpdatesService {
         title: preset.titleKey,
         content: content,
         isAnonymous: isAnonymous,
+        locale: locale,
       );
     } catch (e, stackTrace) {
       log('Error creating update from preset: $e', stackTrace: stackTrace);
@@ -196,7 +202,7 @@ class UpdatesService {
 
       // Get recent followups
       final recentFollowups = await _followupService.getRecentFollowups(cpId);
-      
+
       // Suggest sharing recent followups (if not already shared)
       for (final followup in recentFollowups.take(3)) {
         if (!_followupService.canShareFollowupType(followup.type)) continue;
@@ -205,7 +211,7 @@ class UpdatesService {
           followup.id,
           groupId,
         );
-        
+
         if (!isShared) {
           suggestions.add(
             UpdateSuggestion(
@@ -224,7 +230,7 @@ class UpdatesService {
         cpId,
         limit: 1,
       );
-      
+
       if (userUpdates.isEmpty) {
         suggestions.add(
           UpdateSuggestion(
@@ -237,7 +243,7 @@ class UpdatesService {
         final lastUpdate = userUpdates.first;
         final daysSinceLastUpdate =
             DateTime.now().difference(lastUpdate.createdAt).inDays;
-        
+
         if (daysSinceLastUpdate >= 7) {
           suggestions.add(
             UpdateSuggestion(
@@ -460,4 +466,3 @@ enum SuggestionType {
   challengeProgress,
   milestone,
 }
-

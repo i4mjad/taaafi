@@ -11,6 +11,7 @@ import '../data/repositories/updates_repository_impl.dart';
 import 'package:reboot_app_3/features/vault/data/follow_up/follow_up_repository.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/shared/models/follow_up.dart';
+import 'package:reboot_app_3/core/localization/localization.dart';
 
 part 'updates_providers.g.dart';
 
@@ -187,7 +188,7 @@ Future<List<UpdateSuggestion>> updateSuggestions(
 ) async {
   final service = ref.watch(updatesServiceProvider);
   final currentProfile = await ref.read(currentCommunityProfileProvider.future);
-  
+
   if (currentProfile == null) {
     return [];
   }
@@ -223,6 +224,9 @@ class PostUpdateController extends _$PostUpdateController {
         return PostUpdateResult.failure('User profile not found');
       }
 
+      // Get user's active locale
+      final userLocale = ref.read(localeNotifierProvider)?.languageCode ?? 'en';
+
       final result = await service.postUpdate(
         groupId: groupId,
         authorCpId: currentProfile.id,
@@ -232,6 +236,7 @@ class PostUpdateController extends _$PostUpdateController {
         linkedFollowupId: linkedFollowupId,
         linkedChallengeId: linkedChallengeId,
         isAnonymous: isAnonymous,
+        locale: userLocale,
       );
 
       return result;
@@ -257,12 +262,16 @@ class PostUpdateController extends _$PostUpdateController {
         return PostUpdateResult.failure('User profile not found');
       }
 
+      // Get user's active locale
+      final userLocale = ref.read(localeNotifierProvider)?.languageCode ?? 'en';
+
       return await service.createUpdateFromPreset(
         groupId: groupId,
         authorCpId: currentProfile.id,
         presetId: presetId,
         additionalContent: additionalContent,
         isAnonymous: isAnonymous,
+        locale: userLocale,
       );
     } finally {
       state = false;
@@ -288,13 +297,13 @@ class PostUpdateController extends _$PostUpdateController {
       // TODO: Get the followup by ID
       // For now, this would need the actual followup model
       // You'll need to implement this based on your followup service
-      
+
       return PostUpdateResult.failure('Followup integration pending');
     } finally {
       state = false;
     }
   }
-  
+
   /// Post update from a followup model (used in followup sheet)
   Future<PostUpdateResult> postUpdateFromFollowup({
     required String groupId,
@@ -312,11 +321,15 @@ class PostUpdateController extends _$PostUpdateController {
         return PostUpdateResult.failure('User profile not found');
       }
 
+      // Get user's active locale
+      final userLocale = ref.read(localeNotifierProvider)?.languageCode ?? 'en';
+
       return await service.createUpdateFromFollowup(
         groupId: groupId,
         authorCpId: currentProfile.id,
         followup: followup,
         isAnonymous: isAnonymous,
+        locale: userLocale,
       );
     } finally {
       state = false;
@@ -338,8 +351,9 @@ class PostCommentController extends _$PostCommentController {
     state = true;
     try {
       final repository = ref.read(updatesRepositoryProvider);
-      final currentProfile = await ref.read(currentCommunityProfileProvider.future);
-      
+      final currentProfile =
+          await ref.read(currentCommunityProfileProvider.future);
+
       if (currentProfile == null) {
         throw Exception('Not authenticated');
       }
@@ -379,12 +393,13 @@ class DeleteCommentController extends _$DeleteCommentController {
     state = true;
     try {
       final repository = ref.read(updatesRepositoryProvider);
-      final currentProfile = await ref.read(currentCommunityProfileProvider.future);
-      
+      final currentProfile =
+          await ref.read(currentCommunityProfileProvider.future);
+
       if (currentProfile == null) {
         throw Exception('Not authenticated');
       }
-      
+
       await repository.deleteComment(commentId, currentProfile.id);
     } finally {
       state = false;
@@ -567,4 +582,3 @@ class UpdateManagementController extends _$UpdateManagementController {
     }
   }
 }
-
