@@ -87,15 +87,15 @@ Future<ChallengeEntity?> challengeById(ref, String challengeId) async {
 // Participation Query Providers
 // ============================================
 
-/// Get user's participation in a specific challenge
+/// Get user's participation in a specific challenge (Stream for real-time updates)
 @riverpod
-Future<ChallengeParticipationEntity?> userChallengeParticipation(
+Stream<ChallengeParticipationEntity?> userChallengeParticipation(
   ref,
   String challengeId,
   String cpId,
-) async {
-  final service = ref.watch(challengesServiceProvider);
-  return await service.getParticipation(
+) {
+  final repository = ref.watch(challengesRepositoryProvider);
+  return repository.watchParticipation(
     challengeId: challengeId,
     cpId: cpId,
   );
@@ -163,40 +163,51 @@ Future<List<ChallengeUpdateEntity>> challengeUpdates(
 
 /// Get task instances for a challenge (for the current user)
 /// Loads challenge, user participation, and generates task instances
+/// Uses Stream to watch for real-time updates
 @riverpod
-Future<List<ChallengeTaskInstance>> challengeTaskInstances(
+Stream<List<ChallengeTaskInstance>> challengeTaskInstances(
   ref,
   String challengeId,
-) async {
+) async* {
   // Get challenge
   final challenge = await ref.watch(challengeByIdProvider(challengeId).future);
 
   if (challenge == null) {
-    return [];
+    yield [];
+    return;
   }
 
   // Get current user profile
   final profile = await ref.watch(currentCommunityProfileProvider.future);
 
   if (profile == null) {
-    return [];
+    yield [];
+    return;
   }
 
-  // Get user's participation in this challenge
-  final participation = await ref.watch(
-    userChallengeParticipationProvider(challengeId, profile.id).future,
+  // Watch user's participation for real-time updates
+  final repository = ref.watch(challengesRepositoryProvider);
+  final participationStream = repository.watchParticipation(
+    challengeId: challengeId,
+    cpId: profile.id,
   );
 
-  if (participation == null) {
-    return [];
+  // Transform the participation stream into task instances stream
+  await for (final participation in participationStream) {
+    if (participation == null) {
+      yield [];
+      continue;
+    }
+
+    // Generate task instances using the history service
+    final historyService = ChallengeHistoryService();
+    final instances = historyService.generateTaskInstances(
+      challenge: challenge,
+      participation: participation,
+    );
+    
+    yield instances;
   }
-
-  // Generate task instances using the history service
-  final historyService = ChallengeHistoryService();
-  return historyService.generateTaskInstances(
-    challenge: challenge,
-    participation: participation,
-  );
 }
 
 /// Get today's task instances across all challenges in a group (for the current user)
@@ -230,7 +241,7 @@ Future<List<ChallengeTaskInstance>> groupTodayTasks(
     print('\n🎯 Challenge: "${challenge.name}" (${challenge.id})');
     print('   Tasks in challenge: ${challenge.tasks.length}');
 
-    // Get user's participation
+    // Get user's participation (take first from stream)
     final participation = await ref.watch(
       userChallengeParticipationProvider(challenge.id, profile.id).future,
     );
@@ -246,30 +257,23 @@ Future<List<ChallengeTaskInstance>> groupTodayTasks(
       continue;
     }
     
-    print('   ✅ User is participating (status: ${participation.status.name})');
+    print('   ✅ User is participating');
     print('   Completions: ${participation.taskCompletions.length}');
 
-    // Generate task instances
+    // Generate ONLY today's task instances (more efficient)
     final historyService = ChallengeHistoryService();
-    final instances = historyService.generateTaskInstances(
+    final todayInstances = historyService.generateTodayTaskInstances(
       challenge: challenge,
       participation: participation,
     );
-    print('   Generated ${instances.length} task instances');
+    print('   Generated ${todayInstances.length} task instances for today');
 
-    // Filter for today's tasks (daily/weekly only)
-    final todayInstances = instances.where((instance) {
-      final isToday = instance.scheduledDate.year == today.year &&
-          instance.scheduledDate.month == today.month &&
-          instance.scheduledDate.day == today.day;
-      if (isToday) {
-        print(
-            '   🔸 ${instance.task.frequency.name} task: "${instance.task.name}" - Status: ${instance.status.name}');
-      }
-      return isToday;
-    }).toList();
+    // Log each task
+    for (final instance in todayInstances) {
+      print(
+          '   🔸 ${instance.task.frequency.name} task: "${instance.task.name}" - Status: ${instance.status.name}');
+    }
 
-    print('   ➡️ Filtered to ${todayInstances.length} tasks for today');
     todayTasks.addAll(todayInstances);
   }
 

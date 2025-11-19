@@ -689,25 +689,25 @@ class _ChallengeByIdProviderElement
 }
 
 String _$userChallengeParticipationHash() =>
-    r'70e6782902cd76e639556e4c28976cc468d1d552';
+    r'2070f27d40f3d6e37747c2f7caed7468e390cd40';
 
-/// Get user's participation in a specific challenge
+/// Get user's participation in a specific challenge (Stream for real-time updates)
 ///
 /// Copied from [userChallengeParticipation].
 @ProviderFor(userChallengeParticipation)
 const userChallengeParticipationProvider = UserChallengeParticipationFamily();
 
-/// Get user's participation in a specific challenge
+/// Get user's participation in a specific challenge (Stream for real-time updates)
 ///
 /// Copied from [userChallengeParticipation].
 class UserChallengeParticipationFamily
     extends Family<AsyncValue<ChallengeParticipationEntity?>> {
-  /// Get user's participation in a specific challenge
+  /// Get user's participation in a specific challenge (Stream for real-time updates)
   ///
   /// Copied from [userChallengeParticipation].
   const UserChallengeParticipationFamily();
 
-  /// Get user's participation in a specific challenge
+  /// Get user's participation in a specific challenge (Stream for real-time updates)
   ///
   /// Copied from [userChallengeParticipation].
   UserChallengeParticipationProvider call(
@@ -745,12 +745,12 @@ class UserChallengeParticipationFamily
   String? get name => r'userChallengeParticipationProvider';
 }
 
-/// Get user's participation in a specific challenge
+/// Get user's participation in a specific challenge (Stream for real-time updates)
 ///
 /// Copied from [userChallengeParticipation].
 class UserChallengeParticipationProvider
-    extends AutoDisposeFutureProvider<ChallengeParticipationEntity?> {
-  /// Get user's participation in a specific challenge
+    extends AutoDisposeStreamProvider<ChallengeParticipationEntity?> {
+  /// Get user's participation in a specific challenge (Stream for real-time updates)
   ///
   /// Copied from [userChallengeParticipation].
   UserChallengeParticipationProvider(
@@ -791,7 +791,7 @@ class UserChallengeParticipationProvider
 
   @override
   Override overrideWith(
-    FutureOr<ChallengeParticipationEntity?> Function(
+    Stream<ChallengeParticipationEntity?> Function(
             UserChallengeParticipationRef provider)
         create,
   ) {
@@ -811,7 +811,7 @@ class UserChallengeParticipationProvider
   }
 
   @override
-  AutoDisposeFutureProviderElement<ChallengeParticipationEntity?>
+  AutoDisposeStreamProviderElement<ChallengeParticipationEntity?>
       createElement() {
     return _UserChallengeParticipationProviderElement(this);
   }
@@ -836,7 +836,7 @@ class UserChallengeParticipationProvider
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 mixin UserChallengeParticipationRef
-    on AutoDisposeFutureProviderRef<ChallengeParticipationEntity?> {
+    on AutoDisposeStreamProviderRef<ChallengeParticipationEntity?> {
   /// The parameter `challengeId` of this provider.
   String get challengeId;
 
@@ -845,7 +845,7 @@ mixin UserChallengeParticipationRef
 }
 
 class _UserChallengeParticipationProviderElement
-    extends AutoDisposeFutureProviderElement<ChallengeParticipationEntity?>
+    extends AutoDisposeStreamProviderElement<ChallengeParticipationEntity?>
     with UserChallengeParticipationRef {
   _UserChallengeParticipationProviderElement(super.provider);
 
@@ -1484,10 +1484,11 @@ class _ChallengeUpdatesProviderElement
 }
 
 String _$challengeTaskInstancesHash() =>
-    r'acdd944abd61274a4cadfb3976d0a7a4af5c3f7b';
+    r'5cc83019dbb1fcf8d2172020e6675c8fbd46df9d';
 
 /// Get task instances for a challenge (for the current user)
 /// Loads challenge, user participation, and generates task instances
+/// Uses Stream to watch for real-time updates
 ///
 /// Copied from [challengeTaskInstances].
 @ProviderFor(challengeTaskInstances)
@@ -1495,18 +1496,21 @@ const challengeTaskInstancesProvider = ChallengeTaskInstancesFamily();
 
 /// Get task instances for a challenge (for the current user)
 /// Loads challenge, user participation, and generates task instances
+/// Uses Stream to watch for real-time updates
 ///
 /// Copied from [challengeTaskInstances].
 class ChallengeTaskInstancesFamily
     extends Family<AsyncValue<List<ChallengeTaskInstance>>> {
   /// Get task instances for a challenge (for the current user)
   /// Loads challenge, user participation, and generates task instances
+  /// Uses Stream to watch for real-time updates
   ///
   /// Copied from [challengeTaskInstances].
   const ChallengeTaskInstancesFamily();
 
   /// Get task instances for a challenge (for the current user)
   /// Loads challenge, user participation, and generates task instances
+  /// Uses Stream to watch for real-time updates
   ///
   /// Copied from [challengeTaskInstances].
   ChallengeTaskInstancesProvider call(
@@ -1543,12 +1547,14 @@ class ChallengeTaskInstancesFamily
 
 /// Get task instances for a challenge (for the current user)
 /// Loads challenge, user participation, and generates task instances
+/// Uses Stream to watch for real-time updates
 ///
 /// Copied from [challengeTaskInstances].
 class ChallengeTaskInstancesProvider
-    extends AutoDisposeFutureProvider<List<ChallengeTaskInstance>> {
+    extends AutoDisposeStreamProvider<List<ChallengeTaskInstance>> {
   /// Get task instances for a challenge (for the current user)
   /// Loads challenge, user participation, and generates task instances
+  /// Uses Stream to watch for real-time updates
   ///
   /// Copied from [challengeTaskInstances].
   ChallengeTaskInstancesProvider(
@@ -1584,7 +1590,7 @@ class ChallengeTaskInstancesProvider
 
   @override
   Override overrideWith(
-    FutureOr<List<ChallengeTaskInstance>> Function(
+    Stream<List<ChallengeTaskInstance>> Function(
             ChallengeTaskInstancesRef provider)
         create,
   ) {
@@ -1603,7 +1609,7 @@ class ChallengeTaskInstancesProvider
   }
 
   @override
-  AutoDisposeFutureProviderElement<List<ChallengeTaskInstance>>
+  AutoDisposeStreamProviderElement<List<ChallengeTaskInstance>>
       createElement() {
     return _ChallengeTaskInstancesProviderElement(this);
   }
@@ -1626,13 +1632,13 @@ class ChallengeTaskInstancesProvider
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 mixin ChallengeTaskInstancesRef
-    on AutoDisposeFutureProviderRef<List<ChallengeTaskInstance>> {
+    on AutoDisposeStreamProviderRef<List<ChallengeTaskInstance>> {
   /// The parameter `challengeId` of this provider.
   String get challengeId;
 }
 
 class _ChallengeTaskInstancesProviderElement
-    extends AutoDisposeFutureProviderElement<List<ChallengeTaskInstance>>
+    extends AutoDisposeStreamProviderElement<List<ChallengeTaskInstance>>
     with ChallengeTaskInstancesRef {
   _ChallengeTaskInstancesProviderElement(super.provider);
 
@@ -1641,7 +1647,7 @@ class _ChallengeTaskInstancesProviderElement
       (origin as ChallengeTaskInstancesProvider).challengeId;
 }
 
-String _$groupTodayTasksHash() => r'9baf0eb96870f1b71810382b321f60bb6c951a51';
+String _$groupTodayTasksHash() => r'43570e513e35d094d6d9882115b7c64b8c27c7f7';
 
 /// Get today's task instances across all challenges in a group (for the current user)
 ///

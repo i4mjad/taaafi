@@ -241,6 +241,26 @@ class ChallengesRepositoryImpl implements ChallengesRepository {
     }
   }
 
+  /// Watch participation changes in real-time
+  Stream<ChallengeParticipationEntity?> watchParticipation({
+    required String challengeId,
+    required String cpId,
+  }) {
+    try {
+      final participationId = '${challengeId}_$cpId';
+      return _participationsCollection
+          .doc(participationId)
+          .snapshots()
+          .map((doc) {
+        if (!doc.exists) return null;
+        return ChallengeParticipationModel.fromFirestore(doc);
+      });
+    } catch (e, stackTrace) {
+      log('Error watching participation: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
   @override
   Future<List<ChallengeParticipationEntity>> getChallengeParticipants(
     String challengeId,
@@ -308,22 +328,24 @@ class ChallengesRepositoryImpl implements ChallengesRepository {
     required String cpId,
     required String taskId,
     required int pointsEarned,
+    DateTime? completionDate, // Optional: for retroactive completion
   }) async {
     try {
       final participationId = '${challengeId}_$cpId';
-      final now = DateTime.now();
+      // Use provided date or current date
+      final completedAt = completionDate ?? DateTime.now();
       
       // Create completion record with timestamp
       final completionRecord = {
         'taskId': taskId,
-        'completedAt': now.toIso8601String(),
+        'completedAt': completedAt.toIso8601String(),
         'pointsEarned': pointsEarned,
       };
 
       await _participationsCollection.doc(participationId).update({
         'earnedPoints': FieldValue.increment(pointsEarned),
         'taskCompletions': FieldValue.arrayUnion([completionRecord]),
-        'lastUpdateAt': Timestamp.fromDate(now),
+        'lastUpdateAt': Timestamp.fromDate(DateTime.now()), // Always use now for lastUpdateAt
       });
     } catch (e, stackTrace) {
       log('Error completing task: $e', stackTrace: stackTrace);

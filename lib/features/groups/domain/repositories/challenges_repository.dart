@@ -68,6 +68,12 @@ abstract class ChallengesRepository {
     required String cpId,
   });
 
+  /// Watch participation changes in real-time
+  Stream<ChallengeParticipationEntity?> watchParticipation({
+    required String challengeId,
+    required String cpId,
+  });
+
   /// Get all participants for a challenge
   Future<List<ChallengeParticipationEntity>> getChallengeParticipants(
     String challengeId,
@@ -93,6 +99,7 @@ abstract class ChallengesRepository {
     required String cpId,
     required String taskId,
     required int pointsEarned,
+    DateTime? completionDate, // Optional: for retroactive completion
   });
 
   /// Mark participation as completed

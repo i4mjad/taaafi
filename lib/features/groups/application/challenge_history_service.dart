@@ -35,14 +35,23 @@ class ChallengeHistoryService {
     print('==========================================\n');
 
     for (final task in challenge.tasks) {
-      // Use join date for all tasks
-      final startDate = participation.joinedAt;
+      // IMPORTANT: Weekly tasks use CHALLENGE CREATION DATE as the anchor
+      // Daily tasks use USER JOIN DATE as the start
+      final DateTime taskScheduleStart;
+      
+      if (task.frequency == TaskFrequency.weekly) {
+        // Weekly tasks are anchored to challenge creation date
+        taskScheduleStart = challenge.createdAt;
+      } else {
+        // Daily tasks start from when user joined
+        taskScheduleStart = participation.joinedAt;
+      }
 
       // Normalize start date
       final normalizedStartDate = DateTime(
-        startDate.year,
-        startDate.month,
-        startDate.day,
+        taskScheduleStart.year,
+        taskScheduleStart.month,
+        taskScheduleStart.day,
       );
 
       final taskDates = _generateDatesForTask(
@@ -50,35 +59,50 @@ class ChallengeHistoryService {
         normalizedStartDate,
         endDate,
       );
+      
+      // Filter out dates before user joined (they can't complete tasks before joining!)
+      final userJoinDate = DateTime(
+        participation.joinedAt.year,
+        participation.joinedAt.month,
+        participation.joinedAt.day,
+      );
+      
+      final availableDates = taskDates.where((date) {
+        return date.isAfter(userJoinDate) || _isSameDay(date, userJoinDate);
+      }).toList();
 
       print('🔸 Task: "${task.name}" (${task.frequency.name})');
-      print('   Start: $normalizedStartDate');
-      print('   Generated ${taskDates.length} dates');
-      if (taskDates.length <= 10) {
+      print('   Task schedule start: $normalizedStartDate');
+      print('   User joined: $userJoinDate');
+      print('   Generated ${taskDates.length} dates, ${availableDates.length} available after join');
+      if (availableDates.length <= 10) {
         print(
-            '   Dates: ${taskDates.map((d) => '${d.month}/${d.day}').join(', ')}');
+            '   Available dates: ${availableDates.map((d) => '${d.month}/${d.day}').join(', ')}');
       } else {
         print(
-            '   First 5: ${taskDates.take(5).map((d) => '${d.month}/${d.day}').join(', ')}...');
+            '   First 5: ${availableDates.take(5).map((d) => '${d.month}/${d.day}').join(', ')}...');
         print(
-            '   Last 5: ${taskDates.skip(taskDates.length - 5).map((d) => '${d.month}/${d.day}').join(', ')}');
+            '   Last 5: ${availableDates.skip(availableDates.length - 5).map((d) => '${d.month}/${d.day}').join(', ')}');
       }
       print(
-          '   Today (${today.month}/${today.day}) in dates? ${taskDates.any((d) => _isSameDay(d, today))}');
+          '   Today (${today.month}/${today.day}) in dates? ${availableDates.any((d) => _isSameDay(d, today))}');
 
-      // Debug: Ensure today is included for tasks if it's in range
-      final shouldIncludeToday = (today.isAfter(normalizedStartDate) ||
-              _isSameDay(today, normalizedStartDate)) &&
-          (today.isBefore(endDate) || _isSameDay(today, endDate));
-      print('   Should include today? $shouldIncludeToday');
-      if (shouldIncludeToday) {
-        if (!taskDates.any((d) => _isSameDay(d, today))) {
-          print('   ⚠️  Adding today manually!');
-          taskDates.add(today);
+      // DO NOT manually add today for weekly tasks - respect the 7-day interval!
+      // Only add today for daily tasks if somehow missing
+      if (task.frequency == TaskFrequency.daily) {
+        final shouldIncludeToday = (today.isAfter(userJoinDate) ||
+                _isSameDay(today, userJoinDate)) &&
+            (today.isBefore(endDate) || _isSameDay(today, endDate));
+        print('   Should include today? $shouldIncludeToday');
+        if (shouldIncludeToday) {
+          if (!availableDates.any((d) => _isSameDay(d, today))) {
+            print('   ⚠️  Adding today manually for daily task!');
+            availableDates.add(today);
+          }
         }
       }
 
-      for (final date in taskDates) {
+      for (final date in availableDates) {
         // Normalize the scheduled date for comparison
         final scheduledDate = DateTime(date.year, date.month, date.day);
 
@@ -201,6 +225,108 @@ class ChallengeHistoryService {
       }
     }
     return null;
+  }
+
+  /// Generate ONLY today's task instances (more efficient for "today's tasks" view)
+  /// This method doesn't generate full history - only checks if tasks are due today
+  List<ChallengeTaskInstance> generateTodayTaskInstances({
+    required ChallengeEntity challenge,
+    required ChallengeParticipationEntity participation,
+  }) {
+    final instances = <ChallengeTaskInstance>[];
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final endDate = DateTime(
+      challenge.endDate.year,
+      challenge.endDate.month,
+      challenge.endDate.day,
+    );
+
+    // Check if challenge is still active
+    if (today.isAfter(endDate)) {
+      return instances; // Challenge ended, no tasks for today
+    }
+
+    for (final task in challenge.tasks) {
+      // Check if task is due today based on frequency
+      // Use challenge creation date for task start, but user must have joined
+      final isDueToday = _isTaskDueToday(
+        task: task,
+        challengeCreatedAt: challenge.createdAt,
+        userJoinedAt: participation.joinedAt,
+        today: today,
+        endDate: endDate,
+      );
+
+      if (isDueToday) {
+        // Check if completed today
+        final completion = _findCompletionOn(
+          task.id,
+          today,
+          participation.taskCompletions,
+          task.frequency,
+        );
+
+        // Only add if NOT completed - completed tasks should not appear in "today's tasks"
+        if (completion == null) {
+          instances.add(ChallengeTaskInstance(
+            task: task,
+            scheduledDate: today,
+            status: TaskInstanceStatus.today,
+            completedAt: null,
+          ));
+        }
+      }
+    }
+
+    return instances;
+  }
+
+  /// Check if a task is due today based on its frequency
+  bool _isTaskDueToday({
+    required ChallengeTaskEntity task,
+    required DateTime challengeCreatedAt,
+    required DateTime userJoinedAt,
+    required DateTime today,
+    required DateTime endDate,
+  }) {
+    // Normalize dates
+    final normalizedChallengeStart = DateTime(
+      challengeCreatedAt.year,
+      challengeCreatedAt.month,
+      challengeCreatedAt.day,
+    );
+    
+    final normalizedJoinDate = DateTime(
+      userJoinedAt.year,
+      userJoinedAt.month,
+      userJoinedAt.day,
+    );
+
+    // User must have joined to see tasks
+    final hasUserJoined = today.isAfter(normalizedJoinDate) ||
+        _isSameDay(today, normalizedJoinDate);
+    
+    // Check if today is within challenge range
+    final isBeforeEnd = today.isBefore(endDate) || _isSameDay(today, endDate);
+
+    if (!hasUserJoined || !isBeforeEnd) {
+      return false; // User hasn't joined yet or challenge ended
+    }
+
+    switch (task.frequency) {
+      case TaskFrequency.daily:
+        // Daily tasks are due every day (but only after user joined)
+        return true;
+
+      case TaskFrequency.weekly:
+        // Weekly tasks repeat every 7 days FROM CHALLENGE CREATION DATE
+        // NOT from user join date!
+        final daysSinceChallengeStart = today.difference(normalizedChallengeStart).inDays;
+        
+        // Task is due if it's exactly N weeks from challenge start
+        return daysSinceChallengeStart % 7 == 0;
+    }
   }
 
   /// Check if two dates are the same day

@@ -1063,6 +1063,7 @@ const Map<String, String> kAr = {
   "scheduled-for": "مجدول في",
   "mark-as-complete": "تحديد كمكتمل",
   "task-completed": "تم إكمال المهمة",
+  "error-completing-task": "فشل إكمال المهمة",
   "mark-as-incomplete": "تحديد كغير مكتمل",
   "community-coming-soon": "مجتمع تعافي قريبًا!",
   "already_interested": "لقد أبديت اهتمامك بالفعل",
@@ -1915,6 +1916,10 @@ const Map<String, String> kAr = {
   "remove": "إزالة",
   // Leaderboard
   "leaderboard": "لوحة النتائج",
+  "show-left-users": "إظهار المستخدمين الذين غادروا",
+  "hide-left-users": "إخفاء المستخدمين الذين غادروا",
+  "left": "غادر",
+  "no-active-participants": "لا يوجد مشاركين نشطين بعد",
   "my_tasks": "مهامي",
   "your-tasks-today": "🔥 مهامك لليوم",
   "hours-left": "ساعات متبقية",
@@ -3632,6 +3637,11 @@ const Map<String, String> kAr = {
   'your-progress': 'تقدمك',
   'no-participants-yet': 'لا يوجد مشاركون بعد',
   'all-participants': 'جميع المشاركين',
+  'view-tasks-history': 'عرض سجل المهام',
+  'pick-color': 'اختر لون',
+  'select-color': 'اختر اللون',
+  'select-shade': 'اختر الدرجة',
+  'tap-to-change-color': 'اضغط لتغيير اللون',
 
   // Challenge Actions - إجراءات التحدي
   'join-challenge': 'انضم للتحدي',
@@ -3785,5 +3795,5 @@ const Map<String, String> kAr = {
   // Challenge Overview Screen
   'your-current-tasks': 'مهامك الحالية',
   'remaining': 'متبقي',
-  'and': 'و'
+  'and': 'و',
 };

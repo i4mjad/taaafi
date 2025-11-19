@@ -116,14 +116,8 @@ class ChallengeDetailScreen extends ConsumerWidget {
                   verticalSpace(Spacing.points16),
 
                   // Tasks Checklist
-                  _buildTasksSection(
-                      context, ref, theme, l10n, challenge, userParticipation, state),
-
-                  verticalSpace(Spacing.points16),
-
-                  // Leaderboard Preview
-                  _buildLeaderboardPreview(context, theme, l10n,
-                      state.leaderboard, userParticipation),
+                  _buildTasksSection(context, ref, theme, l10n, challenge,
+                      userParticipation, state),
 
                   verticalSpace(Spacing.points16),
 
@@ -252,8 +246,14 @@ class ChallengeDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildTasksSection(BuildContext context, WidgetRef ref, theme,
-      AppLocalizations l10n, ChallengeEntity challenge, userParticipation, ChallengeDetailState state) {
+  Widget _buildTasksSection(
+      BuildContext context,
+      WidgetRef ref,
+      theme,
+      AppLocalizations l10n,
+      ChallengeEntity challenge,
+      userParticipation,
+      ChallengeDetailState state) {
     return WidgetsContainer(
       backgroundColor: theme.backgroundColor,
       borderRadius: BorderRadius.circular(12),
@@ -263,36 +263,12 @@ class ChallengeDetailScreen extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                l10n.translate('tasks'),
-                style: TextStyles.h6.copyWith(
-                  color: theme.grey[900],
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              if (userParticipation != null)
-                GestureDetector(
-                  onTap: () {
-                    context.pushNamed(
-                      RouteNames.challengeHistory.name,
-                      pathParameters: {
-                        'groupId': groupId,
-                        'challengeId': challengeId,
-                      },
-                    );
-                  },
-                  child: Text(
-                    l10n.translate('view-all'),
-                    style: TextStyles.small.copyWith(
-                      color: theme.primary[600],
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-            ],
+          Text(
+            l10n.translate('tasks'),
+            style: TextStyles.h6.copyWith(
+              color: theme.grey[900],
+              fontWeight: FontWeight.bold,
+            ),
           ),
           verticalSpace(Spacing.points16),
           ...challenge.tasks.asMap().entries.map((entry) {
@@ -300,7 +276,7 @@ class ChallengeDetailScreen extends ConsumerWidget {
             final task = entry.value;
             final isCompletedToday =
                 userParticipation?.isTaskCompletedToday(task.id) ?? false;
-            
+
             // Check if can complete based on frequency and retroactive setting
             bool canComplete = false;
             if (userParticipation != null) {
@@ -327,6 +303,38 @@ class ChallengeDetailScreen extends ConsumerWidget {
               isCompleting,
             );
           }).toList(),
+
+          // View Tasks History button
+          if (userParticipation != null) ...[
+            verticalSpace(Spacing.points16),
+            GestureDetector(
+              onTap: () {
+                context.pushNamed(
+                  RouteNames.challengeHistory.name,
+                  pathParameters: {
+                    'groupId': groupId,
+                    'challengeId': challengeId,
+                  },
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                decoration: BoxDecoration(
+                  border: Border.all(color: theme.primary[600]!, width: 1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Center(
+                  child: Text(
+                    l10n.translate('view-tasks-history'),
+                    style: TextStyles.small.copyWith(
+                      color: theme.primary[600],
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -345,58 +353,12 @@ class ChallengeDetailScreen extends ConsumerWidget {
   ) {
     final frequencyLabel = _getFrequencyLabel(l10n, task.frequency);
 
-    final isParticipating = canComplete || isCompleted;
-
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: [
-          // Checkbox (only for participants)
-          if (isParticipating)
-            GestureDetector(
-              onTap: canComplete && !isCompleting
-                  ? () {
-                      ref
-                          .read(challengeDetailNotifierProvider(challengeId)
-                              .notifier)
-                          .completeTask(task.id, task.points, task.frequency);
-                    }
-                  : null,
-              child: Container(
-                width: 28,
-                height: 28,
-                decoration: BoxDecoration(
-                  color: isCompleted ? theme.success[600] : theme.backgroundColor,
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(
-                    color: isCompleted ? theme.success[600]! : theme.grey[400]!,
-                    width: 2,
-                  ),
-                ),
-                child: isCompleting
-                    ? SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            theme.primary[600]!,
-                          ),
-                        ),
-                      )
-                    : isCompleted
-                        ? const Icon(
-                            Icons.check,
-                            color: Colors.white,
-                            size: 20,
-                          )
-                        : null,
-              ),
-            ),
-
-          if (isParticipating) const SizedBox(width: 12),
-
-          // Task info
+          // Task info only - no completion status
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -405,9 +367,6 @@ class ChallengeDetailScreen extends ConsumerWidget {
                   '$number. ${task.name}',
                   style: TextStyles.body.copyWith(
                     color: theme.grey[900],
-                    decoration: isCompleted
-                        ? TextDecoration.lineThrough
-                        : TextDecoration.none,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -418,105 +377,6 @@ class ChallengeDetailScreen extends ConsumerWidget {
                   ),
                 ),
               ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildLeaderboardPreview(BuildContext context, theme,
-      AppLocalizations l10n, leaderboard, userParticipation) {
-    return WidgetsContainer(
-      backgroundColor: theme.backgroundColor,
-      borderRadius: BorderRadius.circular(12),
-      borderSide: BorderSide(color: theme.grey[200]!, width: 1),
-      cornerSmoothing: 0.8,
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            l10n.translate('leaderboard'),
-            style: TextStyles.h6.copyWith(
-              color: theme.grey[900],
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          verticalSpace(Spacing.points8),
-          if (leaderboard.isEmpty)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              child: Center(
-                child: Text(
-                  l10n.translate('no-participants-yet'),
-                  style: TextStyles.small.copyWith(color: theme.grey[600]),
-                ),
-              ),
-            )
-          else
-            ...leaderboard.take(5).toList().asMap().entries.map((entry) {
-              final index = entry.key;
-              final participant = entry.value;
-              final isCurrentUser = userParticipation != null &&
-                  participant.cpId == userParticipation.cpId;
-
-              return _buildLeaderboardItem(
-                theme,
-                l10n,
-                index + 1,
-                participant,
-                isCurrentUser,
-              );
-            }).toList(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildLeaderboardItem(
-      theme, AppLocalizations l10n, int rank, participant, bool isCurrentUser) {
-    return Container(
-      margin: const EdgeInsets.only(top: 8),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: isCurrentUser ? theme.primary[50] : null,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              color: rank <= 3 ? theme.warn[100] : theme.grey[100],
-              shape: BoxShape.circle,
-            ),
-            child: Center(
-              child: Text(
-                '$rank',
-                style: TextStyles.smallBold.copyWith(
-                  color: rank <= 3 ? theme.warn[700] : theme.grey[700],
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Text(
-              isCurrentUser
-                  ? l10n.translate('you')
-                  : l10n.translate('participant'),
-              style: TextStyles.body.copyWith(
-                color: theme.grey[900],
-                fontWeight: isCurrentUser ? FontWeight.bold : FontWeight.normal,
-              ),
-            ),
-          ),
-          Text(
-            '${participant.earnedPoints} ${l10n.translate('points')}',
-            style: TextStyles.smallBold.copyWith(
-              color: theme.success[700],
             ),
           ),
         ],

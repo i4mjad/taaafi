@@ -183,7 +183,12 @@ class ChallengeDetailNotifier extends _$ChallengeDetailNotifier {
   }
 
   /// Complete a task
-  Future<void> completeTask(String taskId, int points, TaskFrequency frequency) async {
+  Future<void> completeTask(
+    String taskId, 
+    int points, 
+    TaskFrequency frequency,
+    {DateTime? completionDate} // Optional: for retroactive completion
+  ) async {
     final currentState = await future;
     if (currentState.challenge == null) return;
 
@@ -205,6 +210,7 @@ class ChallengeDetailNotifier extends _$ChallengeDetailNotifier {
         taskId: taskId,
         pointsEarned: points,
         taskFrequency: frequency,
+        completionDate: completionDate,
       );
 
       if (result.success) {

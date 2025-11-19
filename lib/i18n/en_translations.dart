@@ -1438,6 +1438,7 @@ const Map<String, String> kEn = {
   "scheduled-for": "Scheduled for",
   "mark-as-complete": "Mark as Complete",
   "task-completed": "Task Completed",
+  "error-completing-task": "Failed to complete task",
   "mark-as-incomplete": "Mark as Incomplete",
   "community-coming-soon": "Ta'aafi Community Coming Soon!",
   "community-coming-soon-description":
@@ -2316,6 +2317,10 @@ const Map<String, String> kEn = {
 
   // Leaderboard
   "leaderboard": "Leaderboard",
+  "show-left-users": "Show users who left",
+  "hide-left-users": "Hide users who left",
+  "left": "Left",
+  "no-active-participants": "No active participants yet",
   "my_tasks": "My Tasks",
   "your-tasks-today": "🔥 Your Tasks for today",
   "hours-left": "hours left",
@@ -3712,6 +3717,11 @@ const Map<String, String> kEn = {
   "your-progress": "Your Progress",
   "no-participants-yet": "No participants yet",
   "all-participants": "All Participants",
+  "view-tasks-history": "View Tasks History",
+  "pick-color": "Pick a Color",
+  "select-color": "Select color",
+  "select-shade": "Select shade",
+  "tap-to-change-color": "Tap to change color",
 
   // Challenge Actions
   "join-challenge": "Join Challenge",
@@ -3872,5 +3882,5 @@ const Map<String, String> kEn = {
   // Challenge Overview Screen
   'your-current-tasks': 'Your Current Tasks',
   'remaining': 'Remaining',
-  'and': 'and'
+  'and': 'and',
 };

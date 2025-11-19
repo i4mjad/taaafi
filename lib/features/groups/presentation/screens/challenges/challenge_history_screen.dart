@@ -4,17 +4,19 @@ import 'package:grouped_list/grouped_list.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/groups/application/challenges_providers.dart';
+import 'package:reboot_app_3/features/groups/application/updates_providers.dart';
 import 'package:reboot_app_3/features/groups/domain/entities/challenge_task_instance.dart';
 import 'package:reboot_app_3/features/groups/domain/entities/challenge_task_entity.dart';
 import 'package:reboot_app_3/features/groups/providers/challenge_detail_notifier.dart';
 
-class ChallengeHistoryScreen extends ConsumerWidget {
+class ChallengeHistoryScreen extends ConsumerStatefulWidget {
   final String groupId;
   final String challengeId;
 
@@ -25,25 +27,27 @@ class ChallengeHistoryScreen extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ChallengeHistoryScreen> createState() =>
+      _ChallengeHistoryScreenState();
+}
+
+class _ChallengeHistoryScreenState
+    extends ConsumerState<ChallengeHistoryScreen> {
+  final Set<String> _completingTasks = {};
+
+  @override
+  Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
     final l10n = AppLocalizations.of(context);
     final locale = ref.watch(localeNotifierProvider);
-    
+
     // Load task instances for this challenge and user
-    final taskInstancesAsync = ref.watch(challengeTaskInstancesProvider(challengeId));
+    final taskInstancesAsync =
+        ref.watch(challengeTaskInstancesProvider(widget.challengeId));
 
     return Scaffold(
       backgroundColor: theme.backgroundColor,
-      appBar: AppBar(
-        title: Text(
-          l10n.translate('task-history'),
-          style: TextStyles.screenHeadding.copyWith(color: theme.grey[900]),
-        ),
-        backgroundColor: theme.backgroundColor,
-        surfaceTintColor: theme.backgroundColor,
-        centerTitle: false,
-      ),
+      appBar: appBar(context, ref, "task-history", false, true),
       body: taskInstancesAsync.when(
         data: (instances) {
           if (instances.isEmpty) {
@@ -57,7 +61,8 @@ class ChallengeHistoryScreen extends ConsumerWidget {
 
           return RefreshIndicator(
             onRefresh: () async {
-              ref.invalidate(challengeTaskInstancesProvider(challengeId));
+              ref.invalidate(
+                  challengeTaskInstancesProvider(widget.challengeId));
             },
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
@@ -81,10 +86,11 @@ class ChallengeHistoryScreen extends ConsumerWidget {
                 ),
                 itemBuilder: (context, instance) => Padding(
                   padding: const EdgeInsets.only(bottom: 8),
-                  child: _buildTaskInstanceWidget(context, ref, theme, l10n, instance),
+                  child: _buildTaskInstanceWidget(
+                      context, ref, theme, l10n, instance),
                 ),
                 // Sort by date descending (most recent first within each group)
-                order: GroupedListOrder.DESC,
+                order: GroupedListOrder.ASC,
               ),
             ),
           );
@@ -102,7 +108,8 @@ class ChallengeHistoryScreen extends ConsumerWidget {
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () {
-                  ref.invalidate(challengeTaskInstancesProvider(challengeId));
+                  ref.invalidate(
+                      challengeTaskInstancesProvider(widget.challengeId));
                 },
                 child: Text(l10n.translate('retry')),
               ),
@@ -171,6 +178,11 @@ class ChallengeHistoryScreen extends ConsumerWidget {
         (instance.status == TaskInstanceStatus.missed &&
             instance.task.allowRetroactiveCompletion);
 
+    // Create a unique key for this task instance
+    final taskKey =
+        '${instance.task.id}_${instance.scheduledDate.millisecondsSinceEpoch}';
+    final isCompleting = _completingTasks.contains(taskKey);
+
     return WidgetsContainer(
       backgroundColor: backgroundColor,
       borderRadius: BorderRadius.circular(8),
@@ -178,11 +190,22 @@ class ChallengeHistoryScreen extends ConsumerWidget {
       padding: const EdgeInsets.all(12),
       child: Row(
         children: [
-          // Status Icon or Checkbox
-          if (canComplete)
+          // Status Icon, Checkbox, or Loading indicator
+          if (canComplete && isCompleting)
+            SizedBox(
+              width: 28,
+              height: 28,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  theme.primary[600]!,
+                ),
+              ),
+            )
+          else if (canComplete)
             GestureDetector(
               onTap: () {
-                _completeTask(context, ref, instance);
+                _completeTask(context, ref, instance, taskKey);
               },
               child: Container(
                 width: 28,
@@ -252,25 +275,54 @@ class ChallengeHistoryScreen extends ConsumerWidget {
     );
   }
 
-  void _completeTask(
-      BuildContext context, WidgetRef ref, ChallengeTaskInstance instance) {
-    // Complete the task using the challenge detail notifier
-    ref
-        .read(challengeDetailNotifierProvider(challengeId).notifier)
-        .completeTask(
-          instance.task.id,
-          instance.task.points,
-          instance.task.frequency,
-        );
+  Future<void> _completeTask(BuildContext context, WidgetRef ref,
+      ChallengeTaskInstance instance, String taskKey) async {
+    // Add to completing set
+    setState(() {
+      _completingTasks.add(taskKey);
+    });
 
-    // Show success message
-    getSuccessSnackBar(
-      context,
-      'task-completed',
-    );
+    try {
+      // Complete the task using the challenge detail notifier
+      // Pass the specific scheduled date for retroactive completion
+      await ref
+          .read(challengeDetailNotifierProvider(widget.challengeId).notifier)
+          .completeTask(
+            instance.task.id,
+            instance.task.points,
+            instance.task.frequency,
+            completionDate: instance.scheduledDate,
+          );
 
-    // Refresh the task instances
-    ref.invalidate(challengeTaskInstancesProvider(challengeId));
+      if (!mounted) return;
+
+      // Show success message
+      getSuccessSnackBar(
+        context,
+        'task-completed',
+      );
+
+      // The stream will automatically update the UI, but we'll invalidate
+      // other related providers that aren't using streams yet
+      ref.invalidate(activeChallengesProvider(widget.groupId));
+      ref.invalidate(groupTodayTasksProvider(widget.groupId));
+      ref.invalidate(latestUpdatesProvider(widget.groupId));
+    } catch (e) {
+      if (!mounted) return;
+
+      // Show error message
+      getErrorSnackBar(
+        context,
+        'error-completing-task',
+      );
+    } finally {
+      if (mounted) {
+        // Remove from completing set
+        setState(() {
+          _completingTasks.remove(taskKey);
+        });
+      }
+    }
   }
 
   String _getFrequencyLabel(AppLocalizations l10n, TaskFrequency frequency) {
@@ -282,4 +334,3 @@ class ChallengeHistoryScreen extends ConsumerWidget {
     }
   }
 }
-

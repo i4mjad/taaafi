@@ -1,3 +1,4 @@
+import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -185,36 +186,111 @@ class _EditChallengeScreenState extends ConsumerState<EditChallengeScreen> {
   }
 
   Widget _buildColorPicker(theme, String selectedColor) {
-    final colors = {
-      'yellow': theme.warn[400]!,
-      'coral': theme.tint[400]!,
-      'blue': theme.secondary[400]!,
-      'teal': theme.primary[400]!,
-    };
+    // Convert color string (hex or named) to Color
+    Color currentColor;
+    if (selectedColor.startsWith('#')) {
+      currentColor = Color(int.parse(selectedColor.substring(1), radix: 16) + 0xFF000000);
+    } else {
+      // Fallback for legacy named colors
+      final colors = {
+        'yellow': theme.warn[400]!,
+        'coral': theme.tint[400]!,
+        'blue': theme.secondary[400]!,
+        'teal': theme.primary[400]!,
+      };
+      currentColor = colors[selectedColor] ?? theme.primary[400]!;
+    }
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: colors.entries.map((entry) {
-        final isSelected = entry.key == selectedColor;
-        return GestureDetector(
-          onTap: () {
-            setState(() => _color = entry.key);
-          },
-          child: Container(
-            margin: const EdgeInsets.only(right: 8),
-            width: 85,
-            height: 36,
-            decoration: BoxDecoration(
-              color: entry.value,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: isSelected ? theme.grey[900]! : entry.value.withValues(alpha: 0.5),
-                width: isSelected ? 2 : 1,
+    return GestureDetector(
+      onTap: () async {
+        await _showColorPickerDialog(context, theme, currentColor);
+      },
+      child: Container(
+        height: 48,
+        decoration: BoxDecoration(
+          color: currentColor,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: theme.grey[300]!,
+            width: 1,
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.palette,
+              color: _getContrastColor(currentColor),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              AppLocalizations.of(context).translate('tap-to-change-color'),
+              style: TextStyles.small.copyWith(
+                color: _getContrastColor(currentColor),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Get contrasting text color for background
+  Color _getContrastColor(Color backgroundColor) {
+    final luminance = backgroundColor.computeLuminance();
+    return luminance > 0.5 ? Colors.black : Colors.white;
+  }
+
+  Future<void> _showColorPickerDialog(BuildContext context, theme, Color currentColor) async {
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(AppLocalizations.of(context).translate('pick-color')),
+          content: SingleChildScrollView(
+            child: ColorPicker(
+              color: currentColor,
+              onColorChanged: (Color color) {
+                // Convert Color to hex string
+                final hexColor = '#${color.value.toRadixString(16).substring(2).toUpperCase()}';
+                setState(() => _color = hexColor);
+              },
+              pickersEnabled: const {
+                ColorPickerType.both: false,
+                ColorPickerType.primary: true,
+                ColorPickerType.accent: false,
+                ColorPickerType.bw: false,
+                ColorPickerType.custom: false,
+                ColorPickerType.wheel: true,
+              },
+              enableShadesSelection: true,
+              heading: Text(
+                AppLocalizations.of(context).translate('select-color'),
+                style: TextStyles.body,
+              ),
+              subheading: Text(
+                AppLocalizations.of(context).translate('select-shade'),
+                style: TextStyles.caption,
               ),
             ),
           ),
+          actions: <Widget>[
+            TextButton(
+              child: Text(AppLocalizations.of(context).translate('cancel')),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text(AppLocalizations.of(context).translate('done')),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
         );
-      }).toList(),
+      },
     );
   }
 

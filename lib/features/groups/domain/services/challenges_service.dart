@@ -216,6 +216,7 @@ class ChallengesService {
     required String taskId,
     required int pointsEarned,
     required TaskFrequency taskFrequency,
+    DateTime? completionDate, // Optional: for retroactive completion
   }) async {
     try {
       // Get participation
@@ -232,7 +233,8 @@ class ChallengesService {
       }
 
       // Check if task can be completed based on frequency
-      if (!participation.canCompleteTask(taskId, taskFrequency)) {
+      // Skip this check for retroactive completions (when completionDate is provided)
+      if (completionDate == null && !participation.canCompleteTask(taskId, taskFrequency)) {
         String errorMessage;
         switch (taskFrequency) {
           case TaskFrequency.daily:
@@ -248,12 +250,13 @@ class ChallengesService {
         );
       }
 
-      // Complete task
+      // Complete task (with optional specific date for retroactive completion)
       await _repository.completeTask(
         challengeId: challengeId,
         cpId: cpId,
         taskId: taskId,
         pointsEarned: pointsEarned,
+        completionDate: completionDate,
       );
 
       // Get updated participation
