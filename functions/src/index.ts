@@ -1281,6 +1281,16 @@ import {
   moderateGroupUpdate 
 } from './moderateGroupUpdate';
 
+// Import forum post moderation function
+import {
+  moderateForumPost
+} from './moderateForumPost';
+
+// Import comment moderation function
+import {
+  moderateComment
+} from './moderateComment';
+
 // Import groups activity backfill function
 import { 
   backfillMemberActivity 
@@ -1315,6 +1325,16 @@ export {
 // Export group update moderation function
 export {
   moderateGroupUpdate
+};
+
+// Export forum post moderation function
+export {
+  moderateForumPost
+};
+
+// Export comment moderation function
+export {
+  moderateComment
 };
 
 // Export groups activity backfill function

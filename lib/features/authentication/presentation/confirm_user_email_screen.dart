@@ -21,7 +21,6 @@ import 'package:reboot_app_3/features/authentication/application/auth_service.da
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
 import 'package:flutter/services.dart';
-import 'package:reboot_app_3/core/utils/url_launcher_provider.dart';
 
 class ConfirmUserEmailScreen extends ConsumerStatefulWidget {
   const ConfirmUserEmailScreen({super.key});
@@ -1269,20 +1268,6 @@ class UserIdContainer extends ConsumerWidget {
     }
   }
 
-  Future<void> _launchWhatsApp(BuildContext context, WidgetRef ref) async {
-    const phoneNumber = '96876691799';
-    final whatsappUrl = Uri.parse('https://wa.me/$phoneNumber');
-    final urlLauncher = ref.read(urlLauncherProvider);
-
-    try {
-      await urlLauncher.launch(whatsappUrl);
-    } on UrlLauncherException {
-      if (context.mounted) {
-        getErrorSnackBar(context, 'whatsapp-error');
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
@@ -1355,70 +1340,6 @@ class UserIdContainer extends ConsumerWidget {
                   ),
                 ),
               ],
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          // Divider
-          Container(
-            height: 1,
-            color: theme.grey[200],
-            margin: const EdgeInsets.symmetric(vertical: 4),
-          ),
-
-          const SizedBox(height: 12),
-
-          // WhatsApp Contact Section
-          GestureDetector(
-            onTap: () => _launchWhatsApp(context, ref),
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: const Color(0xFF25D366).withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                    color: const Color(0xFF25D366).withValues(alpha: 0.3),
-                    width: 1),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    LucideIcons.messageCircle,
-                    color: const Color(0xFF25D366),
-                    size: 18,
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          AppLocalizations.of(context)
-                              .translate('contact-support'),
-                          style: TextStyles.footnote.copyWith(
-                            color: const Color(0xFF25D366),
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          AppLocalizations.of(context)
-                              .translate('contact-through-whatsapp'),
-                          style: TextStyles.small.copyWith(
-                            color: theme.grey[600],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Icon(
-                    LucideIcons.externalLink,
-                    color: const Color(0xFF25D366),
-                    size: 14,
-                  ),
-                ],
-              ),
             ),
           ),
         ],
