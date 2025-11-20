@@ -68,6 +68,7 @@ class _RegistrationStepperScreenState
   Timer? _cooldownTimer;
   bool _emailVerified = false;
 
+
   @override
   void initState() {
     super.initState();
@@ -147,6 +148,9 @@ class _RegistrationStepperScreenState
         final user = FirebaseAuth.instance.currentUser;
         return _emailVerified || (user?.emailVerified == true);
 
+      case 4: // Referral Code (Optional - always valid)
+        return true;
+
       default:
         return true;
     }
@@ -155,7 +159,7 @@ class _RegistrationStepperScreenState
   Future<void> _nextStep() async {
     if (!_validateCurrentStep()) return;
 
-    if (_currentStep < 4) {
+    if (_currentStep < 5) {
       if (mounted) setState(() => _currentStep++);
       if (_currentStep == 3 && mounted) {
         // Check if email is already verified (OAuth users)
@@ -167,15 +171,10 @@ class _RegistrationStepperScreenState
         }
       }
     } else {
-      // Final step - complete registration and show referral code input
+      // Final step - complete registration and navigate to subscription
       await _completeRegistration();
       if (mounted) {
-        // Small delay to ensure context is ready for bottom sheet
-        await Future.delayed(const Duration(milliseconds: 300));
-        if (mounted) {
-          // Show referral code input as optional bottom sheet
-          _showReferralCodeSheet();
-        }
+        context.goNamed(RouteNames.ta3afiPlus.name);
       }
     }
   }
@@ -297,7 +296,7 @@ class _RegistrationStepperScreenState
   }
 
   Widget _buildHorizontalStepIndicator(dynamic theme) {
-    const int totalSteps = 5;
+    const int totalSteps = 6;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
@@ -435,6 +434,8 @@ class _RegistrationStepperScreenState
       case 3:
         return _buildEmailVerificationContent();
       case 4:
+        return _buildReferralCodeContent();
+      case 5:
         return _buildCompletionContent();
       default:
         return Container();
@@ -497,8 +498,10 @@ class _RegistrationStepperScreenState
                     )
                   : Text(
                       _currentStep == 4
-                          ? AppLocalizations.of(context).translate('finish')
-                          : AppLocalizations.of(context).translate('continue'),
+                          ? AppLocalizations.of(context).translate('referral.input.skip')
+                          : _currentStep == 5
+                              ? AppLocalizations.of(context).translate('finish')
+                              : AppLocalizations.of(context).translate('continue'),
                       style:
                           TextStyles.footnote.copyWith(color: theme.grey[50]),
                     ),
@@ -856,6 +859,64 @@ class _RegistrationStepperScreenState
     );
   }
 
+  Widget _buildReferralCodeContent() {
+    final theme = AppTheme.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Icon
+        Center(
+          child: Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              color: theme.primary[50],
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.card_giftcard_rounded,
+              size: 40,
+              color: theme.primary[600],
+            ),
+          ),
+        ),
+        verticalSpace(Spacing.points24),
+
+        // Title
+        Text(
+          AppLocalizations.of(context).translate('referral.input.title'),
+          style: TextStyles.h5.copyWith(
+            color: theme.grey[900],
+            fontWeight: FontWeight.bold,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        verticalSpace(Spacing.points12),
+
+        // Subtitle
+        Text(
+          AppLocalizations.of(context).translate('referral.input.subtitle'),
+          style: TextStyles.body.copyWith(
+            color: theme.grey[600],
+            height: 1.5,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        verticalSpace(Spacing.points32),
+
+        // Referral code input widget
+        ReferralCodeInputWidget(
+          onSuccess: () {
+            // Move to next step on success
+            if (mounted) setState(() => _currentStep++);
+          },
+          onSkip: null, // No skip button - use the main "Skip" button instead
+        ),
+      ],
+    );
+  }
+
   Widget _buildCompletionContent() {
     final theme = AppTheme.of(context);
 
@@ -899,106 +960,4 @@ class _RegistrationStepperScreenState
     );
   }
 
-  void _showReferralCodeSheet() {
-    final theme = AppTheme.of(context);
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        decoration: BoxDecoration(
-          color: theme.backgroundColor,
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
-          ),
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: EdgeInsets.only(
-              left: 24,
-              right: 24,
-              top: 24,
-              bottom: MediaQuery.of(context).viewInsets.bottom + 24,
-            ),
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Drag handle
-                  Center(
-                    child: Container(
-                      width: 40,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: theme.grey[300],
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                  ),
-                  verticalSpace(Spacing.points24),
-
-                  // Icon
-                  Center(
-                    child: Container(
-                      width: 80,
-                      height: 80,
-                      decoration: BoxDecoration(
-                        color: theme.primary[50],
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.card_giftcard_rounded,
-                        size: 40,
-                        color: theme.primary[600],
-                      ),
-                    ),
-                  ),
-                  verticalSpace(Spacing.points24),
-
-                  // Title
-                  Text(
-                    AppLocalizations.of(context)
-                        .translate('referral.input.title'),
-                    style: TextStyles.h5.copyWith(
-                      color: theme.grey[900],
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  verticalSpace(Spacing.points12),
-
-                  // Subtitle
-                  Text(
-                    AppLocalizations.of(context)
-                        .translate('referral.input.subtitle'),
-                    style: TextStyles.body.copyWith(
-                      color: theme.grey[600],
-                      height: 1.5,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  verticalSpace(Spacing.points32),
-
-                  // Referral code input widget
-                  ReferralCodeInputWidget(
-                    onSuccess: () {
-                      Navigator.of(context).pop();
-                      context.goNamed(RouteNames.ta3afiPlus.name);
-                    },
-                    onSkip: () {
-                      Navigator.of(context).pop();
-                      context.goNamed(RouteNames.ta3afiPlus.name);
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 }
