@@ -130,7 +130,7 @@ Automatic fraud detection checks for same device, rapid activity, same IP, and s
 ## Sprint Completion Tracker
 
 - [x] Sprint 01 - Database schema & Firestore security rules
-- [ ] Sprint 02 - Referral code generation system
+- [x] Sprint 02 - Referral code generation system
 - [ ] Sprint 03 - Referral code input during signup
 - [ ] Sprint 04 - Verification checklist Cloud Functions (setup)
 - [ ] Sprint 05 - Verification checklist Cloud Functions (tracking)
