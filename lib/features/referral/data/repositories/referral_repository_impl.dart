@@ -115,39 +115,36 @@ class ReferralRepositoryImpl implements ReferralRepository {
     } on FirebaseFunctionsException catch (e) {
       log('FirebaseFunctionsException: ${e.code} - ${e.message}');
 
-      // Map error codes to user-friendly messages
-      String errorMessage;
+      // Map error codes to localization keys
+      String errorKey;
       switch (e.code) {
         case 'not-found':
-          errorMessage = 'Invalid referral code. Please check and try again.';
+          errorKey = 'referral.input.invalid';
           break;
         case 'already-exists':
-          errorMessage = 'You have already used a referral code.';
+          errorKey = 'referral.input.already_used';
           break;
         case 'invalid-argument':
           if (e.message?.contains('own code') == true) {
-            errorMessage = 'You cannot use your own referral code.';
+            errorKey = 'referral.input.own_code';
           } else {
-            errorMessage = 'Invalid code format.';
+            errorKey = 'referral.input.invalid';
           }
           break;
         case 'failed-precondition':
-          errorMessage = 'This referral code is no longer valid.';
+          errorKey = 'referral.input.invalid';
           break;
         case 'unauthenticated':
-          errorMessage = 'Please sign in to redeem a code.';
+          errorKey = 'referral.input.invalid';
           break;
         default:
-          errorMessage =
-              e.message ?? 'Failed to redeem code. Please try again.';
+          errorKey = 'referral.input.invalid';
       }
 
-      return RedemptionResult.error(errorMessage);
+      return RedemptionResult.error(errorKey);
     } catch (e, stackTrace) {
       log('Error in redeemReferralCode: $e', stackTrace: stackTrace);
-      return RedemptionResult.error(
-        'An unexpected error occurred. Please try again.',
-      );
+      return RedemptionResult.error('referral.input.invalid');
     }
   }
 }

@@ -3899,7 +3899,7 @@ const Map<String, String> kEn = {
   'referral.input.subtitle': 'Enter your friend\'s code to unlock rewards',
   'referral.input.placeholder': 'Enter code',
   'referral.input.verify': 'Verify Code',
-  'referral.input.skip': 'Skip for now',
+  'referral.input.skip': 'Skip',
   'referral.input.invalid': 'Invalid code. Please check and try again.',
   'referral.input.already_used': 'You\'ve already used a referral code.',
   'referral.input.own_code': 'You cannot use your own referral code.',

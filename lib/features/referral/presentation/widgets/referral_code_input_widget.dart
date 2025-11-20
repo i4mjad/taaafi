@@ -127,7 +127,7 @@ class _ReferralCodeInputWidgetState
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    state.error!,
+                    AppLocalizations.of(context).translate(state.error!),
                     style: TextStyles.small.copyWith(
                       color: theme.error[700],
                     ),

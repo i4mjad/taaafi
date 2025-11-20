@@ -3811,7 +3811,7 @@ const Map<String, String> kAr = {
   'referral.input.subtitle': 'أدخل رمز صديقك لفتح المكافآت',
   'referral.input.placeholder': 'أدخل الرمز',
   'referral.input.verify': 'تحقق من الرمز',
-  'referral.input.skip': 'تخطي الآن',
+  'referral.input.skip': 'تخطي',
   'referral.input.invalid': 'رمز غير صالح. يرجى التحقق والمحاولة مرة أخرى.',
   'referral.input.already_used': 'لقد استخدمت رمز إحالة بالفعل.',
   'referral.input.own_code': 'لا يمكنك استخدام رمز الإحالة الخاص بك.',

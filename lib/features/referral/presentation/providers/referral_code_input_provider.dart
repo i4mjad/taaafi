@@ -50,7 +50,7 @@ class ReferralCodeInput extends _$ReferralCodeInput {
     final code = state.code;
 
     if (code.length < 6 || code.length > 8) {
-      state = state.copyWith(error: 'Code must be 6-8 characters long');
+      state = state.copyWith(error: 'referral.input.invalid');
       return;
     }
 

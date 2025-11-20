@@ -68,7 +68,6 @@ class _RegistrationStepperScreenState
   Timer? _cooldownTimer;
   bool _emailVerified = false;
 
-
   @override
   void initState() {
     super.initState();
@@ -498,10 +497,12 @@ class _RegistrationStepperScreenState
                     )
                   : Text(
                       _currentStep == 4
-                          ? AppLocalizations.of(context).translate('referral.input.skip')
+                          ? AppLocalizations.of(context)
+                              .translate('referral.input.skip')
                           : _currentStep == 5
                               ? AppLocalizations.of(context).translate('finish')
-                              : AppLocalizations.of(context).translate('continue'),
+                              : AppLocalizations.of(context)
+                                  .translate('continue'),
                       style:
                           TextStyles.footnote.copyWith(color: theme.grey[50]),
                     ),
@@ -886,9 +887,9 @@ class _RegistrationStepperScreenState
         // Title
         Text(
           AppLocalizations.of(context).translate('referral.input.title'),
-          style: TextStyles.h5.copyWith(
+          style: TextStyles.h6.copyWith(
             color: theme.grey[900],
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w600,
           ),
           textAlign: TextAlign.center,
         ),
@@ -897,7 +898,7 @@ class _RegistrationStepperScreenState
         // Subtitle
         Text(
           AppLocalizations.of(context).translate('referral.input.subtitle'),
-          style: TextStyles.body.copyWith(
+          style: TextStyles.footnote.copyWith(
             color: theme.grey[600],
             height: 1.5,
           ),
@@ -959,5 +960,4 @@ class _RegistrationStepperScreenState
       ],
     );
   }
-
 }
