@@ -17,59 +17,63 @@ export default function DirectMessagesPage() {
   };
 
   return (
-    <>
+    <div className="min-h-screen flex flex-col">
       <SiteHeader dictionary={headerDictionary} />
-      <div className="p-6">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold tracking-tight">
-            {t('modules.community.directMessages.title')}
-          </h1>
-          <p className="text-muted-foreground">
-            {t('modules.community.directMessages.description')}
-          </p>
+      <div className="flex-1 flex flex-col">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b bg-background">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">
+              {t('modules.community.directMessages.title')}
+            </h1>
+            <p className="text-muted-foreground">
+              {t('modules.community.directMessages.description')}
+            </p>
+          </div>
         </div>
-        
-        <Tabs defaultValue="dashboard" className="w-full">
-          <TabsList className="grid w-full grid-cols-5 mb-6">
-            <TabsTrigger value="dashboard">
-              {t('modules.community.directMessages.tabs.dashboard')}
-            </TabsTrigger>
-            <TabsTrigger value="queue">
-              {t('modules.community.directMessages.tabs.moderationQueue')}
-            </TabsTrigger>
-            <TabsTrigger value="conversations">
-              {t('modules.community.directMessages.tabs.allConversations')}
-            </TabsTrigger>
-            <TabsTrigger value="messages">
-              {t('modules.community.directMessages.tabs.allMessages')}
-            </TabsTrigger>
-            <TabsTrigger value="reports">
-              {t('modules.community.directMessages.tabs.userReports')}
-            </TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="dashboard" className="space-y-4">
+
+        {/* Content */}
+        <div className="flex-1 overflow-auto">
+          <div className="p-6 space-y-6 max-w-none">
+            {/* Stats Cards */}
             <DashboardOverview />
-          </TabsContent>
-          
-          <TabsContent value="queue" className="space-y-4">
-            <ModerationQueue />
-          </TabsContent>
-          
-          <TabsContent value="conversations" className="space-y-4">
-            <AllConversations />
-          </TabsContent>
-          
-          <TabsContent value="messages" className="space-y-4">
-            <AllMessages />
-          </TabsContent>
-          
-          <TabsContent value="reports" className="space-y-4">
-            <UserReports />
-          </TabsContent>
-        </Tabs>
+            
+            <Tabs defaultValue="messages" className="w-full">
+              <TabsList className="grid w-full grid-cols-4 mb-6">
+                <TabsTrigger value="messages">
+                  {t('modules.community.directMessages.tabs.allMessages')}
+                </TabsTrigger>
+                <TabsTrigger value="queue">
+                  {t('modules.community.directMessages.tabs.moderationQueue')}
+                </TabsTrigger>
+                <TabsTrigger value="conversations">
+                  {t('modules.community.directMessages.tabs.allConversations')}
+                </TabsTrigger>
+                <TabsTrigger value="reports">
+                  {t('modules.community.directMessages.tabs.userReports')}
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="messages" className="space-y-4">
+                <AllMessages />
+              </TabsContent>
+              
+              <TabsContent value="queue" className="space-y-4">
+                <ModerationQueue />
+              </TabsContent>
+              
+              <TabsContent value="conversations" className="space-y-4">
+                <AllConversations />
+              </TabsContent>
+              
+              <TabsContent value="reports" className="space-y-4">
+                <UserReports />
+              </TabsContent>
+            </Tabs>
+          </div>
+        </div>
       </div>
-    </>
+    </div>
   );
 }
 

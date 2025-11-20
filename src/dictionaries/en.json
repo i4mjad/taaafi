@@ -21,7 +21,8 @@
       "groupAdministration": "Group Administration",
       "adminDashboard": "Admin Dashboard",
       "memberManagement": "Member Management",
-      "contentModeration": "Content Moderation",
+      "messagesModeration": "Messages Moderation",
+      "updatesModeration": "Updates Moderation",
       "reportsManagement": "Reports Management",
       "challengeManagement": "Challenge Management",
       "groupSettings": "Group Settings",
@@ -1967,10 +1968,17 @@
             "metrics": {
               "totalConversations": "Total Conversations",
               "totalMessages": "Total Messages",
+              "todaysMessages": "Today's Messages",
               "messagesByStatus": "Messages by Status",
               "activeReports": "Active Reports",
               "avgResponseTime": "Avg Response Time",
               "topViolations": "Top Violations"
+            },
+            "subtitles": {
+              "allTime": "All time",
+              "last24Hours": "Last 24 hours",
+              "requiresAction": "Requires action",
+              "actionsTaken": "Actions taken"
             },
             "timeFilters": {
               "allTime": "All Time",
@@ -2298,6 +2306,193 @@
             "banCreated": "User banned successfully",
             "exportComplete": "Export completed successfully",
             "error": "An error occurred. Please try again."
+          }
+        },
+        "groupUpdates": {
+          "title": "Group Updates Moderation",
+          "description": "Review and moderate group updates submitted by members",
+          "tabs": {
+            "pending": "Pending Review",
+            "approved": "Approved",
+            "blocked": "Blocked",
+            "all": "All Updates"
+          },
+          "filters": {
+            "status": "Status",
+            "language": "Language",
+            "updateType": "Update Type",
+            "violationType": "Violation Type",
+            "dateRange": "Date Range",
+            "searchPlaceholder": "Search by content, author, or group...",
+            "allLanguages": "All Languages",
+            "allTypes": "All Types",
+            "allViolations": "All Violations"
+          },
+          "stats": {
+            "totalUpdates": "Total Updates",
+            "todaysUpdates": "Today's Updates",
+            "pendingReview": "Pending Review",
+            "requiresAction": "Requires Action",
+            "approvedToday": "Approved Today",
+            "approvedTotal": "Total Approved",
+            "blockedToday": "Blocked Today",
+            "blockedTotal": "Total Blocked",
+            "byLanguage": "By Language",
+            "byType": "By Type",
+            "byViolation": "By Violation",
+            "allTime": "All time",
+            "last24Hours": "Last 24 hours",
+            "requiresActionLabel": "Requires action",
+            "recentApprovals": "Recent approvals",
+            "allApprovals": "All time",
+            "actionsTaken": "Actions taken"
+          },
+          "table": {
+            "columns": {
+              "update": "Update",
+              "author": "Author",
+              "group": "Group",
+              "type": "Type",
+              "language": "Language",
+              "status": "Status",
+              "confidence": "AI Confidence",
+              "violation": "Violation",
+              "createdAt": "Created",
+              "actions": "Actions"
+            },
+            "emptyState": "No updates found",
+            "loading": "Loading updates..."
+          },
+          "updateTypes": {
+            "general": "General",
+            "achievement": "Achievement",
+            "milestone": "Milestone",
+            "support": "Support"
+          },
+          "violationTypes": {
+            "social_media_sharing": "Social Media Sharing",
+            "sexual_content": "Sexual Content",
+            "cuckoldry_content": "Cuckoldry Content",
+            "homosexuality_content": "Homosexuality Content",
+            "harassment": "Harassment",
+            "spam": "Spam",
+            "hate_speech": "Hate Speech",
+            "violence": "Violence",
+            "self_harm": "Self Harm",
+            "none": "No Violation"
+          },
+          "statuses": {
+            "pending": "Pending",
+            "manual_review": "Manual Review",
+            "approved": "Approved",
+            "blocked": "Blocked"
+          },
+          "severities": {
+            "low": "Low",
+            "medium": "Medium",
+            "high": "High"
+          },
+          "detailSheet": {
+            "title": "Update Details",
+            "sections": {
+              "content": "Update Content",
+              "author": "Author Information",
+              "group": "Group Information",
+              "aiAnalysis": "AI Moderation Analysis",
+              "adminAction": "Admin Action"
+            },
+            "content": {
+              "title": "Title",
+              "body": "Content",
+              "type": "Type",
+              "language": "Language",
+              "visibility": "Visibility",
+              "anonymous": "Posted Anonymously",
+              "linkedChallenge": "Linked Challenge",
+              "linkedMilestone": "Linked Milestone",
+              "reactions": "Reactions",
+              "comments": "Comments",
+              "supports": "Supports"
+            },
+            "author": {
+              "displayName": "Display Name",
+              "cpId": "Community Profile ID",
+              "joinedGroup": "Joined Group",
+              "totalUpdates": "Total Updates",
+              "previousFlags": "Previous Flags",
+              "viewProfile": "View Full Profile"
+            },
+            "group": {
+              "name": "Group Name",
+              "id": "Group ID",
+              "memberCount": "Members",
+              "language": "Language",
+              "gender": "Gender",
+              "viewGroup": "View Group"
+            },
+            "aiAnalysis": {
+              "overallStatus": "Overall Status",
+              "confidence": "Confidence Score",
+              "violationType": "Violation Type",
+              "severity": "Severity",
+              "detectedContent": "Detected Content",
+              "reason": "AI Reason",
+              "customRules": "Custom Rules Triggered",
+              "culturalContext": "Cultural Context",
+              "finalDecision": "Final Decision",
+              "analysisTime": "Analysis Time"
+            },
+            "actions": {
+              "title": "Moderation Decision",
+              "approve": "Approve",
+              "block": "Block",
+              "keepUnderReview": "Keep Under Review",
+              "reason": "Reason",
+              "reasonPlaceholder": "Explain your decision...",
+              "notes": "Admin Notes",
+              "notesPlaceholder": "Add any additional notes...",
+              "submit": "Submit Decision",
+              "submitting": "Processing...",
+              "cancel": "Cancel"
+            }
+          },
+          "bulkActions": {
+            "title": "Bulk Actions",
+            "selected": "{count} selected",
+            "approve": "Approve Selected",
+            "block": "Block Selected",
+            "delete": "Delete Selected",
+            "confirmTitle": "Confirm Bulk Action",
+            "confirmMessage": "Are you sure you want to {action} {count} updates?",
+            "reason": "Reason for bulk action",
+            "reasonPlaceholder": "Explain why you're taking this action...",
+            "processing": "Processing {current} of {total}..."
+          },
+          "actions": {
+            "view": "View Details",
+            "approve": "Approve",
+            "block": "Block",
+            "delete": "Delete",
+            "viewAuthor": "View Author",
+            "viewGroup": "View Group"
+          },
+          "notifications": {
+            "approved": "Update approved successfully",
+            "blocked": "Update blocked successfully",
+            "keptUnderReview": "Update kept under review",
+            "bulkActionComplete": "Bulk action completed successfully",
+            "error": "An error occurred. Please try again.",
+            "loadError": "Failed to load updates"
+          },
+          "pagination": {
+            "previous": "Previous",
+            "next": "Next",
+            "page": "Page",
+            "of": "of",
+            "showing": "Showing",
+            "to": "to",
+            "items": "items",
+            "itemsPerPage": "Items per page"
           }
         },
         "rules": {
@@ -3121,7 +3316,7 @@
       },
       "admin": {
         "content": {
-          "title": "Content Moderation",
+          "title": "Messages Moderation",
           "messageModerated": "Message moderated successfully",
           "moderationError": "Failed to moderate message",
           "moderateMessage": "Moderate Message",
@@ -3211,7 +3406,7 @@
           "selectGroup": "Select a group",
           "allGroups": "All Groups",
           "selectGroupPlaceholder": "Choose a group to filter",
-          "contentDescription": "Monitor and moderate all content across groups",
+          "contentDescription": "Monitor and moderate all messages across groups",
           "membersDescription": "Manage all members across the platform",
           "reportsDescription": "Review and handle user reports",
           "quickActionsDesc": "Quick access to common administrative tasks",

@@ -95,10 +95,8 @@ export function AppSidebar({ lang, ...props }: AppSidebarProps) {
           { titleKey: "adminDashboard", url: `/${lang}/community/groups/admin-overview`, icon: LayoutDashboardIcon },
           { titleKey: "allGroups", url: `/${lang}/groups-management`, icon: UsersIcon },
           { titleKey: "memberManagement", url: `/${lang}/community/groups/memberships`, icon: UsersIcon },
-          { titleKey: "contentModeration", url: `/${lang}/community/groups/admin-content`, icon: MessageSquareIcon },
-          { titleKey: "reportsManagement", url: `/${lang}/community/groups/admin-reports`, icon: ShieldIcon },
-          { titleKey: "challengeManagement", url: `/${lang}/community/groups/admin-challenges`, icon: TrophyIcon },
-          { titleKey: "groupSettings", url: `/${lang}/community/groups/admin-settings`, icon: SettingsIcon },
+          { titleKey: "messagesModeration", url: `/${lang}/community/groups/messages-moderation`, icon: MessageSquareIcon },
+          { titleKey: "updatesModeration", url: `/${lang}/community/groups/updates-moderation`, icon: FileTextIcon },
         ]
       },
       { 

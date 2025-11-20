@@ -21,7 +21,8 @@
       "groupAdministration": "إدارة المجموعات",
       "adminDashboard": "لوحة تحكم الإدارة",
       "memberManagement": "إدارة الأعضاء",
-      "contentModeration": "مراجعة المحتوى",
+      "messagesModeration": "مراجعة الرسائل",
+      "updatesModeration": "مراجعة التحديثات",
       "reportsManagement": "إدارة البلاغات",
       "challengeManagement": "إدارة التحديات",
       "groupSettings": "إعدادات المجموعة",
@@ -2002,10 +2003,17 @@
             "metrics": {
               "totalConversations": "إجمالي المحادثات",
               "totalMessages": "إجمالي الرسائل",
+              "todaysMessages": "رسائل اليوم",
               "messagesByStatus": "الرسائل حسب الحالة",
               "activeReports": "البلاغات النشطة",
               "avgResponseTime": "متوسط وقت الاستجابة",
               "topViolations": "أكثر المخالفات"
+            },
+            "subtitles": {
+              "allTime": "طوال الوقت",
+              "last24Hours": "آخر 24 ساعة",
+              "requiresAction": "يتطلب إجراء",
+              "actionsTaken": "الإجراءات المتخذة"
             },
             "timeFilters": {
               "allTime": "كل الوقت",
@@ -2333,6 +2341,193 @@
             "banCreated": "تم حظر المستخدم بنجاح",
             "exportComplete": "تم التصدير بنجاح",
             "error": "حدث خطأ. يرجى المحاولة مرة أخرى."
+          }
+        },
+        "groupUpdates": {
+          "title": "مراجعة التحديثات الجماعية",
+          "description": "مراجعة والموافقة على التحديثات المقدمة من الأعضاء",
+          "tabs": {
+            "pending": "قيد المراجعة",
+            "approved": "موافق عليها",
+            "blocked": "محظورة",
+            "all": "جميع التحديثات"
+          },
+          "filters": {
+            "status": "الحالة",
+            "language": "اللغة",
+            "updateType": "نوع التحديث",
+            "violationType": "نوع الانتهاك",
+            "dateRange": "النطاق الزمني",
+            "searchPlaceholder": "البحث بالمحتوى أو الكاتب أو المجموعة...",
+            "allLanguages": "جميع اللغات",
+            "allTypes": "جميع الأنواع",
+            "allViolations": "جميع الانتهاكات"
+          },
+          "stats": {
+            "totalUpdates": "إجمالي التحديثات",
+            "todaysUpdates": "تحديثات اليوم",
+            "pendingReview": "قيد المراجعة",
+            "requiresAction": "يتطلب إجراء",
+            "approvedToday": "موافق عليها اليوم",
+            "approvedTotal": "إجمالي الموافق عليها",
+            "blockedToday": "محظورة اليوم",
+            "blockedTotal": "إجمالي المحظورة",
+            "byLanguage": "حسب اللغة",
+            "byType": "حسب النوع",
+            "byViolation": "حسب الانتهاك",
+            "allTime": "طوال الوقت",
+            "last24Hours": "آخر 24 ساعة",
+            "requiresActionLabel": "يتطلب إجراء",
+            "recentApprovals": "الموافقات الأخيرة",
+            "allApprovals": "طوال الوقت",
+            "actionsTaken": "الإجراءات المتخذة"
+          },
+          "table": {
+            "columns": {
+              "update": "التحديث",
+              "author": "الكاتب",
+              "group": "المجموعة",
+              "type": "النوع",
+              "language": "اللغة",
+              "status": "الحالة",
+              "confidence": "ثقة الذكاء الاصطناعي",
+              "violation": "الانتهاك",
+              "createdAt": "تاريخ الإنشاء",
+              "actions": "الإجراءات"
+            },
+            "emptyState": "لا توجد تحديثات",
+            "loading": "جاري تحميل التحديثات..."
+          },
+          "updateTypes": {
+            "general": "عام",
+            "achievement": "إنجاز",
+            "milestone": "معلم رئيسي",
+            "support": "دعم"
+          },
+          "violationTypes": {
+            "social_media_sharing": "مشاركة حسابات التواصل الاجتماعي",
+            "sexual_content": "محتوى جنسي",
+            "cuckoldry_content": "محتوى الدياثة",
+            "homosexuality_content": "محتوى اللواط",
+            "harassment": "تحرش",
+            "spam": "بريد مزعج",
+            "hate_speech": "خطاب كراهية",
+            "violence": "عنف",
+            "self_harm": "إيذاء النفس",
+            "none": "لا يوجد انتهاك"
+          },
+          "statuses": {
+            "pending": "قيد الانتظار",
+            "manual_review": "مراجعة يدوية",
+            "approved": "موافق عليه",
+            "blocked": "محظور"
+          },
+          "severities": {
+            "low": "منخفضة",
+            "medium": "متوسطة",
+            "high": "عالية"
+          },
+          "detailSheet": {
+            "title": "تفاصيل التحديث",
+            "sections": {
+              "content": "محتوى التحديث",
+              "author": "معلومات الكاتب",
+              "group": "معلومات المجموعة",
+              "aiAnalysis": "تحليل الذكاء الاصطناعي",
+              "adminAction": "إجراء المشرف"
+            },
+            "content": {
+              "title": "العنوان",
+              "body": "المحتوى",
+              "type": "النوع",
+              "language": "اللغة",
+              "visibility": "الرؤية",
+              "anonymous": "منشور بهوية مجهولة",
+              "linkedChallenge": "تحدي مرتبط",
+              "linkedMilestone": "معلم رئيسي مرتبط",
+              "reactions": "التفاعلات",
+              "comments": "التعليقات",
+              "supports": "الدعم"
+            },
+            "author": {
+              "displayName": "الاسم المعروض",
+              "cpId": "معرف الملف الشخصي",
+              "joinedGroup": "انضم للمجموعة",
+              "totalUpdates": "إجمالي التحديثات",
+              "previousFlags": "الأعلام السابقة",
+              "viewProfile": "عرض الملف الشخصي"
+            },
+            "group": {
+              "name": "اسم المجموعة",
+              "id": "معرف المجموعة",
+              "memberCount": "الأعضاء",
+              "language": "اللغة",
+              "gender": "الجنس",
+              "viewGroup": "عرض المجموعة"
+            },
+            "aiAnalysis": {
+              "overallStatus": "الحالة العامة",
+              "confidence": "درجة الثقة",
+              "violationType": "نوع الانتهاك",
+              "severity": "الخطورة",
+              "detectedContent": "المحتوى المكتشف",
+              "reason": "سبب الذكاء الاصطناعي",
+              "customRules": "القواعد المخصصة المفعلة",
+              "culturalContext": "السياق الثقافي",
+              "finalDecision": "القرار النهائي",
+              "analysisTime": "وقت التحليل"
+            },
+            "actions": {
+              "title": "قرار المراجعة",
+              "approve": "موافقة",
+              "block": "حظر",
+              "keepUnderReview": "الإبقاء قيد المراجعة",
+              "reason": "السبب",
+              "reasonPlaceholder": "اشرح قرارك...",
+              "notes": "ملاحظات المشرف",
+              "notesPlaceholder": "أضف أي ملاحظات إضافية...",
+              "submit": "تقديم القرار",
+              "submitting": "جاري المعالجة...",
+              "cancel": "إلغاء"
+            }
+          },
+          "bulkActions": {
+            "title": "الإجراءات الجماعية",
+            "selected": "{count} محدد",
+            "approve": "الموافقة على المحدد",
+            "block": "حظر المحدد",
+            "delete": "حذف المحدد",
+            "confirmTitle": "تأكيد الإجراء الجماعي",
+            "confirmMessage": "هل أنت متأكد من أنك تريد {action} {count} تحديث؟",
+            "reason": "سبب الإجراء الجماعي",
+            "reasonPlaceholder": "اشرح سبب اتخاذ هذا الإجراء...",
+            "processing": "معالجة {current} من {total}..."
+          },
+          "actions": {
+            "view": "عرض التفاصيل",
+            "approve": "موافقة",
+            "block": "حظر",
+            "delete": "حذف",
+            "viewAuthor": "عرض الكاتب",
+            "viewGroup": "عرض المجموعة"
+          },
+          "notifications": {
+            "approved": "تمت الموافقة على التحديث بنجاح",
+            "blocked": "تم حظر التحديث بنجاح",
+            "keptUnderReview": "تم الإبقاء على التحديث قيد المراجعة",
+            "bulkActionComplete": "تم إكمال الإجراء الجماعي بنجاح",
+            "error": "حدث خطأ. يرجى المحاولة مرة أخرى.",
+            "loadError": "فشل تحميل التحديثات"
+          },
+          "pagination": {
+            "previous": "السابق",
+            "next": "التالي",
+            "page": "صفحة",
+            "of": "من",
+            "showing": "عرض",
+            "to": "إلى",
+            "items": "عناصر",
+            "itemsPerPage": "عدد العناصر في الصفحة"
           }
         },
         "rules": {
@@ -2830,7 +3025,7 @@
           "selectGroup": "اختر مجموعة",
           "allGroups": "جميع المجموعات",
           "selectGroupPlaceholder": "اختر مجموعة للتصفية",
-          "contentDescription": "مراقبة وإدارة جميع المحتوى عبر المجموعات",
+          "contentDescription": "مراقبة وإدارة جميع الرسائل عبر المجموعات",
           "membersDescription": "إدارة جميع الأعضاء عبر المنصة",
           "reportsDescription": "مراجعة ومعالجة بلاغات المستخدمين",
           "quickActionsDesc": "وصول سريع للمهام الإدارية الشائعة",
@@ -3095,7 +3290,7 @@
           }
         },
         "content": {
-          "title": "إدارة المحتوى",
+          "title": "مراجعة الرسائل",
           "messageModerated": "تمت إدارة الرسالة بنجاح",
           "moderationError": "فشل في إدارة الرسالة",
           "moderateMessage": "إدارة الرسالة",
