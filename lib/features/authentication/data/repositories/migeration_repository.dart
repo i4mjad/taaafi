@@ -139,9 +139,17 @@ class FCMRepository {
   FCMRepository(this._messaging);
 
   Future<String> getMessagingToken() async {
-    if (Platform.isIOS) {
-      await _messaging.getAPNSToken();
+    try {
+      if (Platform.isIOS) {
+        // Try to get APNS token first, but don't fail if not available
+        await _messaging.getAPNSToken();
+      }
+      return await _messaging.getToken() ?? "Missing token";
+    } catch (e) {
+      // If APNS token is not available yet, return a placeholder
+      // The token will be updated later when it becomes available
+      print('FCM token not available yet: $e');
+      return "Token pending";
     }
-    return await _messaging.getToken() ?? "Missing token";
   }
 }
