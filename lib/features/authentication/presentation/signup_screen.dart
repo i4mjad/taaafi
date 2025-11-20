@@ -154,8 +154,12 @@ class _SignUpStepperScreenState extends ConsumerState<SignUpStepperScreen> {
       // Final step - create account, complete registration and show referral code input
       await _createAccountAndCompleteRegistration();
       if (mounted) {
-        // Show referral code input as optional bottom sheet
-        _showReferralCodeSheet();
+        // Small delay to ensure context is ready for bottom sheet
+        await Future.delayed(const Duration(milliseconds: 300));
+        if (mounted) {
+          // Show referral code input as optional bottom sheet
+          _showReferralCodeSheet();
+        }
       }
     }
   }
