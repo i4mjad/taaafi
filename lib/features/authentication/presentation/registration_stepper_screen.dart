@@ -294,6 +294,25 @@ class _RegistrationStepperScreenState
     );
   }
 
+  String _getStepLabel(int index) {
+    switch (index) {
+      case 0:
+        return AppLocalizations.of(context).translate('personal-info');
+      case 1:
+        return AppLocalizations.of(context).translate('preferences');
+      case 2:
+        return AppLocalizations.of(context).translate('recovery');
+      case 3:
+        return AppLocalizations.of(context).translate('verification');
+      case 4:
+        return AppLocalizations.of(context).translate('referral');
+      case 5:
+        return AppLocalizations.of(context).translate('complete');
+      default:
+        return '';
+    }
+  }
+
   Widget _buildHorizontalStepIndicator(dynamic theme) {
     const int totalSteps = 6;
 
@@ -379,7 +398,7 @@ class _RegistrationStepperScreenState
                         ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 6),
                   // Step label
                   Text(
                     _getStepLabel(index),
@@ -391,9 +410,10 @@ class _RegistrationStepperScreenState
                               : theme.grey[500],
                       fontWeight:
                           isActive ? FontWeight.w600 : FontWeight.normal,
+                      fontSize: 10,
                     ),
                     textAlign: TextAlign.center,
-                    maxLines: 2,
+                    maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],

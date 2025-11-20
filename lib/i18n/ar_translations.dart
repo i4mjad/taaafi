@@ -827,6 +827,7 @@ const Map<String, String> kAr = {
   "personal-info": "المعلومات الشخصية",
   "recovery": "التعافي",
   "verification": "التحقق",
+  "referral": "الإحالة",
   "complete": "اكتمل",
 
   // Account creation
