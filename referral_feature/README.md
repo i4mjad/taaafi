@@ -152,6 +152,20 @@ Automatic fraud detection checks for same device, rapid activity, same IP, and s
 
 ---
 
+## 📝 Important Notes
+
+### Manual Referral Code Generation (TODO)
+Currently, referral codes are automatically generated:
+- **New users**: Automatically on signup via `generateReferralCodeOnUserCreation` trigger
+- **Existing users**: Admin-only backfill via `backfillReferralCodes` callable function
+
+**Future Enhancement**: Add a user-facing feature to allow users to manually regenerate their referral code if needed (e.g., if they want a more personalized code or if generation failed). This would require:
+- A new callable Cloud Function (e.g., `regenerateUserReferralCode`)
+- UI button in user profile/settings
+- Validation to prevent abuse (e.g., rate limiting, max regenerations)
+
+---
+
 ## Contact & Support
 
 For questions about implementation details, refer to:
