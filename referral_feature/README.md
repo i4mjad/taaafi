@@ -37,7 +37,7 @@ Automatic fraud detection checks for same device, rapid activity, same IP, and s
 - **Sprint 10**: Notification system for milestones
 - **Sprint 11**: RevenueCat reward integration
 
-### Admin Panel Implementation (Sprints 12-17)
+### Admin Panel Implementation (Sprints 12-17) //Don't care about it, will be handeled by other agent.
 - **Sprint 12**: Admin dashboard overview page
 - **Sprint 13**: Fraud detection review queue
 - **Sprint 14**: User referral lookup & search
@@ -65,13 +65,12 @@ Automatic fraud detection checks for same device, rapid activity, same IP, and s
 2. Maintain existing code style and patterns
 3. Add proper error handling and validation
 4. Write clean, maintainable code
-5. Test each feature as you build it
+5. DRY! Check for existing utlities and helpers and reusable classes
+6. Commit changes after each small change with clear short messages (less than 8 words)
 
 ### After Each Sprint:
 1. Ensure app is **buildable** (no compilation errors)
-2. Run basic smoke tests
-3. Commit changes with clear messages
-4. Note any issues or deviations in commit message
+2. Hand your notes to the next sprint
 
 ---
 
@@ -130,7 +129,7 @@ Automatic fraud detection checks for same device, rapid activity, same IP, and s
 
 ## Sprint Completion Tracker
 
-- [ ] Sprint 01 - Database schema & Firestore security rules
+- [x] Sprint 01 - Database schema & Firestore security rules
 - [ ] Sprint 02 - Referral code generation system
 - [ ] Sprint 03 - Referral code input during signup
 - [ ] Sprint 04 - Verification checklist Cloud Functions (setup)
