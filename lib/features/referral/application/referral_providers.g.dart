@@ -22,8 +22,24 @@ final firestoreProvider = AutoDisposeProvider<FirebaseFirestore>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef FirestoreRef = AutoDisposeProviderRef<FirebaseFirestore>;
+String _$functionsHash() => r'f10185eab19f5ef6af456521845113246a8e222a';
+
+/// See also [functions].
+@ProviderFor(functions)
+final functionsProvider = AutoDisposeProvider<FirebaseFunctions>.internal(
+  functions,
+  name: r'functionsProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$functionsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef FunctionsRef = AutoDisposeProviderRef<FirebaseFunctions>;
 String _$referralRepositoryHash() =>
-    r'25da59fbd4775854decd21783b32abafb73019c8';
+    r'3adfe7b29796275e83a711e0ec4170995a10f749';
 
 /// See also [referralRepository].
 @ProviderFor(referralRepository)
