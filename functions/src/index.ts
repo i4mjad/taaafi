@@ -1622,3 +1622,44 @@ export { sendUpdateNotification, sendCommentNotification } from './groupUpdateNo
 // ==================== CHALLENGE TASK COMPLETION NOTIFICATIONS ====================
 // Export challenge task completion notification function
 export { sendChallengeTaskCompletionNotification } from './challengeTaskCompletionNotifications';
+
+// ==================== REFERRAL PROGRAM ====================
+import { initializeReferralConfig } from './referral/initializeConfig';
+
+/**
+ * Initialize Referral Program Configuration
+ * One-time callable function to set up the referral program config document
+ */
+export const initReferralConfig = onCall(
+  {
+    region: 'us-central1',
+  },
+  async (request) => {
+    try {
+      // Check if user is authenticated
+      if (!request.auth) {
+        throw new Error('User must be authenticated');
+      }
+
+      // Check if user is admin
+      const userDoc = await admin.firestore().collection('users').doc(request.auth.uid).get();
+      const userData = userDoc.data();
+      
+      if (!userData || userData.role !== 'admin') {
+        throw new Error('Only admins can initialize referral config');
+      }
+
+      // Initialize the config
+      await initializeReferralConfig();
+
+      return {
+        success: true,
+        message: 'Referral program configuration initialized successfully'
+      };
+
+    } catch (error) {
+      console.error('❌ Error initializing referral config:', error);
+      throw error;
+    }
+  }
+);
