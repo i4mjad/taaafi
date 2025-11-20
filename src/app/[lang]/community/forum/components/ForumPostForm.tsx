@@ -194,7 +194,7 @@ export default function ForumPostForm({ isOpen, onClose, onSuccess }: ForumPostF
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Title */}
           <div className="space-y-2">
-            <Label htmlFor="title">{t('modules.community.posts.title')}</Label>
+            <Label htmlFor="title">{t('modules.community.posts.titleLabel')}</Label>
             <Input
               id="title"
               placeholder={t('modules.community.posts.titlePlaceholder')}

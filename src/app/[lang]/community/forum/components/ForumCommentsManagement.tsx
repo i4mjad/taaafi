@@ -13,7 +13,8 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MessageSquare, MoreHorizontal, Eye, EyeOff, Trash2, ExternalLink, AlertCircle, User, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { MessageSquare, MoreHorizontal, Eye, EyeOff, Trash2, ExternalLink, AlertCircle, User, Shield } from 'lucide-react';
+import { ForumModerationBadge } from '@/components/forum/ForumModerationBadge';
 import { format } from 'date-fns';
 import { Comment } from '@/types/community';
 import ModerationActionDialog from './ModerationActionDialog';
@@ -26,6 +27,7 @@ export default function ForumCommentsManagement() {
   const router = useRouter();
 
   const [search, setSearch] = useState('');
+  const [moderationFilter, setModerationFilter] = useState<'all' | 'approved' | 'manual_review' | 'blocked' | 'pending'>('all');
   const [selectedComment, setSelectedComment] = useState<Comment | null>(null);
   const [moderationOpen, setModerationOpen] = useState(false);
   const [moderationComment, setModerationComment] = useState<Comment | null>(null);
@@ -61,11 +63,14 @@ export default function ForumCommentsManagement() {
 
   const filteredComments = useMemo(() => {
     const q = search.trim().toLowerCase();
-    if (!q) return comments;
-    return comments.filter((c) =>
-      c.body.toLowerCase().includes(q) || (postTitleById.get(c.postId) || '').toLowerCase().includes(q)
-    );
-  }, [comments, search, postTitleById]);
+    return comments.filter((c) => {
+      const matchesSearch = !q || c.body.toLowerCase().includes(q) || (postTitleById.get(c.postId) || '').toLowerCase().includes(q);
+      const matchesModeration = moderationFilter === 'all' || 
+        (moderationFilter === 'pending' && !c.moderation) ||
+        c.moderation?.status === moderationFilter;
+      return matchesSearch && matchesModeration;
+    });
+  }, [comments, search, moderationFilter, postTitleById]);
 
   const paginatedComments = useMemo(() => {
     const start = (currentPage - 1) * pageSize;
@@ -74,6 +79,17 @@ export default function ForumCommentsManagement() {
   }, [filteredComments, currentPage, pageSize]);
 
   const totalPages = Math.ceil(filteredComments.length / pageSize) || 1;
+
+  // Calculate stats
+  const stats = useMemo(() => {
+    const total = comments.length;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todaysComments = comments.filter(comment => comment.createdAt >= today).length;
+    const uniquePosts = new Set(comments.map(c => c.postId)).size;
+
+    return { total, todaysComments, uniquePosts };
+  }, [comments]);
 
   const handleHideToggle = async (comment: Comment) => {
     try {
@@ -115,6 +131,54 @@ export default function ForumCommentsManagement() {
         <p className="text-muted-foreground">{t('modules.community.comments.listDescription')}</p>
       </div>
 
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              {t('modules.community.comments.totalComments')}
+            </CardTitle>
+            <MessageSquare className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.total}</div>
+            <p className="text-xs text-muted-foreground">
+              {t('modules.features.percentOfTotal', { percent: '100' })}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              {t('modules.community.comments.todaysComments')}
+            </CardTitle>
+            <MessageSquare className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.todaysComments}</div>
+            <p className="text-xs text-muted-foreground">
+              {t('modules.community.today')}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              {t('modules.community.comments.postsWithComments')}
+            </CardTitle>
+            <User className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.uniquePosts}</div>
+            <p className="text-xs text-muted-foreground">
+              {t('modules.community.posts.title')}
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
       <div className="flex flex-col md:flex-row gap-4">
         <div className="flex-1">
           <div className="relative">
@@ -127,6 +191,18 @@ export default function ForumCommentsManagement() {
             />
           </div>
         </div>
+        <Select value={moderationFilter} onValueChange={(v) => setModerationFilter(v as any)}>
+          <SelectTrigger className="w-[200px]">
+            <SelectValue placeholder={t('modules.community.forum.moderation.filterByStatus')} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">{t('common.all')}</SelectItem>
+            <SelectItem value="pending">{t('modules.community.forum.moderation.status.pending')}</SelectItem>
+            <SelectItem value="approved">{t('modules.community.forum.moderation.status.approved')}</SelectItem>
+            <SelectItem value="manual_review">{t('modules.community.forum.moderation.status.manual_review')}</SelectItem>
+            <SelectItem value="blocked">{t('modules.community.forum.moderation.status.blocked')}</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <Card>
@@ -139,9 +215,7 @@ export default function ForumCommentsManagement() {
                   <TableHead>{t('modules.community.comments.author')}</TableHead>
                   <TableHead>{t('modules.community.comments.postTitle')}</TableHead>
                   <TableHead className="text-center">{t('modules.community.posts.table.columns.status')}</TableHead>
-                  <TableHead className="text-center">{t('modules.community.posts.table.columns.likes')}</TableHead>
-                  <TableHead className="text-center">{t('modules.community.posts.table.columns.dislikes')}</TableHead>
-                  <TableHead className="text-center">{t('modules.community.posts.table.columns.score')}</TableHead>
+                  <TableHead className="text-center">{t('modules.community.forum.moderation.status.label')}</TableHead>
                   <TableHead>{t('modules.community.posts.table.columns.createdAt')}</TableHead>
                   <TableHead className="text-right">{t('modules.community.posts.table.columns.actions')}</TableHead>
                 </TableRow>
@@ -149,19 +223,19 @@ export default function ForumCommentsManagement() {
               <TableBody>
                 {commentsLoading ? (
                   <TableRow>
-                    <TableCell colSpan={9} className="h-24 text-center">
+                    <TableCell colSpan={7} className="h-24 text-center">
                       {t('common.loading')}
                     </TableCell>
                   </TableRow>
                 ) : commentsError ? (
                   <TableRow>
-                    <TableCell colSpan={9} className="h-24 text-center text-destructive">
+                    <TableCell colSpan={7} className="h-24 text-center text-destructive">
                       {t('common.error')}
                     </TableCell>
                   </TableRow>
                 ) : filteredComments.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={9} className="h-24 text-center">
+                    <TableCell colSpan={7} className="h-24 text-center">
                       {t('modules.community.comments.noCommentsFound')}
                     </TableCell>
                   </TableRow>
@@ -206,18 +280,11 @@ export default function ForumCommentsManagement() {
                       </TableCell>
                       <TableCell className="text-center">
                         <div className="flex items-center justify-center gap-1">
-                          <ThumbsUp className="h-3 w-3 text-green-600" />
-                          <span>{comment.likeCount}</span>
+                          <ForumModerationBadge status={comment.moderation?.status} showIcon={false} />
+                          {comment.moderation?.finalDecision && comment.moderation.finalDecision.confidence >= 0.85 && (
+                            <Shield className="h-3 w-3 text-yellow-600" />
+                          )}
                         </div>
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <div className="flex items-center justify-center gap-1">
-                          <ThumbsDown className="h-3 w-3 text-red-600" />
-                          <span>{comment.dislikeCount}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <Badge variant={comment.score >= 0 ? 'default' : 'destructive'}>{comment.score}</Badge>
                       </TableCell>
                       <TableCell>
                         <span className="text-sm text-muted-foreground">{format(comment.createdAt, 'MMM dd, yyyy')}</span>

@@ -1746,7 +1746,7 @@
           "collapseComments": "Hide Comments",
           "showInteractions": "Show Interactions",
           "hideInteractions": "Hide Interactions",
-          "title": "Title",
+          "titleLabel": "Title",
           "titlePlaceholder": "Enter post title",
           "body": "Content",
           "bodyPlaceholder": "Enter post content",
@@ -1948,6 +1948,66 @@
               "label": "Community rule presets",
               "placeholder": "Select a preset reason (optional)",
               "custom": "Custom reason"
+            }
+          }
+        },
+        "forum": {
+          "moderation": {
+            "status": {
+              "label": "Moderation Status",
+              "approved": "Approved",
+              "manual_review": "Manual Review",
+              "blocked": "Blocked",
+              "pending": "Pending"
+            },
+            "filterByStatus": "Filter by Moderation Status",
+            "noData": "No Moderation Data",
+            "noDataDescription": "This content has not been moderated yet.",
+            "details": "Moderation Details",
+            "detailsDescription": "AI analysis and moderation information",
+            "reason": "Reason",
+            "visibility": "Visibility",
+            "hidden": "Hidden",
+            "visible": "Visible",
+            "autoHiddenInfo": "Content automatically hidden due to high confidence violation detection (>85%)",
+            "finalDecision": "Final Decision",
+            "action": "Action",
+            "confidence": "Confidence",
+            "violationType": "Violation Type",
+            "aiAnalysis": "AI Analysis",
+            "severity": "Severity",
+            "severityLevel": {
+              "low": "Low",
+              "medium": "Medium",
+              "high": "High"
+            },
+            "detectedContent": "Detected Content",
+            "culturalContext": "Cultural Context",
+            "customRules": "Custom Rules",
+            "analyzedAt": "Analyzed",
+            "highConfidence": "High Confidence",
+            "quickActions": "Quick Moderation Actions",
+            "deletedContent": "This content has been deleted",
+            "actions": {
+              "approve": "Approve",
+              "block": "Block",
+              "hide": "Hide",
+              "unhide": "Unhide",
+              "approveTitle": "Approve Content",
+              "approveDescription": "Mark this content as approved and make it visible to all users.",
+              "approveSuccess": "Content approved successfully",
+              "blockTitle": "Block Content",
+              "blockDescription": "Block this content and hide it from all users.",
+              "blockSuccess": "Content blocked successfully",
+              "hideTitle": "Hide Content",
+              "hideDescription": "Hide this content from users without changing moderation status.",
+              "hideSuccess": "Content hidden successfully",
+              "unhideTitle": "Unhide Content",
+              "unhideDescription": "Make this content visible to users again.",
+              "unhideSuccess": "Content unhidden successfully",
+              "error": "Failed to perform moderation action",
+              "reasonLabel": "Reason",
+              "reasonPlaceholder": "Explain why you're taking this action..."
             }
           }
         },
@@ -2543,6 +2603,7 @@
           "noCommentsFound": "No comments found",
           "totalComments": "Total Comments",
           "todaysComments": "Today's Comments",
+          "postsWithComments": "Posts with Comments",
           "body": "Comment",
           "bodyPlaceholder": "Enter comment content",
           "postTitle": "Post Title",
@@ -3792,4 +3853,3 @@
       "detailDateTimeFormat": "MMMM dd, yyyy HH:mm"
     }
   }
-  

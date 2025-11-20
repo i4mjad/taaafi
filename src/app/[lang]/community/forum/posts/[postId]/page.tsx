@@ -555,7 +555,7 @@ export default function PostDetailPage() {
                 <div className="space-y-4">
                   {/* Edit Form */}
                   <div className="space-y-2">
-                    <Label htmlFor="edit-title">{t('modules.community.posts.title')}</Label>
+                    <Label htmlFor="edit-title">{t('modules.community.posts.titleLabel')}</Label>
                     <Input
                       id="edit-title"
                       value={editFormData.title}

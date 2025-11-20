@@ -24,6 +24,32 @@ export interface PostCategory {
   updatedAt?: Date;
 }
 
+export interface ForumPostModeration {
+  status: 'approved' | 'manual_review' | 'blocked';
+  reason?: string;  // Localized string written by cloud function
+  ai?: {
+    reason: string;
+    violationType?: string;
+    severity?: 'low' | 'medium' | 'high';
+    confidence?: number;  // 0-1
+    detectedContent?: string[];
+    culturalContext?: string;
+  };
+  finalDecision?: {
+    action: string;
+    reason: string;
+    violationType?: string;
+    confidence: number;
+  };
+  customRules?: Array<{
+    type: string;
+    severity: 'low' | 'medium' | 'high';
+    confidence: number;
+    reason: string;
+  }>;
+  analysisAt?: Date;
+}
+
 export interface ForumPost {
   id: string;              // Document ID
   authorCPId: string;      // Foreign key -> communityProfiles.id
@@ -39,6 +65,33 @@ export interface ForumPost {
   dislikeCount: number;
   createdAt: Date;
   updatedAt?: Date;
+  moderation?: ForumPostModeration;  // AI moderation data
+}
+
+export interface CommentModeration {
+  status: 'approved' | 'manual_review' | 'blocked';
+  reason?: string;  // Localized string written by cloud function
+  ai?: {
+    reason: string;
+    violationType?: string;
+    severity?: 'low' | 'medium' | 'high';
+    confidence?: number;  // 0-1
+    detectedContent?: string[];
+    culturalContext?: string;
+  };
+  finalDecision?: {
+    action: string;
+    reason: string;
+    violationType?: string;
+    confidence: number;
+  };
+  customRules?: Array<{
+    type: string;
+    severity: 'low' | 'medium' | 'high';
+    confidence: number;
+    reason: string;
+  }>;
+  analysisAt?: Date;
 }
 
 export interface Comment {
@@ -54,6 +107,7 @@ export interface Comment {
   dislikeCount: number;
   createdAt: Date;
   updatedAt?: Date;
+  moderation?: CommentModeration;  // AI moderation data
 }
 
 export interface Interaction {
