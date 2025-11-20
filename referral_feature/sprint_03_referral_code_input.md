@@ -265,12 +265,13 @@ analytics.logEvent('referral_code_verified', parameters: {
 ## ✅ Completion Summary
 
 ### Implementation Approach
-Instead of a full-screen route, implemented as a **modal bottom sheet** for better UX:
-- Shows after signup completion
-- Drag handle for easy dismissal
-- Keyboard-aware with safe area handling
-- Scrollable content
+Implemented as **Step 5 in the registration flow** for better UX:
+- Appears as a proper step in the registration stepper (6 steps total)
+- Shows after email verification, before completion
+- Optional step with "Skip" button
+- Uses the reusable `ReferralCodeInputWidget`
 - Gift icon with welcoming copy
+- Auto-advances to completion step on successful code entry
 
 ### Files Created (7)
 1. `functions/src/referral/redeemReferralCode.ts` - Cloud Function
