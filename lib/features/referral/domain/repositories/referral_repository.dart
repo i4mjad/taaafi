@@ -1,5 +1,5 @@
-import '../models/referral_code_model.dart';
-import '../models/referral_stats_model.dart';
+import '../../data/models/referral_code_model.dart';
+import '../../data/models/referral_stats_model.dart';
 
 abstract class ReferralRepository {
   /// Get user's referral code by user ID
