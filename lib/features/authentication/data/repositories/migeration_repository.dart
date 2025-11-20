@@ -140,7 +140,7 @@ class FCMRepository {
 
   Future<String> getMessagingToken() async {
     if (Platform.isIOS) {
-      await _messaging.getAPNSToken() as String;
+      await _messaging.getAPNSToken();
     }
     return await _messaging.getToken() ?? "Missing token";
   }
