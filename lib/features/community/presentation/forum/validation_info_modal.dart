@@ -159,14 +159,7 @@ class ValidationInfoModal extends StatelessWidget {
         ),
         verticalSpace(Spacing.points4),
         _buildRequirementsList(theme, localizations, [
-          localizations
-              .translate('title_length_requirement')
-              .replaceAll(
-                  '{min}', '${PostFormValidationConstants.minTitleLength}')
-              .replaceAll(
-                  '{max}', '${PostFormValidationConstants.maxTitleLength}'),
-          localizations.translate('title_descriptive_requirement'),
-          localizations.translate('title_appropriate_requirement'),
+          localizations.translate('tip_avoid_spam_duplicate'),
         ]),
       ],
     );
@@ -187,19 +180,12 @@ class ValidationInfoModal extends StatelessWidget {
         verticalSpace(Spacing.points4),
         _buildRequirementsList(theme, localizations, [
           localizations
-              .translate('content_length_requirement')
-              .replaceAll(
-                  '{min}', '${PostFormValidationConstants.minContentLength}')
-              .replaceAll(
-                  '{max}', '${PostFormValidationConstants.maxContentLength}'),
-          localizations
               .translate('content_word_count_requirement')
               .replaceAll(
                   '{min}', '${PostFormValidationConstants.minContentWordCount}')
               .replaceAll('{max}',
                   '${PostFormValidationConstants.maxContentWordCount}'),
-          localizations.translate('content_meaningful_requirement'),
-          localizations.translate('content_appropriate_requirement'),
+          localizations.translate('tip_avoid_spam_duplicate'),
         ]),
       ],
     );
@@ -254,7 +240,6 @@ class ValidationInfoModal extends StatelessWidget {
               _buildTipsList(theme, localizations, [
                 localizations.translate('tip_choose_appropriate_category'),
                 localizations.translate('tip_be_respectful_supportive'),
-                localizations.translate('tip_avoid_spam_duplicate'),
                 localizations.translate('tip_use_clear_language'),
               ]),
             ],
