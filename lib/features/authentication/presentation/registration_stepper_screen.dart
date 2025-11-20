@@ -28,6 +28,7 @@ import 'package:reboot_app_3/core/utils/url_launcher_provider.dart';
 import 'package:reboot_app_3/features/authentication/application/auth_service.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_provider.dart';
+import 'package:reboot_app_3/features/referral/presentation/widgets/referral_code_input_widget.dart';
 
 class RegistrationStepperScreen extends ConsumerStatefulWidget {
   const RegistrationStepperScreen({super.key});
@@ -166,11 +167,11 @@ class _RegistrationStepperScreenState
         }
       }
     } else {
-      // Final step - complete registration and show subscription promotion
+      // Final step - complete registration and show referral code input
       await _completeRegistration();
       if (mounted) {
-        // Promote subscription to new users for better monetization
-        context.goNamed(RouteNames.ta3afiPlus.name);
+        // Show referral code input as optional bottom sheet
+        _showReferralCodeSheet();
       }
     }
   }
@@ -891,6 +892,109 @@ class _RegistrationStepperScreenState
           textAlign: TextAlign.center,
         ),
       ],
+    );
+  }
+
+  void _showReferralCodeSheet() {
+    final theme = AppTheme.of(context);
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: BoxDecoration(
+          color: theme.backgroundColor,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: EdgeInsets.only(
+              left: 24,
+              right: 24,
+              top: 24,
+              bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Drag handle
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: theme.grey[300],
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  verticalSpace(Spacing.points24),
+
+                  // Icon
+                  Center(
+                    child: Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        color: theme.primary[50],
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.card_giftcard_rounded,
+                        size: 40,
+                        color: theme.primary[600],
+                      ),
+                    ),
+                  ),
+                  verticalSpace(Spacing.points24),
+
+                  // Title
+                  Text(
+                    AppLocalizations.of(context)
+                        .translate('referral.input.title'),
+                    style: TextStyles.h5.copyWith(
+                      color: theme.grey[900],
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  verticalSpace(Spacing.points12),
+
+                  // Subtitle
+                  Text(
+                    AppLocalizations.of(context)
+                        .translate('referral.input.subtitle'),
+                    style: TextStyles.body.copyWith(
+                      color: theme.grey[600],
+                      height: 1.5,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  verticalSpace(Spacing.points32),
+
+                  // Referral code input widget
+                  ReferralCodeInputWidget(
+                    onSuccess: () {
+                      Navigator.of(context).pop();
+                      context.goNamed(RouteNames.ta3afiPlus.name);
+                    },
+                    onSkip: () {
+                      Navigator.of(context).pop();
+                      context.goNamed(RouteNames.ta3afiPlus.name);
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
