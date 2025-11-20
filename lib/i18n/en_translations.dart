@@ -3893,4 +3893,16 @@ const Map<String, String> kEn = {
   'your-current-tasks': 'Your Current Tasks',
   'remaining': 'Remaining',
   'and': 'and',
+
+  // Referral Program (Sprint 03)
+  'referral.input.title': 'Do you have a referral code?',
+  'referral.input.subtitle': 'Enter your friend\'s code to unlock rewards',
+  'referral.input.placeholder': 'Enter code',
+  'referral.input.verify': 'Verify Code',
+  'referral.input.skip': 'Skip for now',
+  'referral.input.invalid': 'Invalid code. Please check and try again.',
+  'referral.input.already_used': 'You\'ve already used a referral code.',
+  'referral.input.own_code': 'You cannot use your own referral code.',
+  'referral.input.success': 'Code verified! Welcome from {referrerName}!',
+  'verifying': 'Verifying...',
 };

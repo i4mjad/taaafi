@@ -3805,4 +3805,16 @@ const Map<String, String> kAr = {
   'your-current-tasks': 'مهامك الحالية',
   'remaining': 'متبقي',
   'and': 'و',
+
+  // Referral Program (Sprint 03)
+  'referral.input.title': 'هل لديك رمز إحالة؟',
+  'referral.input.subtitle': 'أدخل رمز صديقك لفتح المكافآت',
+  'referral.input.placeholder': 'أدخل الرمز',
+  'referral.input.verify': 'تحقق من الرمز',
+  'referral.input.skip': 'تخطي الآن',
+  'referral.input.invalid': 'رمز غير صالح. يرجى التحقق والمحاولة مرة أخرى.',
+  'referral.input.already_used': 'لقد استخدمت رمز إحالة بالفعل.',
+  'referral.input.own_code': 'لا يمكنك استخدام رمز الإحالة الخاص بك.',
+  'referral.input.success': 'تم التحقق من الرمز! مرحباً من {referrerName}!',
+  'verifying': 'جاري التحقق...',
 };
