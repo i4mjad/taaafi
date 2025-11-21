@@ -303,6 +303,18 @@ class AccountScreen extends ConsumerWidget {
                                   ),
                                 ),
                               verticalSpace(Spacing.points8),
+                              if (showMainContent)
+                                GestureDetector(
+                                  onTap: () {
+                                    context
+                                        .pushNamed(RouteNames.referralDashboard.name);
+                                  },
+                                  child: SettingsButton(
+                                    icon: LucideIcons.gift,
+                                    textKey: 'referral-program',
+                                  ),
+                                ),
+                              verticalSpace(Spacing.points8),
                               FeatureAccessGuard(
                                 featureUniqueName:
                                     AppFeaturesConfig.contactAdmin,

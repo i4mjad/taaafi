@@ -33,6 +33,7 @@ import 'package:reboot_app_3/features/authentication/presentation/signup_screen.
 import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
 import 'package:reboot_app_3/features/authentication/data/repositories/auth_repository.dart';
 import 'package:reboot_app_3/features/referral/presentation/screens/referral_code_input_screen.dart';
+import 'package:reboot_app_3/features/referral/presentation/screens/referral_dashboard_screen.dart';
 
 import 'package:reboot_app_3/features/community/presentation/community_onboarding_screen.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/groups_onboarding_screen.dart';
@@ -742,6 +743,14 @@ GoRouter goRouter(Ref<GoRouter> ref) {
                     pageBuilder: (context, state) => MaterialPage(
                       name: RouteNames.userProfile.name,
                       child: UserProfileScreen(),
+                    ),
+                  ),
+                  GoRoute(
+                    path: 'referral-dashboard',
+                    name: RouteNames.referralDashboard.name,
+                    pageBuilder: (context, state) => MaterialPage(
+                      name: RouteNames.referralDashboard.name,
+                      child: ReferralDashboardScreen(),
                     ),
                   ),
                   GoRoute(

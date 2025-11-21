@@ -15,6 +15,7 @@ enum RouteNames {
   confirmUserDetails,
   confirmUserEmail,
   referralCodeInput,
+  referralDashboard,
   loading,
   dayOverview,
   combinedTest,
