@@ -5,6 +5,8 @@ import { isChecklistComplete } from '../helpers/verificationStatus';
 import { calculateCompleteFraudScore } from '../fraud/fraudScoreCalculator';
 import { blockUserForFraud, flagUserForReview } from '../fraud/fraudActions';
 import { checkAccountAge } from '../helpers/checklistHelper';
+import { sendReferralNotification, getUserDisplayName } from '../notifications/notificationHelper';
+import { NotificationType } from '../notifications/notificationTypes';
 
 /**
  * Handles the completion of a user's verification checklist.
@@ -97,10 +99,55 @@ export async function handleVerificationCompletion(userId: string): Promise<void
       lastUpdatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
     
+    // Get updated stats to check for milestones
+    const updatedStatsDoc = await referrerStatsRef.get();
+    const updatedStats = updatedStatsDoc.data();
+    const totalVerified = updatedStats?.totalVerified || 1;
+    
     console.log(`✅ User ${userId} verified successfully! (fraud score: ${fraudScore})`);
     
+    // Send notifications
+    try {
+      // Get display names
+      const refereeName = await getUserDisplayName(userId);
+      const referrerName = await getUserDisplayName(verification.referrerId);
+      
+      // Notify referee about verification completion
+      await sendReferralNotification(
+        userId,
+        NotificationType.VERIFICATION_COMPLETE,
+        {}
+      );
+      
+      // Notify referrer about friend verification
+      await sendReferralNotification(
+        verification.referrerId,
+        NotificationType.FRIEND_VERIFIED,
+        {
+          friendName: refereeName,
+          progress: `${totalVerified}/5`,
+        }
+      );
+      
+      // Check if milestone reached (every 5 verifications)
+      if (totalVerified % 5 === 0) {
+        await sendReferralNotification(
+          verification.referrerId,
+          NotificationType.MILESTONE_REACHED,
+          {
+            reward: '1 month Premium',
+          }
+        );
+        console.log(`🎁 Milestone notification sent to referrer ${verification.referrerId}`);
+      }
+      
+      console.log("✅ Verification notifications sent successfully");
+    } catch (notificationError) {
+      // Log but don't fail the function if notifications fail
+      console.error("⚠️ Error sending verification notifications:", notificationError);
+    }
+    
     // Note: Reward awarding will be implemented in Sprint 11
-    // Note: Notifications will be implemented in Sprint 10
   }
 }
 

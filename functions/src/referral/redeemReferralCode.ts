@@ -5,6 +5,8 @@
 
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
+import { sendReferralNotification, getUserDisplayName } from "./notifications/notificationHelper";
+import { NotificationType } from "./notifications/notificationTypes";
 
 interface RedeemReferralCodeData {
   code: string;
@@ -180,6 +182,36 @@ export const redeemReferralCode = functions.https.onCall(
       console.log(
         `🎉 Referral code redeemed successfully! User ${userId} referred by ${referrerId}`
       );
+
+      // Send notifications
+      try {
+        // Get display names
+        const refereeName = await getUserDisplayName(userId);
+        const referrerName = await getUserDisplayName(referrerId);
+
+        // Notify referrer about new signup
+        await sendReferralNotification(
+          referrerId,
+          NotificationType.FRIEND_SIGNED_UP,
+          {
+            friendName: refereeName,
+          }
+        );
+
+        // Welcome notification for referee
+        await sendReferralNotification(
+          userId,
+          NotificationType.WELCOME,
+          {
+            referrerName: referrerName,
+          }
+        );
+
+        console.log("✅ Notifications sent successfully");
+      } catch (notificationError) {
+        // Log but don't fail the function if notifications fail
+        console.error("⚠️ Error sending notifications:", notificationError);
+      }
 
       // Return success with referrer info
       return {
