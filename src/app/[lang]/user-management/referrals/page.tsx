@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import { useTranslation } from '@/contexts/TranslationContext';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { RefreshCw, ShieldAlert, LayoutDashboard } from 'lucide-react';
+import { RefreshCw, ShieldAlert, LayoutDashboard, Search, Settings, BarChart3 } from 'lucide-react';
 import { SiteHeader } from '@/components/site-header';
 
 // Dashboard tab components
@@ -16,6 +16,15 @@ import { RecentActivity } from './dashboard/components/RecentActivity';
 
 // Fraud queue tab components
 import { FraudQueueTable } from './components/FraudQueueTable';
+
+// User lookup tab components
+import { UserLookupTab } from './components/UserLookupTab';
+
+// Manual adjustments tab components
+import { ManualAdjustmentsTab } from './components/ManualAdjustmentsTab';
+
+// Analytics tab components
+import { AnalyticsDashboardTab } from './components/AnalyticsDashboardTab';
 
 interface AggregateStats {
   totalReferrals: number;
@@ -171,7 +180,7 @@ export default function ReferralManagementPage() {
 
                 {/* Tabs */}
             <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-              <TabsList className="grid w-full grid-cols-2 max-w-md">
+              <TabsList className="grid w-full grid-cols-5 max-w-4xl">
                 <TabsTrigger value="dashboard" className="gap-2">
                   <LayoutDashboard className="h-4 w-4" />
                   {t('modules.userManagement.referralDashboard.tabs.dashboard')}
@@ -184,6 +193,18 @@ export default function ReferralManagementPage() {
                       {stats.flaggedForReview}
                     </span>
                   )}
+                </TabsTrigger>
+                <TabsTrigger value="user-lookup" className="gap-2">
+                  <Search className="h-4 w-4" />
+                  {t('modules.userManagement.referralDashboard.tabs.userLookup')}
+                </TabsTrigger>
+                <TabsTrigger value="adjustments" className="gap-2">
+                  <Settings className="h-4 w-4" />
+                  {t('modules.userManagement.referralDashboard.tabs.adjustments')}
+                </TabsTrigger>
+                <TabsTrigger value="analytics" className="gap-2">
+                  <BarChart3 className="h-4 w-4" />
+                  {t('modules.userManagement.referralDashboard.tabs.analytics')}
                 </TabsTrigger>
               </TabsList>
 
@@ -209,6 +230,21 @@ export default function ReferralManagementPage() {
               {/* Fraud Queue Tab */}
               <TabsContent value="fraud-queue" className="space-y-6">
                 <FraudQueueTable />
+              </TabsContent>
+
+              {/* User Lookup Tab */}
+              <TabsContent value="user-lookup" className="space-y-6">
+                <UserLookupTab />
+              </TabsContent>
+
+              {/* Manual Adjustments Tab */}
+              <TabsContent value="adjustments" className="space-y-6">
+                <ManualAdjustmentsTab />
+              </TabsContent>
+
+              {/* Analytics Tab */}
+              <TabsContent value="analytics" className="space-y-6">
+                <AnalyticsDashboardTab />
               </TabsContent>
             </Tabs>
           </div>
