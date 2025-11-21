@@ -698,6 +698,34 @@ class MessagingService with WidgetsBindingObserver {
           GoRouter.of(ctx).goNamed(RouteNames.notifications.name);
           break;
 
+        case 'friend_signed_up':
+        case 'friend_task_progress':
+        case 'friend_verified':
+        case 'friend_subscribed':
+        case 'milestone_reached':
+        case 'reward_ready':
+          // Referral notifications for referrer - navigate to referral dashboard
+          GoRouter.of(ctx).goNamed(RouteNames.referralDashboard.name);
+          break;
+
+        case 'welcome':
+        case 'task_completed':
+        case 'progress_update':
+        case 'verification_complete':
+        case 'premium_activated':
+          // Referral notifications for referee - navigate to checklist progress
+          final userId = data['userId'];
+          if (userId != null && userId.toString().isNotEmpty) {
+            GoRouter.of(ctx).pushNamed(
+              RouteNames.checklistProgress.name,
+              pathParameters: {'userId': userId.toString()},
+            );
+          } else {
+            // Fallback to referral dashboard
+            GoRouter.of(ctx).goNamed(RouteNames.referralDashboard.name);
+          }
+          break;
+
         default:
           // Unknown type, fallback to notifications
           GoRouter.of(ctx).goNamed(RouteNames.notifications.name);
