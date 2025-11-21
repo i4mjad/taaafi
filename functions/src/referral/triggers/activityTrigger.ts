@@ -5,6 +5,7 @@ import { isActionAlreadyCounted, markActionAsCounted } from '../helpers/actionTr
 import { handleVerificationCompletion } from '../handlers/verificationHandler';
 import { updateFraudScore } from '../fraud/fraudScoreCalculator';
 import { ReferralVerification } from '../types/referral.types';
+import { notifyReferrerAboutProgress, notifyRefereeAboutTaskCompletion } from '../notifications/notificationHelper';
 
 /**
  * Firestore trigger that tracks activity subscription for verification checklist.
@@ -69,6 +70,34 @@ export const onActivitySubscribed = functions.firestore
     await markActionAsCounted(userId, 'activityStarted', activityId);
 
     console.log(`✅ Activity subscription tracked for user ${userId}: started activity ${activityId}`);
+
+    // Send notifications
+    try {
+      // Count total completed tasks
+      const totalTasks = 6;
+      const completedTasks = Object.values(verification.checklist).filter(
+        (task: any) => task.completed
+      ).length + 1; // +1 for this task that just completed
+
+      // Notify referee about task completion
+      await notifyRefereeAboutTaskCompletion(
+        userId,
+        'Start 1 Recovery Activity',
+        completedTasks,
+        totalTasks
+      );
+
+      // Notify referrer about progress
+      await notifyReferrerAboutProgress(
+        verification.referrerId,
+        userId,
+        'Started a recovery activity'
+      );
+
+      console.log('✅ Task completion notifications sent');
+    } catch (notificationError) {
+      console.error('⚠️ Error sending task notifications:', notificationError);
+    }
 
     // Update fraud score
     try {

@@ -6,6 +6,7 @@ import { isActionAlreadyCounted, markActionAsCounted } from '../helpers/actionTr
 import { handleVerificationCompletion } from '../handlers/verificationHandler';
 import { updateFraudScore } from '../fraud/fraudScoreCalculator';
 import { ReferralVerification } from '../types/referral.types';
+import { notifyReferrerAboutProgress, notifyRefereeAboutTaskCompletion } from '../notifications/notificationHelper';
 
 /**
  * Firestore trigger that tracks forum post creation for verification checklist.
@@ -85,6 +86,36 @@ export const onForumPostCreated = functions.firestore
     await markActionAsCounted(userId, 'forumPost', postId);
 
     console.log(`✅ Forum post tracked for user ${userId}: ${newCount}/3 posts`);
+
+    // Send notifications if task completed
+    if (completed) {
+      try {
+        // Count total completed tasks
+        const totalTasks = 6;
+        const completedTasks = Object.values(verification.checklist).filter(
+          (task: any) => task.completed
+        ).length + 1; // +1 for this task that just completed
+
+        // Notify referee about task completion
+        await notifyRefereeAboutTaskCompletion(
+          userId,
+          'Post 3 Forum Posts',
+          completedTasks,
+          totalTasks
+        );
+
+        // Notify referrer about progress
+        await notifyReferrerAboutProgress(
+          verification.referrerId,
+          userId,
+          'Posted 3 times'
+        );
+
+        console.log('✅ Task completion notifications sent');
+      } catch (notificationError) {
+        console.error('⚠️ Error sending task notifications:', notificationError);
+      }
+    }
 
     // Update fraud score
     try {
