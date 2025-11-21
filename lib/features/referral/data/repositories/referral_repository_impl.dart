@@ -4,6 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 
 import '../../domain/entities/redemption_result.dart';
+import '../../domain/entities/redemption_response.dart';
+import '../../domain/entities/reward_breakdown.dart';
 import '../../domain/repositories/referral_repository.dart';
 import '../models/referral_code_model.dart';
 import '../models/referral_stats_model.dart';
@@ -184,6 +186,72 @@ class ReferralRepositoryImpl implements ReferralRepository {
     } catch (e, stackTrace) {
       log('Error in redeemReferralCode: $e', stackTrace: stackTrace);
       return RedemptionResult.error('referral.input.invalid');
+    }
+  }
+
+  @override
+  Future<RedemptionResponse> redeemReferralRewards() async {
+    try {
+      log('Attempting to redeem referral rewards');
+
+      final callable = _functions.httpsCallable('redeemReferralRewards');
+      final result = await callable.call();
+
+      final data = result.data as Map<String, dynamic>;
+
+      if (data['success'] == true) {
+        log('Referral rewards redeemed successfully');
+        return RedemptionResponse.success(
+          daysGranted: data['daysGranted'] as int,
+          expiresAt: DateTime.parse(data['expiresAt'] as String),
+          breakdown: data['breakdown'] as Map<String, dynamic>?,
+        );
+      } else {
+        final errorMessage = data['message'] as String? ?? 'Unknown error';
+        return RedemptionResponse.error(errorMessage);
+      }
+    } on FirebaseFunctionsException catch (e) {
+      log('FirebaseFunctionsException in redeemReferralRewards: ${e.code} - ${e.message}');
+
+      String errorMessage;
+      switch (e.code) {
+        case 'unauthenticated':
+          errorMessage = 'User must be authenticated';
+          break;
+        case 'failed-precondition':
+          errorMessage = e.message ?? 'Not eligible for rewards';
+          break;
+        case 'internal':
+          errorMessage = e.message ?? 'Failed to grant rewards';
+          break;
+        default:
+          errorMessage = e.message ?? 'Unknown error occurred';
+      }
+
+      return RedemptionResponse.error(errorMessage);
+    } catch (e, stackTrace) {
+      log('Error in redeemReferralRewards: $e', stackTrace: stackTrace);
+      return RedemptionResponse.error('Failed to redeem rewards');
+    }
+  }
+
+  @override
+  Future<RewardBreakdown?> getRewardBreakdown(String userId) async {
+    try {
+      log('Fetching reward breakdown for user: $userId');
+
+      final callable = _functions.httpsCallable('getRewardBreakdown');
+      final result = await callable.call({'userId': userId});
+
+      final data = result.data as Map<String, dynamic>;
+
+      return RewardBreakdown.fromJson(data);
+    } on FirebaseFunctionsException catch (e) {
+      log('FirebaseFunctionsException in getRewardBreakdown: ${e.code} - ${e.message}');
+      return null;
+    } catch (e, stackTrace) {
+      log('Error in getRewardBreakdown: $e', stackTrace: stackTrace);
+      return null;
     }
   }
 }

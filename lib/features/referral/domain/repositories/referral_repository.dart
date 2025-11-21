@@ -2,6 +2,8 @@ import '../../data/models/referral_code_model.dart';
 import '../../data/models/referral_stats_model.dart';
 import '../../data/models/referral_verification_model.dart';
 import '../entities/redemption_result.dart';
+import '../entities/redemption_response.dart';
+import '../entities/reward_breakdown.dart';
 
 abstract class ReferralRepository {
   /// Get user's referral code by user ID
@@ -24,4 +26,10 @@ abstract class ReferralRepository {
 
   /// Redeem a referral code for the current user
   Future<RedemptionResult> redeemReferralCode(String code);
+
+  /// Redeem accumulated referral rewards (Sprint 11)
+  Future<RedemptionResponse> redeemReferralRewards();
+
+  /// Get reward breakdown (Sprint 11)
+  Future<RewardBreakdown?> getRewardBreakdown(String userId);
 }
