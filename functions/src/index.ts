@@ -1668,3 +1668,14 @@ export const initReferralConfig = onCall(
 export { generateReferralCodeOnUserCreation } from './referral/generateReferralCode';
 export { backfillReferralCodes } from './referral/backfillReferralCodes';
 export { redeemReferralCode } from './referral/redeemReferralCode';
+
+// Export referral verification tracking triggers
+export { onForumPostCreated } from './referral/triggers/forumPostTrigger';
+export { onCommentCreated } from './referral/triggers/commentTrigger';
+export { onInteractionCreated } from './referral/triggers/interactionTrigger';
+export { onGroupMembershipCreated } from './referral/triggers/groupMembershipTrigger';
+export { onGroupMessageCreated } from './referral/triggers/groupMessageTrigger';
+export { onActivitySubscribed } from './referral/triggers/activityTrigger';
+
+// Export referral scheduled functions
+export { checkPendingVerificationAges } from './referral/scheduledChecks';
