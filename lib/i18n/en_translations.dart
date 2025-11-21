@@ -3973,11 +3973,22 @@ const Map<String, String> kEn = {
   'referral.dashboard.error_loading': 'Error loading data. Pull to refresh.',
   'referral.dashboard.no_code_title': 'No Referral Code',
   'referral.dashboard.no_code_message':
-      'Your referral code is being generated. Please check back in a moment.',
+      'Your referral code hasn\'t been generated yet. Click the button below to create yours!',
   'referral.dashboard.no_stats': 'No stats available yet',
   'referral.dashboard.progress_title': 'Detailed Progress',
   'referral.dashboard.progress_coming_soon':
       'Detailed progress tracking coming soon in Sprint 08!',
 
+  // Generate Code
+  'referral.dashboard.generate_code': 'Generate My Code',
+  'referral.dashboard.generating_code': 'Generating your referral code...',
+  'referral.dashboard.code_generated': 'Referral code generated successfully!',
+  'referral.dashboard.generation_failed':
+      'Failed to generate code. Please try again.',
+  'referral.dashboard.code_already_exists': 'You already have a referral code.',
+  'referral.dashboard.generation_limit_reached':
+      'You\'ve reached the maximum number of code generation attempts.',
+
   'common.ok': 'OK',
+  'common.error': 'Error',
 };

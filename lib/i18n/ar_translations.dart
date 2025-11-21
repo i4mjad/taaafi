@@ -3882,11 +3882,22 @@ const Map<String, String> kAr = {
   'referral.dashboard.error_loading': 'خطأ في تحميل البيانات. اسحب للتحديث.',
   'referral.dashboard.no_code_title': 'لا يوجد رمز إحالة',
   'referral.dashboard.no_code_message':
-      'جاري إنشاء رمز الإحالة الخاص بك. يرجى التحقق بعد لحظة.',
+      'لم يتم إنشاء رمز الإحالة الخاص بك بعد. انقر على الزر أدناه لإنشائه!',
   'referral.dashboard.no_stats': 'لا توجد إحصائيات متاحة بعد',
   'referral.dashboard.progress_title': 'التقدم التفصيلي',
   'referral.dashboard.progress_coming_soon':
       'تتبع التقدم التفصيلي قريباً في Sprint 08!',
 
+  // Generate Code
+  'referral.dashboard.generate_code': 'إنشاء رمزي',
+  'referral.dashboard.generating_code': 'جاري إنشاء رمز الإحالة الخاص بك...',
+  'referral.dashboard.code_generated': 'تم إنشاء رمز الإحالة بنجاح!',
+  'referral.dashboard.generation_failed':
+      'فشل إنشاء الرمز. يرجى المحاولة مرة أخرى.',
+  'referral.dashboard.code_already_exists': 'لديك بالفعل رمز إحالة.',
+  'referral.dashboard.generation_limit_reached':
+      'لقد وصلت إلى الحد الأقصى من محاولات إنشاء الرمز.',
+
   'common.ok': 'حسناً',
+  'common.error': 'خطأ',
 };

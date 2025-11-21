@@ -1668,6 +1668,7 @@ export const initReferralConfig = onCall(
 export { generateReferralCodeOnUserCreation } from './referral/generateReferralCode';
 export { backfillReferralCodes } from './referral/backfillReferralCodes';
 export { redeemReferralCode } from './referral/redeemReferralCode';
+export { generateUserReferralCode } from './referral/generateUserReferralCode';
 
 // Export referral verification tracking triggers
 export { onForumPostCreated } from './referral/triggers/forumPostTrigger';
