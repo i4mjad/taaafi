@@ -147,9 +147,9 @@ Automatic fraud detection checks for same device, rapid activity, same IP, and s
 - [x] Sprint 11 - RevenueCat reward integration
 - [ ] Sprint 12 - Admin dashboard overview page
 - [ ] Sprint 13 - Fraud detection review queue
-- [ ] Sprint 14 - User referral lookup & search
-- [ ] Sprint 15 - Manual adjustment tools
-- [ ] Sprint 16 - Analytics & reporting dashboard
+- [x] Sprint 14 - User referral lookup & search
+- [x] Sprint 15 - Manual adjustment tools
+- [x] Sprint 16 - Analytics & reporting dashboard
 - [ ] Sprint 17 - Admin testing & polish
 - [ ] Sprint 18 - End-to-end testing & bug fixes
 - [ ] Sprint 19 - Security audit & performance optimization
