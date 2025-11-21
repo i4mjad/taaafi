@@ -6,7 +6,7 @@ part of 'referral_code_input_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$referralCodeInputHash() => r'60a16fe9a1431abc9895fae8c87eac83ef1bdd3a';
+String _$referralCodeInputHash() => r'770774330868ada00f54a7ca15363e9624533661';
 
 /// See also [ReferralCodeInput].
 @ProviderFor(ReferralCodeInput)
