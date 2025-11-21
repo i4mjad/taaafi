@@ -425,23 +425,6 @@ class _RegistrationStepperScreenState
     );
   }
 
-  String _getStepLabel(int index) {
-    switch (index) {
-      case 0:
-        return AppLocalizations.of(context).translate('personal-info');
-      case 1:
-        return AppLocalizations.of(context).translate('preferences');
-      case 2:
-        return AppLocalizations.of(context).translate('recovery');
-      case 3:
-        return AppLocalizations.of(context).translate('verification');
-      case 4:
-        return AppLocalizations.of(context).translate('complete');
-      default:
-        return '';
-    }
-  }
-
   Widget _buildCurrentStepContent() {
     switch (_currentStep) {
       case 0:

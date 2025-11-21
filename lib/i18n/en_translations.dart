@@ -1095,7 +1095,6 @@ const Map<String, String> kEn = {
 
   // Short stepper labels for horizontal stepper
   "personal-info": "Personal Info",
-  "preferences": "Preferences",
   "recovery": "Recovery",
   "verification": "Verification",
   "referral": "Referral",

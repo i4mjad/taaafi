@@ -70,7 +70,12 @@ Automatic fraud detection checks for same device, rapid activity, same IP, and s
 
 ### After Each Sprint:
 1. Ensure app is **buildable** (no compilation errors)
-2. Hand your notes to the next sprint
+2. **Add implementation summary** to the sprint file itself (at the end)
+   - Include: Files created, architecture decisions, deployment info
+   - Include: Key commits, monitoring tips, known limitations
+   - Keep it concise but comprehensive
+3. Update sprint status in this README
+4. Hand your notes to the next sprint
 
 ---
 
