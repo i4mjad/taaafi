@@ -12,6 +12,7 @@ import '../../../../core/shared_widgets/snackbar.dart';
 import '../../../../core/shared_widgets/spinner.dart';
 import '../../../../core/theming/app-themes.dart';
 import '../../../../core/theming/text_styles.dart';
+import '../../application/referral_providers.dart';
 import '../providers/referral_dashboard_provider.dart';
 import '../widgets/how_it_works_sheet.dart';
 import '../widgets/referral_code_card.dart';
@@ -282,8 +283,9 @@ class ReferralDashboardScreen extends ConsumerWidget {
     BuildContext context,
     dynamic theme,
     AppLocalizations l10n,
-  ) {
-    showDialog(
+  ) async {
+    // Show confirmation dialog
+    final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(
@@ -298,12 +300,158 @@ class ReferralDashboardScreen extends ConsumerWidget {
         ),
         actions: [
           TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.translate('common.cancel')),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(l10n.translate('referral.dashboard.confirm_redeem')),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    if (!context.mounted) return;
+
+    // Show loading bottom sheet
+    showModalBottomSheet(
+      context: context,
+      isDismissible: false,
+      enableDrag: false,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: BoxDecoration(
+          color: theme.backgroundColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Spinner(),
+            const SizedBox(height: 20),
+            Text(
+              l10n.translate('referral.dashboard.redeeming_rewards'),
+              style: TextStyles.body.copyWith(
+                color: theme.grey[900],
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+          ],
+        ),
+      ),
+    );
+
+    try {
+      // Call repository to redeem rewards
+      final container = ProviderScope.containerOf(context);
+      final repository = container.read(referralRepositoryProvider);
+      final result = await repository.redeemReferralRewards();
+
+      // Close loading sheet
+      if (context.mounted) Navigator.of(context).pop();
+
+      if (result.success) {
+        // Show success dialog
+        if (context.mounted) {
+          _showSuccessDialog(
+            context,
+            theme,
+            l10n,
+            result.daysGranted!,
+            result.expiresAt!,
+          );
+
+          // Refresh the dashboard
+          container.invalidate(referralStatsProvider);
+          container.invalidate(referredUsersProvider);
+        }
+      } else {
+        // Show error message
+        if (context.mounted) {
+          _showErrorSheet(
+            context,
+            theme,
+            l10n,
+            result.errorMessage ?? l10n.translate('referral.dashboard.redemption_failed'),
+          );
+        }
+      }
+    } catch (e) {
+      // Close loading sheet
+      if (context.mounted) Navigator.of(context).pop();
+
+      // Show error
+      if (context.mounted) {
+        _showErrorSheet(
+          context,
+          theme,
+          l10n,
+          l10n.translate('referral.dashboard.redemption_failed'),
+        );
+      }
+    }
+  }
+
+  void _showSuccessDialog(
+    BuildContext context,
+    dynamic theme,
+    AppLocalizations l10n,
+    int daysGranted,
+    DateTime expiresAt,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            const Text('🎉 ', style: TextStyle(fontSize: 24)),
+            Expanded(
+              child: Text(
+                l10n.translate('referral.dashboard.redemption_success'),
+                style: TextStyles.h6.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              l10n
+                  .translate('referral.dashboard.days_granted')
+                  .replaceAll('{days}', daysGranted.toString()),
+              style: TextStyles.body,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              l10n
+                  .translate('referral.dashboard.expires_at')
+                  .replaceAll('{date}', _formatDate(expiresAt)),
+              style: TextStyles.caption.copyWith(
+                color: theme.grey[700],
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          ElevatedButton(
             onPressed: () => Navigator.of(context).pop(),
             child: Text(l10n.translate('common.ok')),
           ),
         ],
       ),
     );
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
   }
 
   Future<void> _generateReferralCode(
