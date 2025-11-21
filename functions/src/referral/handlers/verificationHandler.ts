@@ -2,7 +2,8 @@
 import * as admin from 'firebase-admin';
 import { ReferralVerification } from '../types/referral.types';
 import { isChecklistComplete } from '../helpers/verificationStatus';
-import { calculateFraudScore } from '../helpers/fraudDetection';
+import { calculateCompleteFraudScore } from '../fraud/fraudScoreCalculator';
+import { blockUserForFraud, flagUserForReview } from '../fraud/fraudActions';
 import { checkAccountAge } from '../helpers/checklistHelper';
 
 /**
@@ -48,45 +49,35 @@ export async function handleVerificationCompletion(userId: string): Promise<void
     return;
   }
   
-  // Calculate final fraud score
-  const fraudScore = await calculateFraudScore(userId);
+  // Calculate comprehensive fraud score
+  const fraudScoreResult = await calculateCompleteFraudScore(userId);
+  const fraudScore = fraudScoreResult.totalScore;
   
   // Update fraud score in verification document
   await verificationRef.update({
-    fraudScore,
+    fraudScore: fraudScore,
+    fraudFlags: fraudScoreResult.flags,
     lastCheckedAt: admin.firestore.FieldValue.serverTimestamp(),
   });
   
   // Fraud thresholds
-  const FRAUD_THRESHOLD_HIGH = 70;
-  const FRAUD_THRESHOLD_MEDIUM = 40;
+  const FRAUD_THRESHOLD_AUTO_BLOCK = 71;
+  const FRAUD_THRESHOLD_MANUAL_REVIEW = 40;
   
   // Take action based on fraud score
-  if (fraudScore > FRAUD_THRESHOLD_HIGH) {
-    // High risk: Block user and notify admin
-    await verificationRef.update({
-      verificationStatus: 'blocked',
-      isBlocked: true,
-      blockedReason: `High fraud score: ${fraudScore}`,
-      blockedAt: admin.firestore.FieldValue.serverTimestamp(),
-    });
-    
-    // Update referrer's stats (increment blocked count)
-    const referrerStatsRef = db.collection('referralStats').doc(verification.referrerId);
-    await referrerStatsRef.update({
-      blockedReferrals: admin.firestore.FieldValue.increment(1),
-      pendingVerifications: admin.firestore.FieldValue.increment(-1),
-      lastUpdatedAt: admin.firestore.FieldValue.serverTimestamp(),
-    });
+  if (fraudScore >= FRAUD_THRESHOLD_AUTO_BLOCK) {
+    // High risk: Block user automatically
+    await blockUserForFraud(
+      userId,
+      `Automatic block: High fraud score (${fraudScore})`,
+      fraudScore
+    );
     
     console.log(`🚫 User ${userId} blocked due to high fraud score: ${fraudScore}`);
     
-  } else if (fraudScore >= FRAUD_THRESHOLD_MEDIUM) {
+  } else if (fraudScore >= FRAUD_THRESHOLD_MANUAL_REVIEW) {
     // Medium risk: Flag for manual review
-    await verificationRef.update({
-      fraudFlags: admin.firestore.FieldValue.arrayUnion('flagged_for_review'),
-      lastCheckedAt: admin.firestore.FieldValue.serverTimestamp(),
-    });
+    await flagUserForReview(userId, fraudScore);
     
     console.log(`⚠️ User ${userId} flagged for review (fraud score: ${fraudScore})`);
     

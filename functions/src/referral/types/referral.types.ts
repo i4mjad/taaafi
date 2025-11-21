@@ -54,3 +54,27 @@ export interface FraudThresholds {
   highRisk: number;
   autoBlock: number;
 }
+
+export interface FraudCheckResult {
+  checkName: string;
+  score: number;
+  flag: string | null;
+  details?: any;
+}
+
+export interface FraudScoreResult {
+  totalScore: number;
+  flags: string[];
+  checks: FraudCheckResult[];
+}
+
+export interface FraudLog {
+  userId: string;
+  action: 'auto_block' | 'flagged' | 'manual_block' | 'approved';
+  fraudScore: number;
+  fraudFlags: string[];
+  reason: string;
+  performedBy: string; // 'system' or admin UID
+  timestamp: FirebaseFirestore.Timestamp;
+  details: object;
+}

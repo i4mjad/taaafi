@@ -1679,3 +1679,12 @@ export { onActivitySubscribed } from './referral/triggers/activityTrigger';
 
 // Export referral scheduled functions
 export { checkPendingVerificationAges } from './referral/scheduledChecks';
+
+// Export referral fraud management admin functions
+export { 
+  approveReferralVerification,
+  blockReferralUser,
+  getFraudDetails,
+  getFlaggedUsers,
+  recalculateFraudScore
+} from './referral/admin/fraudManagement';

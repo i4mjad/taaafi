@@ -4,6 +4,7 @@ import * as admin from 'firebase-admin';
 import { getUserIdFromCPIdCached } from '../helpers/userHelper';
 import { isActionAlreadyCounted, markActionAsCounted } from '../helpers/actionTrackingHelper';
 import { handleVerificationCompletion } from '../handlers/verificationHandler';
+import { updateFraudScore } from '../fraud/fraudScoreCalculator';
 import { ReferralVerification } from '../types/referral.types';
 
 /**
@@ -84,6 +85,14 @@ export const onForumPostCreated = functions.firestore
     await markActionAsCounted(userId, 'forumPost', postId);
 
     console.log(`✅ Forum post tracked for user ${userId}: ${newCount}/3 posts`);
+
+    // Update fraud score
+    try {
+      await updateFraudScore(userId);
+    } catch (error) {
+      console.error(`⚠️ Error updating fraud score for user ${userId}:`, error);
+      // Don't fail the main operation if fraud score update fails
+    }
 
     // Check if verification is complete
     if (completed) {

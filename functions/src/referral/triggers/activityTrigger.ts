@@ -3,6 +3,7 @@ import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 import { isActionAlreadyCounted, markActionAsCounted } from '../helpers/actionTrackingHelper';
 import { handleVerificationCompletion } from '../handlers/verificationHandler';
+import { updateFraudScore } from '../fraud/fraudScoreCalculator';
 import { ReferralVerification } from '../types/referral.types';
 
 /**
@@ -68,6 +69,14 @@ export const onActivitySubscribed = functions.firestore
     await markActionAsCounted(userId, 'activityStarted', activityId);
 
     console.log(`✅ Activity subscription tracked for user ${userId}: started activity ${activityId}`);
+
+    // Update fraud score
+    try {
+      await updateFraudScore(userId);
+    } catch (error) {
+      console.error(`⚠️ Error updating fraud score for user ${userId}:`, error);
+      // Don't fail the main operation if fraud score update fails
+    }
 
     // Check if verification is complete
     await handleVerificationCompletion(userId);

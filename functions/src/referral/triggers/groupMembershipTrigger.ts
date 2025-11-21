@@ -4,6 +4,7 @@ import * as admin from 'firebase-admin';
 import { getUserIdFromCPIdCached } from '../helpers/userHelper';
 import { isActionAlreadyCounted, markActionAsCounted } from '../helpers/actionTrackingHelper';
 import { handleVerificationCompletion } from '../handlers/verificationHandler';
+import { updateFraudScore } from '../fraud/fraudScoreCalculator';
 import { ReferralVerification } from '../types/referral.types';
 
 /**
@@ -80,6 +81,14 @@ export const onGroupMembershipCreated = functions.firestore
     await markActionAsCounted(userId, 'groupJoined', membershipId);
 
     console.log(`✅ Group join tracked for user ${userId}: joined group ${groupId}`);
+
+    // Update fraud score
+    try {
+      await updateFraudScore(userId);
+    } catch (error) {
+      console.error(`⚠️ Error updating fraud score for user ${userId}:`, error);
+      // Don't fail the main operation if fraud score update fails
+    }
 
     // Check if verification is complete
     await handleVerificationCompletion(userId);
