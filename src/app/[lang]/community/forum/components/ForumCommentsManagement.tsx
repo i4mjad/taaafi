@@ -13,8 +13,11 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MessageSquare, MoreHorizontal, Eye, EyeOff, Trash2, ExternalLink, AlertCircle, User, Shield } from 'lucide-react';
+import { MessageSquare, MoreHorizontal, Eye, EyeOff, Trash2, ExternalLink, AlertCircle, User, Shield, CheckCircle, XCircle } from 'lucide-react';
 import { ForumModerationBadge } from '@/components/forum/ForumModerationBadge';
+import { ModerationDetailPanel } from '@/components/forum/ModerationDetailPanel';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { Separator } from '@/components/ui/separator';
 import { format } from 'date-fns';
 import { Comment } from '@/types/community';
 import ModerationActionDialog from './ModerationActionDialog';
@@ -31,6 +34,8 @@ export default function ForumCommentsManagement() {
   const [selectedComment, setSelectedComment] = useState<Comment | null>(null);
   const [moderationOpen, setModerationOpen] = useState(false);
   const [moderationComment, setModerationComment] = useState<Comment | null>(null);
+  const [moderationDetailsOpen, setModerationDetailsOpen] = useState(false);
+  const [moderationDetailsComment, setModerationDetailsComment] = useState<Comment | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
@@ -116,6 +121,42 @@ export default function ForumCommentsManagement() {
       toast.success(t('modules.community.comments.deleteSuccess'));
     } catch (e) {
       toast.error(t('modules.community.comments.deleteError'));
+    }
+  };
+
+  const handleCommentModeration = async (
+    commentId: string,
+    action: 'approve' | 'block'
+  ) => {
+    try {
+      const commentRef = doc(db, 'comments', commentId);
+      const updates: any = {
+        'moderation.status': action === 'approve' ? 'approved' : 'blocked',
+        'moderation.moderatedBy': 'admin', // TODO: Get actual admin ID
+        'moderation.moderatedAt': new Date(),
+        updatedAt: new Date(),
+      };
+
+      if (action === 'approve') {
+        updates.isHidden = false; // Unhide when approving
+      } else if (action === 'block') {
+        updates.isHidden = true; // Hide when blocking
+      }
+
+      await updateDoc(commentRef, updates);
+      
+      toast.success(
+        action === 'approve' 
+          ? t('modules.community.forum.moderation.actions.approveSuccess')
+          : t('modules.community.forum.moderation.actions.blockSuccess')
+      );
+      
+      setModerationDetailsOpen(false);
+      return true;
+    } catch (error) {
+      console.error('Error moderating comment:', error);
+      toast.error(t('modules.community.forum.moderation.actions.error'));
+      return false;
     }
   };
 
@@ -278,7 +319,14 @@ export default function ForumCommentsManagement() {
                           )}
                         </div>
                       </TableCell>
-                      <TableCell className="text-center">
+                      <TableCell 
+                        className="text-center cursor-pointer hover:bg-accent/20"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setModerationDetailsComment(comment);
+                          setModerationDetailsOpen(true);
+                        }}
+                      >
                         <div className="flex items-center justify-center gap-1">
                           <ForumModerationBadge status={comment.moderation?.status} showIcon={false} />
                           {comment.moderation?.finalDecision && comment.moderation.finalDecision.confidence >= 0.85 && (
@@ -400,6 +448,69 @@ export default function ForumCommentsManagement() {
           contentStatus={{ isHidden: !!moderationComment.isHidden, isDeleted: !!moderationComment.isDeleted }}
         />
       )}
+
+      <Sheet open={moderationDetailsOpen} onOpenChange={setModerationDetailsOpen}>
+        <SheetContent className="overflow-y-auto w-full sm:max-w-2xl">
+          <SheetHeader>
+            <SheetTitle>{t('modules.community.forum.moderation.details.title')}</SheetTitle>
+            <SheetDescription>
+              {t('modules.community.forum.moderation.details.description')}
+            </SheetDescription>
+          </SheetHeader>
+          {moderationDetailsComment && (
+            <div className="mt-6 space-y-6">
+              <div className="space-y-2">
+                <h3 className="text-sm font-semibold">{t('modules.community.comments.body')}</h3>
+                <p className="text-sm text-muted-foreground">{moderationDetailsComment.body}</p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p className="font-semibold">{t('modules.community.comments.author')}</p>
+                  <p className="text-muted-foreground">{moderationDetailsComment.authorCPId}</p>
+                </div>
+                <div>
+                  <p className="font-semibold">{t('modules.community.posts.createdAt')}</p>
+                  <p className="text-muted-foreground">
+                    {format(moderationDetailsComment.createdAt, 'MMM dd, yyyy HH:mm')}
+                  </p>
+                </div>
+              </div>
+
+              <Separator />
+
+              <div className="flex gap-3">
+                <Button
+                  onClick={() => handleCommentModeration(moderationDetailsComment.id, 'approve')}
+                  className="flex-1"
+                  variant="default"
+                  disabled={moderationDetailsComment.moderation?.status === 'approved'}
+                >
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  {t('modules.community.forum.moderation.actions.approve')}
+                </Button>
+                <Button
+                  onClick={() => handleCommentModeration(moderationDetailsComment.id, 'block')}
+                  className="flex-1"
+                  variant="destructive"
+                  disabled={moderationDetailsComment.moderation?.status === 'blocked'}
+                >
+                  <XCircle className="h-4 w-4 mr-2" />
+                  {t('modules.community.forum.moderation.actions.block')}
+                </Button>
+              </div>
+
+              <Separator />
+
+              <ModerationDetailPanel
+                moderation={moderationDetailsComment.moderation}
+                isHidden={moderationDetailsComment.isHidden}
+                contentType="comment"
+              />
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
