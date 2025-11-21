@@ -3989,6 +3989,79 @@ const Map<String, String> kEn = {
   'referral.dashboard.generation_limit_reached':
       'You\'ve reached the maximum number of code generation attempts.',
 
+  // Checklist Progress UI
+  'referral.checklist.title': 'Verification Progress',
+  'referral.checklist.progress': '{completed} of {total} tasks',
+  'referral.checklist.subtitle': 'Complete tasks to unlock Premium!',
+  'referral.checklist.all_complete_message': 'Amazing! You\'ve completed all tasks!',
+  'referral.checklist.almost_there': 'You\'re almost there! Keep going!',
+  'referral.checklist.great_progress': 'Great progress! You\'re doing well!',
+  'referral.checklist.keep_going': 'Keep going! You\'re making progress!',
+  'referral.checklist.tasks_title': 'Verification Tasks',
+
+  // Checklist Items
+  'referral.checklist.account_age': 'Account Active 7 Days',
+  'referral.checklist.forum_posts': 'Post 3 Forum Posts',
+  'referral.checklist.interactions': '5 Interactions',
+  'referral.checklist.join_group': 'Join a Group',
+  'referral.checklist.group_messages': 'Send 3 Group Messages',
+  'referral.checklist.start_activity': 'Start 1 Recovery Activity',
+
+  // Progress indicators
+  'referral.checklist.completed': 'Completed',
+  'referral.checklist.in_progress': 'In Progress',
+  'referral.checklist.not_started': 'Not Started',
+  'referral.checklist.posts': 'posts',
+  'referral.checklist.interactions_count': 'interactions',
+  'referral.checklist.messages': 'messages',
+  'referral.checklist.not_joined': 'Not joined yet',
+  'referral.checklist.no_activity': 'No activity started',
+
+  // Time indicators
+  'referral.checklist.days_remaining': '{days} days remaining',
+  'referral.checklist.day_progress': 'Day {current} of {target}',
+  'referral.checklist.completed_days_ago': 'Completed {days} days ago',
+  'referral.checklist.completed_hours_ago': 'Completed {hours} hours ago',
+  'referral.checklist.completed_recently': 'Completed recently',
+
+  // Action buttons
+  'referral.checklist.go_to_forum': 'Go to Forum',
+  'referral.checklist.go_to_groups': 'Explore Groups',
+  'referral.checklist.go_to_group': 'Go to Group',
+  'referral.checklist.start_an_activity': 'Start Activity',
+
+  // Referrer info
+  'referral.checklist.referred_by': 'Referred by {name}',
+  'referral.checklist.help_referrer': 'Complete tasks to help them earn rewards!',
+
+  // Celebration
+  'referral.checklist.celebration_title': 'Congratulations! 🎉',
+  'referral.checklist.celebration_message': 'You\'re verified! Enjoy 3 days of Premium access.',
+  'referral.checklist.premium_reward': '3 Days Premium Access',
+  'referral.checklist.explore_premium': 'Explore Premium Features',
+  'referral.checklist.referrer_notified': 'Your friend has been notified of your achievement!',
+
+  // States
+  'referral.checklist.under_review': 'Under Review',
+  'referral.checklist.under_review_message': 'Your verification is under review. Our team will contact you soon.',
+  'referral.checklist.no_data_title': 'No Verification Data',
+  'referral.checklist.no_data_message': 'We couldn\'t find your verification progress.',
+
+  // What Happens Next
+  'referral.checklist.what_happens_next': 'What Happens Next?',
+  'referral.checklist.what_happens_title': 'After Verification',
+  'referral.checklist.step1_title': 'You Get Premium',
+  'referral.checklist.step1_message': 'Enjoy 3 days of Premium access with all features unlocked!',
+  'referral.checklist.step2_title': 'Friend Gets Progress',
+  'referral.checklist.step2_message': 'Your friend who referred you gets closer to earning rewards!',
+  'referral.checklist.step3_title': 'Continue Using App',
+  'referral.checklist.step3_message': 'Your Premium access starts immediately. Explore all features!',
+  'referral.checklist.step4_title': 'Subscribe for More',
+  'referral.checklist.step4_message': 'Love Premium? Subscribe and give your friend a 2-week bonus!',
+
   'common.ok': 'OK',
   'common.error': 'Error',
+  'common.loading': 'Loading...',
+  'common.view': 'View',
+  'common.got_it': 'Got it',
 };

@@ -34,6 +34,7 @@ import 'package:reboot_app_3/features/authentication/providers/user_document_pro
 import 'package:reboot_app_3/features/authentication/data/repositories/auth_repository.dart';
 import 'package:reboot_app_3/features/referral/presentation/screens/referral_code_input_screen.dart';
 import 'package:reboot_app_3/features/referral/presentation/screens/referral_dashboard_screen.dart';
+import 'package:reboot_app_3/features/referral/presentation/screens/checklist_progress_screen.dart';
 
 import 'package:reboot_app_3/features/community/presentation/community_onboarding_screen.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/groups_onboarding_screen.dart';
@@ -751,6 +752,16 @@ GoRouter goRouter(Ref<GoRouter> ref) {
                     pageBuilder: (context, state) => MaterialPage(
                       name: RouteNames.referralDashboard.name,
                       child: ReferralDashboardScreen(),
+                    ),
+                  ),
+                  GoRoute(
+                    path: 'checklist-progress/:userId',
+                    name: RouteNames.checklistProgress.name,
+                    pageBuilder: (context, state) => MaterialPage(
+                      name: RouteNames.checklistProgress.name,
+                      child: ChecklistProgressScreen(
+                        userId: state.pathParameters['userId']!,
+                      ),
                     ),
                   ),
                   GoRoute(

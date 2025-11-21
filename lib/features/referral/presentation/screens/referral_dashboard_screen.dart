@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 
 import '../../../../core/localization/localization.dart';
+import '../../../../core/routing/route_names.dart';
 import '../../../../core/shared_widgets/app_bar.dart';
 import '../../../../core/shared_widgets/container.dart';
 import '../../../../core/shared_widgets/snackbar.dart';
@@ -115,9 +117,11 @@ class ReferralDashboardScreen extends ConsumerWidget {
                   return ReferralListWidget(
                     referrals: referredUsers,
                     onTap: (referral) {
-                      // Navigate to detailed progress (Sprint 08)
-                      // For now, just show coming soon
-                      _showComingSoonDialog(context, theme, l10n);
+                      // Navigate to detailed progress
+                      context.pushNamed(
+                        RouteNames.checklistProgress.name,
+                        pathParameters: {'userId': referral.userId},
+                      );
                     },
                   );
                 },
@@ -306,34 +310,6 @@ class ReferralDashboardScreen extends ConsumerWidget {
         ),
         content: Text(
           l10n.translate('referral.dashboard.redeem_message'),
-          style: TextStyles.body,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(l10n.translate('common.ok')),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showComingSoonDialog(
-    BuildContext context,
-    dynamic theme,
-    AppLocalizations l10n,
-  ) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(
-          l10n.translate('referral.dashboard.progress_title'),
-          style: TextStyles.h6.copyWith(
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        content: Text(
-          l10n.translate('referral.dashboard.progress_coming_soon'),
           style: TextStyles.body,
         ),
         actions: [

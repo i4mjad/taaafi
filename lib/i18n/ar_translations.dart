@@ -3898,6 +3898,79 @@ const Map<String, String> kAr = {
   'referral.dashboard.generation_limit_reached':
       'لقد وصلت إلى الحد الأقصى من محاولات إنشاء الرمز.',
 
+  // Checklist Progress UI
+  'referral.checklist.title': 'تقدم التحقق',
+  'referral.checklist.progress': '{completed} من {total} مهام',
+  'referral.checklist.subtitle': 'أكمل المهام لفتح الباقة المميزة!',
+  'referral.checklist.all_complete_message': 'رائع! لقد أكملت جميع المهام!',
+  'referral.checklist.almost_there': 'أنت على وشك الانتهاء! استمر!',
+  'referral.checklist.great_progress': 'تقدم رائع! أنت تقوم بعمل جيد!',
+  'referral.checklist.keep_going': 'استمر! أنت تحرز تقدماً!',
+  'referral.checklist.tasks_title': 'مهام التحقق',
+
+  // Checklist Items
+  'referral.checklist.account_age': 'حساب نشط لمدة 7 أيام',
+  'referral.checklist.forum_posts': 'نشر 3 منشورات في المنتدى',
+  'referral.checklist.interactions': '5 تفاعلات',
+  'referral.checklist.join_group': 'الانضمام إلى مجموعة',
+  'referral.checklist.group_messages': 'إرسال 3 رسائل في المجموعة',
+  'referral.checklist.start_activity': 'بدء نشاط تعافي واحد',
+
+  // Progress indicators
+  'referral.checklist.completed': 'مكتمل',
+  'referral.checklist.in_progress': 'قيد التنفيذ',
+  'referral.checklist.not_started': 'لم يبدأ',
+  'referral.checklist.posts': 'منشورات',
+  'referral.checklist.interactions_count': 'تفاعلات',
+  'referral.checklist.messages': 'رسائل',
+  'referral.checklist.not_joined': 'لم تنضم بعد',
+  'referral.checklist.no_activity': 'لم يتم بدء أي نشاط',
+
+  // Time indicators
+  'referral.checklist.days_remaining': '{days} أيام متبقية',
+  'referral.checklist.day_progress': 'اليوم {current} من {target}',
+  'referral.checklist.completed_days_ago': 'أكمل قبل {days} أيام',
+  'referral.checklist.completed_hours_ago': 'أكمل قبل {hours} ساعات',
+  'referral.checklist.completed_recently': 'أكمل مؤخراً',
+
+  // Action buttons
+  'referral.checklist.go_to_forum': 'الذهاب إلى المنتدى',
+  'referral.checklist.go_to_groups': 'استكشاف المجموعات',
+  'referral.checklist.go_to_group': 'الذهاب إلى المجموعة',
+  'referral.checklist.start_an_activity': 'بدء نشاط',
+
+  // Referrer info
+  'referral.checklist.referred_by': 'تمت إحالتك من قبل {name}',
+  'referral.checklist.help_referrer': 'أكمل المهام لمساعدتهم على كسب المكافآت!',
+
+  // Celebration
+  'referral.checklist.celebration_title': 'تهانينا! 🎉',
+  'referral.checklist.celebration_message': 'تم التحقق منك! استمتع بـ 3 أيام من الباقة المميزة.',
+  'referral.checklist.premium_reward': '3 أيام باقة مميزة',
+  'referral.checklist.explore_premium': 'استكشف ميزات الباقة المميزة',
+  'referral.checklist.referrer_notified': 'تم إخطار صديقك بإنجازك!',
+
+  // States
+  'referral.checklist.under_review': 'قيد المراجعة',
+  'referral.checklist.under_review_message': 'التحقق الخاص بك قيد المراجعة. سيتصل بك فريقنا قريباً.',
+  'referral.checklist.no_data_title': 'لا توجد بيانات التحقق',
+  'referral.checklist.no_data_message': 'لم نتمكن من العثور على تقدم التحقق الخاص بك.',
+
+  // What Happens Next
+  'referral.checklist.what_happens_next': 'ماذا سيحدث بعد ذلك؟',
+  'referral.checklist.what_happens_title': 'بعد التحقق',
+  'referral.checklist.step1_title': 'تحصل على الباقة المميزة',
+  'referral.checklist.step1_message': 'استمتع بـ 3 أيام من الباقة المميزة مع جميع الميزات المفتوحة!',
+  'referral.checklist.step2_title': 'صديقك يحرز تقدماً',
+  'referral.checklist.step2_message': 'صديقك الذي أحالك يقترب من كسب المكافآت!',
+  'referral.checklist.step3_title': 'استمر في استخدام التطبيق',
+  'referral.checklist.step3_message': 'يبدأ الوصول المميز على الفور. استكشف جميع الميزات!',
+  'referral.checklist.step4_title': 'اشترك للمزيد',
+  'referral.checklist.step4_message': 'أعجبتك الباقة المميزة؟ اشترك وامنح صديقك مكافأة أسبوعين!',
+
   'common.ok': 'حسناً',
   'common.error': 'خطأ',
+  'common.loading': 'جارٍ التحميل...',
+  'common.view': 'عرض',
+  'common.got_it': 'فهمت',
 };

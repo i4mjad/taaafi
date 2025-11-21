@@ -73,6 +73,26 @@ class ReferralRepositoryImpl implements ReferralRepository {
   }
 
   @override
+  Stream<ReferralVerificationModel?> getUserVerificationStream(
+      String userId) {
+    try {
+      return _firestore
+          .collection('referralVerifications')
+          .doc(userId)
+          .snapshots()
+          .map((snapshot) {
+        if (!snapshot.exists) {
+          return null;
+        }
+        return ReferralVerificationModel.fromFirestore(snapshot);
+      });
+    } catch (e, stackTrace) {
+      log('Error in getUserVerificationStream: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
   Future<bool> validateReferralCode(String code) async {
     try {
       final querySnapshot = await _firestore

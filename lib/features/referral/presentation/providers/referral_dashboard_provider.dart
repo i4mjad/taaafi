@@ -45,3 +45,11 @@ Future<List<ReferralVerificationModel>> referredUsers(
   return await repository.getReferredUsers(userId);
 }
 
+/// Provider for user's verification progress (real-time stream)
+@riverpod
+Stream<ReferralVerificationModel?> userVerificationProgress(
+    UserVerificationProgressRef ref, String userId) {
+  final repository = ref.watch(referralRepositoryProvider);
+  return repository.getUserVerificationStream(userId);
+}
+

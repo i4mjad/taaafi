@@ -13,6 +13,9 @@ abstract class ReferralRepository {
   /// Get list of users referred by this user
   Future<List<ReferralVerificationModel>> getReferredUsers(String userId);
 
+  /// Get real-time stream of user's verification progress
+  Stream<ReferralVerificationModel?> getUserVerificationStream(String userId);
+
   /// Validate if a referral code exists and is active
   Future<bool> validateReferralCode(String code);
 
