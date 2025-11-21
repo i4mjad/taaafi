@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/localization/localization.dart';
 import '../../../../core/theming/app-themes.dart';
-import '../../../../core/theming/spacing.dart';
 import '../../../../core/theming/text_styles.dart';
 import '../../data/models/referral_verification_model.dart';
 
@@ -223,7 +222,7 @@ class _ReferralListItem extends StatelessWidget {
     return _StatusInfo(
       icon: '⏳',
       label: l10n.translate('referral.dashboard.status_pending'),
-      color: theme.warning[600]!,
+      color: theme.warn[600]!,
     );
   }
 }

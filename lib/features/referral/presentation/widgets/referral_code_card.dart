@@ -7,7 +7,6 @@ import 'package:share_plus/share_plus.dart';
 import '../../../../core/localization/localization.dart';
 import '../../../../core/shared_widgets/snackbar.dart';
 import '../../../../core/theming/app-themes.dart';
-import '../../../../core/theming/spacing.dart';
 import '../../../../core/theming/text_styles.dart';
 
 class ReferralCodeCard extends ConsumerWidget {
@@ -111,11 +110,7 @@ class ReferralCodeCard extends ConsumerWidget {
 
   void _copyToClipboard(BuildContext context, AppLocalizations l10n) {
     Clipboard.setData(ClipboardData(text: code));
-    showCustomSnackbar(
-      context,
-      l10n.translate('referral.dashboard.code_copied'),
-      SnackbarType.success,
-    );
+    getSuccessSnackBar(context, 'referral.dashboard.code_copied');
   }
 
   void _shareCode(BuildContext context, AppLocalizations l10n) {

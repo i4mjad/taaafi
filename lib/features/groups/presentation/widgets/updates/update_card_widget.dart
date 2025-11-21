@@ -167,24 +167,24 @@ class UpdateCardWidget extends ConsumerWidget {
   ) {
     // Check if content should be redacted
     final bool shouldRedact = update.shouldBeRedacted();
-    
+
     if (shouldRedact) {
       return Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: theme.warning[50],
+          color: theme.warn[50],
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: theme.warning[200]!, width: 1),
+          border: Border.all(color: theme.warn[200]!, width: 1),
         ),
         child: Row(
           children: [
-            Icon(LucideIcons.eye, size: 16, color: theme.warning[700]),
+            Icon(LucideIcons.eye, size: 16, color: theme.warn[700]),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
                 l10n.translate('update-under-review'),
                 style: TextStyles.small.copyWith(
-                  color: theme.warning[700],
+                  color: theme.warn[700],
                   fontStyle: FontStyle.italic,
                 ),
               ),

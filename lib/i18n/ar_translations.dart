@@ -3818,7 +3818,7 @@ const Map<String, String> kAr = {
   'referral.input.own_code': 'لا يمكنك استخدام رمز الإحالة الخاص بك.',
   'referral.input.success': 'تم التحقق من الرمز! مرحباً من {referrerName}!',
   'verifying': 'جاري التحقق...',
-  
+
   // Referral Dashboard
   'referral-program': 'برنامج الإحالة',
   'referral.dashboard.title': 'برنامج الإحالة',
@@ -3826,26 +3826,29 @@ const Map<String, String> kAr = {
   'referral.dashboard.code_copied': 'تم نسخ الرمز!',
   'referral.dashboard.share_code': 'مشاركة الرمز',
   'referral.dashboard.share_subject': 'انضم إلي على تعافي',
-  'referral.dashboard.share_message': 'انضم إلي على تعافي للدعم في رحلة التعافي!\n\nاستخدم رمزي: {code}\nاحصل على 3 أيام مجانية من البريميوم عند التحقق من حسابك.\n\nحمل التطبيق الآن!',
-  
+  'referral.dashboard.share_message':
+      'انضم إلي على تعافي للدعم في رحلة التعافي!\n\nاستخدم رمزي: {code}\nاحصل على 3 أيام مجانية من البريميوم عند التحقق من حسابك.\n\nحمل التطبيق الآن!',
+
   // Stats
   'referral.dashboard.stats_title': 'إحصائيات الإحالة',
   'referral.dashboard.total_referrals': 'الإجمالي',
   'referral.dashboard.verified': 'محققون',
   'referral.dashboard.paid_conversions': 'بريميوم',
   'referral.dashboard.pending': 'قيد الانتظار',
-  
+
   // Rewards
   'referral.dashboard.rewards_title': 'المكافآت المكتسبة',
   'referral.dashboard.months_earned': 'أشهر بريميوم',
   'referral.dashboard.weeks_earned': 'أسابيع بريميوم',
   'referral.dashboard.no_rewards_yet': 'ابدأ المشاركة لكسب المكافآت!',
   'referral.dashboard.next_reward': 'المكافأة التالية',
-  'referral.dashboard.users_to_next_milestone': '{count} مستخدمين محققين أكثر لفتح شهر بريميوم واحد',
+  'referral.dashboard.users_to_next_milestone':
+      '{count} مستخدمين محققين أكثر لفتح شهر بريميوم واحد',
   'referral.dashboard.redeem_rewards': 'استلام المكافآت',
   'referral.dashboard.redeem_title': 'الاستلام قريباً',
-  'referral.dashboard.redeem_message': 'سيكون استلام المكافآت متاحاً في التحديث القادم. مكافآتك آمنة!',
-  
+  'referral.dashboard.redeem_message':
+      'سيكون استلام المكافآت متاحاً في التحديث القادم. مكافآتك آمنة!',
+
   // Referral List
   'referral.dashboard.your_referrals': 'إحالاتك',
   'referral.dashboard.no_referrals_title': 'لا توجد إحالات بعد',
@@ -3854,14 +3857,15 @@ const Map<String, String> kAr = {
   'referral.dashboard.status_pending': 'قيد الانتظار',
   'referral.dashboard.status_premium': 'بريميوم',
   'referral.dashboard.status_blocked': 'محظور',
-  
+
   // How It Works
   'referral.dashboard.how_it_works': 'كيف يعمل',
   'referral.how_it_works.title': 'كيف يعمل برنامج الإحالة',
   'referral.how_it_works.step1_title': 'شارك رمزك',
   'referral.how_it_works.step1_description': 'شارك رمزك الفريد مع الأصدقاء',
   'referral.how_it_works.step2_title': 'ينضمون ويتحققون',
-  'referral.how_it_works.step2_description': 'يكمل المستخدمون الجدد أنشطة بسيطة:',
+  'referral.how_it_works.step2_description':
+      'يكمل المستخدمون الجدد أنشطة بسيطة:',
   'referral.how_it_works.checklist_active_7_days': 'كن نشطاً لمدة 7 أيام',
   'referral.how_it_works.checklist_forum_posts': 'انشر 3 منشورات في المنتدى',
   'referral.how_it_works.checklist_interactions': 'تفاعل 5 مرات',
@@ -3869,17 +3873,20 @@ const Map<String, String> kAr = {
   'referral.how_it_works.checklist_activity': 'ابدأ نشاط تعافي واحد',
   'referral.how_it_works.step3_title': 'اكسب المكافآت',
   'referral.how_it_works.step3_description': 'احصل على وصول بريميوم مجاناً!',
-  'referral.how_it_works.reward_verified': 'كل 5 مستخدمين محققين = شهر بريميوم واحد',
+  'referral.how_it_works.reward_verified':
+      'كل 5 مستخدمين محققين = شهر بريميوم واحد',
   'referral.how_it_works.reward_paid': 'عند اشتراكهم = +2 أسبوع إضافي',
   'referral.how_it_works.got_it': 'حسناً',
-  
+
   // Errors and Empty States
   'referral.dashboard.error_loading': 'خطأ في تحميل البيانات. اسحب للتحديث.',
   'referral.dashboard.no_code_title': 'لا يوجد رمز إحالة',
-  'referral.dashboard.no_code_message': 'جاري إنشاء رمز الإحالة الخاص بك. يرجى التحقق بعد لحظة.',
+  'referral.dashboard.no_code_message':
+      'جاري إنشاء رمز الإحالة الخاص بك. يرجى التحقق بعد لحظة.',
   'referral.dashboard.no_stats': 'لا توجد إحصائيات متاحة بعد',
   'referral.dashboard.progress_title': 'التقدم التفصيلي',
-  'referral.dashboard.progress_coming_soon': 'تتبع التقدم التفصيلي قريباً في Sprint 08!',
-  
+  'referral.dashboard.progress_coming_soon':
+      'تتبع التقدم التفصيلي قريباً في Sprint 08!',
+
   'common.ok': 'حسناً',
 };

@@ -6,7 +6,6 @@ import '../../../../core/localization/localization.dart';
 import '../../../../core/shared_widgets/app_bar.dart';
 import '../../../../core/shared_widgets/spinner.dart';
 import '../../../../core/theming/app-themes.dart';
-import '../../../../core/theming/spacing.dart';
 import '../../../../core/theming/text_styles.dart';
 import '../providers/referral_dashboard_provider.dart';
 import '../widgets/how_it_works_sheet.dart';
@@ -32,10 +31,9 @@ class ReferralDashboardScreen extends ConsumerWidget {
       appBar: appBar(
         context,
         ref,
-        'referral-dashboard',
+        'referral.dashboard.title',
         false,
         true,
-        titleText: l10n.translate('referral.dashboard.title'),
       ),
       body: RefreshIndicator(
         onRefresh: () async {
@@ -212,10 +210,10 @@ class ReferralDashboardScreen extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: theme.warning[50],
+        color: theme.warn[50],
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: theme.warning[200]!,
+          color: theme.warn[200]!,
           width: 1,
         ),
       ),

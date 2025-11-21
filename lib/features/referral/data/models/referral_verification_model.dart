@@ -131,14 +131,12 @@ class ReferralVerificationModel extends ReferralVerificationEntity {
       'signupDate': Timestamp.fromDate(signupDate),
       'currentTier': currentTier,
       'checklist': {
-        'accountAge7Days':
-            ChecklistItemModel.fromEntity(accountAge7Days).toMap(),
-        'forumPosts3': ChecklistItemModel.fromEntity(forumPosts3).toMap(),
-        'interactions5': ChecklistItemModel.fromEntity(interactions5).toMap(),
-        'groupJoined': ChecklistItemModel.fromEntity(groupJoined).toMap(),
-        'groupMessages3': ChecklistItemModel.fromEntity(groupMessages3).toMap(),
-        'activityStarted':
-            ChecklistItemModel.fromEntity(activityStarted).toMap(),
+        'accountAge7Days': _checklistItemToMap(accountAge7Days),
+        'forumPosts3': _checklistItemToMap(forumPosts3),
+        'interactions5': _checklistItemToMap(interactions5),
+        'groupJoined': _checklistItemToMap(groupJoined),
+        'groupMessages3': _checklistItemToMap(groupMessages3),
+        'activityStarted': _checklistItemToMap(activityStarted),
       },
       'verificationStatus': verificationStatus,
       'verifiedAt':
@@ -156,16 +154,18 @@ class ReferralVerificationModel extends ReferralVerificationEntity {
     };
   }
 
-  /// Helper factory method to convert from entity
-  static ChecklistItemModel fromEntity(ChecklistItemEntity entity) {
-    return ChecklistItemModel(
-      completed: entity.completed,
-      completedAt: entity.completedAt,
-      current: entity.current,
-      groupId: entity.groupId,
-      activityId: entity.activityId,
-      uniqueUsers: entity.uniqueUsers,
-    );
+  /// Helper method to convert checklist item to map
+  Map<String, dynamic> _checklistItemToMap(ChecklistItemEntity entity) {
+    return {
+      'completed': entity.completed,
+      'completedAt': entity.completedAt != null
+          ? Timestamp.fromDate(entity.completedAt!)
+          : null,
+      if (entity.current != null) 'current': entity.current,
+      if (entity.groupId != null) 'groupId': entity.groupId,
+      if (entity.activityId != null) 'activityId': entity.activityId,
+      if (entity.uniqueUsers != null) 'uniqueUsers': entity.uniqueUsers,
+    };
   }
 
   /// Convert to domain entity

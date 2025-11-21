@@ -3906,7 +3906,7 @@ const Map<String, String> kEn = {
   'referral.input.own_code': 'You cannot use your own referral code.',
   'referral.input.success': 'Code verified! Welcome from {referrerName}!',
   'verifying': 'Verifying...',
-  
+
   // Referral Dashboard
   'referral-program': 'Referral Program',
   'referral.dashboard.title': 'Referral Program',
@@ -3914,60 +3914,70 @@ const Map<String, String> kEn = {
   'referral.dashboard.code_copied': 'Code copied to clipboard!',
   'referral.dashboard.share_code': 'Share Code',
   'referral.dashboard.share_subject': 'Join me on Ta3afi',
-  'referral.dashboard.share_message': 'Join me on Ta3afi for recovery support!\n\nUse my code: {code}\nGet 3 days Premium free when you verify your account.\n\nDownload now!',
-  
+  'referral.dashboard.share_message':
+      'Join me on Ta3afi for recovery support!\n\nUse my code: {code}\nGet 3 days Premium free when you verify your account.\n\nDownload now!',
+
   // Stats
   'referral.dashboard.stats_title': 'Referral Stats',
   'referral.dashboard.total_referrals': 'Total',
   'referral.dashboard.verified': 'Verified',
   'referral.dashboard.paid_conversions': 'Premium',
   'referral.dashboard.pending': 'Pending',
-  
+
   // Rewards
   'referral.dashboard.rewards_title': 'Rewards Earned',
   'referral.dashboard.months_earned': 'Months Premium',
   'referral.dashboard.weeks_earned': 'Weeks Premium',
   'referral.dashboard.no_rewards_yet': 'Start sharing to earn rewards!',
   'referral.dashboard.next_reward': 'Next Reward',
-  'referral.dashboard.users_to_next_milestone': '{count} more verified users to unlock 1 month Premium',
+  'referral.dashboard.users_to_next_milestone':
+      '{count} more verified users to unlock 1 month Premium',
   'referral.dashboard.redeem_rewards': 'Redeem Rewards',
   'referral.dashboard.redeem_title': 'Redeem Coming Soon',
-  'referral.dashboard.redeem_message': 'Reward redemption will be available in the next update. Your rewards are safe!',
-  
+  'referral.dashboard.redeem_message':
+      'Reward redemption will be available in the next update. Your rewards are safe!',
+
   // Referral List
   'referral.dashboard.your_referrals': 'Your Referrals',
   'referral.dashboard.no_referrals_title': 'No referrals yet',
-  'referral.dashboard.no_referrals_message': 'Share your code to start earning rewards!',
+  'referral.dashboard.no_referrals_message':
+      'Share your code to start earning rewards!',
   'referral.dashboard.status_verified': 'Verified',
   'referral.dashboard.status_pending': 'Pending',
   'referral.dashboard.status_premium': 'Premium',
   'referral.dashboard.status_blocked': 'Blocked',
-  
+
   // How It Works
   'referral.dashboard.how_it_works': 'How It Works',
   'referral.how_it_works.title': 'How Referral Program Works',
   'referral.how_it_works.step1_title': 'Share Your Code',
-  'referral.how_it_works.step1_description': 'Share your unique code with friends',
+  'referral.how_it_works.step1_description':
+      'Share your unique code with friends',
   'referral.how_it_works.step2_title': 'They Join & Verify',
-  'referral.how_it_works.step2_description': 'New users complete simple activities:',
+  'referral.how_it_works.step2_description':
+      'New users complete simple activities:',
   'referral.how_it_works.checklist_active_7_days': 'Be active for 7 days',
   'referral.how_it_works.checklist_forum_posts': 'Post 3 forum posts',
   'referral.how_it_works.checklist_interactions': 'Interact 5 times',
-  'referral.how_it_works.checklist_group_join': 'Join a group & send 3 messages',
+  'referral.how_it_works.checklist_group_join':
+      'Join a group & send 3 messages',
   'referral.how_it_works.checklist_activity': 'Start 1 recovery activity',
   'referral.how_it_works.step3_title': 'You Earn Rewards',
   'referral.how_it_works.step3_description': 'Get Premium access for free!',
-  'referral.how_it_works.reward_verified': 'Every 5 verified users = 1 month Premium',
+  'referral.how_it_works.reward_verified':
+      'Every 5 verified users = 1 month Premium',
   'referral.how_it_works.reward_paid': 'When they subscribe = +2 weeks bonus',
   'referral.how_it_works.got_it': 'Got it',
-  
+
   // Errors and Empty States
   'referral.dashboard.error_loading': 'Error loading data. Pull to refresh.',
   'referral.dashboard.no_code_title': 'No Referral Code',
-  'referral.dashboard.no_code_message': 'Your referral code is being generated. Please check back in a moment.',
+  'referral.dashboard.no_code_message':
+      'Your referral code is being generated. Please check back in a moment.',
   'referral.dashboard.no_stats': 'No stats available yet',
   'referral.dashboard.progress_title': 'Detailed Progress',
-  'referral.dashboard.progress_coming_soon': 'Detailed progress tracking coming soon in Sprint 08!',
-  
+  'referral.dashboard.progress_coming_soon':
+      'Detailed progress tracking coming soon in Sprint 08!',
+
   'common.ok': 'OK',
 };

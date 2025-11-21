@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/localization/localization.dart';
 import '../../../../core/theming/app-themes.dart';
-import '../../../../core/theming/spacing.dart';
 import '../../../../core/theming/text_styles.dart';
 import '../../data/models/referral_stats_model.dart';
 
@@ -41,7 +40,7 @@ class ReferralStatsCard extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 20),
-          
+
           // Stats grid
           Column(
             children: [
@@ -50,7 +49,8 @@ class ReferralStatsCard extends ConsumerWidget {
                   Expanded(
                     child: _StatItem(
                       icon: '👥',
-                      label: l10n.translate('referral.dashboard.total_referrals'),
+                      label:
+                          l10n.translate('referral.dashboard.total_referrals'),
                       value: stats.totalReferred.toString(),
                       theme: theme,
                     ),
@@ -73,7 +73,8 @@ class ReferralStatsCard extends ConsumerWidget {
                   Expanded(
                     child: _StatItem(
                       icon: '💰',
-                      label: l10n.translate('referral.dashboard.paid_conversions'),
+                      label:
+                          l10n.translate('referral.dashboard.paid_conversions'),
                       value: stats.totalPaidConversions.toString(),
                       theme: theme,
                       valueColor: theme.primary[600],
@@ -86,7 +87,7 @@ class ReferralStatsCard extends ConsumerWidget {
                       label: l10n.translate('referral.dashboard.pending'),
                       value: stats.pendingVerifications.toString(),
                       theme: theme,
-                      valueColor: theme.warning[600],
+                      valueColor: theme.warn[600],
                     ),
                   ),
                 ],
@@ -162,4 +163,3 @@ class _StatItem extends StatelessWidget {
     );
   }
 }
-
