@@ -1,14 +1,16 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
-import 'package:share_plus/share_plus.dart';
 
 import '../../../../core/localization/localization.dart';
 import '../../../../core/shared_widgets/snackbar.dart';
 import '../../../../core/theming/app-themes.dart';
 import '../../../../core/theming/text_styles.dart';
+import '../../data/services/referral_share_service.dart';
+import 'share_options_sheet.dart';
 
 class ReferralCodeCard extends ConsumerWidget {
   final String code;
@@ -96,23 +98,78 @@ class ReferralCodeCard extends ConsumerWidget {
   }
 
   void _shareCode(BuildContext context, AppLocalizations l10n) {
-    final message = _buildShareMessage(code, l10n);
-
-    Share.share(
-      message,
-      subject: l10n.translate('referral.dashboard.share_subject'),
+    // Show share options bottom sheet
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => ShareOptionsSheet(
+        referralCode: code,
+        onShareMethodSelected: (method) =>
+            _handleShareMethod(context, method, l10n),
+      ),
     );
+  }
 
-    if (onShare != null) {
-      onShare!();
+  Future<void> _handleShareMethod(
+    BuildContext context,
+    ShareMethod method,
+    AppLocalizations l10n,
+  ) async {
+    final shareService = ReferralShareService(l10n);
+    bool success = false;
+    String methodName = '';
+
+    try {
+      switch (method) {
+        case ShareMethod.whatsapp:
+          methodName = 'whatsapp';
+          success = await shareService.shareViaWhatsApp(code);
+          break;
+        case ShareMethod.sms:
+          methodName = 'sms';
+          success = await shareService.shareViaSMS(code);
+          break;
+        case ShareMethod.email:
+          methodName = 'email';
+          success = await shareService.shareViaEmail(code);
+          break;
+        case ShareMethod.copyLink:
+          methodName = 'copy_link';
+          success = await shareService.copyToClipboard(code);
+          if (success && context.mounted) {
+            getSuccessSnackBar(context, 'referral.share.copied_success');
+          }
+          break;
+        case ShareMethod.more:
+          methodName = 'generic';
+          success = await shareService.shareGeneric(code);
+          break;
+      }
+
+      // Track analytics
+      _trackShareEvent(methodName, success);
+
+      // Callback for parent widget
+      if (onShare != null) {
+        onShare!();
+      }
+    } catch (e) {
+      if (context.mounted) {
+        getErrorSnackBar(context, 'referral.share.share_failed');
+      }
     }
   }
 
-  String _buildShareMessage(String code, AppLocalizations l10n) {
-    // Build localized share message
-    return l10n
-        .translate('referral.dashboard.share_message')
-        .replaceAll('{code}', code);
+  void _trackShareEvent(String method, bool success) {
+    FirebaseAnalytics.instance.logEvent(
+      name: 'referral_code_shared',
+      parameters: {
+        'method': method,
+        'referral_code': code,
+        'success': success,
+      },
+    );
   }
 }
 

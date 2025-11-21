@@ -3917,6 +3917,36 @@ const Map<String, String> kEn = {
   'referral.dashboard.share_message':
       'Join me on Ta3afi for recovery support!\n\nUse my code: {code}\nGet 3 days Premium free when you verify your account.\n\nDownload now!',
 
+  // Share Feature
+  'referral.share.sheet_title': 'Share Your Referral Code',
+  'referral.share.sheet_subtitle': 'Choose how you want to share',
+  'referral.share.your_code': 'Your Code:',
+  'referral.share.whatsapp': 'Share via WhatsApp',
+  'referral.share.sms': 'Share via SMS',
+  'referral.share.email': 'Share via Email',
+  'referral.share.copy_link': 'Copy Message',
+  'referral.share.more_options': 'More Options',
+  'referral.share.subject': 'Join me on Ta3afi - Recovery Support',
+  'referral.share.default_user': 'a friend',
+  
+  // Share Templates
+  'referral.share.generic_message':
+      '🌟 Join me on Ta3afi!\n\nI\'m using Ta3afi for recovery support and it\'s been amazing. Join me and get 3 days of Premium features free!\n\nUse my code: {code}\n\nLet\'s support each other on this journey! 💪',
+  'referral.share.whatsapp_message':
+      '🌟 Join me on Ta3afi!\n\nI\'m on a recovery journey with Ta3afi and would love your support. Use my code *{code}* to join and get 3 days Premium free! 💪',
+  'referral.share.sms_message':
+      'Join me on Ta3afi for recovery support! Use code: {code} to get 3 days Premium free.',
+  'referral.share.email_subject': 'Join me on Ta3afi - Recovery Support',
+  'referral.share.email_message':
+      'Hi,\n\nI wanted to share something important with you. I\'ve been using Ta3afi for recovery support and it\'s been making a real difference in my life.\n\nI thought you might find it helpful too. When you sign up with my referral code ({code}), you\'ll get 3 days of Premium features completely free.\n\nTa3afi offers:\n• Daily motivation and support\n• Recovery tracking tools\n• A supportive community\n• Helpful resources and guides\n\nUse my code: {code}\n\nLet\'s support each other on this journey!\n\nBest regards',
+  'referral.share.copy_link_message':
+      'Join me on Ta3afi! Use code {code} for 3 days Premium free.',
+  
+  // Share Success Messages
+  'referral.share.copied_success': 'Message copied to clipboard!',
+  'referral.share.share_success': 'Shared successfully!',
+  'referral.share.share_failed': 'Failed to share. Please try again.',
+
   // Stats
   'referral.dashboard.stats_title': 'Referral Stats',
   'referral.dashboard.total_referrals': 'Total',
