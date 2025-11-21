@@ -100,7 +100,7 @@ class ReferralShareService {
 
       _log('Sharing via generic share sheet');
 
-      final result = await Share.share(
+      final result = await Share.shareWithResult(
         message,
         subject: subject,
       );
