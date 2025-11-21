@@ -132,8 +132,8 @@ Automatic fraud detection checks for same device, rapid activity, same IP, and s
 - [x] Sprint 01 - Database schema & Firestore security rules
 - [x] Sprint 02 - Referral code generation system
 - [x] Sprint 03 - Referral code input during signup
-- [ ] Sprint 04 - Verification checklist Cloud Functions (setup)
-- [ ] Sprint 05 - Verification checklist Cloud Functions (tracking)
+- [x] Sprint 04 - Verification checklist Cloud Functions (setup)
+- [x] Sprint 05 - Verification checklist Cloud Functions (tracking)
 - [ ] Sprint 06 - Fraud detection system
 - [ ] Sprint 07 - User referral dashboard UI
 - [ ] Sprint 08 - Checklist progress tracker UI
