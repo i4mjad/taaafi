@@ -7,6 +7,7 @@ import '../../domain/entities/redemption_result.dart';
 import '../../domain/repositories/referral_repository.dart';
 import '../models/referral_code_model.dart';
 import '../models/referral_stats_model.dart';
+import '../models/referral_verification_model.dart';
 
 class ReferralRepositoryImpl implements ReferralRepository {
   final FirebaseFirestore _firestore;
@@ -48,6 +49,25 @@ class ReferralRepositoryImpl implements ReferralRepository {
       return ReferralStatsModel.fromFirestore(docSnapshot);
     } catch (e, stackTrace) {
       log('Error in getReferralStats: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<List<ReferralVerificationModel>> getReferredUsers(
+      String userId) async {
+    try {
+      final querySnapshot = await _firestore
+          .collection('referralVerifications')
+          .where('referrerId', isEqualTo: userId)
+          .orderBy('signupDate', descending: true)
+          .get();
+
+      return querySnapshot.docs
+          .map((doc) => ReferralVerificationModel.fromFirestore(doc))
+          .toList();
+    } catch (e, stackTrace) {
+      log('Error in getReferredUsers: $e', stackTrace: stackTrace);
       rethrow;
     }
   }

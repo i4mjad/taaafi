@@ -1,5 +1,6 @@
 import '../../data/models/referral_code_model.dart';
 import '../../data/models/referral_stats_model.dart';
+import '../../data/models/referral_verification_model.dart';
 import '../entities/redemption_result.dart';
 
 abstract class ReferralRepository {
@@ -8,6 +9,9 @@ abstract class ReferralRepository {
 
   /// Get referral stats for a user
   Future<ReferralStatsModel?> getReferralStats(String userId);
+
+  /// Get list of users referred by this user
+  Future<List<ReferralVerificationModel>> getReferredUsers(String userId);
 
   /// Validate if a referral code exists and is active
   Future<bool> validateReferralCode(String code);
