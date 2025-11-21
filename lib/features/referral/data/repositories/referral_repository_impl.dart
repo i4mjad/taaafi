@@ -73,8 +73,7 @@ class ReferralRepositoryImpl implements ReferralRepository {
   }
 
   @override
-  Stream<ReferralVerificationModel?> getUserVerificationStream(
-      String userId) {
+  Stream<ReferralVerificationModel?> getUserVerificationStream(String userId) {
     try {
       return _firestore
           .collection('referralVerifications')

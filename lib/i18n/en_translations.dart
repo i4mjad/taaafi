@@ -3993,7 +3993,8 @@ const Map<String, String> kEn = {
   'referral.checklist.title': 'Verification Progress',
   'referral.checklist.progress': '{completed} of {total} tasks',
   'referral.checklist.subtitle': 'Complete tasks to unlock Premium!',
-  'referral.checklist.all_complete_message': 'Amazing! You\'ve completed all tasks!',
+  'referral.checklist.all_complete_message':
+      'Amazing! You\'ve completed all tasks!',
   'referral.checklist.almost_there': 'You\'re almost there! Keep going!',
   'referral.checklist.great_progress': 'Great progress! You\'re doing well!',
   'referral.checklist.keep_going': 'Keep going! You\'re making progress!',
@@ -4032,32 +4033,41 @@ const Map<String, String> kEn = {
 
   // Referrer info
   'referral.checklist.referred_by': 'Referred by {name}',
-  'referral.checklist.help_referrer': 'Complete tasks to help them earn rewards!',
+  'referral.checklist.help_referrer':
+      'Complete tasks to help them earn rewards!',
 
   // Celebration
   'referral.checklist.celebration_title': 'Congratulations! 🎉',
-  'referral.checklist.celebration_message': 'You\'re verified! Enjoy 3 days of Premium access.',
+  'referral.checklist.celebration_message':
+      'You\'re verified! Enjoy 3 days of Premium access.',
   'referral.checklist.premium_reward': '3 Days Premium Access',
   'referral.checklist.explore_premium': 'Explore Premium Features',
-  'referral.checklist.referrer_notified': 'Your friend has been notified of your achievement!',
+  'referral.checklist.referrer_notified':
+      'Your friend has been notified of your achievement!',
 
   // States
   'referral.checklist.under_review': 'Under Review',
-  'referral.checklist.under_review_message': 'Your verification is under review. Our team will contact you soon.',
+  'referral.checklist.under_review_message':
+      'Your verification is under review. Our team will contact you soon.',
   'referral.checklist.no_data_title': 'No Verification Data',
-  'referral.checklist.no_data_message': 'We couldn\'t find your verification progress.',
+  'referral.checklist.no_data_message':
+      'We couldn\'t find your verification progress.',
 
   // What Happens Next
   'referral.checklist.what_happens_next': 'What Happens Next?',
   'referral.checklist.what_happens_title': 'After Verification',
   'referral.checklist.step1_title': 'You Get Premium',
-  'referral.checklist.step1_message': 'Enjoy 3 days of Premium access with all features unlocked!',
+  'referral.checklist.step1_message':
+      'Enjoy 3 days of Premium access with all features unlocked!',
   'referral.checklist.step2_title': 'Friend Gets Progress',
-  'referral.checklist.step2_message': 'Your friend who referred you gets closer to earning rewards!',
+  'referral.checklist.step2_message':
+      'Your friend who referred you gets closer to earning rewards!',
   'referral.checklist.step3_title': 'Continue Using App',
-  'referral.checklist.step3_message': 'Your Premium access starts immediately. Explore all features!',
+  'referral.checklist.step3_message':
+      'Your Premium access starts immediately. Explore all features!',
   'referral.checklist.step4_title': 'Subscribe for More',
-  'referral.checklist.step4_message': 'Love Premium? Subscribe and give your friend a 2-week bonus!',
+  'referral.checklist.step4_message':
+      'Love Premium? Subscribe and give your friend a 2-week bonus!',
 
   'common.ok': 'OK',
   'common.error': 'Error',

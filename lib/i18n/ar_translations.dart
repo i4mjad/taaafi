@@ -3945,28 +3945,34 @@ const Map<String, String> kAr = {
 
   // Celebration
   'referral.checklist.celebration_title': 'تهانينا! 🎉',
-  'referral.checklist.celebration_message': 'تم التحقق منك! استمتع بـ 3 أيام من الباقة المميزة.',
+  'referral.checklist.celebration_message':
+      'تم التحقق منك! استمتع بـ 3 أيام من الباقة المميزة.',
   'referral.checklist.premium_reward': '3 أيام باقة مميزة',
   'referral.checklist.explore_premium': 'استكشف ميزات الباقة المميزة',
   'referral.checklist.referrer_notified': 'تم إخطار صديقك بإنجازك!',
 
   // States
   'referral.checklist.under_review': 'قيد المراجعة',
-  'referral.checklist.under_review_message': 'التحقق الخاص بك قيد المراجعة. سيتصل بك فريقنا قريباً.',
+  'referral.checklist.under_review_message':
+      'التحقق الخاص بك قيد المراجعة. سيتصل بك فريقنا قريباً.',
   'referral.checklist.no_data_title': 'لا توجد بيانات التحقق',
-  'referral.checklist.no_data_message': 'لم نتمكن من العثور على تقدم التحقق الخاص بك.',
+  'referral.checklist.no_data_message':
+      'لم نتمكن من العثور على تقدم التحقق الخاص بك.',
 
   // What Happens Next
   'referral.checklist.what_happens_next': 'ماذا سيحدث بعد ذلك؟',
   'referral.checklist.what_happens_title': 'بعد التحقق',
   'referral.checklist.step1_title': 'تحصل على الباقة المميزة',
-  'referral.checklist.step1_message': 'استمتع بـ 3 أيام من الباقة المميزة مع جميع الميزات المفتوحة!',
+  'referral.checklist.step1_message':
+      'استمتع بـ 3 أيام من الباقة المميزة مع جميع الميزات المفتوحة!',
   'referral.checklist.step2_title': 'صديقك يحرز تقدماً',
   'referral.checklist.step2_message': 'صديقك الذي أحالك يقترب من كسب المكافآت!',
   'referral.checklist.step3_title': 'استمر في استخدام التطبيق',
-  'referral.checklist.step3_message': 'يبدأ الوصول المميز على الفور. استكشف جميع الميزات!',
+  'referral.checklist.step3_message':
+      'يبدأ الوصول المميز على الفور. استكشف جميع الميزات!',
   'referral.checklist.step4_title': 'اشترك للمزيد',
-  'referral.checklist.step4_message': 'أعجبتك الباقة المميزة؟ اشترك وامنح صديقك مكافأة أسبوعين!',
+  'referral.checklist.step4_message':
+      'أعجبتك الباقة المميزة؟ اشترك وامنح صديقك مكافأة أسبوعين!',
 
   'common.ok': 'حسناً',
   'common.error': 'خطأ',
