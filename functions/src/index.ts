@@ -1689,3 +1689,7 @@ export {
   getFlaggedUsers,
   recalculateFraudScore
 } from './referral/admin/fraudManagement';
+
+// Export referral rewards functions (Sprint 11)
+export { redeemReferralRewards } from './referral/rewards/redeemRewards';
+export { handleRevenueCatWebhook } from './referral/webhooks/revenuecatWebhook';

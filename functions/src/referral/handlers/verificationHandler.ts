@@ -147,7 +147,37 @@ export async function handleVerificationCompletion(userId: string): Promise<void
       console.error("⚠️ Error sending verification notifications:", notificationError);
     }
     
-    // Note: Reward awarding will be implemented in Sprint 11
+    // Grant 3-day Premium reward to referee (Sprint 11)
+    try {
+      const { grantPromotionalEntitlement } = require('../revenuecat/revenuecatHelper');
+      
+      console.log(`🎁 Granting 3-day Premium reward to referee ${userId}`);
+      const rewardResult = await grantPromotionalEntitlement(userId, 3);
+      
+      if (rewardResult.success) {
+        // Log reward in referralRewards collection
+        await db.collection('referralRewards').add({
+          referrerId: userId,
+          type: 'referee_reward',
+          amount: '3 days',
+          daysGranted: 3,
+          verifiedUserIds: [userId],
+          revenueCatResponse: {
+            expiresAt: rewardResult.expiresAt.toISOString(),
+          },
+          awardedAt: admin.firestore.FieldValue.serverTimestamp(),
+          expiresAt: rewardResult.expiresAt,
+          status: 'awarded',
+        });
+        
+        console.log(`✅ Successfully granted 3-day reward to ${userId}`);
+      } else {
+        console.error(`❌ Failed to grant reward to ${userId}: ${rewardResult.error}`);
+      }
+    } catch (rewardError) {
+      // Log but don't fail verification if reward granting fails
+      console.error("⚠️ Error granting verification reward:", rewardError);
+    }
   }
 }
 
