@@ -100,14 +100,13 @@ class ReferralShareService {
 
       _log('Sharing via generic share sheet');
 
-      final result = await Share.shareWithResult(
+      await Share.share(
         message,
         subject: subject,
       );
 
-      final success = result.status == ShareResultStatus.success;
-      _log('Generic share result: ${result.status}');
-      return success;
+      _log('Share sheet opened successfully');
+      return true;
     } catch (e) {
       _log('Error sharing generically: $e');
       return false;
