@@ -388,9 +388,9 @@ class ReferralDashboardScreen extends ConsumerWidget {
       // Call Cloud Function to generate referral code
       final functions = FirebaseFunctions.instance;
       final callable = functions.httpsCallable('generateUserReferralCode');
-      
+
       final result = await callable.call();
-      
+
       // Close loading sheet
       if (context.mounted) Navigator.of(context).pop();
 
