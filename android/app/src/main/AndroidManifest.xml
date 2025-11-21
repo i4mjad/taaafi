@@ -45,6 +45,18 @@
         <action android:name="FLUTTER_NOTIFICATION_CLICK"/>
         <category android:name="android.intent.category.DEFAULT"/>
       </intent-filter>
+      <!-- Deep Links for Referral Codes -->
+      <intent-filter android:autoVerify="true">
+        <action android:name="android.intent.action.VIEW"/>
+        <category android:name="android.intent.category.DEFAULT"/>
+        <category android:name="android.intent.category.BROWSABLE"/>
+        <!-- Custom scheme: ta3afi://referral?code=ABC123 -->
+        <data android:scheme="ta3afi" android:host="referral"/>
+        <!-- HTTPS deep links: https://ta3afi.app/referral?code=ABC123 -->
+        <data android:scheme="https" android:host="ta3afi.app" android:pathPrefix="/referral"/>
+        <!-- Additional web domain if needed -->
+        <data android:scheme="https" android:host="www.ta3afi.app" android:pathPrefix="/referral"/>
+      </intent-filter>
     </activity>
     <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver"/>
     <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">

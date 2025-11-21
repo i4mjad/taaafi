@@ -28,9 +28,13 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>com.googleusercontent.apps.364568176835-j2eijl6oi1bs1bi1c755e0f3oj1h2eta</string>
+				<string>ta3afi</string>
 			</array>
 		</dict>
 	</array>
+	<!-- Universal Links for Deep Linking -->
+	<key>FlutterDeepLinkingEnabled</key>
+	<true/>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
