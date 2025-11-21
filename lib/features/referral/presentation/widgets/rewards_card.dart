@@ -50,7 +50,7 @@ class RewardsCard extends ConsumerWidget {
           ),
         ],
       ),
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -72,7 +72,7 @@ class RewardsCard extends ConsumerWidget {
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
 
           if (hasRewards) ...[
             // Rewards earned
@@ -103,7 +103,7 @@ class RewardsCard extends ConsumerWidget {
 
           // Progress to next milestone
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.15),
               borderRadius: BorderRadius.circular(12),

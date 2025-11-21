@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/localization/localization.dart';
+import '../../../../core/shared_widgets/container.dart';
 import '../../../../core/theming/app-themes.dart';
 import '../../../../core/theming/text_styles.dart';
 import '../../data/models/referral_stats_model.dart';
@@ -19,16 +20,15 @@ class ReferralStatsCard extends ConsumerWidget {
     final theme = AppTheme.of(context);
     final l10n = AppLocalizations.of(context);
 
-    return Container(
-      decoration: BoxDecoration(
-        color: theme.backgroundColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: theme.grey[200]!,
-          width: 1,
-        ),
+    return WidgetsContainer(
+      backgroundColor: theme.backgroundColor,
+      borderRadius: BorderRadius.circular(16),
+      borderSide: BorderSide(
+        color: theme.grey[200]!,
+        width: 1,
       ),
-      padding: const EdgeInsets.all(20),
+      cornerSmoothing: 1,
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -39,7 +39,7 @@ class ReferralStatsCard extends ConsumerWidget {
               fontWeight: FontWeight.w700,
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
 
           // Stats grid
           Column(
@@ -117,16 +117,15 @@ class _StatItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: theme.grey[50],
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: theme.grey[100]!,
-          width: 1,
-        ),
+    return WidgetsContainer(
+      padding: const EdgeInsets.all(12),
+      backgroundColor: theme.grey[50],
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide(
+        color: theme.grey[100]!,
+        width: 1,
       ),
+      cornerSmoothing: 1,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

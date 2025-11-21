@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/localization/localization.dart';
+import '../../../../core/shared_widgets/container.dart';
 import '../../../../core/theming/app-themes.dart';
 import '../../../../core/theming/text_styles.dart';
 import '../../data/models/referral_verification_model.dart';
@@ -22,17 +23,16 @@ class ReferralListWidget extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
 
     if (referrals.isEmpty) {
-      return Container(
+      return WidgetsContainer(
         width: MediaQuery.of(context).size.width,
-        decoration: BoxDecoration(
-          color: theme.backgroundColor,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: theme.grey[200]!,
-            width: 1,
-          ),
+        backgroundColor: theme.backgroundColor,
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide(
+          color: theme.grey[200]!,
+          width: 1,
         ),
-        padding: const EdgeInsets.all(32),
+        cornerSmoothing: 1,
+        padding: const EdgeInsets.all(24),
         child: Column(
           children: [
             Text(
@@ -61,20 +61,20 @@ class ReferralListWidget extends ConsumerWidget {
       );
     }
 
-    return Container(
-      decoration: BoxDecoration(
-        color: theme.backgroundColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: theme.grey[200]!,
-          width: 1,
-        ),
+    return WidgetsContainer(
+      backgroundColor: theme.backgroundColor,
+      borderRadius: BorderRadius.circular(16),
+      borderSide: BorderSide(
+        color: theme.grey[200]!,
+        width: 1,
       ),
+      cornerSmoothing: 1,
+      padding: EdgeInsets.zero,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(16),
             child: Text(
               l10n.translate('referral.dashboard.your_referrals'),
               style: TextStyles.h6.copyWith(
@@ -129,7 +129,7 @@ class _ReferralListItem extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         child: Row(
           children: [
             // Status icon

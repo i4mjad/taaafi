@@ -5,6 +5,7 @@ import 'package:cloud_functions/cloud_functions.dart';
 
 import '../../../../core/localization/localization.dart';
 import '../../../../core/shared_widgets/app_bar.dart';
+import '../../../../core/shared_widgets/container.dart';
 import '../../../../core/shared_widgets/snackbar.dart';
 import '../../../../core/shared_widgets/spinner.dart';
 import '../../../../core/theming/app-themes.dart';
@@ -161,16 +162,15 @@ class ReferralDashboardScreen extends ConsumerWidget {
   }
 
   Widget _buildLoadingCard(dynamic theme) {
-    return Container(
+    return WidgetsContainer(
       height: 120,
-      decoration: BoxDecoration(
-        color: theme.backgroundColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: theme.grey[200]!,
-          width: 1,
-        ),
+      backgroundColor: theme.backgroundColor,
+      borderRadius: BorderRadius.circular(16),
+      borderSide: BorderSide(
+        color: theme.grey[200]!,
+        width: 1,
       ),
+      cornerSmoothing: 1,
       child: const Center(
         child: Spinner(),
       ),
@@ -178,16 +178,15 @@ class ReferralDashboardScreen extends ConsumerWidget {
   }
 
   Widget _buildErrorCard(dynamic theme, AppLocalizations l10n) {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: theme.error[50],
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: theme.error[200]!,
-          width: 1,
-        ),
+    return WidgetsContainer(
+      padding: const EdgeInsets.all(20),
+      backgroundColor: theme.error[50],
+      borderRadius: BorderRadius.circular(16),
+      borderSide: BorderSide(
+        color: theme.error[200]!,
+        width: 1,
       ),
+      cornerSmoothing: 1,
       child: Row(
         children: [
           Icon(
@@ -211,17 +210,16 @@ class ReferralDashboardScreen extends ConsumerWidget {
 
   Widget _buildNoCodeCard(
       BuildContext context, dynamic theme, AppLocalizations l10n) {
-    return Container(
+    return WidgetsContainer(
       width: double.infinity,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: theme.warn[50],
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: theme.warn[200]!,
-          width: 1,
-        ),
+      padding: const EdgeInsets.all(20),
+      backgroundColor: theme.warn[50],
+      borderRadius: BorderRadius.circular(16),
+      borderSide: BorderSide(
+        color: theme.warn[200]!,
+        width: 1,
       ),
+      cornerSmoothing: 1,
       child: Column(
         children: [
           Text(
@@ -272,16 +270,15 @@ class ReferralDashboardScreen extends ConsumerWidget {
   }
 
   Widget _buildNoStatsCard(dynamic theme, AppLocalizations l10n) {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: theme.backgroundColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: theme.grey[200]!,
-          width: 1,
-        ),
+    return WidgetsContainer(
+      padding: const EdgeInsets.all(20),
+      backgroundColor: theme.backgroundColor,
+      borderRadius: BorderRadius.circular(16),
+      borderSide: BorderSide(
+        color: theme.grey[200]!,
+        width: 1,
       ),
+      cornerSmoothing: 1,
       child: Center(
         child: Text(
           l10n.translate('referral.dashboard.no_stats'),
