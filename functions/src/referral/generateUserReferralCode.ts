@@ -73,13 +73,26 @@ export const generateUserReferralCode = functions.https.onCall(
 
       // Get user details for code generation
       const userDoc = await db.collection('users').doc(userId).get();
-      const userData = userDoc.data();
       
-      const userName = userData?.displayName || userData?.name || '';
-      const userEmail = userData?.email || context.auth.token.email || '';
+      if (!userDoc.exists) {
+        console.log(`⚠️ User document not found for ${userId}`);
+        throw new functions.https.HttpsError(
+          'not-found',
+          'User profile not found. Please ensure your profile is set up.'
+        );
+      }
+
+      const userData = userDoc.data()!;
+      console.log(`📋 User data: displayName=${userData.displayName}, email=${userData.email}`);
+      
+      const userName = userData.displayName || userData.name || '';
+      const userEmail = userData.email || context.auth.token.email || '';
+
+      console.log(`🔤 Generating code with: name="${userName}", email="${userEmail}"`);
 
       // Generate unique referral code
       const code = await generateAndEnsureUniqueCode(userName, userEmail);
+      console.log(`✨ Generated unique code: ${code}`);
 
       // Create referral code document
       const referralCodeData = {

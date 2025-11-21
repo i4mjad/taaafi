@@ -136,6 +136,7 @@ class ReferralDashboardScreen extends ConsumerWidget {
                   icon: const Icon(LucideIcons.helpCircle),
                   label: Text(
                     l10n.translate('referral.dashboard.how_it_works'),
+                    style: TextStyles.footnoteSelected,
                   ),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: theme.primary[600],
@@ -252,6 +253,7 @@ class ReferralDashboardScreen extends ConsumerWidget {
               icon: const Icon(LucideIcons.plus),
               label: Text(
                 l10n.translate('referral.dashboard.generate_code'),
+                style: TextStyles.footnoteSelected,
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: theme.primary[500],
@@ -352,21 +354,31 @@ class ReferralDashboardScreen extends ConsumerWidget {
     dynamic theme,
     AppLocalizations l10n,
   ) async {
-    // Show loading dialog
-    showDialog(
+    // Show loading bottom sheet
+    showModalBottomSheet(
       context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        content: Row(
+      isDismissible: false,
+      enableDrag: false,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: BoxDecoration(
+          color: theme.backgroundColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             const Spinner(),
-            const SizedBox(width: 20),
-            Expanded(
-              child: Text(
-                l10n.translate('referral.dashboard.generating_code'),
-                style: TextStyles.body,
+            const SizedBox(height: 20),
+            Text(
+              l10n.translate('referral.dashboard.generating_code'),
+              style: TextStyles.body.copyWith(
+                color: theme.grey[900],
               ),
+              textAlign: TextAlign.center,
             ),
+            const SizedBox(height: 24),
           ],
         ),
       ),
@@ -376,11 +388,13 @@ class ReferralDashboardScreen extends ConsumerWidget {
       // Call Cloud Function to generate referral code
       final functions = FirebaseFunctions.instance;
       final callable = functions.httpsCallable('generateUserReferralCode');
-
+      
       final result = await callable.call();
-
-      // Close loading dialog
+      
+      // Close loading sheet
       if (context.mounted) Navigator.of(context).pop();
+
+      print('✅ Function call result: ${result.data}');
 
       if (result.data['success'] == true) {
         // Show success message
@@ -395,35 +409,23 @@ class ReferralDashboardScreen extends ConsumerWidget {
       } else {
         // Show error message
         if (context.mounted) {
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: Text(
-                l10n.translate('common.error'),
-                style: TextStyles.h6.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              content: Text(
-                result.data['message'] ??
-                    l10n.translate('referral.dashboard.generation_failed'),
-                style: TextStyles.body,
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: Text(l10n.translate('common.ok')),
-                ),
-              ],
-            ),
+          _showErrorSheet(
+            context,
+            theme,
+            l10n,
+            result.data['message'] ??
+                l10n.translate('referral.dashboard.generation_failed'),
           );
         }
       }
     } on FirebaseFunctionsException catch (e) {
-      // Close loading dialog
+      // Close loading sheet
       if (context.mounted) Navigator.of(context).pop();
 
-      // Show error dialog
+      print('❌ FirebaseFunctionsException: ${e.code} - ${e.message}');
+      print('Details: ${e.details}');
+
+      // Show error sheet
       if (context.mounted) {
         String errorMessage;
         switch (e.code) {
@@ -437,59 +439,103 @@ class ReferralDashboardScreen extends ConsumerWidget {
             break;
           default:
             errorMessage =
-                l10n.translate('referral.dashboard.generation_failed');
+                '${l10n.translate('referral.dashboard.generation_failed')}\n\nError: ${e.code}';
         }
 
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text(
-              l10n.translate('common.error'),
-              style: TextStyles.h6.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            content: Text(
-              errorMessage,
-              style: TextStyles.body,
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text(l10n.translate('common.ok')),
-              ),
-            ],
-          ),
-        );
+        _showErrorSheet(context, theme, l10n, errorMessage);
       }
     } catch (e) {
-      // Close loading dialog
+      // Close loading sheet
       if (context.mounted) Navigator.of(context).pop();
+
+      print('❌ General error: $e');
 
       // Show generic error
       if (context.mounted) {
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text(
-              l10n.translate('common.error'),
-              style: TextStyles.h6.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            content: Text(
-              l10n.translate('referral.dashboard.generation_failed'),
-              style: TextStyles.body,
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text(l10n.translate('common.ok')),
-              ),
-            ],
-          ),
+        _showErrorSheet(
+          context,
+          theme,
+          l10n,
+          '${l10n.translate('referral.dashboard.generation_failed')}\n\nError: $e',
         );
       }
     }
+  }
+
+  void _showErrorSheet(
+    BuildContext context,
+    dynamic theme,
+    AppLocalizations l10n,
+    String message,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: BoxDecoration(
+          color: theme.backgroundColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Handle bar
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: theme.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Icon(
+              LucideIcons.alertCircle,
+              color: theme.error[600],
+              size: 48,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              l10n.translate('common.error'),
+              style: TextStyles.h6.copyWith(
+                color: theme.grey[900],
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              message,
+              style: TextStyles.body.copyWith(
+                color: theme.grey[700],
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => Navigator.of(context).pop(),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: theme.primary[500],
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Text(
+                  l10n.translate('common.ok'),
+                  style: TextStyles.body.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
   }
 }

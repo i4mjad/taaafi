@@ -23,6 +23,7 @@ class ReferralListWidget extends ConsumerWidget {
 
     if (referrals.isEmpty) {
       return Container(
+        width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
           color: theme.backgroundColor,
           borderRadius: BorderRadius.circular(16),
@@ -144,7 +145,7 @@ class _ReferralListItem extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 16),
-            
+
             // User info
             Expanded(
               child: Column(
@@ -181,7 +182,7 @@ class _ReferralListItem extends StatelessWidget {
                 ],
               ),
             ),
-            
+
             // Arrow icon if tappable
             if (onTap != null)
               Icon(
@@ -238,4 +239,3 @@ class _StatusInfo {
     required this.color,
   });
 }
-

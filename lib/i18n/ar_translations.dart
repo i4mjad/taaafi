@@ -3889,7 +3889,7 @@ const Map<String, String> kAr = {
       'تتبع التقدم التفصيلي قريباً في Sprint 08!',
 
   // Generate Code
-  'referral.dashboard.generate_code': 'إنشاء رمزي',
+  'referral.dashboard.generate_code': 'إنشاء الرمز الخاص بي',
   'referral.dashboard.generating_code': 'جاري إنشاء رمز الإحالة الخاص بك...',
   'referral.dashboard.code_generated': 'تم إنشاء رمز الإحالة بنجاح!',
   'referral.dashboard.generation_failed':
