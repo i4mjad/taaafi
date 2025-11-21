@@ -140,7 +140,7 @@ Automatic fraud detection checks for same device, rapid activity, same IP, and s
 - [x] Sprint 04 - Verification checklist Cloud Functions (setup)
 - [x] Sprint 05 - Verification checklist Cloud Functions (tracking)
 - [x] Sprint 06 - Fraud detection system
-- [ ] Sprint 07 - User referral dashboard UI
+- [x] Sprint 07 - User referral dashboard UI
 - [ ] Sprint 08 - Checklist progress tracker UI
 - [ ] Sprint 09 - Share referral feature
 - [ ] Sprint 10 - Notification system for milestones
