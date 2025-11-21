@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../../core/localization/localization.dart';
@@ -24,60 +25,41 @@ class ReferralCodeCard extends ConsumerWidget {
     final theme = AppTheme.of(context);
     final l10n = AppLocalizations.of(context);
 
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            theme.primary[500]!,
-            theme.primary[700]!,
-          ],
-        ),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: theme.primary[500]!.withOpacity(0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
+    return WidgetsContainer(
       padding: const EdgeInsets.all(20),
+      backgroundColor: theme.backgroundColor,
+      borderSide: BorderSide(width: 1, color: theme.primary[700]!),
+      // boxShadow: Shadows.mainShadows,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             l10n.translate('referral.dashboard.your_code'),
             style: TextStyles.body.copyWith(
-              color: Colors.white.withOpacity(0.9),
+              color: theme.primary[700]!,
               fontWeight: FontWeight.w500,
             ),
           ),
           const SizedBox(height: 16),
-          
+
           // Code display with copy and share buttons
           Row(
             children: [
               Expanded(
-                child: Container(
+                child: WidgetsContainer(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
+                    horizontal: 16,
                     vertical: 16,
                   ),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: Colors.white.withOpacity(0.3),
-                      width: 1.5,
-                    ),
+                  borderSide: BorderSide(
+                    color: theme.grey[100]!,
+                    width: 1.5,
                   ),
                   child: Center(
                     child: Text(
                       code,
                       style: TextStyles.h4.copyWith(
-                        color: Colors.white,
+                        color: theme.primary[600]!,
                         fontWeight: FontWeight.w800,
                         letterSpacing: 2,
                       ),
@@ -86,7 +68,7 @@ class ReferralCodeCard extends ConsumerWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              
+
               // Copy button
               _ActionButton(
                 icon: LucideIcons.copy,
@@ -94,7 +76,7 @@ class ReferralCodeCard extends ConsumerWidget {
                 theme: theme,
               ),
               const SizedBox(width: 8),
-              
+
               // Share button
               _ActionButton(
                 icon: LucideIcons.share2,
@@ -115,7 +97,7 @@ class ReferralCodeCard extends ConsumerWidget {
 
   void _shareCode(BuildContext context, AppLocalizations l10n) {
     final message = _buildShareMessage(code, l10n);
-    
+
     Share.share(
       message,
       subject: l10n.translate('referral.dashboard.share_subject'),
@@ -128,7 +110,8 @@ class ReferralCodeCard extends ConsumerWidget {
 
   String _buildShareMessage(String code, AppLocalizations l10n) {
     // Build localized share message
-    return l10n.translate('referral.dashboard.share_message')
+    return l10n
+        .translate('referral.dashboard.share_message')
         .replaceAll('{code}', code);
   }
 }
@@ -146,29 +129,21 @@ class _ActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.white.withOpacity(0.15),
+    return InkWell(
+      onTap: onTap,
       borderRadius: BorderRadius.circular(12),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: Colors.white.withOpacity(0.3),
-              width: 1.5,
-            ),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(
-            icon,
-            color: Colors.white,
-            size: 22,
-          ),
+      child: WidgetsContainer(
+        padding: const EdgeInsets.all(14),
+        borderSide: BorderSide(
+          color: theme.grey[100]!,
+          width: 1.5,
+        ),
+        child: Icon(
+          icon,
+          color: theme.primary[600]!,
+          size: 22,
         ),
       ),
     );
   }
 }
-

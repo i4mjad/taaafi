@@ -39,6 +39,18 @@ class ReferralDashboardScreen extends ConsumerWidget {
         'referral.dashboard.title',
         false,
         true,
+        actions: [
+          IconButton(
+            onPressed: () {
+              HowItWorksSheet.show(context);
+            },
+            icon: Icon(
+              LucideIcons.helpCircle,
+              color: theme.grey[900],
+            ),
+            tooltip: l10n.translate('referral.dashboard.how_it_works'),
+          ),
+        ],
       ),
       body: RefreshIndicator(
         onRefresh: () async {
@@ -127,34 +139,6 @@ class ReferralDashboardScreen extends ConsumerWidget {
                 },
                 loading: () => _buildLoadingCard(theme),
                 error: (error, stack) => _buildErrorCard(theme, l10n),
-              ),
-
-              const SizedBox(height: 16),
-
-              // How It Works Button
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  onPressed: () {
-                    HowItWorksSheet.show(context);
-                  },
-                  icon: const Icon(LucideIcons.helpCircle),
-                  label: Text(
-                    l10n.translate('referral.dashboard.how_it_works'),
-                    style: TextStyles.footnoteSelected,
-                  ),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: theme.primary[600],
-                    side: BorderSide(
-                      color: theme.primary[300]!,
-                      width: 1.5,
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
               ),
 
               const SizedBox(height: 24),
