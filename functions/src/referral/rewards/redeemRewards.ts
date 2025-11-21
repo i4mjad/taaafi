@@ -11,10 +11,8 @@ import {
   getRewardBreakdown,
 } from "./rewardCalculator";
 import { grantPromotionalEntitlement } from "../revenuecat/revenuecatHelper";
-import {
-  sendReferralNotification,
-  NotificationType,
-} from "../notifications/notificationHelper";
+import { sendReferralNotification } from "../notifications/notificationHelper";
+import { NotificationType } from "../notifications/notificationTypes";
 
 const db = admin.firestore();
 

@@ -10,6 +10,7 @@ export enum NotificationType {
   FRIEND_SUBSCRIBED = 'friend_subscribed',
   MILESTONE_REACHED = 'milestone_reached',
   REWARD_READY = 'reward_ready',
+  REWARD_REDEEMED = 'reward_redeemed',
   
   // For Referee
   WELCOME = 'welcome',
@@ -35,5 +36,7 @@ export interface ReferralNotificationData {
   reward?: string;
   verifiedCount?: number;
   referralCode?: string;
+  duration?: string;
+  expiresAt?: string;
 }
 

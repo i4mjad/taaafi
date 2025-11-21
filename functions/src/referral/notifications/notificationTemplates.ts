@@ -41,6 +41,10 @@ export const notificationTemplates: NotificationTemplates = {
       title: '🎁 Reward Ready!',
       body: 'Your {reward} is ready. Tap to claim it now!'
     },
+    [NotificationType.REWARD_REDEEMED]: {
+      title: '🎉 Rewards Redeemed!',
+      body: 'You got {duration} of Premium access! Expires: {expiresAt}'
+    },
     [NotificationType.WELCOME]: {
       title: '🌟 Welcome to Ta3afi!',
       body: 'Thanks for using {referrerName}\'s code! Complete tasks to unlock Premium.'
@@ -106,6 +110,10 @@ export const notificationTemplates: NotificationTemplates = {
     [NotificationType.PREMIUM_ACTIVATED]: {
       title: '💎 تم تفعيل البريميوم!',
       body: 'وصولك للبريميوم نشط الآن. استمتع بجميع المميزات!'
+    },
+    [NotificationType.REWARD_REDEEMED]: {
+      title: '🎉 تم استرداد المكافآت!',
+      body: 'حصلت على {duration} وصول بريميوم! تنتهي في: {expiresAt}'
     }
   }
 };
