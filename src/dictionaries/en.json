@@ -11,6 +11,7 @@
       "dashboard": "Dashboard",
       "userManagement": "User Management",
       "users": "Users",
+      "referralProgram": "Referral Program",
       "roles": "Roles",
       "permissions": "Permissions",
       "community": "Community",
@@ -437,9 +438,48 @@
     },
     "modules": {
       "userManagement": {
-
         "title": "User Management",
         "description": "Manage platform users and their permissions",
+        "referralDashboard": {
+          "title": "Referral Program Dashboard",
+          "description": "Monitor and manage the referral program",
+          "refresh": "Refresh",
+          "loading": "Loading dashboard...",
+          "errorLoading": "Error Loading Dashboard",
+          "tryAgain": "Try Again",
+          "stats": {
+            "totalReferrals": "Total Referrals",
+            "totalReferralsDesc": "All-time signups",
+            "verifiedUsers": "Verified Users",
+            "conversionRate": "conversion rate",
+            "pendingReview": "Pending Review",
+            "pendingReviewDesc": "Needs admin action",
+            "blocked": "Blocked (Fraud)",
+            "blockedDesc": "Auto + manual blocks"
+          },
+          "chart": {
+            "title": "Referrals Over Time",
+            "description": "Daily referral signups and verifications",
+            "totalReferrals": "Total Referrals",
+            "verified": "Verified"
+          },
+          "topReferrers": {
+            "title": "Top Referrers",
+            "description": "Users with the most successful referrals",
+            "user": "User",
+            "referred": "Referred",
+            "verified": "Verified",
+            "rewards": "Rewards",
+            "actions": "Actions",
+            "noReferrers": "No referrers found",
+            "days": "days"
+          },
+          "recentActivity": {
+            "title": "Recent Activity",
+            "description": "Latest referral program events",
+            "noActivity": "No recent activity"
+          }
+        },
         "users": "Users",
         "usersDescription": "Manage user accounts and permissions",
         "settings": "Settings",

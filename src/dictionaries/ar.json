@@ -11,6 +11,7 @@
       "dashboard": "لوحة التحكم",
       "userManagement": "إدارة المستخدمين",
       "users": "المستخدمون",
+      "referralProgram": "برنامج الإحالة",
       "roles": "الأدوار",
       "permissions": "الصلاحيات",
       "community": "المجتمع",
@@ -440,6 +441,46 @@
       "userManagement": {
         "title": "إدارة المستخدمين",
         "description": "إدارة مستخدمي المنصة وصلاحياتهم",
+        "referralDashboard": {
+          "title": "لوحة تحكم برنامج الإحالة",
+          "description": "مراقبة وإدارة برنامج الإحالة",
+          "refresh": "تحديث",
+          "loading": "جاري تحميل لوحة التحكم...",
+          "errorLoading": "خطأ في تحميل لوحة التحكم",
+          "tryAgain": "حاول مرة أخرى",
+          "stats": {
+            "totalReferrals": "إجمالي الإحالات",
+            "totalReferralsDesc": "التسجيلات الكلية",
+            "verifiedUsers": "المستخدمون المعتمدون",
+            "conversionRate": "معدل التحويل",
+            "pendingReview": "قيد المراجعة",
+            "pendingReviewDesc": "يحتاج إجراء إداري",
+            "blocked": "محظور (احتيال)",
+            "blockedDesc": "الحظر التلقائي واليدوي"
+          },
+          "chart": {
+            "title": "الإحالات عبر الوقت",
+            "description": "تسجيلات الإحالة اليومية والاعتمادات",
+            "totalReferrals": "إجمالي الإحالات",
+            "verified": "معتمد"
+          },
+          "topReferrers": {
+            "title": "أفضل المُحيلين",
+            "description": "المستخدمون الأكثر نجاحاً في الإحالات",
+            "user": "المستخدم",
+            "referred": "تمت إحالته",
+            "verified": "معتمد",
+            "rewards": "المكافآت",
+            "actions": "الإجراءات",
+            "noReferrers": "لم يتم العثور على محيلين",
+            "days": "أيام"
+          },
+          "recentActivity": {
+            "title": "النشاط الأخير",
+            "description": "أحدث أحداث برنامج الإحالة",
+            "noActivity": "لا يوجد نشاط حديث"
+          }
+        },
         "users": "المستخدمون",
         "usersDescription": "إدارة حسابات المستخدمين وصلاحياتهم",
         "settings": "الإعدادات",
