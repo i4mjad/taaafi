@@ -143,7 +143,7 @@ Automatic fraud detection checks for same device, rapid activity, same IP, and s
 - [x] Sprint 07 - User referral dashboard UI
 - [x] Sprint 08 - Checklist progress tracker UI
 - [x] Sprint 09 - Enhanced share referral feature (deep links skipped)
-- [ ] Sprint 10 - Notification system for milestones
+- [x] Sprint 10 - Notification system for milestones
 - [ ] Sprint 11 - RevenueCat reward integration
 - [ ] Sprint 12 - Admin dashboard overview page
 - [ ] Sprint 13 - Fraud detection review queue
