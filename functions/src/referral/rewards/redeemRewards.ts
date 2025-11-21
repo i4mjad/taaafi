@@ -19,6 +19,7 @@ const db = admin.firestore();
 /**
  * Redeem Referral Rewards
  * Callable function for users to redeem their accumulated rewards
+ * Note: API key loaded from .env file automatically
  */
 export const redeemReferralRewards = functions.https.onCall(
   async (data, context) => {

@@ -17,6 +17,7 @@ const db = admin.firestore();
 
 /**
  * Handle RevenueCat Webhook Events
+ * Note: API key loaded from .env file automatically
  */
 export const handleRevenueCatWebhook = functions.https.onRequest(
   async (req, res) => {

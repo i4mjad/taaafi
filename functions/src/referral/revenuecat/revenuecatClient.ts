@@ -4,7 +4,6 @@
  */
 
 import axios, { AxiosInstance, AxiosError } from "axios";
-import * as functions from "firebase-functions";
 import {
   GrantEntitlementRequest,
   RevenueCatSubscriber,
@@ -18,13 +17,12 @@ export class RevenueCatClient {
   private secretKey: string;
 
   constructor(secretKey?: string) {
-    // Get API key from Firebase config or constructor parameter
-    this.secretKey =
-      secretKey || functions.config().revenuecat?.secret_key || "";
+    // Get API key from .env file (loaded automatically by Firebase)
+    this.secretKey = secretKey || process.env.REVENUECAT_SECRET_KEY || "";
 
     if (!this.secretKey) {
       console.error(
-        "RevenueCat: Secret key not configured. Set with: firebase functions:config:set revenuecat.secret_key=sk_XXXXX"
+        "RevenueCat: Secret key not configured. Add REVENUECAT_SECRET_KEY to functions/.env file"
       );
     }
 
