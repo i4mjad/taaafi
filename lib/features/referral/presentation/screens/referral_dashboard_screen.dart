@@ -42,7 +42,7 @@ class ReferralDashboardScreen extends ConsumerWidget {
           ref.invalidate(userReferralCodeProvider);
           ref.invalidate(referralStatsProvider);
           ref.invalidate(referredUsersProvider);
-          
+
           // Wait for all providers to reload
           await Future.wait([
             ref.read(userReferralCodeProvider.future),
@@ -376,16 +376,16 @@ class ReferralDashboardScreen extends ConsumerWidget {
       // Call Cloud Function to generate referral code
       final functions = FirebaseFunctions.instance;
       final callable = functions.httpsCallable('generateUserReferralCode');
-      
+
       final result = await callable.call();
-      
+
       // Close loading dialog
       if (context.mounted) Navigator.of(context).pop();
 
       if (result.data['success'] == true) {
         // Show success message
         getSuccessSnackBar(context, 'referral.dashboard.code_generated');
-        
+
         // Refresh the dashboard
         if (context.mounted) {
           final container = ProviderScope.containerOf(context);
@@ -405,7 +405,7 @@ class ReferralDashboardScreen extends ConsumerWidget {
                 ),
               ),
               content: Text(
-                result.data['message'] ?? 
+                result.data['message'] ??
                     l10n.translate('referral.dashboard.generation_failed'),
                 style: TextStyles.body,
               ),
@@ -422,19 +422,22 @@ class ReferralDashboardScreen extends ConsumerWidget {
     } on FirebaseFunctionsException catch (e) {
       // Close loading dialog
       if (context.mounted) Navigator.of(context).pop();
-      
+
       // Show error dialog
       if (context.mounted) {
         String errorMessage;
         switch (e.code) {
           case 'already-exists':
-            errorMessage = l10n.translate('referral.dashboard.code_already_exists');
+            errorMessage =
+                l10n.translate('referral.dashboard.code_already_exists');
             break;
           case 'resource-exhausted':
-            errorMessage = l10n.translate('referral.dashboard.generation_limit_reached');
+            errorMessage =
+                l10n.translate('referral.dashboard.generation_limit_reached');
             break;
           default:
-            errorMessage = l10n.translate('referral.dashboard.generation_failed');
+            errorMessage =
+                l10n.translate('referral.dashboard.generation_failed');
         }
 
         showDialog(
@@ -462,7 +465,7 @@ class ReferralDashboardScreen extends ConsumerWidget {
     } catch (e) {
       // Close loading dialog
       if (context.mounted) Navigator.of(context).pop();
-      
+
       // Show generic error
       if (context.mounted) {
         showDialog(
@@ -490,4 +493,3 @@ class ReferralDashboardScreen extends ConsumerWidget {
     }
   }
 }
-

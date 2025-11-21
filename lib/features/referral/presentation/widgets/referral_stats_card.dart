@@ -140,9 +140,8 @@ class _StatItem extends StatelessWidget {
               Expanded(
                 child: Text(
                   label,
-                  style: TextStyles.caption.copyWith(
+                  style: TextStyles.small.copyWith(
                     color: theme.grey[600],
-                    fontSize: 11,
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
