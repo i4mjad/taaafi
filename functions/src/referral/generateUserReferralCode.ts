@@ -2,7 +2,7 @@
 
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
-import {generateReferralCode} from './helpers/codeGenerator';
+import {generateAndEnsureUniqueCode} from './helpers/codeGenerator';
 
 /**
  * Callable function for users to manually generate their referral code.
@@ -71,8 +71,15 @@ export const generateUserReferralCode = functions.https.onCall(
         attemptedAt: admin.firestore.FieldValue.serverTimestamp(),
       });
 
+      // Get user details for code generation
+      const userDoc = await db.collection('users').doc(userId).get();
+      const userData = userDoc.data();
+      
+      const userName = userData?.displayName || userData?.name || '';
+      const userEmail = userData?.email || context.auth.token.email || '';
+
       // Generate unique referral code
-      const code = await generateReferralCode(db);
+      const code = await generateAndEnsureUniqueCode(userName, userEmail);
 
       // Create referral code document
       const referralCodeData = {
