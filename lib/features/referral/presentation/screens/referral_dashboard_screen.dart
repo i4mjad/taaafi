@@ -60,7 +60,7 @@ class ReferralDashboardScreen extends ConsumerWidget {
               referralCodeAsync.when(
                 data: (referralCode) {
                   if (referralCode == null) {
-                    return _buildNoCodeCard(theme, l10n);
+                    return _buildNoCodeCard(context, theme, l10n);
                   }
                   return ReferralCodeCard(
                     code: referralCode.code,
@@ -208,7 +208,8 @@ class ReferralDashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildNoCodeCard(dynamic theme, AppLocalizations l10n) {
+  Widget _buildNoCodeCard(
+      BuildContext context, dynamic theme, AppLocalizations l10n) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
