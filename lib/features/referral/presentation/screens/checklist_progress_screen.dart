@@ -231,8 +231,8 @@ class ChecklistProgressScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 20),
 
-                  // What happens next button (if not completed)
-                  if (!entity.isVerified) ...[
+                  // What happens next button (ONLY for users viewing their own progress)
+                  if (isViewingOwnProgress && !entity.isVerified) ...[
                     SizedBox(
                       width: double.infinity,
                       child: OutlinedButton.icon(
