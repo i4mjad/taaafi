@@ -11,17 +11,33 @@ import { ReferralVerification } from '../types/referral.types';
  * Firestore trigger that tracks group message creation for verification checklist.
  * Increments the groupMessages3 counter and marks as completed when 3 messages are sent
  * in the group the user joined.
+ * 
+ * NOTE: Group messages are stored in a flat 'group_messages' collection, not as subcollection.
  */
 export const onGroupMessageCreated = functions.firestore
-  .document('groups/{groupId}/group_messages/{messageId}')
+  .document('group_messages/{messageId}')
   .onCreate(async (snap, context) => {
     const messageId = context.params.messageId;
-    const groupId = context.params.groupId;
     const messageData = snap.data();
+    const groupId = messageData?.groupId;
     const senderCpId = messageData?.senderCpId;
+    const isDeleted = messageData?.isDeleted || false;
+    const isHidden = messageData?.isHidden || false;
+    const moderationStatus = messageData?.moderation?.status;
 
     if (!senderCpId) {
       console.log(`⚠️ Group message ${messageId} has no senderCpId`);
+      return;
+    }
+
+    if (!groupId) {
+      console.log(`⚠️ Group message ${messageId} has no groupId`);
+      return;
+    }
+
+    // Skip tracking for deleted, hidden, or blocked messages
+    if (isDeleted || isHidden || moderationStatus === 'blocked') {
+      console.log(`⏭️ Skipping referral tracking for message ${messageId} - isDeleted: ${isDeleted}, isHidden: ${isHidden}, moderationStatus: ${moderationStatus}`);
       return;
     }
 

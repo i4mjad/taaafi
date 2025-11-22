@@ -8,6 +8,7 @@ export enum NotificationType {
   FRIEND_TASK_PROGRESS = 'friend_task_progress',
   FRIEND_VERIFIED = 'friend_verified',
   FRIEND_SUBSCRIBED = 'friend_subscribed',
+  FRIEND_DELETED = 'friend_deleted',
   MILESTONE_REACHED = 'milestone_reached',
   REWARD_READY = 'reward_ready',
   REWARD_REDEEMED = 'reward_redeemed',
@@ -38,5 +39,6 @@ export interface ReferralNotificationData {
   referralCode?: string;
   duration?: string;
   expiresAt?: string;
+  wasVerified?: string;
 }
 

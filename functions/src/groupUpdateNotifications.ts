@@ -1,5 +1,6 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
+import { getUserLocale } from './utils/localeHelper';
 
 interface UpdateData {
   groupId: string;
@@ -70,7 +71,7 @@ export const sendUpdateNotification = functions.firestore
           
           const userData = userDoc.data()!;
           const fcmToken = userData.messagingToken || userData.fcmToken;
-          const locale = userData.locale || 'english';
+          const locale = getUserLocale(userData);
           
           if (!fcmToken) return null;
 
@@ -206,7 +207,7 @@ export const sendCommentNotification = functions.firestore
 
       const userData = userDoc.data()!;
       const fcmToken = userData.messagingToken || userData.fcmToken;
-      const locale = userData.locale || 'english';
+      const locale = getUserLocale(userData);
 
       if (!fcmToken) {
         console.log('📭 No FCM token');

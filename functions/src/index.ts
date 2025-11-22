@@ -970,15 +970,19 @@ export const deleteUserAccount = onCall(
         console.log('🏦 Deleting vault data...');
         await deleteVaultData(db, userId, deletionSummary);
         
-        // 3. Delete User Profile and Main Document
+        // 3. Handle Referral Data (notify referrer, update stats)
+        console.log('🔗 Handling referral data...');
+        await handleReferralDataOnDeletion(db, userId, deletionSummary);
+        
+        // 4. Delete User Profile and Main Document
         console.log('👤 Deleting user profile...');
         await deleteUserProfile(db, userId, deletionSummary);
         
-        // 4. Delete Authentication Records
+        // 5. Delete Authentication Records
         console.log('🔐 Deleting authentication records...');
         await deleteAuthenticationData(db, userId, deletionSummary);
         
-        // 5. Add deletion record for audit purposes
+        // 6. Add deletion record for audit purposes
         console.log('📝 Creating deletion audit record...');
         await createDeletionAuditRecord(db, deletionSummary);
         
@@ -1117,6 +1121,36 @@ async function deleteCommunityData(
     console.error('❌ Error deleting community data:', error);
     summary.errors.push(`Community deletion failed: ${error.message}`);
     throw error;
+  }
+}
+
+// Helper function to handle referral data on user deletion
+async function handleReferralDataOnDeletion(
+  db: FirebaseFirestore.Firestore,
+  userId: string,
+  summary: any
+): Promise<void> {
+  try {
+    // Import the handler (dynamic import to avoid circular dependencies)
+    const { handleReferralUserDeletion } = await import('./referral/handlers/userDeletionHandler');
+    
+    const result = await handleReferralUserDeletion(userId);
+    
+    summary.collections.referralVerifications = result.verificationsMarked;
+    summary.collections.referralNotifications = result.referrerNotified ? 1 : 0;
+    summary.collections.referralStats = result.statsUpdated ? 1 : 0;
+    
+    if (result.errors.length > 0) {
+      console.warn(`⚠️ Referral cleanup had errors: ${result.errors.join(', ')}`);
+      summary.errors.push(...result.errors);
+    } else {
+      console.log('✅ Referral data handled successfully');
+    }
+    
+  } catch (error) {
+    console.error('❌ Error handling referral data:', error);
+    summary.errors.push(`Referral cleanup failed: ${error.message}`);
+    // Don't throw - referral cleanup failure shouldn't block account deletion
   }
 }
 

@@ -33,6 +33,10 @@ export const notificationTemplates: NotificationTemplates = {
       title: '💰 Bonus Earned!',
       body: '{friendName} subscribed to Premium. You earned 2 weeks bonus!'
     },
+    [NotificationType.FRIEND_DELETED]: {
+      title: '📊 Referral Update',
+      body: 'One of your referrals deleted their account. Your stats have been updated.'
+    },
     [NotificationType.MILESTONE_REACHED]: {
       title: '🎁 Reward Unlocked!',
       body: 'You earned {reward}! Tap to redeem.'
@@ -82,6 +86,10 @@ export const notificationTemplates: NotificationTemplates = {
     [NotificationType.FRIEND_SUBSCRIBED]: {
       title: '💰 حصلت على مكافأة!',
       body: '{friendName} اشترك في البريميوم. حصلت على أسبوعين إضافيين!'
+    },
+    [NotificationType.FRIEND_DELETED]: {
+      title: '📊 تحديث في برنامج الإحالة',
+      body: 'أحد المستخدمين الذين تمت إحالتهم قد حذف حسابه. تم تحديث إحصائياتك.'
     },
     [NotificationType.MILESTONE_REACHED]: {
       title: '🎁 فتحت مكافأة!',

@@ -21,6 +21,7 @@ AccountStatus accountStatus(Ref ref) {
 
   // If either provider is still loading, return loading status
   if (userDocAsync.isLoading || userAsync.isLoading) {
+    print('🔄 ACCOUNT STATUS: Loading...');
     return AccountStatus.loading;
   }
 
@@ -28,18 +29,26 @@ AccountStatus accountStatus(Ref ref) {
     data: (doc) {
       return userAsync.when(
         data: (user) {
+          print('=== ACCOUNT STATUS CHECK ===');
+          print('📧 User email: ${user?.email}');
+          print('🔐 User UID: ${user?.uid}');
+          print('📱 Provider data: ${user?.providerData.map((p) => p.providerId).join(', ')}');
+          
           // If no user is logged in, return ok (this will be handled by auth routing)
           if (user == null) {
+            print('✅ ACCOUNT STATUS: OK (No user logged in)');
             return AccountStatus.ok;
           }
 
           // If no document exists, user needs to complete registration
           if (doc == null) {
+            print('⚠️ ACCOUNT STATUS: needCompleteRegistration (No document)');
             return AccountStatus.needCompleteRegistration;
           }
 
           // Check if account deletion is pending
           if (doc.isRequestedToBeDeleted == true) {
+            print('⚠️ ACCOUNT STATUS: pendingDeletion');
             return AccountStatus.pendingDeletion;
           }
 
@@ -57,23 +66,42 @@ AccountStatus accountStatus(Ref ref) {
                   .any((provider) => provider.providerId == 'password') &&
               !hasOnlyAppleProvider &&
               !isAppleUserWithoutEmail) {
+            print('⚠️ ACCOUNT STATUS: needEmailVerification');
             return AccountStatus.needEmailVerification;
           }
 
           // Check if user document has missing data or is legacy
           final notifier = ref.read(userDocumentsNotifierProvider.notifier);
-          if (notifier.hasMissingData(doc) ||
-              notifier.isLegacyUserDocument(doc)) {
+          final hasMissing = notifier.hasMissingData(doc);
+          final isLegacy = notifier.isLegacyUserDocument(doc);
+          
+          if (hasMissing || isLegacy) {
+            print('⚠️ ACCOUNT STATUS: needConfirmDetails');
+            print('   - Has missing data: $hasMissing');
+            print('   - Is legacy document: $isLegacy');
             return AccountStatus.needConfirmDetails;
           }
 
+          print('✅ ACCOUNT STATUS: OK (All checks passed)');
           return AccountStatus.ok;
         },
-        error: (_, __) => AccountStatus.needCompleteRegistration,
-        loading: () => AccountStatus.loading, // Still loading user data
+        error: (error, __) {
+          print('❌ ACCOUNT STATUS: needCompleteRegistration (User error: $error)');
+          return AccountStatus.needCompleteRegistration;
+        },
+        loading: () {
+          print('🔄 ACCOUNT STATUS: Loading (User data)');
+          return AccountStatus.loading;
+        },
       );
     },
-    error: (_, __) => AccountStatus.needCompleteRegistration,
-    loading: () => AccountStatus.loading, // Still loading document data
+    error: (error, __) {
+      print('❌ ACCOUNT STATUS: needCompleteRegistration (Document error: $error)');
+      return AccountStatus.needCompleteRegistration;
+    },
+    loading: () {
+      print('🔄 ACCOUNT STATUS: Loading (Document data)');
+      return AccountStatus.loading;
+    },
   );
 }

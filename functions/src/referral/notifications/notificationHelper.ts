@@ -6,6 +6,7 @@
 import * as admin from 'firebase-admin';
 import { NotificationType, ReferralNotificationData } from './notificationTypes';
 import { buildNotification } from './notificationTemplates';
+import { getUserLocale, getLanguageCode } from '../../utils/localeHelper';
 
 /**
  * Send a referral notification to a user
@@ -41,11 +42,12 @@ export async function sendReferralNotification(
       return false;
     }
     
-    // Get user's locale (default to English)
-    const locale = userData.language || userData.locale || 'en';
+    // Get user's locale using standardized helper
+    const locale = getUserLocale(userData);
+    const languageCode = getLanguageCode(locale);
     
     // Build notification from template
-    const notification = buildNotification(type, locale, data as Record<string, string>);
+    const notification = buildNotification(type, languageCode, data as Record<string, string>);
     
     // Prepare notification data
     const notificationData: Record<string, string> = {

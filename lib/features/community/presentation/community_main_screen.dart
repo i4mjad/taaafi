@@ -30,7 +30,8 @@ import 'package:reboot_app_3/core/shared_widgets/account_action_banner.dart';
 import 'package:reboot_app_3/core/shared_widgets/complete_registration_banner.dart';
 import 'package:reboot_app_3/core/shared_widgets/confirm_details_banner.dart';
 import 'package:reboot_app_3/core/shared_widgets/confirm_email_banner.dart';
-import 'package:reboot_app_3/features/direct_messaging/presentation/screens/community_chats_screen.dart';
+// TODO: Temporarily disabled - uncomment when chats tab is re-enabled
+// import 'package:reboot_app_3/features/direct_messaging/presentation/screens/community_chats_screen.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/groups_main_screen.dart';
 
 class CommunityMainScreen extends ConsumerStatefulWidget {
@@ -56,10 +57,11 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
   void initState() {
     super.initState();
 
-    // Initialize tab controller with 3 tabs (Community, Chats, and Groups)
+    // Initialize tab controller with 2 tabs (Community and Groups)
+    // TODO: Chats tab temporarily disabled - change back to length: 3 when re-enabled
     // Dispose any existing controller first (in case of hot reload)
     _tabController?.dispose();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
 
     // Listen to tab changes to update UI (e.g., floating action button)
     _tabController!.addListener(() {
@@ -373,32 +375,33 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
                   ],
                 ),
               ),
-              Tab(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      LucideIcons.messageSquare,
-                      size: 18,
-                      color: _tabController!.index == 1
-                          ? theme.primary[600]
-                          : theme.grey[600],
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      AppLocalizations.of(context).translate('community-chats'),
-                      style: (_tabController!.index == 1
-                              ? TextStyles.footnoteSelected
-                              : TextStyles.footnote)
-                          .copyWith(
-                              color: _tabController!.index == 1
-                                  ? theme.primary[600]
-                                  : theme.grey[600],
-                              fontSize: 12),
-                    ),
-                  ],
-                ),
-              ),
+              // TODO: Chats tab temporarily disabled - uncomment when re-enabled
+              // Tab(
+              //   child: Row(
+              //     mainAxisAlignment: MainAxisAlignment.center,
+              //     children: [
+              //       Icon(
+              //         LucideIcons.messageSquare,
+              //         size: 18,
+              //         color: _tabController!.index == 1
+              //             ? theme.primary[600]
+              //             : theme.grey[600],
+              //       ),
+              //       const SizedBox(width: 8),
+              //       Text(
+              //         AppLocalizations.of(context).translate('community-chats'),
+              //         style: (_tabController!.index == 1
+              //                 ? TextStyles.footnoteSelected
+              //                 : TextStyles.footnote)
+              //             .copyWith(
+              //                 color: _tabController!.index == 1
+              //                     ? theme.primary[600]
+              //                     : theme.grey[600],
+              //                 fontSize: 12),
+              //       ),
+              //     ],
+              //   ),
+              // ),
               Tab(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -406,18 +409,18 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
                     Icon(
                       LucideIcons.users2,
                       size: 18,
-                      color: _tabController!.index == 2
+                      color: _tabController!.index == 1
                           ? theme.primary[600]
                           : theme.grey[600],
                     ),
                     const SizedBox(width: 8),
                     Text(
                       AppLocalizations.of(context).translate('group'),
-                      style: (_tabController!.index == 2
+                      style: (_tabController!.index == 1
                               ? TextStyles.footnoteSelected
                               : TextStyles.footnote)
                           .copyWith(
-                              color: _tabController!.index == 2
+                              color: _tabController!.index == 1
                                   ? theme.primary[600]
                                   : theme.grey[600],
                               fontSize: 12),
@@ -433,7 +436,8 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
               controller: _tabController!,
               children: [
                 _buildForumTab(),
-                const CommunityChatsScreen(showAppBar: false),
+                // TODO: Chats tab temporarily disabled - uncomment when re-enabled
+                // const CommunityChatsScreen(showAppBar: false),
                 const GroupsMainScreen(),
               ],
             ),

@@ -2,6 +2,7 @@ import { onDocumentUpdated } from 'firebase-functions/v2/firestore';
 import { getMessaging } from 'firebase-admin/messaging';
 import { getFirestore } from 'firebase-admin/firestore';
 import { logger } from 'firebase-functions';
+import { getUserLocale } from './utils/localeHelper';
 
 /**
  * Localization for group member management notifications
@@ -195,14 +196,15 @@ export const sendMemberManagementNotification = onDocumentUpdated(
         return;
       }
 
-      const groupName = userData.locale === 'arabic' ? groupData.nameAr : groupData.name;
+      const locale = getUserLocale(userData);
+      const groupName = locale === 'arabic' ? groupData.nameAr : groupData.name;
 
       // Check for role changes (promotion/demotion)
       if (beforeData.role !== afterData.role) {
         if (beforeData.role === 'member' && afterData.role === 'admin') {
           // Promotion to admin
-          const title = translate('promoted-title', userData.locale);
-          const body = translate('promoted-body', userData.locale, { groupName });
+          const title = translate('promoted-title', locale);
+          const body = translate('promoted-body', locale, { groupName });
           
           await sendNotification(userData.fcmToken, title, body, {
             screen: 'groups',
@@ -214,8 +216,8 @@ export const sendMemberManagementNotification = onDocumentUpdated(
           logger.info(`✅ Promotion notification sent to user ${userData.userUID} (cpId: ${cpId}) for group ${groupId}`);
         } else if (beforeData.role === 'admin' && afterData.role === 'member') {
           // Demotion to member
-          const title = translate('demoted-title', userData.locale);
-          const body = translate('demoted-body', userData.locale, { groupName });
+          const title = translate('demoted-title', locale);
+          const body = translate('demoted-body', locale, { groupName });
           
           await sendNotification(userData.fcmToken, title, body, {
             screen: 'groups',
@@ -231,8 +233,8 @@ export const sendMemberManagementNotification = onDocumentUpdated(
       // Check for removal (isActive changed from true to false)
       if (beforeData.isActive === true && afterData.isActive === false) {
         // Member was removed from group
-        const title = translate('removed-title', userData.locale);
-        const body = translate('removed-body', userData.locale, { groupName });
+        const title = translate('removed-title', locale);
+        const body = translate('removed-body', locale, { groupName });
         
         await sendNotification(userData.fcmToken, title, body, {
           screen: 'groups',

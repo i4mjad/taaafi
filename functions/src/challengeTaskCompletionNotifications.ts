@@ -1,6 +1,7 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 import {logger} from 'firebase-functions';
+import { getUserLocale } from './utils/localeHelper';
 import {getMessaging} from 'firebase-admin/messaging';
 
 // Translation keys for different locales
@@ -72,7 +73,7 @@ async function getUserData(cpId: string) {
     return {
       userUID,
       cpId,
-      locale: userData?.locale || 'english',
+      locale: getUserLocale(userData),
       fcmToken: userData?.messagingToken || userData?.fcmToken,
       displayName,
       isAnonymous,

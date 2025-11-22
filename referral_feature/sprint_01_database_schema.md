@@ -67,6 +67,8 @@ Fields:
   - isActive: boolean (default: true)
   - totalRedemptions: number (default: 0)
   - lastUsedAt: timestamp?
+  - deactivatedAt: timestamp? (when code was deactivated)
+  - deactivatedReason: string? (reason for deactivation, e.g., 'User account deleted')
 ```
 
 #### 1.3: `referralVerifications/{userId}` (One per Referred User)
@@ -76,6 +78,7 @@ Fields:
   - userId: string (referee's UID)
   - referrerId: string (referrer's UID)
   - referralCode: string
+  - userEmail: string (normalized email for duplicate prevention)
   - signupDate: timestamp
   - currentTier: string ('none' | 'verified' | 'paid')
 
@@ -87,7 +90,7 @@ Fields:
       - groupMessages3: map { completed: boolean, completedAt: timestamp?, current: number }
       - activityStarted: map { completed: boolean, completedAt: timestamp?, activityId: string? }
 
-  - verificationStatus: string ('pending' | 'verified' | 'blocked')
+  - verificationStatus: string ('pending' | 'verified' | 'blocked' | 'deleted')
   - verifiedAt: timestamp?
 
   - fraudScore: number (0-100)
@@ -98,6 +101,11 @@ Fields:
 
   - rewardAwarded: boolean (default: false)
   - rewardAwardedAt: timestamp?
+
+  - deletedAt: timestamp? (when referred user deleted their account)
+  - deletedReason: string? (reason for deletion)
+  - referrerDeleted: boolean? (true if referrer deleted their account)
+  - referrerDeletedAt: timestamp? (when referrer deleted their account)
 
   - lastCheckedAt: timestamp
   - updatedAt: timestamp
@@ -115,6 +123,8 @@ Fields:
   - awardedAt: timestamp
   - status: string ('pending' | 'awarded' | 'failed')
   - errorMessage: string?
+  - referrerDeleted: boolean? (true if referrer deleted their account)
+  - referrerDeletedAt: timestamp? (when referrer deleted their account)
 ```
 
 #### 1.5: `referralStats/{userId}` (One per User)
@@ -138,6 +148,8 @@ Fields:
       - achievedAt: timestamp
       - reward: string
 
+  - isDeleted: boolean? (true if this referrer deleted their account)
+  - deletedAt: timestamp? (when referrer deleted their account)
   - lastUpdatedAt: timestamp
 ```
 
@@ -266,6 +278,13 @@ Add to `firestore.indexes.json`:
       "fields": [
         { "fieldPath": "verificationStatus", "order": "ASCENDING" },
         { "fieldPath": "fraudScore", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "referralVerifications",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userEmail", "order": "ASCENDING" }
       ]
     },
     {

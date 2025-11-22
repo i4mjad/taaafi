@@ -2,6 +2,7 @@ import { onDocumentCreated } from 'firebase-functions/v2/firestore';
 import { setGlobalOptions } from 'firebase-functions/v2';
 import * as admin from 'firebase-admin';
 import OpenAI from 'openai';
+import { getUserLocale as getStandardLocale } from './utils/localeHelper';
 
 // Set global options for all functions
 setGlobalOptions({
@@ -30,7 +31,7 @@ interface UpdateData {
 
 interface UserProfile {
   userUID: string;
-  locale?: 'arabic' | 'english';
+  locale?: string;
   [key: string]: any;
 }
 
@@ -310,12 +311,15 @@ const MODERATION_PROMPTS = {
 
 **السياق المهم:**
 هذا تحديث عام في مجموعة دعم. يجب أن يكون المحتوى داعماً وآمناً للجميع.
+التطبيق يحتوي على مجموعات دعم متعددة يمكن للمستخدمين الانتقال بينها.
 
 **المحتوى المسموح (لا تحجبه):**
 ✅ مشاركة الإنجازات والاحتفال بالتعافي
 ✅ طلب الدعم والمساعدة
 ✅ مشاركة التجارب الشخصية المفيدة
 ✅ النقاش حول التحديات والانتكاسات بصدق
+✅ دعوة الأعضاء لمجموعات دعم أخرى داخل التطبيق
+✅ ذكر مجموعات أخرى داخل التطبيق
 
 **المخالفات المطلوب رصدها فقط:**
 
@@ -323,9 +327,14 @@ const MODERATION_PROMPTS = {
    - طلبات لقاءات جنسية حقيقية
    - عروض جنسية مباشرة صريحة
 
-2. **مشاركة وسائل التواصل لأغراض غير علاجية واضحة**
-   - "تابعوني على انستقرام" + اسم حساب (للترويج)
-   - محاولات واضحة لنقل المحادثة خارج التطبيق لأغراض تجارية أو شخصية مشبوهة
+2. **مشاركة حسابات منصات التواصل الخارجية**
+   - مشاركة حسابات انستقرام، سناب شات، واتساب، فيسبوك، تيك توك، تليجرام
+   - أمثلة: "تابعوني على انستقرام @username"، "ضيفوني على سناب"، "راسلوني واتساب"
+   - محاولات واضحة لنقل المحادثة إلى منصات خارجية (وليس المجموعات الداخلية)
+   - مشاركة أسماء مستخدمين أو روابط لمنصات خارجية
+
+**ملاحظة هامة:**
+لا تحجب الدعوات لمجموعات أخرى داخل التطبيق. فقط احجب المحاولات لنقل المستخدمين إلى منصات خارجية.
 
 **النص المطلوب تحليله:**
 "{{MESSAGE_TEXT}}"
@@ -343,18 +352,21 @@ const MODERATION_PROMPTS = {
   "culturalContext": "ملاحظة"
 }
 
-مهم: كن متوازناً. احجب المحتوى الخطير أو الترويجي الواضح، ولكن اسمح بالتعبير الصادق عن المشاعر.`,
+مهم: كن متوازناً. احجب المحتوى الخطير أو محاولات التواصل عبر المنصات الخارجية فقط، ولكن اسمح بدعوات المجموعات الداخلية والتعبير الصادق عن المشاعر.`,
 
   english: `You are a content moderation system for GROUP UPDATES in a recovery app.
 
 **Important Context:**
 This is a public update in a support group. Content should be supportive and safe for everyone.
+The app has multiple support groups that users can navigate between.
 
 **ALLOWED Content (DO NOT block):**
 ✅ Sharing achievements and celebrating recovery
 ✅ Asking for support and help
 ✅ Sharing helpful personal experiences
 ✅ Discussing challenges and relapses honestly
+✅ Inviting members to other in-app support groups
+✅ References to other in-app groups
 
 **VIOLATIONS to Detect:**
 
@@ -362,12 +374,14 @@ This is a public update in a support group. Content should be supportive and saf
    - Actual requests for real sexual encounters
    - Explicit direct sexual propositions
 
-2. **Social Media Account Requests or Sharing**
-   - ANY request for social media accounts (Instagram, Snapchat, WhatsApp, Facebook, TikTok, Telegram, etc.)
-   - Examples: "your snapchat?", "what's your insta?", "send me your WhatsApp", "add me on telegram"
-   - Sharing personal social media handles or usernames
-   - ANY attempt to move conversation outside the app to social media platforms
-   - This includes BOTH explicit sharing and asking for others' accounts
+2. **EXTERNAL Social Media Platform Account Sharing**
+   - Sharing accounts on Instagram, Snapchat, WhatsApp, Facebook, TikTok, Telegram
+   - Examples: "follow me on Instagram @username", "add me on Snapchat", "message me on WhatsApp"
+   - Clear attempts to move conversation to EXTERNAL platforms (not in-app groups)
+   - Sharing usernames or links to external social media platforms
+
+**Important Note:**
+DO NOT block invitations to other in-app support groups. ONLY block attempts to move users to external social media platforms.
 
 **Text to Analyze:**
 "{{MESSAGE_TEXT}}"
@@ -385,7 +399,7 @@ Respond with JSON only:
   "culturalContext": "Note"
 }
 
-Important: Be balanced. Block clearly dangerous or promotional content, but allow honest expression of feelings.`
+Important: Be balanced. Block attempts to connect via external platforms only, but allow in-app group invitations and honest expression of feelings.`
 };
 
 /**
@@ -424,14 +438,14 @@ async function getUserLocale(senderCpId: string): Promise<'arabic' | 'english'> 
     }
     
     const userData = userDoc.data();
-    const locale = userData?.locale || 'arabic';
+    const locale = getStandardLocale(userData);
     
     console.log('🌐 User locale determined:', locale);
-    return locale === 'english' ? 'english' : 'arabic';
+    return locale;
     
   } catch (error) {
     console.error('❌ Error getting user locale:', error);
-    return 'arabic';
+    return 'english';
   }
 }
 

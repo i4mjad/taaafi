@@ -139,16 +139,37 @@ class FCMRepository {
   FCMRepository(this._messaging);
 
   Future<String> getMessagingToken() async {
-    try {
-      if (Platform.isIOS) {
-        // Try to get APNS token first, but don't fail if not available
-        await _messaging.getAPNSToken();
+    print('🔑 FCM REPO: Getting messaging token...');
+    print('🔑 FCM REPO: Platform: ${Platform.isIOS ? "iOS" : "Android"}');
+    
+    // On iOS, try to get APNS token first (but don't fail if not available)
+    if (Platform.isIOS) {
+      try {
+        print('🔑 FCM REPO: iOS detected, requesting APNS token...');
+        final apnsToken = await _messaging.getAPNSToken();
+        print('🔑 FCM REPO: APNS Token: ${apnsToken ?? "null"}');
+      } catch (e) {
+        // APNS token not available yet - this is OK, FCM token will still work
+        print('⚠️ FCM REPO: APNS token not available (this is OK): $e');
       }
-      return await _messaging.getToken() ?? "Missing token";
-    } catch (e) {
-      // If APNS token is not available yet, return a placeholder
-      // The token will be updated later when it becomes available
-      print('FCM token not available yet: $e');
+    }
+    
+    // Get FCM token - this should always work regardless of APNS token
+    try {
+      print('🔑 FCM REPO: Getting FCM token from Firebase...');
+      final token = await _messaging.getToken();
+      
+      if (token == null) {
+        print('⚠️ FCM REPO: Token is NULL, returning "Missing token"');
+        return "Missing token";
+      }
+      
+      print('✅ FCM REPO: Token retrieved successfully: ${token.substring(0, 20)}...');
+      return token;
+    } catch (e, stackTrace) {
+      // Only if FCM token itself fails, return placeholder
+      print('❌ FCM REPO ERROR: Failed to get FCM token: $e');
+      print('Stack trace: $stackTrace');
       return "Token pending";
     }
   }

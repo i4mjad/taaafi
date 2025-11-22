@@ -3955,14 +3955,14 @@ const Map<String, String> kEn = {
   'referral.dashboard.pending': 'Pending',
 
   // Rewards
-  'referral.dashboard.rewards_title': 'Rewards Earned',
-  'referral.dashboard.months_earned': 'Months Premium',
-  'referral.dashboard.weeks_earned': 'Weeks Premium',
-  'referral.dashboard.no_rewards_yet': 'Start sharing to earn rewards!',
-  'referral.dashboard.next_reward': 'Next Reward',
+  'referral.dashboard.rewards_title': 'Your Rewards (As Referrer)',
+  'referral.dashboard.months_earned': 'Months Premium (You)',
+  'referral.dashboard.weeks_earned': 'Weeks Premium (You)',
+  'referral.dashboard.no_rewards_yet': 'Share your code to earn Premium rewards for yourself!',
+  'referral.dashboard.next_reward': 'Your Next Reward',
   'referral.dashboard.users_to_next_milestone':
-      '{count} more verified users to unlock 1 month Premium',
-  'referral.dashboard.redeem_rewards': 'Redeem Rewards',
+      '{count} more verified users → YOU get 1 month Premium',
+  'referral.dashboard.redeem_rewards': 'Redeem My Rewards',
   'referral.dashboard.redeem_title': 'Redeem Coming Soon',
   'referral.dashboard.redeem_message':
       'Reward redemption will be available in the next update. Your rewards are safe!',
@@ -4069,11 +4069,11 @@ const Map<String, String> kEn = {
   // Celebration
   'referral.checklist.celebration_title': 'Congratulations! 🎉',
   'referral.checklist.celebration_message':
-      'You\'re verified! Enjoy 3 days of Premium access.',
-  'referral.checklist.premium_reward': '3 Days Premium Access',
-  'referral.checklist.explore_premium': 'Explore Premium Features',
+      'You\'re verified! You\'ve unlocked 3 days of Premium access as your reward.',
+  'referral.checklist.premium_reward': '3 Days Premium (Your Reward)',
+  'referral.checklist.explore_premium': 'Explore Your Premium Features',
   'referral.checklist.referrer_notified':
-      'Your friend has been notified of your achievement!',
+      'The friend who referred you has been notified!',
 
   // States
   'referral.checklist.under_review': 'Under Review',
@@ -4086,18 +4086,18 @@ const Map<String, String> kEn = {
   // What Happens Next
   'referral.checklist.what_happens_next': 'What Happens Next?',
   'referral.checklist.what_happens_title': 'After Verification',
-  'referral.checklist.step1_title': 'You Get Premium',
+  'referral.checklist.step1_title': '✅ You Get 3 Days Premium',
   'referral.checklist.step1_message':
-      'Enjoy 3 days of Premium access with all features unlocked!',
-  'referral.checklist.step2_title': 'Friend Gets Progress',
+      'As the referred user, YOU receive 3 days of Premium access immediately!',
+  'referral.checklist.step2_title': '🎁 Your Friend Gets Progress',
   'referral.checklist.step2_message':
-      'Your friend who referred you gets closer to earning rewards!',
-  'referral.checklist.step3_title': 'Continue Using App',
+      'The friend who referred you moves closer to their rewards (1 month per 5 verified users).',
+  'referral.checklist.step3_title': '🚀 Enjoy Premium Now',
   'referral.checklist.step3_message':
-      'Your Premium access starts immediately. Explore all features!',
-  'referral.checklist.step4_title': 'Subscribe for More',
+      'Your 3-day Premium access is active. Explore all features immediately!',
+  'referral.checklist.step4_title': '💎 Bonus: Subscribe = Gift Friend',
   'referral.checklist.step4_message':
-      'Love Premium? Subscribe and give your friend a 2-week bonus!',
+      'If you love Premium and subscribe, your friend gets a bonus 2 weeks free!',
 
   'common.ok': 'OK',
   'common.error': 'Error',

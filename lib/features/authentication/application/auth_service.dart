@@ -4,6 +4,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:reboot_app_3/core/monitoring/error_logger.dart';
 import 'package:reboot_app_3/core/services/email_sync_service.dart';
 import 'package:reboot_app_3/features/authentication/data/repositories/auth_repository.dart';
@@ -58,18 +59,39 @@ class AuthService {
     DateTime firstDate,
   ) async {
     try {
+      print('=== SIGNUP START ===');
+      print('📧 Email: $email');
+
       final credential = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
 
+      print('✅ SIGNUP: User created with UID: ${credential.user?.uid}');
+
       // Send email verification immediately after account creation
       if (credential.user != null && !credential.user!.emailVerified) {
         await credential.user!.sendEmailVerification();
+        print('📧 SIGNUP: Verification email sent');
       }
 
+      print('🔑 SIGNUP: Getting FCM token...');
       final fcmToken = await _fcmRepository.getMessagingToken();
+      print(
+          '📱 SIGNUP: FCM Token received: ${fcmToken.length > 20 ? fcmToken.substring(0, 20) + "..." : fcmToken}');
+
+      print('📱 SIGNUP: Getting device ID...');
       final deviceId = await _getDeviceId();
+      print('📱 SIGNUP: Device ID: $deviceId');
+
+      print('💾 SIGNUP: Creating user document...');
+      print('   - Name: $name');
+      print('   - DOB: $dob');
+      print('   - Gender: $gender');
+      print('   - Locale: $locale');
+      print('   - First Date: $firstDate');
+      print('   - FCM Token: $fcmToken');
+      print('   - Device ID: $deviceId');
 
       await _authRepository.creatUserDocuemnt(
         context,
@@ -83,13 +105,19 @@ class AuthService {
         deviceId,
       );
 
+      print('✅ SIGNUP: User document created successfully');
+
       // Invalidate startup to re-check security for new user
       if (credential.user != null) {
         _invalidateAppStartup();
       }
+
+      print('=== SIGNUP COMPLETE ===');
     } on FirebaseAuthException catch (e) {
+      print('❌ SIGNUP ERROR (Firebase): ${e.code} - ${e.message}');
       getSnackBar(context, e.code);
     } catch (e, stackTrace) {
+      print('❌ SIGNUP ERROR: $e');
       ref.read(errorLoggerProvider).logException(e, stackTrace);
       getSystemSnackBar(
         context,
@@ -134,13 +162,36 @@ class AuthService {
     try {
       await _auth.signOut();
 
-      final googleProvider = GoogleAuthProvider();
-      // Request email scope by default.
-      googleProvider.addScope('email');
-      // Force account selection prompt
-      googleProvider.setCustomParameters({"prompt": "select_account"});
+      // Use native Google Sign-In instead of redirect-based auth
+      final GoogleSignIn googleSignIn = GoogleSignIn(
+        scopes: ['email', 'profile'],
+      );
 
-      final userCredential = await _auth.signInWithProvider(googleProvider);
+      // IMPORTANT: Sign out from Google Sign-In first to force account selection
+      // This ensures users can choose a different account instead of auto-signing
+      // in with the cached account on Android
+      await googleSignIn.signOut();
+
+      // Trigger the authentication flow - this will now show account picker
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+
+      // If user cancels the sign-in
+      if (googleUser == null) {
+        return null;
+      }
+
+      // Obtain the auth details from the request
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+
+      // Create a new credential
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      // Sign in to Firebase with the Google credential
+      final userCredential = await _auth.signInWithCredential(credential);
       await userCredential.user?.reload();
       final user = _auth.currentUser;
 
@@ -263,12 +314,34 @@ class AuthService {
 
   Future<bool> reSignInWithGoogle(BuildContext context) async {
     try {
-      final googleProvider = GoogleAuthProvider();
-      googleProvider.addScope('email');
-      // Force account selection prompt
-      googleProvider.setCustomParameters({"prompt": "select_account"});
+      // Use native Google Sign-In for reauthentication
+      final GoogleSignIn googleSignIn = GoogleSignIn(
+        scopes: ['email', 'profile'],
+      );
 
-      await _auth.currentUser?.reauthenticateWithProvider(googleProvider);
+      // Sign out first to force account selection
+      await googleSignIn.signOut();
+
+      // Trigger the authentication flow
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+
+      // If user cancels the sign-in
+      if (googleUser == null) {
+        return false;
+      }
+
+      // Obtain the auth details from the request
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+
+      // Create a new credential
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      // Reauthenticate with the Google credential
+      await _auth.currentUser?.reauthenticateWithCredential(credential);
       return true;
     } on FirebaseAuthException catch (e, stackTrace) {
       ref.read(errorLoggerProvider).logException(e, stackTrace);
@@ -455,9 +528,26 @@ class AuthService {
     DateTime firstDate,
   ) async {
     try {
+      print('=== COMPLETE ACCOUNT REGISTRATION START ===');
+
       final user = await _authRepository.currentUser;
+      if (user == null) {
+        print('❌ COMPLETE REG: No current user');
+        return;
+      }
+
+      print('👤 COMPLETE REG: User UID: ${user.uid}');
+
+      print('🔑 COMPLETE REG: Getting FCM token...');
       final fcmToken = await _fcmRepository.getMessagingToken();
+      print(
+          '📱 COMPLETE REG: FCM Token: ${fcmToken.length > 20 ? fcmToken.substring(0, 20) + "..." : fcmToken}');
+
+      print('📱 COMPLETE REG: Getting device ID...');
       final deviceId = await _getDeviceId();
+      print('📱 COMPLETE REG: Device ID: $deviceId');
+
+      print('💾 COMPLETE REG: Creating user document...');
       await _authRepository.creatUserDocuemnt(
         context,
         user,
@@ -469,7 +559,11 @@ class AuthService {
         fcmToken,
         deviceId,
       );
+
+      print('✅ COMPLETE REG: Registration completed successfully');
+      print('=== COMPLETE ACCOUNT REGISTRATION END ===');
     } catch (e, stackTrace) {
+      print('❌ COMPLETE REG ERROR: $e');
       ref.read(errorLoggerProvider).logException(e, stackTrace);
     }
   }

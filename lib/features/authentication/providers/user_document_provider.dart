@@ -51,29 +51,47 @@ class UserDocumentsNotifier extends _$UserDocumentsNotifier {
         return null;
       }
 
+      print('📥 FETCHING USER DOCUMENT for UID: $uid');
+
       final doc = await _firestore
           .collection('users')
           .doc(uid)
           .get(GetOptions(source: Source.server));
 
       if (!doc.exists) {
+        print('⚠️ USER DOCUMENT: Document does not exist for UID: $uid');
         return null; // No document found
       }
 
       final data = doc.data();
       if (data == null) {
+        print('⚠️ USER DOCUMENT: Document exists but data is null for UID: $uid');
         return null;
       }
 
       // Check if the document has any non-null fields
       final hasAnyData = data.values.any((value) => value != null);
       if (!hasAnyData) {
+        print('⚠️ USER DOCUMENT: Document exists but all fields are null for UID: $uid');
         return null;
       }
 
+      print('📄 USER DOCUMENT RAW DATA:');
+      data.forEach((key, value) {
+        print('   - $key: $value');
+      });
+
       var userDocument = UserDocument.fromFirestore(doc);
+      
+      if (userDocument.uid == null) {
+        print('⚠️ USER DOCUMENT: Parsed document has null uid field');
+      } else {
+        print('✅ USER DOCUMENT: Successfully loaded document with uid: ${userDocument.uid}');
+      }
+      
       return userDocument.uid != null ? userDocument : null;
     } catch (e, stackTrace) {
+      print('❌ USER DOCUMENT ERROR: $e');
       ref.read(errorLoggerProvider).logException(e, stackTrace);
       return null;
     }
@@ -98,9 +116,24 @@ class UserDocumentsNotifier extends _$UserDocumentsNotifier {
 
     if (allFieldsNull) return false;
 
-    return userDocument.devicesIds == null ||
+    final isLegacy = userDocument.devicesIds == null ||
         userDocument.messagingToken == null ||
         userDocument.role == null;
+    
+    if (isLegacy) {
+      final legacyFields = <String>[];
+      if (userDocument.devicesIds == null) legacyFields.add('devicesIds');
+      if (userDocument.messagingToken == null) legacyFields.add('messagingToken');
+      if (userDocument.role == null) legacyFields.add('role');
+      
+      print('🔍 USER DOCUMENT IS LEGACY: Missing ${legacyFields.join(', ')}');
+      print('📋 Legacy check values:');
+      print('   - devicesIds: ${userDocument.devicesIds}');
+      print('   - messagingToken: ${userDocument.messagingToken}');
+      print('   - role: ${userDocument.role}');
+    }
+    
+    return isLegacy;
   }
 
   bool isNewUserDocument(UserDocument userDocument) {
@@ -110,12 +143,29 @@ class UserDocumentsNotifier extends _$UserDocumentsNotifier {
   }
 
   bool hasMissingData(UserDocument userDocument) {
-    return userDocument.displayName == null ||
-        userDocument.email == null ||
-        userDocument.locale == null ||
-        userDocument.uid == null ||
-        userDocument.dayOfBirth == null ||
-        userDocument.userFirstDate == null;
+    final missingFields = <String>[];
+    
+    if (userDocument.displayName == null) missingFields.add('displayName');
+    if (userDocument.email == null) missingFields.add('email');
+    if (userDocument.locale == null) missingFields.add('locale');
+    if (userDocument.uid == null) missingFields.add('uid');
+    if (userDocument.dayOfBirth == null) missingFields.add('dayOfBirth');
+    if (userDocument.userFirstDate == null) missingFields.add('userFirstDate');
+    
+    final hasMissing = missingFields.isNotEmpty;
+    
+    if (hasMissing) {
+      print('🔍 USER DOCUMENT MISSING DATA: ${missingFields.join(', ')}');
+      print('📋 Current document values:');
+      print('   - displayName: ${userDocument.displayName}');
+      print('   - email: ${userDocument.email}');
+      print('   - locale: ${userDocument.locale}');
+      print('   - uid: ${userDocument.uid}');
+      print('   - dayOfBirth: ${userDocument.dayOfBirth}');
+      print('   - userFirstDate: ${userDocument.userFirstDate}');
+    }
+    
+    return hasMissing;
   }
 
   Future<bool> hasOldStructure() async {

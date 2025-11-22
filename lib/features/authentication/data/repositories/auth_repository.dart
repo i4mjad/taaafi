@@ -61,9 +61,21 @@ class AuthRepository {
     String deviceId,
   ) async {
     try {
+      print('=== CREATE USER DOCUMENT ===');
+      
       if (user == null) {
+        print('❌ CREATE DOC: User is null, aborting');
         return;
       }
+      
+      print('📝 CREATE DOC: Building user document...');
+      print('   - UID: ${user.uid}');
+      print('   - Name: $name');
+      print('   - Email: ${user.email}');
+      print('   - Device ID: $deviceId');
+      print('   - Messaging Token: $messagingToken');
+      print('   - Role: user');
+      
       final userDocument = UserDocument(
         uid: user.uid,
         devicesIds: [deviceId],
@@ -77,13 +89,32 @@ class AuthRepository {
         messagingToken: messagingToken,
       );
 
+      print('🔄 CREATE DOC: Converting to Firestore map...');
       var userDocumentMap = userDocument.toFirestore();
+      
+      print('📄 CREATE DOC: Document map contents:');
+      userDocumentMap.forEach((key, value) {
+        if (key == 'messagingToken') {
+          print('   - $key: $value ${value == null ? "(NULL!)" : value.toString().isEmpty ? "(EMPTY!)" : "(OK)"}');
+        } else {
+          print('   - $key: $value');
+        }
+      });
+      
+      print('🔐 CREATE DOC: Adding user to trackers...');
       await _addUserIdentifierToTrackers(user);
+      
+      print('💾 CREATE DOC: Saving to Firestore...');
       await _firestore
           .collection("users")
           .doc(userDocument.uid)
           .set(userDocumentMap);
+      
+      print('✅ CREATE DOC: User document saved successfully!');
+      print('=== CREATE USER DOCUMENT COMPLETE ===');
     } catch (e, stackTrace) {
+      print('❌ CREATE DOC ERROR: $e');
+      print('Stack trace: $stackTrace');
       ref.read(errorLoggerProvider).logException(e, stackTrace);
     }
   }

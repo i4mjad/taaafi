@@ -3867,14 +3867,14 @@ const Map<String, String> kAr = {
   'referral.dashboard.pending': 'قيد الانتظار',
 
   // Rewards
-  'referral.dashboard.rewards_title': 'المكافآت المكتسبة',
-  'referral.dashboard.months_earned': 'أشهر بريميوم',
-  'referral.dashboard.weeks_earned': 'أسابيع بريميوم',
-  'referral.dashboard.no_rewards_yet': 'ابدأ المشاركة لكسب المكافآت!',
-  'referral.dashboard.next_reward': 'المكافأة التالية',
+  'referral.dashboard.rewards_title': 'مكافآتك (كمُحيل)',
+  'referral.dashboard.months_earned': 'أشهر بريميوم (لك)',
+  'referral.dashboard.weeks_earned': 'أسابيع بريميوم (لك)',
+  'referral.dashboard.no_rewards_yet': 'شارك كودك لتكسب مكافآت مميزة لنفسك!',
+  'referral.dashboard.next_reward': 'مكافأتك التالية',
   'referral.dashboard.users_to_next_milestone':
-      '{count} مستخدمين محققين أكثر لفتح شهر بريميوم واحد',
-  'referral.dashboard.redeem_rewards': 'استلام المكافآت',
+      '{count} مستخدمين محققين أكثر ← أنت تحصل على شهر بريميوم واحد',
+  'referral.dashboard.redeem_rewards': 'استلام مكافآتي',
   'referral.dashboard.redeem_title': 'الاستلام قريباً',
   'referral.dashboard.redeem_message':
       'سيكون استلام المكافآت متاحاً في التحديث القادم. مكافآتك آمنة!',
@@ -3976,10 +3976,10 @@ const Map<String, String> kAr = {
   // Celebration
   'referral.checklist.celebration_title': 'تهانينا! 🎉',
   'referral.checklist.celebration_message':
-      'تم التحقق منك! استمتع بـ 3 أيام من الباقة المميزة.',
-  'referral.checklist.premium_reward': '3 أيام باقة مميزة',
-  'referral.checklist.explore_premium': 'استكشف ميزات الباقة المميزة',
-  'referral.checklist.referrer_notified': 'تم إخطار صديقك بإنجازك!',
+      'تم التحقق منك! حصلت على 3 أيام من الباقة المميزة كمكافأة لك.',
+  'referral.checklist.premium_reward': '3 أيام باقة مميزة (مكافأتك)',
+  'referral.checklist.explore_premium': 'استكشف ميزاتك المميزة',
+  'referral.checklist.referrer_notified': 'تم إخطار الصديق الذي أحالك!',
 
   // States
   'referral.checklist.under_review': 'قيد المراجعة',
@@ -3992,17 +3992,18 @@ const Map<String, String> kAr = {
   // What Happens Next
   'referral.checklist.what_happens_next': 'ماذا سيحدث بعد ذلك؟',
   'referral.checklist.what_happens_title': 'بعد التحقق',
-  'referral.checklist.step1_title': 'تحصل على الباقة المميزة',
+  'referral.checklist.step1_title': '✅ أنت تحصل على 3 أيام مميزة',
   'referral.checklist.step1_message':
-      'استمتع بـ 3 أيام من الباقة المميزة مع جميع الميزات المفتوحة!',
-  'referral.checklist.step2_title': 'صديقك يحرز تقدماً',
-  'referral.checklist.step2_message': 'صديقك الذي أحالك يقترب من كسب المكافآت!',
-  'referral.checklist.step3_title': 'استمر في استخدام التطبيق',
+      'كشخص تمت إحالته، أنت تحصل على 3 أيام من الباقة المميزة فوراً!',
+  'referral.checklist.step2_title': '🎁 صديقك يحرز تقدماً',
+  'referral.checklist.step2_message':
+      'الصديق الذي أحالك يقترب من مكافآته (شهر واحد لكل 5 مستخدمين موثقين).',
+  'referral.checklist.step3_title': '🚀 استمتع بالباقة المميزة الآن',
   'referral.checklist.step3_message':
-      'يبدأ الوصول المميز على الفور. استكشف جميع الميزات!',
-  'referral.checklist.step4_title': 'اشترك للمزيد',
+      'باقتك المميزة لمدة 3 أيام نشطة. استكشف جميع الميزات فوراً!',
+  'referral.checklist.step4_title': '💎 مكافأة: اشتراكك = هدية لصديقك',
   'referral.checklist.step4_message':
-      'أعجبتك الباقة المميزة؟ اشترك وامنح صديقك مكافأة أسبوعين!',
+      'إذا أعجبتك الباقة المميزة واشتركت، صديقك يحصل على أسبوعين مجاناً كمكافأة!',
 
   'common.ok': 'حسناً',
   'common.error': 'خطأ',

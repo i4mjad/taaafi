@@ -37,6 +37,7 @@ class UserProfile {
 
   Map<String, dynamic> toMap() {
     return {
+      'uid': uid, // CRITICAL: Include uid to prevent profile completion loop
       'displayName': displayName,
       'email': email,
       'gender': gender,

@@ -51,49 +51,70 @@ class MessagingService with WidgetsBindingObserver {
   RemoteMessage? _queuedMessage;
 
   Future<void> init() async {
+    print('🚀 FCM SERVICE: Starting initialization...');
+    
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
     // Add lifecycle observer to listen for app state changes
     WidgetsBinding.instance.addObserver(this);
 
     try {
+      print('📱 FCM SERVICE: Step 1 - Requesting permissions...');
       //1. Request permission
       await requestPermission();
+      print('✅ FCM SERVICE: Permissions requested');
     } catch (e) {
+      print('❌ FCM SERVICE: Permission error: $e');
       // Continue with initialization even if permissions fail
     }
 
     try {
+      print('📬 FCM SERVICE: Step 2 - Setting up message handler...');
       //2. Setup message handler
       await _setupMessageHandler();
+      print('✅ FCM SERVICE: Message handler set up');
     } catch (e) {
+      print('❌ FCM SERVICE: Message handler error: $e');
       // Continue with initialization
     }
 
     try {
+      print('🔑 FCM SERVICE: Step 3 - Getting FCM token...');
       //3. Get FCM token
-      await getFCMToken();
+      final token = await getFCMToken();
+      print('✅ FCM SERVICE: Got FCM token: ${token?.substring(0, 20)}...');
     } catch (e) {
+      print('❌ FCM SERVICE: Get token error: $e');
       // Continue with initialization
     }
 
     try {
+      print('💾 FCM SERVICE: Step 4 - Updating FCM token in Firestore...');
       //4. Update FCM token
       await updateFCMToken();
+      print('✅ FCM SERVICE: FCM token update completed');
     } catch (e) {
+      print('❌ FCM SERVICE: Update token error: $e');
       // Continue with initialization
     }
 
+    print('👂 FCM SERVICE: Step 5 - Setting up auth state listener...');
     //5. Setup auth state listener for topic subscription
     _setupAuthStateListener();
 
+    print('📨 FCM SERVICE: Step 6 - Checking for initial message...');
     //6. Check if app was opened from a notification when terminated
     final initialMessage = await _messaging.getInitialMessage();
     if (initialMessage != null) {
+      print('📥 FCM SERVICE: Found initial message, queuing for later processing');
       // Defer navigation until after the UI (and GoRouter) have been
       // completely built. We'll process this message later from MyApp.
       _queuedMessage = initialMessage;
+    } else {
+      print('ℹ️ FCM SERVICE: No initial message found');
     }
+    
+    print('🎉 FCM SERVICE: Initialization complete!');
   }
 
   @override
@@ -552,11 +573,32 @@ class MessagingService with WidgetsBindingObserver {
   /// Sets up listener for authentication state changes
   /// Subscribes logged-in users to all_users topic
   void _setupAuthStateListener() {
+    print('👂 FCM SERVICE: Setting up auth state listener...');
     _auth.authStateChanges().listen((User? user) async {
       if (user != null) {
+        print('🔐 FCM SERVICE: Auth state changed - User logged in: ${user.uid}');
         // User is signed in - subscribe to all_users topic and update FCM token
+        print('📢 FCM SERVICE: Subscribing to all_users topic...');
         await _subscribeToAllUsersGroup();
+        print('💾 FCM SERVICE: Updating FCM token on auth state change...');
         await updateFCMToken();
+        print('✅ FCM SERVICE: Auth state handling complete');
+      } else {
+        print('🚪 FCM SERVICE: Auth state changed - User logged out');
+      }
+    });
+    
+    // Also listen to token refresh events (when APNS becomes available, etc.)
+    print('👂 FCM SERVICE: Setting up token refresh listener...');
+    _messaging.onTokenRefresh.listen((newToken) async {
+      print('🔄 FCM SERVICE: Token refreshed! New token: ${newToken.substring(0, 20)}...');
+      final user = _auth.currentUser;
+      if (user != null) {
+        print('💾 FCM SERVICE: Updating refreshed token in Firestore...');
+        await updateFCMToken();
+        print('✅ FCM SERVICE: Token refresh update complete');
+      } else {
+        print('ℹ️ FCM SERVICE: Token refreshed but no user logged in, skipping update');
       }
     });
   }

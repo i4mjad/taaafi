@@ -60,6 +60,55 @@ export const redeemReferralCode = functions.https.onCall(
         );
       }
 
+      // 3.5. Check if this email was previously used with ANY referral code (fraud prevention)
+      // This prevents someone from deleting their account and re-registering with same email
+      const userEmail = userData.email || context.auth.token.email;
+      
+      if (userEmail) {
+        const normalizedEmail = userEmail.toLowerCase().trim();
+        
+        // Check for any previous verifications with this email (including deleted accounts)
+        const previousVerifications = await db
+          .collection("referralVerifications")
+          .where("userEmail", "==", normalizedEmail)
+          .limit(1)
+          .get();
+
+        if (!previousVerifications.empty) {
+          const prevVerification = previousVerifications.docs[0].data();
+          const wasDeleted = prevVerification.verificationStatus === 'deleted';
+          
+          console.warn(
+            `⚠️ User ${userId} (${userEmail}) attempted to reuse referral code. ` +
+            `Previous verification found${wasDeleted ? ' (deleted account)' : ''}.`
+          );
+          
+          // Log to fraud detection
+          await db.collection('referralFraudLogs').add({
+            userId: userId,
+            action: 'duplicate_email_attempt',
+            userEmail: normalizedEmail,
+            previousUserId: prevVerification.userId,
+            wasDeleted: wasDeleted,
+            attemptedCode: code,
+            reason: 'Email previously used with referral code',
+            performedBy: 'system',
+            timestamp: admin.firestore.FieldValue.serverTimestamp(),
+            details: {
+              previousReferrerId: prevVerification.referrerId,
+              previousVerificationStatus: prevVerification.verificationStatus,
+            }
+          });
+          
+          throw new functions.https.HttpsError(
+            "already-exists",
+            wasDeleted
+              ? "This email was previously used with a referral code. You cannot reuse referral codes."
+              : "This email has already been used with a referral code"
+          );
+        }
+      }
+
       // 4. Find referral code in database
       const codeQuery = await db
         .collection("referralCodes")
@@ -118,6 +167,7 @@ export const redeemReferralCode = functions.https.onCall(
         userId,
         referrerId,
         referralCode: code,
+        userEmail: (userData.email || context.auth.token.email || '').toLowerCase().trim(), // Track email for duplicate prevention
         signupDate: now,
         currentTier: "none",
         checklist: {

@@ -259,11 +259,39 @@ export async function middleware(request: NextRequest) {
 - [ ] User can export their data
 - [ ] Privacy policy updated
 - [ ] Cookie consent (if applicable)
+- [ ] Referral data properly handled on account deletion
 
 **App Store Compliance**:
 - [ ] Privacy manifest (iOS)
 - [ ] Data usage declarations
 - [ ] Terms of service
+
+### Task 10.1: User Deletion & Referral System
+
+**When a referred user (referee) deletes their account**:
+- [ ] Referrer is notified
+- [ ] Verification status updated to 'deleted'
+- [ ] Referrer's stats decremented (totalReferred, totalVerified)
+- [ ] Referral code redemption count decremented
+- [ ] Audit log created for tracking
+- [ ] Data preserved (not deleted) for audit purposes
+
+**When a referrer deletes their account**:
+- [ ] Referral code deactivated
+- [ ] Referral stats marked as deleted
+- [ ] All verifications marked with referrerDeleted flag
+- [ ] All rewards marked with referrerDeleted flag
+- [ ] Data preserved (not deleted) for audit purposes
+
+**Implementation**: 
+- File: `functions/src/referral/handlers/userDeletionHandler.ts`
+- Integrated into: `functions/src/index.ts` (deleteUserAccount function)
+- Collections affected:
+  - `referralVerifications` (status updated to 'deleted')
+  - `referralStats` (decremented/marked deleted)
+  - `referralCodes` (redemptions decremented/deactivated)
+  - `referralRewards` (marked as referrer deleted)
+  - `referralFraudLogs` (audit entries created)
 
 ---
 
