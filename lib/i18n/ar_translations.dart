@@ -3930,7 +3930,10 @@ const Map<String, String> kAr = {
 
   // Checklist Progress UI
   'referral.checklist.title': 'تقدم التحقق',
+  'referral.checklist.my_progress_title': 'تقدم التحقق الخاص بي',
   'referral.checklist.user_progress': 'تقدم المستخدم',
+  'referral.checklist.not_referred_title': 'لست جزءاً من برنامج الإحالة',
+  'referral.checklist.not_referred_message': 'لم تقم بالتسجيل باستخدام رمز إحالة، لذلك لا يوجد تقدم التحقق لتتبعه.',
   'referral.checklist.no_referral_data': 'لا توجد بيانات إحالة',
   'referral.checklist.user_not_referred': 'لم تتم إحالة هذا المستخدم من خلال برنامج الإحالة.',
   'referral.checklist.viewing_progress': '👀 أنت تشاهد تقدم شخص آخر (للقراءة فقط)',
@@ -4002,6 +4005,12 @@ const Map<String, String> kAr = {
   'referral.rewards.active_until': 'نشطة حتى {date}',
   'referral.rewards.expired_on': 'انتهت في {date}',
   'referral.rewards.claim_success': '🎉 نجح! لديك الآن {days} أيام من الباقة المميزة!',
+
+  // Referee Banner (shown in account screen)
+  'referral.banner.reward_ready': '🎁 مكافأتك جاهزة!',
+  'referral.banner.claim_3_days': 'احصل على 3 أيام من الباقة المميزة الآن',
+  'referral.banner.progress_title': 'التحقق: {completed}/{total} مهام',
+  'referral.banner.complete_tasks': 'أكمل المهام لفتح 3 أيام باقة مميزة',
 
   // States
   'referral.checklist.under_review': 'قيد المراجعة',

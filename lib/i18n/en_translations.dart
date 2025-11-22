@@ -4021,7 +4021,10 @@ const Map<String, String> kEn = {
 
   // Checklist Progress UI
   'referral.checklist.title': 'Verification Progress',
+  'referral.checklist.my_progress_title': 'My Verification Progress',
   'referral.checklist.user_progress': 'User Progress',
+  'referral.checklist.not_referred_title': 'Not Part of Referral Program',
+  'referral.checklist.not_referred_message': 'You didn\'t sign up using a referral code, so there\'s no verification progress to track.',
   'referral.checklist.no_referral_data': 'No Referral Data',
   'referral.checklist.user_not_referred': 'This user was not referred through the referral program.',
   'referral.checklist.viewing_progress': '👀 You\'re viewing someone else\'s progress (read-only)',
@@ -4096,6 +4099,12 @@ const Map<String, String> kEn = {
   'referral.rewards.active_until': 'Active until {date}',
   'referral.rewards.expired_on': 'Expired on {date}',
   'referral.rewards.claim_success': '🎉 Success! You now have {days} days of Premium!',
+
+  // Referee Banner (shown in account screen)
+  'referral.banner.reward_ready': '🎁 Your Reward is Ready!',
+  'referral.banner.claim_3_days': 'Claim your 3 days Premium now',
+  'referral.banner.progress_title': 'Verification: {completed}/{total} tasks',
+  'referral.banner.complete_tasks': 'Complete tasks to unlock 3 days Premium',
 
   // States
   'referral.checklist.under_review': 'Under Review',

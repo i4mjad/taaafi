@@ -767,6 +767,14 @@ GoRouter goRouter(Ref<GoRouter> ref) {
                     ),
                   ),
                   GoRoute(
+                    path: 'my-verification-progress',
+                    name: RouteNames.myVerificationProgress.name,
+                    pageBuilder: (context, state) => const MaterialPage(
+                      name: RouteNames.myVerificationProgress.name,
+                      child: MyVerificationProgressScreen(),
+                    ),
+                  ),
+                  GoRoute(
                     path: 'ta3afi-plus',
                     name: RouteNames.ta3afiPlus.name,
                     pageBuilder: (context, state) => MaterialPage(
