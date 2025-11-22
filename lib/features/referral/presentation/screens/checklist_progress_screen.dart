@@ -12,7 +12,6 @@ import '../providers/referral_dashboard_provider.dart';
 import '../widgets/checklist_item_widget.dart';
 import '../widgets/referee_rewards_list_widget.dart';
 import '../widgets/referrer_info_card.dart';
-import '../widgets/verification_complete_widget.dart';
 import '../widgets/verification_progress_header.dart';
 
 class ChecklistProgressScreen extends ConsumerWidget {
