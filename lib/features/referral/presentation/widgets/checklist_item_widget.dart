@@ -78,12 +78,20 @@ class ChecklistItemWidget extends ConsumerWidget {
         children: [
           Row(
             children: [
-              // Status icon
-              Icon(
-                icon,
-                color: iconColor,
-                size: 24,
-              ),
+              // Status icon - Different styling for read-only
+              if (isReadOnly)
+                // Read-only: Just show status with emoji/icon
+                Text(
+                  isCompleted ? '✅' : isInProgress ? '⏳' : '⏸️',
+                  style: const TextStyle(fontSize: 24),
+                )
+              else
+                // Interactive: Show icon
+                Icon(
+                  icon,
+                  color: iconColor,
+                  size: 24,
+                ),
               const SizedBox(width: 12),
 
               // Title
