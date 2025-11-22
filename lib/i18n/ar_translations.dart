@@ -3950,6 +3950,7 @@ const Map<String, String> kAr = {
   'referral.checklist.almost_there_readonly': 'على وشك الإكمال',
   'referral.checklist.all_complete_message_readonly': 'جميع المهام مكتملة',
   'referral.checklist.subtitle_readonly': 'المهام المطلوب إكمالها',
+  'referral.checklist.completed': 'مكتمل',
   'referral.checklist.tasks_title': 'مهام التحقق',
 
   // Checklist Items

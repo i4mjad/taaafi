@@ -28,7 +28,8 @@ class ChecklistProgressScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
 
     // Watch the real-time stream of verification progress
-    final verificationAsync = ref.watch(userVerificationProgressProvider(userId));
+    final verificationAsync =
+        ref.watch(userVerificationProgressProvider(userId));
 
     return Scaffold(
       backgroundColor: theme.backgroundColor,
@@ -49,7 +50,8 @@ class ChecklistProgressScreen extends ConsumerWidget {
 
           // Check if user is blocked
           if (entity.isBlocked) {
-            return _buildBlockedState(context, theme, l10n, entity.blockedReason);
+            return _buildBlockedState(
+                context, theme, l10n, entity.blockedReason);
           }
 
           return RefreshIndicator(
@@ -62,40 +64,6 @@ class ChecklistProgressScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Banner showing this is read-only view
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: theme.primary[50],
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: theme.primary[200]!,
-                        width: 2,
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          LucideIcons.eye,
-                          color: theme.primary[600],
-                          size: 20,
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            l10n.translate('referral.checklist.viewing_progress'),
-                            style: TextStyles.body.copyWith(
-                              color: theme.primary[900],
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
                   // Progress header (always read-only for this screen)
                   VerificationProgressHeader(
                     completedItems: entity.completedItemsCount,
@@ -104,100 +72,100 @@ class ChecklistProgressScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 20),
 
-                  // Checklist items header
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          l10n.translate('referral.checklist.their_tasks'),
-                          style: TextStyles.h6.copyWith(
-                            color: theme.grey[900],
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: theme.grey[100],
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
+                  // Tasks Container - Compact List View
+                  WidgetsContainer(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    backgroundColor: theme.backgroundColor,
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: theme.grey[200]!,
+                      width: 1,
+                    ),
+                    cornerSmoothing: 1,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Header
+                        Row(
                           children: [
-                            Icon(
-                              LucideIcons.info,
-                              size: 14,
-                              color: theme.grey[600],
+                            Expanded(
+                              child: Text(
+                                l10n.translate('referral.checklist.their_tasks'),
+                                style: TextStyles.body.copyWith(
+                                  color: theme.grey[900],
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
                             ),
-                            const SizedBox(width: 6),
-                            Text(
-                              l10n.translate('referral.checklist.read_only'),
-                              style: TextStyles.caption.copyWith(
-                                color: theme.grey[700],
-                                fontWeight: FontWeight.w600,
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: theme.grey[100],
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                l10n.translate('referral.checklist.read_only'),
+                                style: TextStyles.caption.copyWith(
+                                  color: theme.grey[600],
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
                           ],
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
+                        const SizedBox(height: 16),
 
-                  // Account Age (ALWAYS READ-ONLY)
-                  ChecklistItemWidget(
-                    type: ChecklistItemType.accountAge7Days,
-                    item: entity.accountAge7Days,
-                    signupDate: entity.signupDate,
-                    isReadOnly: true,
+                        // Compact task items
+                        _buildCompactTaskItem(theme, l10n, '⏳', 
+                          l10n.translate('referral.checklist.account_age'),
+                          entity.accountAge7Days.completed 
+                            ? l10n.translate('referral.checklist.completed')
+                            : l10n.translate('referral.checklist.days_remaining').replaceAll('{days}', 
+                                (7 - DateTime.now().difference(entity.signupDate).inDays).toString()),
+                          entity.accountAge7Days.completed),
+                        
+                        _buildCompactTaskItem(theme, l10n, 
+                          entity.forumPosts3.completed ? '✅' : '⏸️',
+                          l10n.translate('referral.checklist.forum_posts'),
+                          '${entity.forumPosts3.current ?? 0}/3 ${l10n.translate('referral.checklist.posts')}',
+                          entity.forumPosts3.completed),
+                        
+                        _buildCompactTaskItem(theme, l10n,
+                          entity.interactions5.completed ? '✅' : entity.interactions5.current! > 0 ? '⏳' : '⏸️',
+                          l10n.translate('referral.checklist.interactions'),
+                          '${entity.interactions5.current ?? 0}/5 ${l10n.translate('referral.checklist.interactions_count')}',
+                          entity.interactions5.completed),
+                        
+                        _buildCompactTaskItem(theme, l10n,
+                          entity.groupJoined.completed ? '✅' : '⏸️',
+                          l10n.translate('referral.checklist.join_group'),
+                          entity.groupJoined.completed 
+                            ? l10n.translate('referral.checklist.completed')
+                            : l10n.translate('referral.checklist.not_joined'),
+                          entity.groupJoined.completed),
+                        
+                        _buildCompactTaskItem(theme, l10n,
+                          entity.groupMessages3.completed ? '✅' : '⏸️',
+                          l10n.translate('referral.checklist.group_messages'),
+                          '${entity.groupMessages3.current ?? 0}/3 ${l10n.translate('referral.checklist.messages')}',
+                          entity.groupMessages3.completed),
+                        
+                        _buildCompactTaskItem(theme, l10n,
+                          entity.activityStarted.completed ? '✅' : '⏸️',
+                          l10n.translate('referral.checklist.start_activity'),
+                          entity.activityStarted.completed 
+                            ? l10n.translate('referral.checklist.completed')
+                            : l10n.translate('referral.checklist.no_activity'),
+                          entity.activityStarted.completed,
+                          isLast: true),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 12),
 
-                  // Forum Posts (ALWAYS READ-ONLY)
-                  ChecklistItemWidget(
-                    type: ChecklistItemType.forumPosts3,
-                    item: entity.forumPosts3,
-                    isReadOnly: true,
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Interactions (ALWAYS READ-ONLY)
-                  ChecklistItemWidget(
-                    type: ChecklistItemType.interactions5,
-                    item: entity.interactions5,
-                    isReadOnly: true,
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Group Joined (ALWAYS READ-ONLY)
-                  ChecklistItemWidget(
-                    type: ChecklistItemType.groupJoined,
-                    item: entity.groupJoined,
-                    isReadOnly: true,
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Group Messages (ALWAYS READ-ONLY)
-                  ChecklistItemWidget(
-                    type: ChecklistItemType.groupMessages3,
-                    item: entity.groupMessages3,
-                    isReadOnly: true,
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Activity Started (ALWAYS READ-ONLY)
-                  ChecklistItemWidget(
-                    type: ChecklistItemType.activityStarted,
-                    item: entity.activityStarted,
-                    isReadOnly: true,
-                  ),
-                  const SizedBox(height: 20),
-
-                  // NO OTHER BUTTONS - THIS IS PURELY FOR MONITORING
                   const SizedBox(height: 24),
                 ],
               ),
@@ -332,5 +300,54 @@ class ChecklistProgressScreen extends ConsumerWidget {
       ),
     );
   }
-}
 
+  Widget _buildCompactTaskItem(
+    dynamic theme,
+    AppLocalizations l10n,
+    String emoji,
+    String title,
+    String status,
+    bool isCompleted,
+    {bool isLast = false}
+  ) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            Text(
+              emoji,
+              style: const TextStyle(fontSize: 20),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyles.footnote.copyWith(
+                      color: theme.grey[900],
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    status,
+                    style: TextStyles.small.copyWith(
+                      color: isCompleted ? theme.success[700] : theme.grey[600],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        if (!isLast) ...[
+          const SizedBox(height: 12),
+          Divider(height: 1, color: theme.grey[200]),
+          const SizedBox(height: 12),
+        ],
+      ],
+    );
+  }
+}

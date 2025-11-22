@@ -4042,6 +4042,7 @@ const Map<String, String> kEn = {
   'referral.checklist.almost_there_readonly': 'Almost complete',
   'referral.checklist.all_complete_message_readonly': 'All tasks completed',
   'referral.checklist.subtitle_readonly': 'Tasks to be completed',
+  'referral.checklist.completed': 'Completed',
   'referral.checklist.tasks_title': 'Verification Tasks',
 
   // Checklist Items
