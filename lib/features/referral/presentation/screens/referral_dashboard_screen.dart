@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../../../core/localization/localization.dart';
 import '../../../../core/routing/route_names.dart';
@@ -19,6 +20,7 @@ import '../widgets/referral_code_card.dart';
 import '../widgets/referral_list_widget.dart';
 import '../widgets/referral_stats_card.dart';
 import '../widgets/rewards_card.dart';
+import '../widgets/referee_verification_progress_sheet.dart';
 
 class ReferralDashboardScreen extends ConsumerWidget {
   const ReferralDashboardScreen({super.key});
@@ -27,10 +29,16 @@ class ReferralDashboardScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = AppTheme.of(context);
     final l10n = AppLocalizations.of(context);
+    final userId = FirebaseAuth.instance.currentUser?.uid;
 
     final referralCodeAsync = ref.watch(userReferralCodeProvider);
     final statsAsync = ref.watch(referralStatsProvider);
     final referredUsersAsync = ref.watch(referredUsersProvider);
+    
+    // Check if current user is a referee
+    final myVerificationAsync = userId != null 
+        ? ref.watch(userVerificationProgressProvider(userId))
+        : null;
 
     return Scaffold(
       backgroundColor: theme.backgroundColor,
@@ -58,6 +66,9 @@ class ReferralDashboardScreen extends ConsumerWidget {
           ref.invalidate(userReferralCodeProvider);
           ref.invalidate(referralStatsProvider);
           ref.invalidate(referredUsersProvider);
+          if (userId != null) {
+            ref.invalidate(userVerificationProgressProvider(userId));
+          }
 
           // Wait for all providers to reload
           await Future.wait([
@@ -72,6 +83,23 @@ class ReferralDashboardScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Referee Banner - Show if user was referred
+              if (myVerificationAsync != null)
+                myVerificationAsync.when(
+                  data: (verification) {
+                    if (verification != null) {
+                      return Column(
+                        children: [
+                          _buildRefereeBanner(context, ref, theme, l10n, verification),
+                          const SizedBox(height: 16),
+                        ],
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  },
+                  loading: () => const SizedBox.shrink(),
+                  error: (_, __) => const SizedBox.shrink(),
+                ),
               // Referral Code Card
               referralCodeAsync.when(
                 data: (referralCode) {
@@ -638,6 +666,102 @@ class ReferralDashboardScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRefereeBanner(
+    BuildContext context,
+    WidgetRef ref,
+    dynamic theme,
+    AppLocalizations l10n,
+    dynamic verification,
+  ) {
+    final entity = verification.toEntity();
+
+    // Determine banner style
+    Color backgroundColor;
+    Color borderColor;
+    Color textColor;
+    String title;
+    String subtitle;
+    IconData icon;
+
+    if (entity.isVerified && !entity.rewardAwarded) {
+      // Verified but reward not claimed
+      backgroundColor = theme.success[50]!;
+      borderColor = theme.success[300]!;
+      textColor = theme.success[900]!;
+      icon = LucideIcons.gift;
+      title = l10n.translate('referral.banner.reward_ready');
+      subtitle = l10n.translate('referral.banner.claim_3_days');
+    } else if (entity.isVerified && entity.rewardAwarded) {
+      // All done - don't show banner
+      return const SizedBox.shrink();
+    } else {
+      // Still working on verification
+      backgroundColor = theme.primary[50]!;
+      borderColor = theme.primary[200]!;
+      textColor = theme.primary[900]!;
+      icon = LucideIcons.target;
+      title = l10n
+          .translate('referral.banner.progress_title')
+          .replaceAll('{completed}', entity.completedItemsCount.toString())
+          .replaceAll('{total}', entity.totalItemsCount.toString());
+      subtitle = l10n.translate('referral.banner.complete_tasks');
+    }
+
+    return GestureDetector(
+      onTap: () {
+        // Show bottom sheet with progress
+        RefereeVerificationProgressSheet.show(context, ref);
+      },
+      child: WidgetsContainer(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        backgroundColor: backgroundColor,
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(
+          color: borderColor,
+          width: 2,
+        ),
+        cornerSmoothing: 1,
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              color: textColor,
+              size: 32,
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyles.body.copyWith(
+                      color: textColor,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    style: TextStyles.caption.copyWith(
+                      color: textColor.withOpacity(0.8),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              LucideIcons.chevronRight,
+              color: textColor,
+              size: 24,
+            ),
           ],
         ),
       ),
