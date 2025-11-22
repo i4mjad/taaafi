@@ -30,6 +30,9 @@ abstract class ReferralRepository {
   /// Redeem accumulated referral rewards (Sprint 11)
   Future<RedemptionResponse> redeemReferralRewards();
 
+  /// Claim 3-day Premium reward for verified referee
+  Future<RedemptionResponse> claimRefereeReward();
+
   /// Get reward breakdown (Sprint 11)
   Future<RewardBreakdown?> getRewardBreakdown(String userId);
 }

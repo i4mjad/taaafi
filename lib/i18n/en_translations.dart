@@ -4074,6 +4074,22 @@ const Map<String, String> kEn = {
   'referral.checklist.explore_premium': 'Explore Your Premium Features',
   'referral.checklist.referrer_notified':
       'The friend who referred you has been notified!',
+  'referral.checklist.claim_my_reward': 'Claim My 3-Day Reward',
+  'referral.checklist.claiming_reward': 'Activating your Premium access...',
+  'referral.checklist.reward_claimed': 'Reward Claimed!',
+  'referral.checklist.days_activated': 'You now have {days} days of Premium access!',
+  'referral.checklist.claim_failed': 'Failed to claim reward. Please try again.',
+
+  // Rewards List
+  'referral.rewards.my_rewards_title': 'My Rewards',
+  'referral.rewards.claim_now': 'Claim',
+  'referral.rewards.status_active': 'Active',
+  'referral.rewards.status_expired': 'Expired',
+  'referral.rewards.status_ready_to_claim': 'Ready to claim!',
+  'referral.rewards.status_locked': 'Locked',
+  'referral.rewards.active_until': 'Active until {date}',
+  'referral.rewards.expired_on': 'Expired on {date}',
+  'referral.rewards.claim_success': '🎉 Success! You now have {days} days of Premium!',
 
   // States
   'referral.checklist.under_review': 'Under Review',

@@ -3980,6 +3980,22 @@ const Map<String, String> kAr = {
   'referral.checklist.premium_reward': '3 أيام باقة مميزة (مكافأتك)',
   'referral.checklist.explore_premium': 'استكشف ميزاتك المميزة',
   'referral.checklist.referrer_notified': 'تم إخطار الصديق الذي أحالك!',
+  'referral.checklist.claim_my_reward': 'احصل على مكافأتي 3 أيام',
+  'referral.checklist.claiming_reward': 'جارٍ تفعيل الوصول المميز...',
+  'referral.checklist.reward_claimed': 'تم الحصول على المكافأة!',
+  'referral.checklist.days_activated': 'لديك الآن {days} أيام من الوصول المميز!',
+  'referral.checklist.claim_failed': 'فشل الحصول على المكافأة. يرجى المحاولة مرة أخرى.',
+
+  // Rewards List
+  'referral.rewards.my_rewards_title': 'مكافآتي',
+  'referral.rewards.claim_now': 'احصل عليها',
+  'referral.rewards.status_active': 'نشطة',
+  'referral.rewards.status_expired': 'منتهية',
+  'referral.rewards.status_ready_to_claim': 'جاهزة للحصول عليها!',
+  'referral.rewards.status_locked': 'مقفلة',
+  'referral.rewards.active_until': 'نشطة حتى {date}',
+  'referral.rewards.expired_on': 'انتهت في {date}',
+  'referral.rewards.claim_success': '🎉 نجح! لديك الآن {days} أيام من الباقة المميزة!',
 
   // States
   'referral.checklist.under_review': 'قيد المراجعة',

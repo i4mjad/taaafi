@@ -190,6 +190,68 @@ class ReferralRepositoryImpl implements ReferralRepository {
   }
 
   @override
+  Future<RedemptionResponse> claimRefereeReward() async {
+    try {
+      log('Calling claimRefereeReward Cloud Function');
+
+      final callable = _functions.httpsCallable('claimRefereeReward');
+      final result = await callable.call();
+
+      log('claimRefereeReward result: ${result.data}');
+
+      if (result.data['success'] == true) {
+        return RedemptionResponse(
+          success: true,
+          daysGranted: result.data['daysGranted'] as int?,
+          expiresAt: result.data['expiresAt'] != null
+              ? DateTime.parse(result.data['expiresAt'] as String)
+              : null,
+          errorMessage: null,
+        );
+      } else {
+        return RedemptionResponse(
+          success: false,
+          daysGranted: null,
+          expiresAt: null,
+          errorMessage: result.data['message'] as String? ?? 'Failed to claim reward',
+        );
+      }
+    } on FirebaseFunctionsException catch (e) {
+      log('FirebaseFunctionsException in claimRefereeReward: ${e.code} - ${e.message}');
+
+      String errorMessage;
+      switch (e.code) {
+        case 'not-found':
+          errorMessage = 'You were not referred by anyone.';
+          break;
+        case 'failed-precondition':
+          errorMessage = e.message ?? 'You are not eligible to claim this reward yet.';
+          break;
+        case 'already-exists':
+          errorMessage = 'You have already claimed your reward!';
+          break;
+        default:
+          errorMessage = e.message ?? 'Failed to claim reward. Please try again.';
+      }
+
+      return RedemptionResponse(
+        success: false,
+        daysGranted: null,
+        expiresAt: null,
+        errorMessage: errorMessage,
+      );
+    } catch (e, stackTrace) {
+      log('Error in claimRefereeReward: $e', stackTrace: stackTrace);
+      return RedemptionResponse(
+        success: false,
+        daysGranted: null,
+        expiresAt: null,
+        errorMessage: 'An unexpected error occurred. Please try again.',
+      );
+    }
+  }
+
+  @override
   Future<RedemptionResponse> redeemReferralRewards() async {
     try {
       log('Attempting to redeem referral rewards');

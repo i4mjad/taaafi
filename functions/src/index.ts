@@ -1710,6 +1710,11 @@ export { onCommentCreated } from './referral/triggers/commentTrigger';
 export { onInteractionCreated } from './referral/triggers/interactionTrigger';
 export { onGroupMembershipCreated } from './referral/triggers/groupMembershipTrigger';
 export { onGroupMessageCreated } from './referral/triggers/groupMessageTrigger';
+
+// Referral Rewards
+export { redeemReferralRewards } from './referral/rewards/redeemRewards';
+export { claimRefereeReward } from './referral/rewards/claimRefereeReward';
+export { manuallyGrantRefereeReward } from './referral/admin/manualRewardGrant';
 export { onActivitySubscribed } from './referral/triggers/activityTrigger';
 
 // Export referral scheduled functions
@@ -1724,6 +1729,5 @@ export {
   recalculateFraudScore
 } from './referral/admin/fraudManagement';
 
-// Export referral rewards functions (Sprint 11)
-export { redeemReferralRewards } from './referral/rewards/redeemRewards';
+// Export referral webhooks (Sprint 11)
 export { handleRevenueCatWebhook } from './referral/webhooks/revenuecatWebhook';

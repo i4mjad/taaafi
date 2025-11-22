@@ -9,6 +9,7 @@ import '../../../../core/theming/app-themes.dart';
 import '../../../../core/theming/text_styles.dart';
 import '../providers/referral_dashboard_provider.dart';
 import '../widgets/checklist_item_widget.dart';
+import '../widgets/referee_rewards_list_widget.dart';
 import '../widgets/referrer_info_card.dart';
 import '../widgets/verification_complete_widget.dart';
 import '../widgets/verification_progress_header.dart';
@@ -84,11 +85,9 @@ class ChecklistProgressScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 20),
 
-                  // Show completion celebration if verified
-                  if (entity.isVerified) ...[
-                    const VerificationCompleteWidget(),
-                    const SizedBox(height: 20),
-                  ],
+                  // Show rewards list
+                  RefereeRewardsListWidget(userId: userId),
+                  const SizedBox(height: 20),
 
                   // Checklist items
                   Text(
