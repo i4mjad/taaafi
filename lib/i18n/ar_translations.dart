@@ -3840,7 +3840,7 @@ const Map<String, String> kAr = {
   'referral.share.more_options': 'خيارات أخرى',
   'referral.share.subject': 'انضم إلي على تعافي - دعم التعافي',
   'referral.share.default_user': 'صديق',
-  
+
   // Share Templates
   'referral.share.generic_message':
       '🌟 انضم إلي على تعافي!\n\nأستخدم تعافي للدعم في رحلة التعافي وكانت تجربة رائعة. انضم إلي واحصل على 3 أيام مجانية من البريميوم!\n\nاستخدم رمزي: {code}\n\nلندعم بعضنا في هذه الرحلة! 💪',
@@ -3853,7 +3853,7 @@ const Map<String, String> kAr = {
       'مرحباً،\n\nأردت مشاركة شيء مهم معك. كنت أستخدم تعافي للدعم في التعافي وأحدث فرقاً حقيقياً في حياتي.\n\nاعتقدت أنه قد يكون مفيداً لك أيضاً. عندما تسجل باستخدام رمز الإحالة الخاص بي ({code})، ستحصل على 3 أيام من ميزات البريميوم مجاناً تماماً.\n\nتعافي يقدم:\n• تحفيز ودعم يومي\n• أدوات تتبع التعافي\n• مجتمع داعم\n• موارد وأدلة مفيدة\n\nاستخدم رمزي: {code}\n\nلندعم بعضنا في هذه الرحلة!\n\nأطيب التحيات',
   'referral.share.copy_link_message':
       'انضم إلي على تعافي! استخدم الرمز {code} للحصول على 3 أيام بريميوم مجاناً.',
-  
+
   // Share Success Messages
   'referral.share.copied_success': 'تم نسخ الرسالة!',
   'referral.share.share_success': 'تمت المشاركة بنجاح!',
@@ -3933,10 +3933,13 @@ const Map<String, String> kAr = {
   'referral.checklist.my_progress_title': 'تقدم التحقق الخاص بي',
   'referral.checklist.user_progress': 'تقدم المستخدم',
   'referral.checklist.not_referred_title': 'لست جزءاً من برنامج الإحالة',
-  'referral.checklist.not_referred_message': 'لم تقم بالتسجيل باستخدام رمز إحالة، لذلك لا يوجد تقدم التحقق لتتبعه.',
+  'referral.checklist.not_referred_message':
+      'لم تقم بالتسجيل باستخدام رمز إحالة، لذلك لا يوجد تقدم التحقق لتتبعه.',
   'referral.checklist.no_referral_data': 'لا توجد بيانات إحالة',
-  'referral.checklist.user_not_referred': 'لم تتم إحالة هذا المستخدم من خلال برنامج الإحالة.',
-  'referral.checklist.viewing_progress': '👀 أنت تشاهد تقدم شخص آخر (للقراءة فقط)',
+  'referral.checklist.user_not_referred':
+      'لم تتم إحالة هذا المستخدم من خلال برنامج الإحالة.',
+  'referral.checklist.viewing_progress':
+      '👀 أنت تشاهد تقدم شخص آخر (للقراءة فقط)',
   'referral.checklist.their_tasks': 'مهامهم',
   'referral.checklist.read_only': 'للقراءة فقط',
   'referral.checklist.progress': '{completed} من {total} مهام',
@@ -3962,7 +3965,6 @@ const Map<String, String> kAr = {
   'referral.checklist.start_activity': 'بدء نشاط تعافي واحد',
 
   // Progress indicators
-  'referral.checklist.completed': 'مكتمل',
   'referral.checklist.in_progress': 'قيد التنفيذ',
   'referral.checklist.not_started': 'لم يبدأ',
   'referral.checklist.posts': 'منشورات',
@@ -3998,8 +4000,10 @@ const Map<String, String> kAr = {
   'referral.checklist.claim_my_reward': 'احصل على مكافأتي 3 أيام',
   'referral.checklist.claiming_reward': 'جارٍ تفعيل الوصول المميز...',
   'referral.checklist.reward_claimed': 'تم الحصول على المكافأة!',
-  'referral.checklist.days_activated': 'لديك الآن {days} أيام من الوصول المميز!',
-  'referral.checklist.claim_failed': 'فشل الحصول على المكافأة. يرجى المحاولة مرة أخرى.',
+  'referral.checklist.days_activated':
+      'لديك الآن {days} أيام من الوصول المميز!',
+  'referral.checklist.claim_failed':
+      'فشل الحصول على المكافأة. يرجى المحاولة مرة أخرى.',
 
   // Rewards List
   'referral.rewards.my_rewards_title': 'مكافآتي',
@@ -4010,13 +4014,23 @@ const Map<String, String> kAr = {
   'referral.rewards.status_locked': 'مقفلة',
   'referral.rewards.active_until': 'نشطة حتى {date}',
   'referral.rewards.expired_on': 'انتهت في {date}',
-  'referral.rewards.claim_success': '🎉 نجح! لديك الآن {days} أيام من الباقة المميزة!',
+  'referral.rewards.claim_success':
+      '🎉 نجح! لديك الآن {days} أيام من الباقة المميزة!',
 
   // Referee Banner (shown in account screen)
   'referral.banner.reward_ready': '🎁 مكافأتك جاهزة!',
   'referral.banner.claim_3_days': 'احصل على 3 أيام من الباقة المميزة الآن',
   'referral.banner.progress_title': 'التحقق: {completed}/{total} مهام',
   'referral.banner.complete_tasks': 'أكمل المهام لفتح 3 أيام باقة مميزة',
+
+  // Late Referral Code Banner
+  'referral.late_code.title': 'هل لديك رمز إحالة؟',
+  'referral.late_code.subtitle': 'أدخله خلال {days} يوم للحصول على 3 أيام باقة مميزة!',
+  'referral.late_code.sheet_title': 'أدخل رمز الإحالة',
+  'referral.late_code.description': 'إذا أحالك صديق، أدخل رمزه أدناه لفتح 3 أيام من الباقة المميزة.',
+  'referral.late_code.submit': 'استخدام الرمز',
+  'referral.late_code.success_title': 'تم استخدام الرمز!',
+  'referral.late_code.success_message': 'رائع! أكمل مهام التحقق لفتح مكافأة الـ 3 أيام من الباقة المميزة.',
 
   // States
   'referral.checklist.under_review': 'قيد المراجعة',

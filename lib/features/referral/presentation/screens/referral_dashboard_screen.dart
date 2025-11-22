@@ -16,6 +16,7 @@ import '../../../../core/theming/text_styles.dart';
 import '../../application/referral_providers.dart';
 import '../providers/referral_dashboard_provider.dart';
 import '../widgets/how_it_works_sheet.dart';
+import '../widgets/late_referral_code_banner.dart';
 import '../widgets/referral_code_card.dart';
 import '../widgets/referral_list_widget.dart';
 import '../widgets/referral_stats_card.dart';
@@ -83,6 +84,10 @@ class ReferralDashboardScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Late Referral Code Banner - Show if user hasn't used a code yet
+              const LateReferralCodeBanner(),
+              const SizedBox(height: 16),
+
               // Referee Banner - Show if user was referred
               if (myVerificationAsync != null)
                 myVerificationAsync.when(

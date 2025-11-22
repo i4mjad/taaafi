@@ -3928,7 +3928,7 @@ const Map<String, String> kEn = {
   'referral.share.more_options': 'More Options',
   'referral.share.subject': 'Join me on Ta3afi - Recovery Support',
   'referral.share.default_user': 'a friend',
-  
+
   // Share Templates
   'referral.share.generic_message':
       '🌟 Join me on Ta3afi!\n\nI\'m using Ta3afi for recovery support and it\'s been amazing. Join me and get 3 days of Premium features free!\n\nUse my code: {code}\n\nLet\'s support each other on this journey! 💪',
@@ -3941,7 +3941,7 @@ const Map<String, String> kEn = {
       'Hi,\n\nI wanted to share something important with you. I\'ve been using Ta3afi for recovery support and it\'s been making a real difference in my life.\n\nI thought you might find it helpful too. When you sign up with my referral code ({code}), you\'ll get 3 days of Premium features completely free.\n\nTa3afi offers:\n• Daily motivation and support\n• Recovery tracking tools\n• A supportive community\n• Helpful resources and guides\n\nUse my code: {code}\n\nLet\'s support each other on this journey!\n\nBest regards',
   'referral.share.copy_link_message':
       'Join me on Ta3afi! Use code {code} for 3 days Premium free.',
-  
+
   // Share Success Messages
   'referral.share.copied_success': 'Message copied to clipboard!',
   'referral.share.share_success': 'Shared successfully!',
@@ -3958,7 +3958,8 @@ const Map<String, String> kEn = {
   'referral.dashboard.rewards_title': 'Your Rewards (As Referrer)',
   'referral.dashboard.months_earned': 'Months Premium (You)',
   'referral.dashboard.weeks_earned': 'Weeks Premium (You)',
-  'referral.dashboard.no_rewards_yet': 'Share your code to earn Premium rewards for yourself!',
+  'referral.dashboard.no_rewards_yet':
+      'Share your code to earn Premium rewards for yourself!',
   'referral.dashboard.next_reward': 'Your Next Reward',
   'referral.dashboard.users_to_next_milestone':
       '{count} more verified users → YOU get 1 month Premium',
@@ -4024,10 +4025,13 @@ const Map<String, String> kEn = {
   'referral.checklist.my_progress_title': 'My Verification Progress',
   'referral.checklist.user_progress': 'User Progress',
   'referral.checklist.not_referred_title': 'Not Part of Referral Program',
-  'referral.checklist.not_referred_message': 'You didn\'t sign up using a referral code, so there\'s no verification progress to track.',
+  'referral.checklist.not_referred_message':
+      'You didn\'t sign up using a referral code, so there\'s no verification progress to track.',
   'referral.checklist.no_referral_data': 'No Referral Data',
-  'referral.checklist.user_not_referred': 'This user was not referred through the referral program.',
-  'referral.checklist.viewing_progress': '👀 You\'re viewing someone else\'s progress (read-only)',
+  'referral.checklist.user_not_referred':
+      'This user was not referred through the referral program.',
+  'referral.checklist.viewing_progress':
+      '👀 You\'re viewing someone else\'s progress (read-only)',
   'referral.checklist.their_tasks': 'Their Tasks',
   'referral.checklist.read_only': 'Read Only',
   'referral.checklist.progress': '{completed} of {total} tasks',
@@ -4054,7 +4058,6 @@ const Map<String, String> kEn = {
   'referral.checklist.start_activity': 'Start 1 Recovery Activity',
 
   // Progress indicators
-  'referral.checklist.completed': 'Completed',
   'referral.checklist.in_progress': 'In Progress',
   'referral.checklist.not_started': 'Not Started',
   'referral.checklist.posts': 'posts',
@@ -4092,8 +4095,10 @@ const Map<String, String> kEn = {
   'referral.checklist.claim_my_reward': 'Claim My 3-Day Reward',
   'referral.checklist.claiming_reward': 'Activating your Premium access...',
   'referral.checklist.reward_claimed': 'Reward Claimed!',
-  'referral.checklist.days_activated': 'You now have {days} days of Premium access!',
-  'referral.checklist.claim_failed': 'Failed to claim reward. Please try again.',
+  'referral.checklist.days_activated':
+      'You now have {days} days of Premium access!',
+  'referral.checklist.claim_failed':
+      'Failed to claim reward. Please try again.',
 
   // Rewards List
   'referral.rewards.my_rewards_title': 'My Rewards',
@@ -4104,13 +4109,23 @@ const Map<String, String> kEn = {
   'referral.rewards.status_locked': 'Locked',
   'referral.rewards.active_until': 'Active until {date}',
   'referral.rewards.expired_on': 'Expired on {date}',
-  'referral.rewards.claim_success': '🎉 Success! You now have {days} days of Premium!',
+  'referral.rewards.claim_success':
+      '🎉 Success! You now have {days} days of Premium!',
 
   // Referee Banner (shown in account screen)
   'referral.banner.reward_ready': '🎁 Your Reward is Ready!',
   'referral.banner.claim_3_days': 'Claim your 3 days Premium now',
   'referral.banner.progress_title': 'Verification: {completed}/{total} tasks',
   'referral.banner.complete_tasks': 'Complete tasks to unlock 3 days Premium',
+
+  // Late Referral Code Banner
+  'referral.late_code.title': 'Have a Referral Code?',
+  'referral.late_code.subtitle': 'Enter it within {days} days to get 3 days Premium!',
+  'referral.late_code.sheet_title': 'Enter Referral Code',
+  'referral.late_code.description': 'If a friend referred you, enter their code below to unlock 3 days of Premium access.',
+  'referral.late_code.submit': 'Redeem Code',
+  'referral.late_code.success_title': 'Code Redeemed!',
+  'referral.late_code.success_message': 'Great! Complete the verification tasks to unlock your 3-day Premium reward.',
 
   // States
   'referral.checklist.under_review': 'Under Review',
