@@ -3874,6 +3874,8 @@ const Map<String, String> kAr = {
   'referral.dashboard.next_reward': 'مكافأتك التالية',
   'referral.dashboard.users_to_next_milestone':
       '{count} مستخدمين محققين أكثر ← أنت تحصل على شهر بريميوم واحد',
+  'referral.dashboard.users_to_next_milestone_singular':
+      'مستخدم محقق واحد أكثر ← أنت تحصل على شهر بريميوم واحد',
   'referral.dashboard.redeem_rewards': 'استلام مكافآتي',
   'referral.dashboard.redeem_title': 'الاستلام قريباً',
   'referral.dashboard.redeem_message':
@@ -4025,12 +4027,15 @@ const Map<String, String> kAr = {
 
   // Late Referral Code Banner
   'referral.late_code.title': 'هل لديك رمز إحالة؟',
-  'referral.late_code.subtitle': 'أدخله خلال {days} يوم للحصول على 3 أيام باقة مميزة!',
+  'referral.late_code.subtitle':
+      'أدخله خلال {days} يوم للحصول على 3 أيام باقة مميزة!',
   'referral.late_code.sheet_title': 'أدخل رمز الإحالة',
-  'referral.late_code.description': 'إذا أحالك صديق، أدخل رمزه أدناه لفتح 3 أيام من الباقة المميزة.',
+  'referral.late_code.description':
+      'إذا أحالك صديق، أدخل رمزه أدناه لفتح 3 أيام من الباقة المميزة.',
   'referral.late_code.submit': 'استخدام الرمز',
   'referral.late_code.success_title': 'تم استخدام الرمز!',
-  'referral.late_code.success_message': 'رائع! أكمل مهام التحقق لفتح مكافأة الـ 3 أيام من الباقة المميزة.',
+  'referral.late_code.success_message':
+      'رائع! أكمل مهام التحقق لفتح مكافأة الـ 3 أيام من الباقة المميزة.',
 
   // States
   'referral.checklist.under_review': 'قيد المراجعة',

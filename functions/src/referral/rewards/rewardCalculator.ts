@@ -51,7 +51,7 @@ export async function calculateUserRewards(
   const adjustedVerified = Math.max(0, totalVerified - blockedReferrals);
 
   // Calculate rewards
-  const monthsEarned = Math.floor(adjustedVerified / 5);
+  const monthsEarned = Math.floor(adjustedVerified / 2);
   const weeksEarned = totalPaidConversions * 2;
   const totalDays = monthsEarned * 30 + weeksEarned * 7;
 

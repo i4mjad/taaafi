@@ -43,13 +43,7 @@ export async function handleVerificationCompletion(userId: string): Promise<void
     return;
   }
   
-  // Check if account age requirement is met (7 days)
-  const accountAgeOk = await checkAccountAge(userId, 7);
-  
-  if (!accountAgeOk) {
-    console.log(`ℹ️ User ${userId} has not met the 7-day account age requirement yet.`);
-    return;
-  }
+  // Account age requirement removed - users can verify immediately
   
   // Calculate comprehensive fraud score
   const fraudScoreResult = await calculateCompleteFraudScore(userId);
@@ -125,12 +119,12 @@ export async function handleVerificationCompletion(userId: string): Promise<void
         NotificationType.FRIEND_VERIFIED,
         {
           friendName: refereeName,
-          progress: `${totalVerified}/5`,
+          progress: `${totalVerified}/2`,
         }
       );
       
-      // Check if milestone reached (every 5 verifications)
-      if (totalVerified % 5 === 0) {
+      // Check if milestone reached (every 2 verifications)
+      if (totalVerified % 2 === 0) {
         await sendReferralNotification(
           verification.referrerId,
           NotificationType.MILESTONE_REACHED,

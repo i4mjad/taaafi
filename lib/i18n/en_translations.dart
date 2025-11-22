@@ -3963,6 +3963,8 @@ const Map<String, String> kEn = {
   'referral.dashboard.next_reward': 'Your Next Reward',
   'referral.dashboard.users_to_next_milestone':
       '{count} more verified users → YOU get 1 month Premium',
+  'referral.dashboard.users_to_next_milestone_singular':
+      '1 more verified user → YOU get 1 month Premium',
   'referral.dashboard.redeem_rewards': 'Redeem My Rewards',
   'referral.dashboard.redeem_title': 'Redeem Coming Soon',
   'referral.dashboard.redeem_message':
@@ -3996,7 +3998,7 @@ const Map<String, String> kEn = {
   'referral.how_it_works.step3_title': 'You Earn Rewards',
   'referral.how_it_works.step3_description': 'Get Premium access for free!',
   'referral.how_it_works.reward_verified':
-      'Every 5 verified users = 1 month Premium',
+      'Every 2 verified users = 1 month Premium',
   'referral.how_it_works.reward_paid': 'When they subscribe = +2 weeks bonus',
   'referral.how_it_works.got_it': 'Got it',
 
@@ -4120,12 +4122,15 @@ const Map<String, String> kEn = {
 
   // Late Referral Code Banner
   'referral.late_code.title': 'Have a Referral Code?',
-  'referral.late_code.subtitle': 'Enter it within {days} days to get 3 days Premium!',
+  'referral.late_code.subtitle':
+      'Enter it within {days} days to get 3 days Premium!',
   'referral.late_code.sheet_title': 'Enter Referral Code',
-  'referral.late_code.description': 'If a friend referred you, enter their code below to unlock 3 days of Premium access.',
+  'referral.late_code.description':
+      'If a friend referred you, enter their code below to unlock 3 days of Premium access.',
   'referral.late_code.submit': 'Redeem Code',
   'referral.late_code.success_title': 'Code Redeemed!',
-  'referral.late_code.success_message': 'Great! Complete the verification tasks to unlock your 3-day Premium reward.',
+  'referral.late_code.success_message':
+      'Great! Complete the verification tasks to unlock your 3-day Premium reward.',
 
   // States
   'referral.checklist.under_review': 'Under Review',
@@ -4143,7 +4148,7 @@ const Map<String, String> kEn = {
       'As the referred user, YOU receive 3 days of Premium access immediately!',
   'referral.checklist.step2_title': '🎁 Your Friend Gets Progress',
   'referral.checklist.step2_message':
-      'The friend who referred you moves closer to their rewards (1 month per 5 verified users).',
+      'The friend who referred you moves closer to their rewards (1 month per 2 verified users).',
   'referral.checklist.step3_title': '🚀 Enjoy Premium Now',
   'referral.checklist.step3_message':
       'Your 3-day Premium access is active. Explore all features immediately!',

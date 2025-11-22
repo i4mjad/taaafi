@@ -25,11 +25,11 @@ class RewardsCard extends ConsumerWidget {
     final totalWeeks = stats.rewardsEarned.totalWeeks;
     final hasRewards = totalMonths > 0 || totalWeeks > 0;
 
-    // Calculate progress to next milestone (every 5 verified users = 1 month)
+    // Calculate progress to next milestone (every 2 verified users = 1 month)
     final currentVerified = stats.totalVerified;
-    final nextMilestone = ((currentVerified ~/ 5) + 1) * 5;
+    final nextMilestone = ((currentVerified ~/ 2) + 1) * 2;
     final usersToNextReward = nextMilestone - currentVerified;
-    final progress = (currentVerified % 5) / 5.0;
+    final progress = (currentVerified % 2) / 2.0;
 
     return Container(
       decoration: BoxDecoration(
@@ -124,9 +124,11 @@ class RewardsCard extends ConsumerWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  l10n
-                      .translate('referral.dashboard.users_to_next_milestone')
-                      .replaceAll('{count}', usersToNextReward.toString()),
+                  usersToNextReward == 1
+                      ? l10n.translate('referral.dashboard.users_to_next_milestone_singular')
+                      : l10n
+                          .translate('referral.dashboard.users_to_next_milestone')
+                          .replaceAll('{count}', usersToNextReward.toString()),
                   style: TextStyles.body.copyWith(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,

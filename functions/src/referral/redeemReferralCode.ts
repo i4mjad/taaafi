@@ -171,7 +171,6 @@ export const redeemReferralCode = functions.https.onCall(
         signupDate: now,
         currentTier: "none",
         checklist: {
-          accountAge7Days: { completed: false, completedAt: null },
           forumPosts3: { completed: false, completedAt: null, current: 0 },
           interactions5: {
             completed: false,
