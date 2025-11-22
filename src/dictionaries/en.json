@@ -11,6 +11,7 @@
       "dashboard": "Dashboard",
       "userManagement": "User Management",
       "users": "Users",
+      "referralProgram": "Referral Program",
       "roles": "Roles",
       "permissions": "Permissions",
       "community": "Community",
@@ -21,7 +22,8 @@
       "groupAdministration": "Group Administration",
       "adminDashboard": "Admin Dashboard",
       "memberManagement": "Member Management",
-      "contentModeration": "Content Moderation",
+      "messagesModeration": "Messages Moderation",
+      "updatesModeration": "Updates Moderation",
       "reportsManagement": "Reports Management",
       "challengeManagement": "Challenge Management",
       "groupSettings": "Group Settings",
@@ -436,10 +438,264 @@
     },
     "modules": {
       "userManagement": {
-
         "title": "User Management",
         "description": "Manage platform users and their permissions",
-        "users": "Users",
+        "referralDashboard": {
+          "title": "Referral Program Dashboard",
+          "description": "Monitor and manage the referral program",
+          "refresh": "Refresh",
+          "loading": "Loading dashboard...",
+          "errorLoading": "Error Loading Dashboard",
+          "tryAgain": "Try Again",
+          "stats": {
+            "totalReferrals": "Total Referrals",
+            "totalReferralsDesc": "All-time signups",
+            "verifiedUsers": "Verified Users",
+            "conversionRate": "conversion rate",
+            "pendingReview": "Pending Review",
+            "pendingReviewDesc": "Needs admin action",
+            "blocked": "Blocked (Fraud)",
+            "blockedDesc": "Auto + manual blocks"
+          },
+          "chart": {
+            "title": "Referrals Over Time",
+            "description": "Daily referral signups and verifications",
+            "totalReferrals": "Total Referrals",
+            "verified": "Verified"
+          },
+          "topReferrers": {
+            "title": "Top Referrers",
+            "description": "Users with the most successful referrals",
+            "user": "User",
+            "referred": "Referred",
+            "verified": "Verified",
+            "rewards": "Rewards",
+            "actions": "Actions",
+            "noReferrers": "No referrers found",
+            "days": "days"
+          },
+          "recentActivity": {
+            "title": "Recent Activity",
+            "description": "Latest referral program events",
+            "noActivity": "No recent activity"
+          },
+          "tabs": {
+            "dashboard": "Dashboard",
+            "fraudQueue": "Fraud Queue",
+            "userLookup": "User Lookup",
+            "adjustments": "Adjustments",
+            "analytics": "Analytics"
+          },
+          "fraudQueue": {
+          "title": "Fraud Detection Queue",
+          "description": "Review and manage flagged referral accounts",
+          "loading": "Loading fraud queue...",
+          "errorLoading": "Error Loading Fraud Queue",
+          "noFlaggedUsers": "All Clear!",
+          "noFlaggedUsersDesc": "No users are currently flagged for fraud review.",
+          "bulkApprove": "Approve Selected",
+          "bulkBlock": "Block Selected",
+          "riskLevels": {
+            "low": "Low Risk",
+            "medium": "Medium Risk",
+            "high": "High Risk"
+          },
+          "filters": {
+            "scoreRange": "Score Range",
+            "allScores": "All Scores",
+            "mediumRisk": "Medium Risk (40-70)",
+            "highRisk": "High Risk (71+)",
+            "status": "Status",
+            "allStatuses": "All Statuses",
+            "pending": "Pending",
+            "blocked": "Blocked"
+          },
+          "table": {
+            "user": "User",
+            "fraudScore": "Fraud Score",
+            "flags": "Flags",
+            "referrer": "Referrer",
+            "status": "Status",
+            "actions": "Actions"
+          },
+          "detailsModal": {
+            "title": "Fraud Detection Details",
+            "description": "Detailed fraud analysis and user information",
+            "userInfo": "User Information",
+            "displayName": "Display Name",
+            "email": "Email",
+            "signupDate": "Signup Date",
+            "status": "Status",
+            "fraudScore": "Fraud Score",
+            "scoreOutOf100": "Out of 100",
+            "lastChecked": "Last Checked",
+            "lowRiskThreshold": "0-39: Low Risk (Auto-approved)",
+            "mediumRiskThreshold": "40-70: Medium Risk (Manual review)",
+            "highRiskThreshold": "71-100: High Risk (Auto-blocked)",
+            "checkBreakdown": "Fraud Check Breakdown",
+            "checkBreakdownDesc": "Individual fraud checks that contributed to the score",
+            "noFlagsDetected": "No fraud flags detected",
+            "points": "points",
+            "referrerInfo": "Referrer Information",
+            "referrerId": "Referrer ID",
+            "referralCode": "Referral Code",
+            "close": "Close",
+            "approve": "Approve User",
+            "block": "Block User"
+          }
+        },
+        "userLookup": {
+          "title": "Search Users",
+          "description": "Search for users by email, ID, or referral code",
+          "searchPlaceholder": "Search by email, user ID, or referral code...",
+          "searchTypes": {
+            "all": "All Types",
+            "email": "Email",
+            "id": "User ID",
+            "code": "Referral Code"
+          },
+          "searching": "Searching...",
+          "noResults": "No Users Found",
+          "noResultsDesc": "Try adjusting your search query or type.",
+          "resultsCount": "Found {{count}} result(s)",
+          "referred": "Referred",
+          "verified": "Verified",
+          "viewDetails": "View Details"
+        },
+        "userDetails": {
+          "title": "User Referral Details",
+          "description": "Complete referral information and activity history",
+          "error": "Error Loading User",
+          "errorMessage": "Failed to load user details. Please try again.",
+          "close": "Close",
+          "export": "Export CSV",
+          "blocked": "Blocked",
+          "joined": "Joined",
+          "code": "Code",
+          "stats": {
+            "totalReferred": "Total Referred",
+            "verified": "Verified",
+            "pending": "Pending",
+            "rewards": "Rewards Earned"
+          },
+          "verificationTitle": "Verification Information",
+          "verificationStatus": "Status",
+          "fraudScore": "Fraud Score",
+          "referrerId": "Referrer ID",
+          "verifiedAt": "Verified At",
+          "tabs": {
+            "referredUsers": "Referred Users",
+            "timeline": "Activity Timeline"
+          }
+        },
+        "referredUsers": {
+          "title": "Referred Users",
+          "description": "{{count}} user(s) referred by this user",
+          "error": "Failed to load referred users",
+          "noUsers": "No Referrals Yet",
+          "noUsersDesc": "This user hasn't referred anyone yet.",
+          "user": "User",
+          "status": "Status",
+          "fraudScore": "Fraud Score",
+          "joined": "Joined",
+          "verified": "Verified",
+          "notVerified": "Not verified"
+        },
+        "timeline": {
+          "title": "Activity Timeline",
+          "description": "Chronological history of referral events",
+          "noEvents": "No Activity Yet",
+          "noEventsDesc": "No referral activity has been recorded for this user.",
+          "userSignedUp": "User Signed Up",
+          "userJoinedPlatform": "User joined the platform",
+          "verified": "Verified",
+          "verifiedDesc": "User successfully completed verification",
+          "blocked": "Blocked by Admin",
+          "blockedDesc": "User was blocked due to fraud detection",
+          "adminApproved": "Approved by Admin",
+          "adminBlocked": "Blocked by Admin",
+          "adminAction": "Admin performed a manual action",
+          "referredUser": "Referred a New User",
+          "referredUserDesc": "User referred new signup (ID: {{userId}}...)",
+          "error": "Error Loading Timeline",
+          "errorHint": "This may require a Firestore composite index. Check the browser console for details."
+        },
+        "manualAdjustments": {
+          "title": "Manual Adjustments",
+          "description": "Apply manual corrections and overrides to user referral data",
+          "searchUser": "Search User",
+          "searchUserDesc": "Find a user by email, ID, or referral code",
+          "searchPlaceholder": "Enter email, user ID, or referral code...",
+          "userNotFound": "User not found. Please try a different search.",
+          "searchError": "Failed to search users. Please try again.",
+          "selectAction": "Select Action",
+          "actionType": "Action Type",
+          "adjustRewards": "Adjust Rewards",
+          "resetVerification": "Reset Verification",
+          "overrideFraud": "Override Fraud",
+          "updateStats": "Update Stats",
+          "rewardDays": "Adjustment Days",
+          "rewardDaysHint": "Enter positive number to add days, negative to subtract",
+          "verificationResetWarning": "This will reset the user's verification checklist to initial state. All progress will be lost.",
+          "fraudOverrideWarning": "This will clear all fraud flags and reset the fraud score to 0. Use with caution.",
+          "statsUpdateHint": "Leave fields empty to keep current values. Only fill fields you want to update.",
+          "totalReferred": "Total Referred",
+          "totalVerified": "Total Verified",
+          "totalPending": "Total Pending",
+          "totalBlocked": "Total Blocked",
+          "totalRewards": "Total Rewards",
+          "reason": "Reason",
+          "reasonPlaceholder": "Enter the reason for this adjustment (required)...",
+          "reasonRequired": "Reason is required for all adjustments",
+          "applyAdjustment": "Apply Adjustment",
+          "confirmTitle": "Confirm Adjustment",
+          "confirmDescription": "Please review the adjustment details before confirming.",
+          "user": "User",
+          "action": "Action",
+          "cancel": "Cancel",
+          "confirm": "Confirm",
+          "adjustmentSuccess": "Adjustment applied successfully!",
+          "adjustmentError": "Failed to apply adjustment. Please try again.",
+          "referred": "Referred",
+          "verified": "Verified"
+        },
+        "analytics": {
+          "title": "Analytics Dashboard",
+          "description": "Comprehensive insights into referral program performance",
+          "retry": "Retry",
+          "last7Days": "Last 7 Days",
+          "last30Days": "Last 30 Days",
+          "last90Days": "Last 90 Days",
+          "export": "Export",
+          "totalReferrals": "Total Referrals",
+          "inSelectedPeriod": "In selected period",
+          "conversionRate": "Conversion Rate",
+          "verified": "verified",
+          "rewardsDistributed": "Rewards Distributed",
+          "premiumDays": "premium days",
+          "avgFraudScore": "Avg Fraud Score",
+          "blocked": "blocked",
+          "conversionFunnel": "Conversion Funnel",
+          "conversionFunnelDesc": "Track user progression through verification stages",
+          "users": "Users",
+          "percentage": "Percentage",
+          "cohortAnalysis": "Cohort Analysis",
+          "cohortAnalysisDesc": "Compare performance across different time periods",
+          "weekly": "Weekly",
+          "monthly": "Monthly",
+          "signups": "Signups",
+          "retentionRate": "Retention Rate",
+          "retentionRateDesc": "Percentage of users who complete verification",
+          "usersVerified": "users verified",
+          "timeToVerify": "Time to Verify",
+          "timeToVerifyDesc": "Distribution of verification completion times",
+          "cohortPerformance": "Cohort Performance",
+          "cohortPerformanceDesc": "Detailed metrics for each cohort period",
+          "cohort": "Cohort",
+          "avgTimeToVerify": "Avg Time to Verify"
+        }
+      },
+      "users": "Users",
         "usersDescription": "Manage user accounts and permissions",
         "settings": "Settings",
         "settingsDescription": "Configure user management and notification settings",
@@ -1745,7 +2001,7 @@
           "collapseComments": "Hide Comments",
           "showInteractions": "Show Interactions",
           "hideInteractions": "Hide Interactions",
-          "title": "Title",
+          "titleLabel": "Title",
           "titlePlaceholder": "Enter post title",
           "body": "Content",
           "bodyPlaceholder": "Enter post content",
@@ -1950,6 +2206,610 @@
             }
           }
         },
+        "forum": {
+          "moderation": {
+            "status": {
+              "label": "Moderation Status",
+              "approved": "Approved",
+              "manual_review": "Manual Review",
+              "blocked": "Blocked",
+              "pending": "Pending"
+            },
+            "filterByStatus": "Filter by Moderation Status",
+            "noData": "No Moderation Data",
+            "noDataDescription": "This content has not been moderated yet.",
+            "details": "Moderation Details",
+            "detailsDescription": "AI analysis and moderation information",
+            "reason": "Reason",
+            "visibility": "Visibility",
+            "hidden": "Hidden",
+            "visible": "Visible",
+            "autoHiddenInfo": "Content automatically hidden due to high confidence violation detection (>85%)",
+            "finalDecision": "Final Decision",
+            "action": "Action",
+            "confidence": "Confidence",
+            "violationType": "Violation Type",
+            "aiAnalysis": "AI Analysis",
+            "severity": "Severity",
+            "severityLevel": {
+              "low": "Low",
+              "medium": "Medium",
+              "high": "High"
+            },
+            "detectedContent": "Detected Content",
+            "culturalContext": "Cultural Context",
+            "customRules": "Custom Rules",
+            "analyzedAt": "Analyzed",
+            "highConfidence": "High Confidence",
+            "quickActions": "Quick Moderation Actions",
+            "deletedContent": "This content has been deleted",
+            "actions": {
+              "approve": "Approve",
+              "block": "Block",
+              "hide": "Hide",
+              "unhide": "Unhide",
+              "approveTitle": "Approve Content",
+              "approveDescription": "Mark this content as approved and make it visible to all users.",
+              "approveSuccess": "Content approved successfully",
+              "blockTitle": "Block Content",
+              "blockDescription": "Block this content and hide it from all users.",
+              "blockSuccess": "Content blocked successfully",
+              "hideTitle": "Hide Content",
+              "hideDescription": "Hide this content from users without changing moderation status.",
+              "hideSuccess": "Content hidden successfully",
+              "unhideTitle": "Unhide Content",
+              "unhideDescription": "Make this content visible to users again.",
+              "unhideSuccess": "Content unhidden successfully",
+              "error": "Failed to perform moderation action",
+              "reasonLabel": "Reason",
+              "reasonPlaceholder": "Explain why you're taking this action..."
+            }
+          }
+        },
+        "directMessages": {
+          "title": "Direct Messaging Management",
+          "description": "Manage and moderate direct messages between community members",
+          "tabs": {
+            "dashboard": "Dashboard",
+            "moderationQueue": "Moderation Queue",
+            "allConversations": "All Conversations",
+            "allMessages": "All Messages",
+            "userReports": "User Reports",
+            "settings": "Settings"
+          },
+          "dashboard": {
+            "title": "Dashboard Overview",
+            "description": "Key metrics and statistics for direct messaging",
+            "metrics": {
+              "totalConversations": "Total Conversations",
+              "totalMessages": "Total Messages",
+              "todaysMessages": "Today's Messages",
+              "messagesByStatus": "Messages by Status",
+              "activeReports": "Active Reports",
+              "avgResponseTime": "Avg Response Time",
+              "topViolations": "Top Violations"
+            },
+            "subtitles": {
+              "allTime": "All time",
+              "last24Hours": "Last 24 hours",
+              "requiresAction": "Requires action",
+              "actionsTaken": "Actions taken"
+            },
+            "timeFilters": {
+              "allTime": "All Time",
+              "last30Days": "Last 30 Days",
+              "last7Days": "Last 7 Days",
+              "today": "Today"
+            },
+            "charts": {
+              "messagesOverTime": "Messages Over Time",
+              "statusDistribution": "Status Distribution",
+              "violationTypes": "Violation Types"
+            }
+          },
+          "moderationQueue": {
+            "title": "Moderation Queue",
+            "description": "Review and moderate flagged messages",
+            "filters": {
+              "status": "Status",
+              "priority": "Priority",
+              "messageType": "Message Type",
+              "violationType": "Violation Type",
+              "dateRange": "Date Range",
+              "sender": "Sender"
+            },
+            "columns": {
+              "messageId": "Message ID",
+              "sender": "Sender",
+              "preview": "Message Preview",
+              "violationType": "Violation Type",
+              "confidence": "Confidence",
+              "severity": "Severity",
+              "priority": "Priority",
+              "status": "Status",
+              "createdAt": "Created At",
+              "actions": "Actions"
+            },
+            "actions": {
+              "viewDetails": "View Details",
+              "approve": "Approve",
+              "reject": "Reject",
+              "dismiss": "Dismiss",
+              "viewConversation": "View Conversation",
+              "viewSender": "View Sender",
+              "banUser": "Ban User"
+            },
+            "bulkActions": {
+              "title": "Bulk Actions",
+              "approveSelected": "Approve Selected",
+              "rejectSelected": "Reject Selected",
+              "dismissSelected": "Dismiss Selected",
+              "exportSelected": "Export Selected"
+            },
+            "empty": "No messages in moderation queue",
+            "loading": "Loading moderation queue..."
+          },
+          "conversations": {
+            "title": "All Conversations",
+            "description": "Browse and search all direct conversations",
+            "filters": {
+              "status": "Status",
+              "dateRange": "Date Range",
+              "participants": "Participants",
+              "hasFlagged": "Has Flagged Messages",
+              "hasReports": "Has Reports"
+            },
+            "columns": {
+              "conversationId": "Conversation ID",
+              "participants": "Participants",
+              "lastMessage": "Last Message",
+              "lastActivity": "Last Activity",
+              "messageCount": "Message Count",
+              "flaggedCount": "Flagged Messages",
+              "reportsCount": "Reports",
+              "createdAt": "Created At",
+              "actions": "Actions"
+            },
+            "actions": {
+              "viewMessages": "View Messages",
+              "viewParticipants": "View Participants",
+              "deleteConversation": "Delete Conversation",
+              "exportConversation": "Export Conversation"
+            },
+            "empty": "No conversations found",
+            "loading": "Loading conversations..."
+          },
+          "messages": {
+            "title": "All Messages",
+            "description": "Browse and search all direct messages",
+            "filters": {
+              "moderationStatus": "Moderation Status",
+              "dateRange": "Date Range",
+              "sender": "Sender",
+              "conversation": "Conversation",
+              "hasViolations": "Has Violations",
+              "violationType": "Violation Type"
+            },
+            "columns": {
+              "messageId": "Message ID",
+              "sender": "Sender",
+              "preview": "Preview",
+              "conversationId": "Conversation ID",
+              "moderationStatus": "Moderation Status",
+              "violationType": "Violation Type",
+              "confidence": "Confidence",
+              "createdAt": "Created At",
+              "actions": "Actions"
+            },
+            "actions": {
+              "viewFullMessage": "View Full Message",
+              "viewConversation": "View Conversation",
+              "reviewModeration": "Review Moderation",
+              "deleteMessage": "Delete Message",
+              "viewSender": "View Sender"
+            },
+            "empty": "No messages found",
+            "loading": "Loading messages..."
+          },
+          "reports": {
+            "title": "User Reports",
+            "description": "Manage user-submitted reports",
+            "filters": {
+              "reportType": "Report Type",
+              "status": "Status",
+              "dateRange": "Date Range",
+              "reporter": "Reporter",
+              "reported": "Reported"
+            },
+            "columns": {
+              "reportId": "Report ID",
+              "reportType": "Type",
+              "reporter": "Reporter",
+              "reported": "Reported User/Message",
+              "description": "Description",
+              "status": "Status",
+              "createdAt": "Created At",
+              "actions": "Actions"
+            },
+            "actions": {
+              "viewDetails": "View Details",
+              "resolve": "Resolve",
+              "dismiss": "Dismiss",
+              "takeAction": "Take Action"
+            },
+            "statistics": {
+              "totalReports": "Total Reports",
+              "activeReports": "Active Reports",
+              "avgResolutionTime": "Avg Resolution Time",
+              "mostReported": "Most Reported Users",
+              "commonViolations": "Common Violations"
+            },
+            "empty": "No reports found",
+            "loading": "Loading reports..."
+          },
+          "conversationDetail": {
+            "title": "Conversation Details",
+            "description": "View conversation timeline and messages",
+            "header": {
+              "conversationId": "Conversation ID",
+              "participants": "Participants",
+              "created": "Created",
+              "lastActivity": "Last Activity",
+              "messageCount": "Message Count",
+              "flaggedCount": "Flagged Messages",
+              "reportsCount": "Active Reports"
+            },
+            "actions": {
+              "exportConversation": "Export Conversation",
+              "deleteConversation": "Delete Conversation",
+              "viewProfiles": "View Profiles",
+              "viewReports": "View Reports"
+            },
+            "messagesFilter": {
+              "all": "All Messages",
+              "flaggedOnly": "Flagged Only",
+              "approvedOnly": "Approved Only"
+            },
+            "searchPlaceholder": "Search in conversation...",
+            "empty": "No messages in this conversation",
+            "loading": "Loading conversation..."
+          },
+          "senderProfile": {
+            "title": "Sender Profile & History",
+            "description": "View community profile's DM activity",
+            "profile": {
+              "displayName": "Display Name",
+              "cpId": "Community Profile ID",
+              "userUID": "User UID",
+              "accountCreated": "Account Created",
+              "dmSettings": "DM Settings",
+              "allowDirectMessages": "Allow Direct Messages"
+            },
+            "statistics": {
+              "totalConversations": "Total Conversations",
+              "totalMessages": "Total Messages Sent",
+              "approvedMessages": "Approved Messages",
+              "flaggedMessages": "Flagged Messages",
+              "blockedMessages": "Blocked Messages",
+              "reportsReceived": "Reports Received",
+              "activeBans": "Active Bans"
+            },
+            "sections": {
+              "recentMessages": "Recent Messages",
+              "conversations": "Conversations",
+              "reports": "Reports Against User",
+              "bans": "Active Bans"
+            },
+            "actions": {
+              "banFromStarting": "Ban from Starting Conversations",
+              "banFromSending": "Ban from Sending Messages",
+              "appWideBan": "App-wide Ban",
+              "viewBans": "View Existing Bans"
+            },
+            "loading": "Loading profile..."
+          },
+          "modals": {
+            "messageDetail": {
+              "title": "Message Details",
+              "fullContent": "Full Content",
+              "senderInfo": "Sender Information",
+              "conversationInfo": "Conversation Information",
+              "aiAnalysis": "AI Analysis",
+              "customRules": "Custom Rules Triggered",
+              "adminActions": "Admin Actions",
+              "reviewNotes": "Review Notes",
+              "addNotes": "Add review notes..."
+            },
+            "reportDetail": {
+              "title": "Report Details",
+              "reporterInfo": "Reporter Information",
+              "reportedContent": "Reported Content",
+              "reportDescription": "Report Description",
+              "resolutionNotes": "Resolution Notes",
+              "addResolutionNotes": "Add resolution notes..."
+            },
+            "banUser": {
+              "title": "Ban User",
+              "selectBanType": "Select Ban Type",
+              "featureBan": "Feature Ban",
+              "appWideBan": "App-wide Ban",
+              "duration": "Duration",
+              "severity": "Severity",
+              "reason": "Reason",
+              "additionalNotes": "Additional Notes"
+            },
+            "deleteConfirm": {
+              "title": "Confirm Deletion",
+              "messageWarning": "Are you sure you want to delete this message?",
+              "conversationWarning": "Are you sure you want to delete this conversation?",
+              "irreversible": "This action cannot be undone."
+            }
+          },
+          "statuses": {
+            "pending": "Pending",
+            "approved": "Approved",
+            "blocked": "Blocked",
+            "manual_review": "Manual Review",
+            "active": "Active",
+            "resolved": "Resolved",
+            "dismissed": "Dismissed"
+          },
+          "priorities": {
+            "low": "Low",
+            "medium": "Medium",
+            "high": "High",
+            "critical": "Critical"
+          },
+          "severities": {
+            "low": "Low",
+            "medium": "Medium",
+            "high": "High"
+          },
+          "violationTypes": {
+            "social_media_sharing": "Social Media Sharing",
+            "sexual_content": "Sexual Content",
+            "cuckoldry_content": "Cuckoldry Content",
+            "homosexuality_content": "Homosexuality Content",
+            "harassment": "Harassment",
+            "spam": "Spam",
+            "none": "None"
+          },
+          "reportTypes": {
+            "user": "User Report",
+            "message": "Message Report"
+          },
+          "messageTypes": {
+            "direct_message": "Direct Message",
+            "group_message": "Group Message"
+          },
+          "common": {
+            "search": "Search...",
+            "filter": "Filter",
+            "export": "Export",
+            "cancel": "Cancel",
+            "save": "Save",
+            "delete": "Delete",
+            "confirm": "Confirm",
+            "loading": "Loading...",
+            "noData": "No data available",
+            "error": "An error occurred",
+            "success": "Operation successful",
+            "selected": "{count} selected",
+            "showMore": "Show More",
+            "showLess": "Show Less",
+            "viewAll": "View All",
+            "pagination": {
+              "previous": "Previous",
+              "next": "Next",
+              "page": "Page",
+              "of": "of",
+              "showing": "Showing",
+              "to": "to",
+              "items": "items",
+              "itemsPerPage": "Items per page"
+            },
+            "confirmDelete": "Are you sure you want to delete this?",
+            "moderationSuccess": "Moderation action completed successfully"
+          },
+          "notifications": {
+            "approved": "Message approved successfully",
+            "rejected": "Message rejected successfully",
+            "dismissed": "Message dismissed from queue",
+            "deleted": "Message deleted successfully",
+            "reportResolved": "Report resolved successfully",
+            "reportDismissed": "Report dismissed successfully",
+            "banCreated": "User banned successfully",
+            "exportComplete": "Export completed successfully",
+            "error": "An error occurred. Please try again."
+          }
+        },
+        "groupUpdates": {
+          "title": "Group Updates Moderation",
+          "description": "Review and moderate group updates submitted by members",
+          "tabs": {
+            "pending": "Pending Review",
+            "approved": "Approved",
+            "blocked": "Blocked",
+            "all": "All Updates"
+          },
+          "filters": {
+            "status": "Status",
+            "language": "Language",
+            "updateType": "Update Type",
+            "violationType": "Violation Type",
+            "dateRange": "Date Range",
+            "searchPlaceholder": "Search by content, author, or group...",
+            "allLanguages": "All Languages",
+            "allTypes": "All Types",
+            "allViolations": "All Violations"
+          },
+          "stats": {
+            "totalUpdates": "Total Updates",
+            "todaysUpdates": "Today's Updates",
+            "pendingReview": "Pending Review",
+            "requiresAction": "Requires Action",
+            "approvedToday": "Approved Today",
+            "approvedTotal": "Total Approved",
+            "blockedToday": "Blocked Today",
+            "blockedTotal": "Total Blocked",
+            "byLanguage": "By Language",
+            "byType": "By Type",
+            "byViolation": "By Violation",
+            "allTime": "All time",
+            "last24Hours": "Last 24 hours",
+            "requiresActionLabel": "Requires action",
+            "recentApprovals": "Recent approvals",
+            "allApprovals": "All time",
+            "actionsTaken": "Actions taken"
+          },
+          "table": {
+            "columns": {
+              "update": "Update",
+              "author": "Author",
+              "group": "Group",
+              "type": "Type",
+              "language": "Language",
+              "status": "Status",
+              "confidence": "AI Confidence",
+              "violation": "Violation",
+              "createdAt": "Created",
+              "actions": "Actions"
+            },
+            "emptyState": "No updates found",
+            "loading": "Loading updates..."
+          },
+          "updateTypes": {
+            "general": "General",
+            "achievement": "Achievement",
+            "milestone": "Milestone",
+            "support": "Support"
+          },
+          "violationTypes": {
+            "social_media_sharing": "Social Media Sharing",
+            "sexual_content": "Sexual Content",
+            "cuckoldry_content": "Cuckoldry Content",
+            "homosexuality_content": "Homosexuality Content",
+            "harassment": "Harassment",
+            "spam": "Spam",
+            "hate_speech": "Hate Speech",
+            "violence": "Violence",
+            "self_harm": "Self Harm",
+            "none": "No Violation"
+          },
+          "statuses": {
+            "pending": "Pending",
+            "manual_review": "Manual Review",
+            "approved": "Approved",
+            "blocked": "Blocked"
+          },
+          "severities": {
+            "low": "Low",
+            "medium": "Medium",
+            "high": "High"
+          },
+          "detailSheet": {
+            "title": "Update Details",
+            "sections": {
+              "content": "Update Content",
+              "author": "Author Information",
+              "group": "Group Information",
+              "aiAnalysis": "AI Moderation Analysis",
+              "adminAction": "Admin Action"
+            },
+            "content": {
+              "title": "Title",
+              "body": "Content",
+              "type": "Type",
+              "language": "Language",
+              "visibility": "Visibility",
+              "anonymous": "Posted Anonymously",
+              "linkedChallenge": "Linked Challenge",
+              "linkedMilestone": "Linked Milestone",
+              "reactions": "Reactions",
+              "comments": "Comments",
+              "supports": "Supports"
+            },
+            "author": {
+              "displayName": "Display Name",
+              "cpId": "Community Profile ID",
+              "joinedGroup": "Joined Group",
+              "totalUpdates": "Total Updates",
+              "previousFlags": "Previous Flags",
+              "viewProfile": "View Full Profile"
+            },
+            "group": {
+              "name": "Group Name",
+              "id": "Group ID",
+              "memberCount": "Members",
+              "language": "Language",
+              "gender": "Gender",
+              "viewGroup": "View Group"
+            },
+            "aiAnalysis": {
+              "overallStatus": "Overall Status",
+              "confidence": "Confidence Score",
+              "violationType": "Violation Type",
+              "severity": "Severity",
+              "detectedContent": "Detected Content",
+              "reason": "AI Reason",
+              "customRules": "Custom Rules Triggered",
+              "culturalContext": "Cultural Context",
+              "finalDecision": "Final Decision",
+              "analysisTime": "Analysis Time"
+            },
+            "actions": {
+              "title": "Moderation Decision",
+              "approve": "Approve",
+              "block": "Block",
+              "keepUnderReview": "Keep Under Review",
+              "reason": "Reason",
+              "reasonPlaceholder": "Explain your decision...",
+              "notes": "Admin Notes",
+              "notesPlaceholder": "Add any additional notes...",
+              "submit": "Submit Decision",
+              "submitting": "Processing...",
+              "cancel": "Cancel"
+            }
+          },
+          "bulkActions": {
+            "title": "Bulk Actions",
+            "selected": "{count} selected",
+            "approve": "Approve Selected",
+            "block": "Block Selected",
+            "delete": "Delete Selected",
+            "confirmTitle": "Confirm Bulk Action",
+            "confirmMessage": "Are you sure you want to {action} {count} updates?",
+            "reason": "Reason for bulk action",
+            "reasonPlaceholder": "Explain why you're taking this action...",
+            "processing": "Processing {current} of {total}..."
+          },
+          "actions": {
+            "view": "View Details",
+            "approve": "Approve",
+            "block": "Block",
+            "delete": "Delete",
+            "viewAuthor": "View Author",
+            "viewGroup": "View Group"
+          },
+          "notifications": {
+            "approved": "Update approved successfully",
+            "blocked": "Update blocked successfully",
+            "keptUnderReview": "Update kept under review",
+            "bulkActionComplete": "Bulk action completed successfully",
+            "error": "An error occurred. Please try again.",
+            "loadError": "Failed to load updates"
+          },
+          "pagination": {
+            "previous": "Previous",
+            "next": "Next",
+            "page": "Page",
+            "of": "of",
+            "showing": "Showing",
+            "to": "to",
+            "items": "items",
+            "itemsPerPage": "Items per page"
+          }
+        },
         "rules": {
           "no_personal_contact": {
             "title": "No personal contact sharing",
@@ -1998,6 +2858,7 @@
           "noCommentsFound": "No comments found",
           "totalComments": "Total Comments",
           "todaysComments": "Today's Comments",
+          "postsWithComments": "Posts with Comments",
           "body": "Comment",
           "bodyPlaceholder": "Enter comment content",
           "postTitle": "Post Title",
@@ -2771,7 +3632,7 @@
       },
       "admin": {
         "content": {
-          "title": "Content Moderation",
+          "title": "Messages Moderation",
           "messageModerated": "Message moderated successfully",
           "moderationError": "Failed to moderate message",
           "moderateMessage": "Moderate Message",
@@ -2861,7 +3722,7 @@
           "selectGroup": "Select a group",
           "allGroups": "All Groups",
           "selectGroupPlaceholder": "Choose a group to filter",
-          "contentDescription": "Monitor and moderate all content across groups",
+          "contentDescription": "Monitor and moderate all messages across groups",
           "membersDescription": "Manage all members across the platform",
           "reportsDescription": "Review and handle user reports",
           "quickActionsDesc": "Quick access to common administrative tasks",
@@ -3247,4 +4108,3 @@
       "detailDateTimeFormat": "MMMM dd, yyyy HH:mm"
     }
   }
-  

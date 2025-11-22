@@ -16,8 +16,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { 
-  User, ThumbsUp, ThumbsDown, Pin, MoreHorizontal, EyeOff, Eye, PinOff, Edit, Trash2, AlertCircle, ExternalLink, Lock
+  User, ThumbsUp, ThumbsDown, Pin, MoreHorizontal, EyeOff, Eye, PinOff, Edit, Trash2, AlertCircle, ExternalLink, Lock, Shield
 } from 'lucide-react';
+import { ModerationDetailPanel } from '@/components/forum/ModerationDetailPanel';
+import { ForumModerationActions } from '@/components/forum/ForumModerationActions';
 import { format } from 'date-fns';
 import Link from 'next/link';
 import { ForumPost, Comment, Interaction } from '@/types/community';
@@ -486,6 +488,12 @@ export default function PostDetailContent({ postId, lang, hideHeader }: PostDeta
                                   {t('modules.community.posts.detailPage.deleted')}
                                 </Badge>
                               )}
+                              {comment.moderation?.finalDecision && comment.moderation.finalDecision.confidence >= 0.85 && (
+                                <Badge variant="outline" className="text-yellow-600 text-xs">
+                                  <Shield className="h-3 w-3 mr-1" />
+                                  {t('modules.community.forum.moderation.highConfidence')}
+                                </Badge>
+                              )}
                             </div>
                             <p className={`text-sm whitespace-pre-wrap mb-2 ${comment.isDeleted ? 'opacity-75 italic' : ''}`}>
                               {comment.body}
@@ -591,6 +599,32 @@ export default function PostDetailContent({ postId, lang, hideHeader }: PostDeta
                   {t('modules.community.posts.detailPage.actions.deletePost')}
                 </Button>
               )}
+            </CardContent>
+          </Card>
+
+          {/* Post Moderation */}
+          <ModerationDetailPanel 
+            moderation={post.moderation}
+            isHidden={post.isHidden}
+            contentType="post"
+          />
+
+          {/* Post Moderation Actions */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Shield className="h-4 w-4" />
+                <span>{t('modules.community.forum.moderation.quickActions')}</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ForumModerationActions
+                contentId={post.id}
+                contentType="post"
+                currentStatus={post.moderation}
+                isHidden={post.isHidden}
+                isDeleted={post.isDeleted}
+              />
             </CardContent>
           </Card>
 

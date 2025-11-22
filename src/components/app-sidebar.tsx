@@ -70,6 +70,7 @@ export function AppSidebar({ lang, ...props }: AppSidebarProps) {
         icon: UsersIcon,
         items: [
           { titleKey: "users", url: `/${lang}/user-management/users`, icon: UserIcon },
+          { titleKey: "referralProgram", url: `/${lang}/user-management/referrals`, icon: UserPlusIcon },
           { titleKey: "reports", url: `/${lang}/user-management/reports`, icon: AlertTriangleIcon },
           { titleKey: "notifications", url: `/${lang}/user-management/notifications`, icon: BellIcon },
           { titleKey: "settings", url: `/${lang}/user-management/settings`, icon: SettingsIcon },
@@ -81,6 +82,7 @@ export function AppSidebar({ lang, ...props }: AppSidebarProps) {
         icon: HeartHandshakeIcon,
         items: [
           { titleKey: "forum", url: `/${lang}/community/forum`, icon: MessageSquareIcon },
+          { titleKey: "directMessages", url: `/${lang}/community/direct-messages`, icon: MessageCircleIcon },
           { titleKey: "reports", url: `/${lang}/community/reports`, icon: AlertTriangleIcon },
           { titleKey: "settings", url: `/${lang}/community/settings`, icon: SettingsIcon },
         ]
@@ -94,10 +96,8 @@ export function AppSidebar({ lang, ...props }: AppSidebarProps) {
           { titleKey: "adminDashboard", url: `/${lang}/community/groups/admin-overview`, icon: LayoutDashboardIcon },
           { titleKey: "allGroups", url: `/${lang}/groups-management`, icon: UsersIcon },
           { titleKey: "memberManagement", url: `/${lang}/community/groups/memberships`, icon: UsersIcon },
-          { titleKey: "contentModeration", url: `/${lang}/community/groups/admin-content`, icon: MessageSquareIcon },
-          { titleKey: "reportsManagement", url: `/${lang}/community/groups/admin-reports`, icon: ShieldIcon },
-          { titleKey: "challengeManagement", url: `/${lang}/community/groups/admin-challenges`, icon: TrophyIcon },
-          { titleKey: "groupSettings", url: `/${lang}/community/groups/admin-settings`, icon: SettingsIcon },
+          { titleKey: "messagesModeration", url: `/${lang}/community/groups/messages-moderation`, icon: MessageSquareIcon },
+          { titleKey: "updatesModeration", url: `/${lang}/community/groups/updates-moderation`, icon: FileTextIcon },
         ]
       },
       { 

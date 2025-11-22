@@ -13,7 +13,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Search, MessageSquare, ThumbsUp, ThumbsDown, User, MoreHorizontal, Eye, Edit, Trash2, EyeOff, Plus, Pin, PinOff, X, AlertCircle } from 'lucide-react';
+import { Search, MessageSquare, User, MoreHorizontal, Eye, Edit, Trash2, EyeOff, Plus, Pin, PinOff, X, AlertCircle, Shield } from 'lucide-react';
+import { ForumModerationBadge } from '@/components/forum/ForumModerationBadge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import ModerationActionDialog from './ModerationActionDialog';
 import { format } from 'date-fns';
@@ -31,6 +32,7 @@ export default function ForumPostsManagement() {
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [genderFilter, setGenderFilter] = useState<'all' | 'male' | 'female' | 'other'>('all');
+  const [moderationFilter, setModerationFilter] = useState<'all' | 'approved' | 'manual_review' | 'blocked' | 'pending'>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [selectedPost, setSelectedPost] = useState<ForumPost | null>(null);
@@ -134,9 +136,13 @@ export default function ForumPostsManagement() {
       const matchesCategory = categoryFilter === 'all' || post.category === categoryFilter;
       const matchesGender = genderFilter === 'all' || cpGenderById.get(post.authorCPId) === genderFilter;
       
-      return matchesSearch && matchesCategory && matchesGender;
+      const matchesModeration = moderationFilter === 'all' || 
+        (moderationFilter === 'pending' && !post.moderation) ||
+        post.moderation?.status === moderationFilter;
+      
+      return matchesSearch && matchesCategory && matchesGender && matchesModeration;
     });
-  }, [posts, search, categoryFilter, genderFilter, cpGenderById]);
+  }, [posts, search, categoryFilter, genderFilter, moderationFilter, cpGenderById]);
 
   // Get paginated posts
   const paginatedPosts = useMemo(() => {
@@ -448,7 +454,7 @@ export default function ForumPostsManagement() {
             <CardTitle className="text-sm font-medium">
               {t('modules.community.posts.totalInteractions')}
             </CardTitle>
-            <ThumbsUp className="h-4 w-4 text-muted-foreground" />
+            <User className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.totalInteractions}</div>
@@ -557,6 +563,18 @@ export default function ForumPostsManagement() {
             <SelectItem value="other">{t('modules.community.profiles.other')}</SelectItem>
           </SelectContent>
         </Select>
+        <Select value={moderationFilter} onValueChange={(v) => setModerationFilter(v as any)}>
+          <SelectTrigger className="w-[200px]">
+            <SelectValue placeholder={t('modules.community.forum.moderation.filterByStatus')} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">{t('common.all')}</SelectItem>
+            <SelectItem value="pending">{t('modules.community.forum.moderation.status.pending')}</SelectItem>
+            <SelectItem value="approved">{t('modules.community.forum.moderation.status.approved')}</SelectItem>
+            <SelectItem value="manual_review">{t('modules.community.forum.moderation.status.manual_review')}</SelectItem>
+            <SelectItem value="blocked">{t('modules.community.forum.moderation.status.blocked')}</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Posts Table */}
@@ -576,10 +594,8 @@ export default function ForumPostsManagement() {
                   </TableHead>
                   <TableHead>{t('modules.community.posts.table.columns.title')}</TableHead>
                   <TableHead>{t('modules.community.posts.table.columns.category')}</TableHead>
-                  <TableHead className="text-center">{t('modules.community.posts.table.columns.likes')}</TableHead>
-                  <TableHead className="text-center">{t('modules.community.posts.table.columns.dislikes')}</TableHead>
+                  <TableHead className="text-center">{t('modules.community.forum.moderation.status.label')}</TableHead>
                   <TableHead className="text-center">{t('modules.community.posts.table.columns.comments')}</TableHead>
-                  <TableHead className="text-center">{t('modules.community.posts.table.columns.score')}</TableHead>
                   <TableHead>{t('modules.community.posts.table.columns.createdAt')}</TableHead>
                   <TableHead className="text-right">{t('modules.community.posts.table.columns.actions')}</TableHead>
                 </TableRow>
@@ -587,7 +603,7 @@ export default function ForumPostsManagement() {
               <TableBody>
                 {paginatedPosts.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={9} className="h-24 text-center">
+                    <TableCell colSpan={7} className="h-24 text-center">
                       {t('modules.community.posts.table.noData')}
                     </TableCell>
                   </TableRow>
@@ -620,15 +636,11 @@ export default function ForumPostsManagement() {
                         </Badge>
                       </TableCell>
                       <TableCell className="text-center">
-                        <div className="flex items-center justify-center space-x-1">
-                          <ThumbsUp className="h-3 w-3 text-green-600" />
-                          <span>{post.likeCount}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <div className="flex items-center justify-center space-x-1">
-                          <ThumbsDown className="h-3 w-3 text-red-600" />
-                          <span>{post.dislikeCount}</span>
+                        <div className="flex items-center justify-center gap-1">
+                          <ForumModerationBadge status={post.moderation?.status} showIcon={false} />
+                          {post.moderation?.finalDecision && post.moderation.finalDecision.confidence >= 0.85 && (
+                            <Shield className="h-3 w-3 text-yellow-600" />
+                          )}
                         </div>
                       </TableCell>
                       <TableCell className="text-center">
@@ -636,11 +648,6 @@ export default function ForumPostsManagement() {
                           <MessageSquare className="h-3 w-3 text-blue-600" />
                           <span>{getPostCommentsCount(post.id)}</span>
                         </div>
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <Badge variant={post.score >= 0 ? 'default' : 'destructive'}>
-                          {post.score}
-                        </Badge>
                       </TableCell>
                       <TableCell>
                         <span className="text-sm text-muted-foreground">

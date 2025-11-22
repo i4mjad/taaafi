@@ -11,6 +11,7 @@
       "dashboard": "لوحة التحكم",
       "userManagement": "إدارة المستخدمين",
       "users": "المستخدمون",
+      "referralProgram": "برنامج الإحالة",
       "roles": "الأدوار",
       "permissions": "الصلاحيات",
       "community": "المجتمع",
@@ -21,7 +22,8 @@
       "groupAdministration": "إدارة المجموعات",
       "adminDashboard": "لوحة تحكم الإدارة",
       "memberManagement": "إدارة الأعضاء",
-      "contentModeration": "مراجعة المحتوى",
+      "messagesModeration": "مراجعة الرسائل",
+      "updatesModeration": "مراجعة التحديثات",
       "reportsManagement": "إدارة البلاغات",
       "challengeManagement": "إدارة التحديات",
       "groupSettings": "إعدادات المجموعة",
@@ -439,7 +441,262 @@
       "userManagement": {
         "title": "إدارة المستخدمين",
         "description": "إدارة مستخدمي المنصة وصلاحياتهم",
-        "users": "المستخدمون",
+        "referralDashboard": {
+          "title": "لوحة تحكم برنامج الإحالة",
+          "description": "مراقبة وإدارة برنامج الإحالة",
+          "refresh": "تحديث",
+          "loading": "جاري تحميل لوحة التحكم...",
+          "errorLoading": "خطأ في تحميل لوحة التحكم",
+          "tryAgain": "حاول مرة أخرى",
+          "stats": {
+            "totalReferrals": "إجمالي الإحالات",
+            "totalReferralsDesc": "التسجيلات الكلية",
+            "verifiedUsers": "المستخدمون المعتمدون",
+            "conversionRate": "معدل التحويل",
+            "pendingReview": "قيد المراجعة",
+            "pendingReviewDesc": "يحتاج إجراء إداري",
+            "blocked": "محظور (احتيال)",
+            "blockedDesc": "الحظر التلقائي واليدوي"
+          },
+          "chart": {
+            "title": "الإحالات عبر الوقت",
+            "description": "تسجيلات الإحالة اليومية والاعتمادات",
+            "totalReferrals": "إجمالي الإحالات",
+            "verified": "معتمد"
+          },
+          "topReferrers": {
+            "title": "أفضل المُحيلين",
+            "description": "المستخدمون الأكثر نجاحاً في الإحالات",
+            "user": "المستخدم",
+            "referred": "تمت إحالته",
+            "verified": "معتمد",
+            "rewards": "المكافآت",
+            "actions": "الإجراءات",
+            "noReferrers": "لم يتم العثور على محيلين",
+            "days": "أيام"
+          },
+          "recentActivity": {
+            "title": "النشاط الأخير",
+            "description": "أحدث أحداث برنامج الإحالة",
+            "noActivity": "لا يوجد نشاط حديث"
+          },
+          "tabs": {
+            "dashboard": "لوحة التحكم",
+            "fraudQueue": "قائمة الاحتيال",
+            "userLookup": "البحث عن المستخدمين",
+            "adjustments": "التعديلات",
+            "analytics": "التحليلات"
+          },
+          "fraudQueue": {
+          "title": "قائمة كشف الاحتيال",
+          "description": "مراجعة وإدارة الحسابات المشبوهة في الإحالات",
+          "loading": "جاري تحميل قائمة الاحتيال...",
+          "errorLoading": "خطأ في تحميل قائمة الاحتيال",
+          "noFlaggedUsers": "كل شيء على ما يرام!",
+          "noFlaggedUsersDesc": "لا يوجد مستخدمون مُعلّمون لمراجعة الاحتيال حالياً.",
+          "bulkApprove": "الموافقة على المحددين",
+          "bulkBlock": "حظر المحددين",
+          "riskLevels": {
+            "low": "خطر منخفض",
+            "medium": "خطر متوسط",
+            "high": "خطر عالي"
+          },
+          "filters": {
+            "scoreRange": "نطاق النقاط",
+            "allScores": "كل النقاط",
+            "mediumRisk": "خطر متوسط (40-70)",
+            "highRisk": "خطر عالي (71+)",
+            "status": "الحالة",
+            "allStatuses": "كل الحالات",
+            "pending": "قيد الانتظار",
+            "blocked": "محظور"
+          },
+          "table": {
+            "user": "المستخدم",
+            "fraudScore": "نقاط الاحتيال",
+            "flags": "العلامات",
+            "referrer": "المُحيل",
+            "status": "الحالة",
+            "actions": "الإجراءات"
+          },
+          "detailsModal": {
+            "title": "تفاصيل كشف الاحتيال",
+            "description": "تحليل مفصل للاحتيال ومعلومات المستخدم",
+            "userInfo": "معلومات المستخدم",
+            "displayName": "الاسم المعروض",
+            "email": "البريد الإلكتروني",
+            "signupDate": "تاريخ التسجيل",
+            "status": "الحالة",
+            "fraudScore": "نقاط الاحتيال",
+            "scoreOutOf100": "من 100",
+            "lastChecked": "آخر فحص",
+            "lowRiskThreshold": "0-39: خطر منخفض (موافقة تلقائية)",
+            "mediumRiskThreshold": "40-70: خطر متوسط (مراجعة يدوية)",
+            "highRiskThreshold": "71-100: خطر عالي (حظر تلقائي)",
+            "checkBreakdown": "تفصيل فحوصات الاحتيال",
+            "checkBreakdownDesc": "فحوصات الاحتيال الفردية التي ساهمت في النقاط",
+            "noFlagsDetected": "لم يتم اكتشاف علامات احتيال",
+            "points": "نقاط",
+            "referrerInfo": "معلومات المُحيل",
+            "referrerId": "معرف المُحيل",
+            "referralCode": "رمز الإحالة",
+            "close": "إغلاق",
+            "approve": "الموافقة على المستخدم",
+            "block": "حظر المستخدم"
+          }
+        },
+        "userLookup": {
+          "title": "البحث عن المستخدمين",
+          "description": "ابحث عن المستخدمين بواسطة البريد الإلكتروني أو المعرف أو رمز الإحالة",
+          "searchPlaceholder": "ابحث بالبريد الإلكتروني أو معرف المستخدم أو رمز الإحالة...",
+          "searchTypes": {
+            "all": "جميع الأنواع",
+            "email": "البريد الإلكتروني",
+            "id": "معرف المستخدم",
+            "code": "رمز الإحالة"
+          },
+          "searching": "جاري البحث...",
+          "noResults": "لم يتم العثور على مستخدمين",
+          "noResultsDesc": "جرب تعديل استعلام البحث أو النوع.",
+          "resultsCount": "تم العثور على {{count}} نتيجة",
+          "referred": "مُحال",
+          "verified": "موثق",
+          "viewDetails": "عرض التفاصيل"
+        },
+        "userDetails": {
+          "title": "تفاصيل إحالة المستخدم",
+          "description": "معلومات الإحالة الكاملة وسجل النشاط",
+          "error": "خطأ في تحميل المستخدم",
+          "errorMessage": "فشل تحميل تفاصيل المستخدم. يرجى المحاولة مرة أخرى.",
+          "close": "إغلاق",
+          "export": "تصدير CSV",
+          "blocked": "محظور",
+          "joined": "انضم",
+          "code": "الرمز",
+          "stats": {
+            "totalReferred": "إجمالي المُحالين",
+            "verified": "موثق",
+            "pending": "قيد الانتظار",
+            "rewards": "المكافآت المكتسبة"
+          },
+          "verificationTitle": "معلومات التوثيق",
+          "verificationStatus": "الحالة",
+          "fraudScore": "نقاط الاحتيال",
+          "referrerId": "معرف المُحيل",
+          "verifiedAt": "تاريخ التوثيق",
+          "tabs": {
+            "referredUsers": "المستخدمون المُحالون",
+            "timeline": "جدول النشاط الزمني"
+          }
+        },
+        "referredUsers": {
+          "title": "المستخدمون المُحالون",
+          "description": "{{count}} مستخدم مُحال بواسطة هذا المستخدم",
+          "error": "فشل تحميل المستخدمين المُحالين",
+          "noUsers": "لا توجد إحالات بعد",
+          "noUsersDesc": "لم يقم هذا المستخدم بإحالة أي شخص بعد.",
+          "user": "المستخدم",
+          "status": "الحالة",
+          "fraudScore": "نقاط الاحتيال",
+          "joined": "تاريخ الانضمام",
+          "verified": "تاريخ التوثيق",
+          "notVerified": "غير موثق"
+        },
+        "timeline": {
+          "title": "جدول النشاط الزمني",
+          "description": "تاريخ زمني لأحداث الإحالة",
+          "noEvents": "لا يوجد نشاط بعد",
+          "noEventsDesc": "لم يتم تسجيل أي نشاط إحالة لهذا المستخدم.",
+          "userSignedUp": "تسجيل المستخدم",
+          "userJoinedPlatform": "انضم المستخدم إلى المنصة",
+          "verified": "تم التوثيق",
+          "verifiedDesc": "أكمل المستخدم التوثيق بنجاح",
+          "blocked": "تم الحظر من قبل المسؤول",
+          "blockedDesc": "تم حظر المستخدم بسبب كشف الاحتيال",
+          "adminApproved": "تمت الموافقة من قبل المسؤول",
+          "adminBlocked": "تم الحظر من قبل المسؤول",
+          "adminAction": "قام المسؤول بإجراء يدوي",
+          "referredUser": "أحال مستخدم جديد",
+          "referredUserDesc": "أحال المستخدم تسجيل جديد (المعرف: {{userId}}...)",
+          "error": "خطأ في تحميل الجدول الزمني",
+          "errorHint": "قد يتطلب هذا فهرس مركب في Firestore. تحقق من وحدة تحكم المتصفح للتفاصيل."
+        },
+        "manualAdjustments": {
+          "title": "التعديلات اليدوية",
+          "description": "تطبيق التصحيحات والتجاوزات اليدوية على بيانات إحالة المستخدم",
+          "searchUser": "البحث عن مستخدم",
+          "searchUserDesc": "ابحث عن مستخدم بالبريد الإلكتروني أو المعرف أو رمز الإحالة",
+          "searchPlaceholder": "أدخل البريد الإلكتروني أو معرف المستخدم أو رمز الإحالة...",
+          "userNotFound": "لم يتم العثور على المستخدم. حاول بحثاً مختلفاً.",
+          "searchError": "فشل البحث عن المستخدمين. حاول مرة أخرى.",
+          "selectAction": "اختر الإجراء",
+          "actionType": "نوع الإجراء",
+          "adjustRewards": "تعديل المكافآت",
+          "resetVerification": "إعادة تعيين التحقق",
+          "overrideFraud": "تجاوز الاحتيال",
+          "updateStats": "تحديث الإحصائيات",
+          "rewardDays": "أيام التعديل",
+          "rewardDaysHint": "أدخل رقماً موجباً لإضافة الأيام، أو سالباً للطرح",
+          "verificationResetWarning": "سيؤدي هذا إلى إعادة تعيين قائمة التحقق للمستخدم إلى الحالة الأولية. سيتم فقد جميع التقدم.",
+          "fraudOverrideWarning": "سيؤدي هذا إلى مسح جميع علامات الاحتيال وإعادة تعيين درجة الاحتيال إلى 0. استخدم بحذر.",
+          "statsUpdateHint": "اترك الحقول فارغة للاحتفاظ بالقيم الحالية. املأ فقط الحقول التي تريد تحديثها.",
+          "totalReferred": "إجمالي المُحالين",
+          "totalVerified": "إجمالي المعتمدين",
+          "totalPending": "إجمالي المعلقين",
+          "totalBlocked": "إجمالي المحظورين",
+          "totalRewards": "إجمالي المكافآت",
+          "reason": "السبب",
+          "reasonPlaceholder": "أدخل سبب هذا التعديل (مطلوب)...",
+          "reasonRequired": "السبب مطلوب لجميع التعديلات",
+          "applyAdjustment": "تطبيق التعديل",
+          "confirmTitle": "تأكيد التعديل",
+          "confirmDescription": "يرجى مراجعة تفاصيل التعديل قبل التأكيد.",
+          "user": "المستخدم",
+          "action": "الإجراء",
+          "cancel": "إلغاء",
+          "confirm": "تأكيد",
+          "adjustmentSuccess": "تم تطبيق التعديل بنجاح!",
+          "adjustmentError": "فشل تطبيق التعديل. حاول مرة أخرى.",
+          "referred": "تمت الإحالة",
+          "verified": "معتمد"
+        },
+        "analytics": {
+          "title": "لوحة التحليلات",
+          "description": "رؤى شاملة حول أداء برنامج الإحالة",
+          "retry": "إعادة المحاولة",
+          "last7Days": "آخر 7 أيام",
+          "last30Days": "آخر 30 يوماً",
+          "last90Days": "آخر 90 يوماً",
+          "export": "تصدير",
+          "totalReferrals": "إجمالي الإحالات",
+          "inSelectedPeriod": "في الفترة المحددة",
+          "conversionRate": "معدل التحويل",
+          "verified": "معتمد",
+          "rewardsDistributed": "المكافآت الموزعة",
+          "premiumDays": "أيام مميزة",
+          "avgFraudScore": "متوسط درجة الاحتيال",
+          "blocked": "محظور",
+          "conversionFunnel": "قمع التحويل",
+          "conversionFunnelDesc": "تتبع تقدم المستخدم عبر مراحل التحقق",
+          "users": "المستخدمون",
+          "percentage": "النسبة المئوية",
+          "cohortAnalysis": "تحليل المجموعات",
+          "cohortAnalysisDesc": "مقارنة الأداء عبر فترات زمنية مختلفة",
+          "weekly": "أسبوعي",
+          "monthly": "شهري",
+          "signups": "التسجيلات",
+          "retentionRate": "معدل الاحتفاظ",
+          "retentionRateDesc": "نسبة المستخدمين الذين يكملون التحقق",
+          "usersVerified": "مستخدم معتمد",
+          "timeToVerify": "وقت التحقق",
+          "timeToVerifyDesc": "توزيع أوقات إكمال التحقق",
+          "cohortPerformance": "أداء المجموعات",
+          "cohortPerformanceDesc": "مقاييس مفصلة لكل فترة مجموعة",
+          "cohort": "المجموعة",
+          "avgTimeToVerify": "متوسط وقت التحقق"
+        }
+      },
+      "users": "المستخدمون",
         "usersDescription": "إدارة حسابات المستخدمين وصلاحياتهم",
         "settings": "الإعدادات",
         "settingsDescription": "تكوين إدارة المستخدمين وإعدادات الإشعارات",
@@ -1763,7 +2020,7 @@
           "collapseComments": "إخفاء التعليقات",
           "showInteractions": "إظهار التفاعلات",
           "hideInteractions": "إخفاء التفاعلات",
-          "title": "العنوان",
+          "titleLabel": "العنوان",
           "titlePlaceholder": "أدخل عنوان المنشور",
           "body": "المحتوى",
           "bodyPlaceholder": "أدخل محتوى المنشور",
@@ -1965,25 +2222,611 @@
               "placeholder": "اختر سبباً جاهزاً (اختياري)",
               "custom": "سبب مخصص"
             }
+          }
+        },
+        "forum": {
+          "moderation": {
+            "status": {
+              "label": "حالة الإشراف",
+              "approved": "موافق عليه",
+              "manual_review": "مراجعة يدوية",
+              "blocked": "محظور",
+              "pending": "قيد الانتظار"
+            },
+            "filterByStatus": "تصفية حسب حالة الإشراف",
+            "noData": "لا توجد بيانات إشراف",
+            "noDataDescription": "لم يتم الإشراف على هذا المحتوى بعد.",
+            "details": "تفاصيل الإشراف",
+            "detailsDescription": "تحليل الذكاء الاصطناعي ومعلومات الإشراف",
+            "reason": "السبب",
+            "visibility": "الظهور",
+            "hidden": "مخفي",
+            "visible": "ظاهر",
+            "autoHiddenInfo": "تم إخفاء المحتوى تلقائياً بسبب اكتشاف انتهاك بثقة عالية (>85%)",
+            "finalDecision": "القرار النهائي",
+            "action": "الإجراء",
+            "confidence": "الثقة",
+            "violationType": "نوع الانتهاك",
+            "aiAnalysis": "تحليل الذكاء الاصطناعي",
+            "severity": "الشدة",
+            "severityLevel": {
+              "low": "منخفض",
+              "medium": "متوسط",
+              "high": "عالي"
+            },
+            "detectedContent": "المحتوى المكتشف",
+            "culturalContext": "السياق الثقافي",
+            "customRules": "القواعد المخصصة",
+            "analyzedAt": "تم التحليل",
+            "highConfidence": "ثقة عالية",
+            "quickActions": "إجراءات الإشراف السريعة",
+            "deletedContent": "تم حذف هذا المحتوى",
+            "actions": {
+              "approve": "موافقة",
+              "block": "حظر",
+              "hide": "إخفاء",
+              "unhide": "إظهار",
+              "approveTitle": "الموافقة على المحتوى",
+              "approveDescription": "وضع علامة على هذا المحتوى كموافق عليه وجعله مرئياً لجميع المستخدمين.",
+              "approveSuccess": "تمت الموافقة على المحتوى بنجاح",
+              "blockTitle": "حظر المحتوى",
+              "blockDescription": "حظر هذا المحتوى وإخفائه عن جميع المستخدمين.",
+              "blockSuccess": "تم حظر المحتوى بنجاح",
+              "hideTitle": "إخفاء المحتوى",
+              "hideDescription": "إخفاء هذا المحتوى عن المستخدمين دون تغيير حالة الإشراف.",
+              "hideSuccess": "تم إخفاء المحتوى بنجاح",
+              "unhideTitle": "إظهار المحتوى",
+              "unhideDescription": "جعل هذا المحتوى مرئياً للمستخدمين مرة أخرى.",
+              "unhideSuccess": "تم إظهار المحتوى بنجاح",
+              "error": "فشل في تنفيذ إجراء الإشراف",
+              "reasonLabel": "السبب",
+              "reasonPlaceholder": "اشرح سبب اتخاذك لهذا الإجراء..."
+            }
+          }
+        },
+        "directMessages": {
+          "title": "إدارة الرسائل المباشرة",
+          "description": "إدارة ومراجعة الرسائل المباشرة بين أعضاء المجتمع",
+          "tabs": {
+            "dashboard": "لوحة التحكم",
+            "moderationQueue": "قائمة المراجعة",
+            "allConversations": "جميع المحادثات",
+            "allMessages": "جميع الرسائل",
+            "userReports": "بلاغات المستخدمين",
+            "settings": "الإعدادات"
           },
-          "totalAcrossAllPosts": "الإجمالي عبر جميع المنشورات",
-          "likesAndDislikes": "إعجابات وعدم إعجابات",
-          "tryAdjustingFilters": "حاول تعديل معايير البحث أو التصفية",
-          "anonymous": "مجهول",
-          "byAuthor": "بواسطة: {author}",
-          "dateFormat": "dd MMM, yyyy",
-          "noCommentsYet": "لا توجد تعليقات بعد",
-          "commentDateFormat": "dd MMM, HH:mm",
-          "moreComments": "...و{count} تعليق آخر",
-          "detailedView": "عرض تفصيلي للمنشور المحدد في المنتدى",
-          "author": "الكاتب: {author}",
-          "category": "التصنيف: {category}",
-          "created": "تاريخ الإنشاء: {date}",
-          "likes": "{count} إعجاب",
-          "dislikes": "{count} عدم إعجاب",
-          "comments": "{count} تعليق",
-          "score": "النقاط: {score}",
-          "detailDateTimeFormat": "dd MMMM, yyyy HH:mm"
+          "dashboard": {
+            "title": "نظرة عامة",
+            "description": "المقاييس والإحصائيات الرئيسية للرسائل المباشرة",
+            "metrics": {
+              "totalConversations": "إجمالي المحادثات",
+              "totalMessages": "إجمالي الرسائل",
+              "todaysMessages": "رسائل اليوم",
+              "messagesByStatus": "الرسائل حسب الحالة",
+              "activeReports": "البلاغات النشطة",
+              "avgResponseTime": "متوسط وقت الاستجابة",
+              "topViolations": "أكثر المخالفات"
+            },
+            "subtitles": {
+              "allTime": "طوال الوقت",
+              "last24Hours": "آخر 24 ساعة",
+              "requiresAction": "يتطلب إجراء",
+              "actionsTaken": "الإجراءات المتخذة"
+            },
+            "timeFilters": {
+              "allTime": "كل الوقت",
+              "last30Days": "آخر 30 يوماً",
+              "last7Days": "آخر 7 أيام",
+              "today": "اليوم"
+            },
+            "charts": {
+              "messagesOverTime": "الرسائل عبر الزمن",
+              "statusDistribution": "توزيع الحالة",
+              "violationTypes": "أنواع المخالفات"
+            }
+          },
+          "moderationQueue": {
+            "title": "قائمة المراجعة",
+            "description": "مراجعة ومراقبة الرسائل المبلغ عنها",
+            "filters": {
+              "status": "الحالة",
+              "priority": "الأولوية",
+              "messageType": "نوع الرسالة",
+              "violationType": "نوع المخالفة",
+              "dateRange": "النطاق الزمني",
+              "sender": "المرسل"
+            },
+            "columns": {
+              "messageId": "معرف الرسالة",
+              "sender": "المرسل",
+              "preview": "معاينة الرسالة",
+              "violationType": "نوع المخالفة",
+              "confidence": "درجة الثقة",
+              "severity": "الخطورة",
+              "priority": "الأولوية",
+              "status": "الحالة",
+              "createdAt": "تاريخ الإنشاء",
+              "actions": "الإجراءات"
+            },
+            "actions": {
+              "viewDetails": "عرض التفاصيل",
+              "approve": "قبول",
+              "reject": "رفض",
+              "dismiss": "تجاهل",
+              "viewConversation": "عرض المحادثة",
+              "viewSender": "عرض المرسل",
+              "banUser": "حظر المستخدم"
+            },
+            "bulkActions": {
+              "title": "الإجراءات الجماعية",
+              "approveSelected": "قبول المحدد",
+              "rejectSelected": "رفض المحدد",
+              "dismissSelected": "تجاهل المحدد",
+              "exportSelected": "تصدير المحدد"
+            },
+            "empty": "لا توجد رسائل في قائمة المراجعة",
+            "loading": "جاري تحميل قائمة المراجعة..."
+          },
+          "conversations": {
+            "title": "جميع المحادثات",
+            "description": "استعراض والبحث في جميع المحادثات المباشرة",
+            "filters": {
+              "status": "الحالة",
+              "dateRange": "النطاق الزمني",
+              "participants": "المشاركون",
+              "hasFlagged": "تحتوي على رسائل مبلغ عنها",
+              "hasReports": "تحتوي على بلاغات"
+            },
+            "columns": {
+              "conversationId": "معرف المحادثة",
+              "participants": "المشاركون",
+              "lastMessage": "آخر رسالة",
+              "lastActivity": "آخر نشاط",
+              "messageCount": "عدد الرسائل",
+              "flaggedCount": "الرسائل المبلغ عنها",
+              "reportsCount": "البلاغات",
+              "createdAt": "تاريخ الإنشاء",
+              "actions": "الإجراءات"
+            },
+            "actions": {
+              "viewMessages": "عرض الرسائل",
+              "viewParticipants": "عرض المشاركين",
+              "deleteConversation": "حذف المحادثة",
+              "exportConversation": "تصدير المحادثة"
+            },
+            "empty": "لم يتم العثور على محادثات",
+            "loading": "جاري تحميل المحادثات..."
+          },
+          "messages": {
+            "title": "جميع الرسائل",
+            "description": "استعراض والبحث في جميع الرسائل المباشرة",
+            "filters": {
+              "moderationStatus": "حالة المراجعة",
+              "dateRange": "النطاق الزمني",
+              "sender": "المرسل",
+              "conversation": "المحادثة",
+              "hasViolations": "تحتوي على مخالفات",
+              "violationType": "نوع المخالفة"
+            },
+            "columns": {
+              "messageId": "معرف الرسالة",
+              "sender": "المرسل",
+              "preview": "المعاينة",
+              "conversationId": "معرف المحادثة",
+              "moderationStatus": "حالة المراجعة",
+              "violationType": "نوع المخالفة",
+              "confidence": "درجة الثقة",
+              "createdAt": "تاريخ الإنشاء",
+              "actions": "الإجراءات"
+            },
+            "actions": {
+              "viewFullMessage": "عرض الرسالة الكاملة",
+              "viewConversation": "عرض المحادثة",
+              "reviewModeration": "مراجعة الاعتدال",
+              "deleteMessage": "حذف الرسالة",
+              "viewSender": "عرض المرسل"
+            },
+            "empty": "لم يتم العثور على رسائل",
+            "loading": "جاري تحميل الرسائل..."
+          },
+          "reports": {
+            "title": "بلاغات المستخدمين",
+            "description": "إدارة البلاغات المقدمة من المستخدمين",
+            "filters": {
+              "reportType": "نوع البلاغ",
+              "status": "الحالة",
+              "dateRange": "النطاق الزمني",
+              "reporter": "المبلِّغ",
+              "reported": "المُبلَّغ عنه"
+            },
+            "columns": {
+              "reportId": "معرف البلاغ",
+              "reportType": "النوع",
+              "reporter": "المبلِّغ",
+              "reported": "المستخدم/الرسالة المُبلَّغ عنها",
+              "description": "الوصف",
+              "status": "الحالة",
+              "createdAt": "تاريخ الإنشاء",
+              "actions": "الإجراءات"
+            },
+            "actions": {
+              "viewDetails": "عرض التفاصيل",
+              "resolve": "حل",
+              "dismiss": "تجاهل",
+              "takeAction": "اتخاذ إجراء"
+            },
+            "statistics": {
+              "totalReports": "إجمالي البلاغات",
+              "activeReports": "البلاغات النشطة",
+              "avgResolutionTime": "متوسط وقت الحل",
+              "mostReported": "المستخدمون الأكثر بلاغاً",
+              "commonViolations": "المخالفات الشائعة"
+            },
+            "empty": "لم يتم العثور على بلاغات",
+            "loading": "جاري تحميل البلاغات..."
+          },
+          "conversationDetail": {
+            "title": "تفاصيل المحادثة",
+            "description": "عرض المحادثة والرسائل",
+            "header": {
+              "conversationId": "معرف المحادثة",
+              "participants": "المشاركون",
+              "created": "تاريخ الإنشاء",
+              "lastActivity": "آخر نشاط",
+              "messageCount": "عدد الرسائل",
+              "flaggedCount": "الرسائل المبلغ عنها",
+              "reportsCount": "البلاغات النشطة"
+            },
+            "actions": {
+              "exportConversation": "تصدير المحادثة",
+              "deleteConversation": "حذف المحادثة",
+              "viewProfiles": "عرض الملفات الشخصية",
+              "viewReports": "عرض البلاغات"
+            },
+            "messagesFilter": {
+              "all": "جميع الرسائل",
+              "flaggedOnly": "المبلغ عنها فقط",
+              "approvedOnly": "المعتمدة فقط"
+            },
+            "searchPlaceholder": "البحث في المحادثة...",
+            "empty": "لا توجد رسائل في هذه المحادثة",
+            "loading": "جاري تحميل المحادثة..."
+          },
+          "senderProfile": {
+            "title": "الملف الشخصي وسجل المرسل",
+            "description": "عرض نشاط الرسائل المباشرة لملف المجتمع",
+            "profile": {
+              "displayName": "الاسم المعروض",
+              "cpId": "معرف ملف المجتمع",
+              "userUID": "معرف المستخدم",
+              "accountCreated": "تاريخ إنشاء الحساب",
+              "dmSettings": "إعدادات الرسائل المباشرة",
+              "allowDirectMessages": "السماح بالرسائل المباشرة"
+            },
+            "statistics": {
+              "totalConversations": "إجمالي المحادثات",
+              "totalMessages": "إجمالي الرسائل المرسلة",
+              "approvedMessages": "الرسائل المعتمدة",
+              "flaggedMessages": "الرسائل المبلغ عنها",
+              "blockedMessages": "الرسائل المحظورة",
+              "reportsReceived": "البلاغات المستلمة",
+              "activeBans": "الحظر النشط"
+            },
+            "sections": {
+              "recentMessages": "الرسائل الأخيرة",
+              "conversations": "المحادثات",
+              "reports": "البلاغات ضد المستخدم",
+              "bans": "الحظر النشط"
+            },
+            "actions": {
+              "banFromStarting": "منع من بدء المحادثات",
+              "banFromSending": "منع من إرسال الرسائل",
+              "appWideBan": "حظر من التطبيق بالكامل",
+              "viewBans": "عرض الحظر الحالي"
+            },
+            "loading": "جاري تحميل الملف الشخصي..."
+          },
+          "modals": {
+            "messageDetail": {
+              "title": "تفاصيل الرسالة",
+              "fullContent": "المحتوى الكامل",
+              "senderInfo": "معلومات المرسل",
+              "conversationInfo": "معلومات المحادثة",
+              "aiAnalysis": "تحليل الذكاء الاصطناعي",
+              "customRules": "القواعد المخصصة المفعَّلة",
+              "adminActions": "إجراءات المدير",
+              "reviewNotes": "ملاحظات المراجعة",
+              "addNotes": "إضافة ملاحظات المراجعة..."
+            },
+            "reportDetail": {
+              "title": "تفاصيل البلاغ",
+              "reporterInfo": "معلومات المُبلِّغ",
+              "reportedContent": "المحتوى المُبلَّغ عنه",
+              "reportDescription": "وصف البلاغ",
+              "resolutionNotes": "ملاحظات الحل",
+              "addResolutionNotes": "إضافة ملاحظات الحل..."
+            },
+            "banUser": {
+              "title": "حظر المستخدم",
+              "selectBanType": "اختر نوع الحظر",
+              "featureBan": "حظر ميزة",
+              "appWideBan": "حظر من التطبيق",
+              "duration": "المدة",
+              "severity": "الخطورة",
+              "reason": "السبب",
+              "additionalNotes": "ملاحظات إضافية"
+            },
+            "deleteConfirm": {
+              "title": "تأكيد الحذف",
+              "messageWarning": "هل أنت متأكد من حذف هذه الرسالة؟",
+              "conversationWarning": "هل أنت متأكد من حذف هذه المحادثة؟",
+              "irreversible": "لا يمكن التراجع عن هذا الإجراء."
+            }
+          },
+          "statuses": {
+            "pending": "قيد المراجعة",
+            "approved": "معتمد",
+            "blocked": "محظور",
+            "manual_review": "مراجعة يدوية",
+            "active": "نشط",
+            "resolved": "محلول",
+            "dismissed": "متجاهل"
+          },
+          "priorities": {
+            "low": "منخفضة",
+            "medium": "متوسطة",
+            "high": "عالية",
+            "critical": "حرجة"
+          },
+          "severities": {
+            "low": "منخفضة",
+            "medium": "متوسطة",
+            "high": "عالية"
+          },
+          "violationTypes": {
+            "social_media_sharing": "مشاركة حسابات التواصل الاجتماعي",
+            "sexual_content": "محتوى جنسي",
+            "cuckoldry_content": "محتوى الدياثة",
+            "homosexuality_content": "محتوى اللواط",
+            "harassment": "تحرش",
+            "spam": "بريد مزعج",
+            "none": "لا يوجد"
+          },
+          "reportTypes": {
+            "user": "بلاغ مستخدم",
+            "message": "بلاغ رسالة"
+          },
+          "messageTypes": {
+            "direct_message": "رسالة مباشرة",
+            "group_message": "رسالة جماعية"
+          },
+          "common": {
+            "search": "بحث...",
+            "filter": "تصفية",
+            "export": "تصدير",
+            "cancel": "إلغاء",
+            "save": "حفظ",
+            "delete": "حذف",
+            "confirm": "تأكيد",
+            "loading": "جاري التحميل...",
+            "noData": "لا توجد بيانات متاحة",
+            "error": "حدث خطأ",
+            "success": "تمت العملية بنجاح",
+            "selected": "{count} محدد",
+            "showMore": "عرض المزيد",
+            "showLess": "عرض أقل",
+            "viewAll": "عرض الكل",
+            "pagination": {
+              "previous": "السابق",
+              "next": "التالي",
+              "page": "صفحة",
+              "of": "من",
+              "showing": "عرض",
+              "to": "إلى",
+              "items": "عناصر",
+              "itemsPerPage": "عدد العناصر في الصفحة"
+            },
+            "confirmDelete": "هل أنت متأكد من أنك تريد حذف هذا؟",
+            "moderationSuccess": "تم إجراء المراجعة بنجاح"
+          },
+          "notifications": {
+            "approved": "تم قبول الرسالة بنجاح",
+            "rejected": "تم رفض الرسالة بنجاح",
+            "dismissed": "تم تجاهل الرسالة من القائمة",
+            "deleted": "تم حذف الرسالة بنجاح",
+            "reportResolved": "تم حل البلاغ بنجاح",
+            "reportDismissed": "تم تجاهل البلاغ بنجاح",
+            "banCreated": "تم حظر المستخدم بنجاح",
+            "exportComplete": "تم التصدير بنجاح",
+            "error": "حدث خطأ. يرجى المحاولة مرة أخرى."
+          }
+        },
+        "groupUpdates": {
+          "title": "مراجعة التحديثات الجماعية",
+          "description": "مراجعة والموافقة على التحديثات المقدمة من الأعضاء",
+          "tabs": {
+            "pending": "قيد المراجعة",
+            "approved": "موافق عليها",
+            "blocked": "محظورة",
+            "all": "جميع التحديثات"
+          },
+          "filters": {
+            "status": "الحالة",
+            "language": "اللغة",
+            "updateType": "نوع التحديث",
+            "violationType": "نوع الانتهاك",
+            "dateRange": "النطاق الزمني",
+            "searchPlaceholder": "البحث بالمحتوى أو الكاتب أو المجموعة...",
+            "allLanguages": "جميع اللغات",
+            "allTypes": "جميع الأنواع",
+            "allViolations": "جميع الانتهاكات"
+          },
+          "stats": {
+            "totalUpdates": "إجمالي التحديثات",
+            "todaysUpdates": "تحديثات اليوم",
+            "pendingReview": "قيد المراجعة",
+            "requiresAction": "يتطلب إجراء",
+            "approvedToday": "موافق عليها اليوم",
+            "approvedTotal": "إجمالي الموافق عليها",
+            "blockedToday": "محظورة اليوم",
+            "blockedTotal": "إجمالي المحظورة",
+            "byLanguage": "حسب اللغة",
+            "byType": "حسب النوع",
+            "byViolation": "حسب الانتهاك",
+            "allTime": "طوال الوقت",
+            "last24Hours": "آخر 24 ساعة",
+            "requiresActionLabel": "يتطلب إجراء",
+            "recentApprovals": "الموافقات الأخيرة",
+            "allApprovals": "طوال الوقت",
+            "actionsTaken": "الإجراءات المتخذة"
+          },
+          "table": {
+            "columns": {
+              "update": "التحديث",
+              "author": "الكاتب",
+              "group": "المجموعة",
+              "type": "النوع",
+              "language": "اللغة",
+              "status": "الحالة",
+              "confidence": "ثقة الذكاء الاصطناعي",
+              "violation": "الانتهاك",
+              "createdAt": "تاريخ الإنشاء",
+              "actions": "الإجراءات"
+            },
+            "emptyState": "لا توجد تحديثات",
+            "loading": "جاري تحميل التحديثات..."
+          },
+          "updateTypes": {
+            "general": "عام",
+            "achievement": "إنجاز",
+            "milestone": "معلم رئيسي",
+            "support": "دعم"
+          },
+          "violationTypes": {
+            "social_media_sharing": "مشاركة حسابات التواصل الاجتماعي",
+            "sexual_content": "محتوى جنسي",
+            "cuckoldry_content": "محتوى الدياثة",
+            "homosexuality_content": "محتوى اللواط",
+            "harassment": "تحرش",
+            "spam": "بريد مزعج",
+            "hate_speech": "خطاب كراهية",
+            "violence": "عنف",
+            "self_harm": "إيذاء النفس",
+            "none": "لا يوجد انتهاك"
+          },
+          "statuses": {
+            "pending": "قيد الانتظار",
+            "manual_review": "مراجعة يدوية",
+            "approved": "موافق عليه",
+            "blocked": "محظور"
+          },
+          "severities": {
+            "low": "منخفضة",
+            "medium": "متوسطة",
+            "high": "عالية"
+          },
+          "detailSheet": {
+            "title": "تفاصيل التحديث",
+            "sections": {
+              "content": "محتوى التحديث",
+              "author": "معلومات الكاتب",
+              "group": "معلومات المجموعة",
+              "aiAnalysis": "تحليل الذكاء الاصطناعي",
+              "adminAction": "إجراء المشرف"
+            },
+            "content": {
+              "title": "العنوان",
+              "body": "المحتوى",
+              "type": "النوع",
+              "language": "اللغة",
+              "visibility": "الرؤية",
+              "anonymous": "منشور بهوية مجهولة",
+              "linkedChallenge": "تحدي مرتبط",
+              "linkedMilestone": "معلم رئيسي مرتبط",
+              "reactions": "التفاعلات",
+              "comments": "التعليقات",
+              "supports": "الدعم"
+            },
+            "author": {
+              "displayName": "الاسم المعروض",
+              "cpId": "معرف الملف الشخصي",
+              "joinedGroup": "انضم للمجموعة",
+              "totalUpdates": "إجمالي التحديثات",
+              "previousFlags": "الأعلام السابقة",
+              "viewProfile": "عرض الملف الشخصي"
+            },
+            "group": {
+              "name": "اسم المجموعة",
+              "id": "معرف المجموعة",
+              "memberCount": "الأعضاء",
+              "language": "اللغة",
+              "gender": "الجنس",
+              "viewGroup": "عرض المجموعة"
+            },
+            "aiAnalysis": {
+              "overallStatus": "الحالة العامة",
+              "confidence": "درجة الثقة",
+              "violationType": "نوع الانتهاك",
+              "severity": "الخطورة",
+              "detectedContent": "المحتوى المكتشف",
+              "reason": "سبب الذكاء الاصطناعي",
+              "customRules": "القواعد المخصصة المفعلة",
+              "culturalContext": "السياق الثقافي",
+              "finalDecision": "القرار النهائي",
+              "analysisTime": "وقت التحليل"
+            },
+            "actions": {
+              "title": "قرار المراجعة",
+              "approve": "موافقة",
+              "block": "حظر",
+              "keepUnderReview": "الإبقاء قيد المراجعة",
+              "reason": "السبب",
+              "reasonPlaceholder": "اشرح قرارك...",
+              "notes": "ملاحظات المشرف",
+              "notesPlaceholder": "أضف أي ملاحظات إضافية...",
+              "submit": "تقديم القرار",
+              "submitting": "جاري المعالجة...",
+              "cancel": "إلغاء"
+            }
+          },
+          "bulkActions": {
+            "title": "الإجراءات الجماعية",
+            "selected": "{count} محدد",
+            "approve": "الموافقة على المحدد",
+            "block": "حظر المحدد",
+            "delete": "حذف المحدد",
+            "confirmTitle": "تأكيد الإجراء الجماعي",
+            "confirmMessage": "هل أنت متأكد من أنك تريد {action} {count} تحديث؟",
+            "reason": "سبب الإجراء الجماعي",
+            "reasonPlaceholder": "اشرح سبب اتخاذ هذا الإجراء...",
+            "processing": "معالجة {current} من {total}..."
+          },
+          "actions": {
+            "view": "عرض التفاصيل",
+            "approve": "موافقة",
+            "block": "حظر",
+            "delete": "حذف",
+            "viewAuthor": "عرض الكاتب",
+            "viewGroup": "عرض المجموعة"
+          },
+          "notifications": {
+            "approved": "تمت الموافقة على التحديث بنجاح",
+            "blocked": "تم حظر التحديث بنجاح",
+            "keptUnderReview": "تم الإبقاء على التحديث قيد المراجعة",
+            "bulkActionComplete": "تم إكمال الإجراء الجماعي بنجاح",
+            "error": "حدث خطأ. يرجى المحاولة مرة أخرى.",
+            "loadError": "فشل تحميل التحديثات"
+          },
+          "pagination": {
+            "previous": "السابق",
+            "next": "التالي",
+            "page": "صفحة",
+            "of": "من",
+            "showing": "عرض",
+            "to": "إلى",
+            "items": "عناصر",
+            "itemsPerPage": "عدد العناصر في الصفحة"
+          }
         },
         "rules": {
           "no_personal_contact": {
@@ -2033,6 +2876,7 @@
           "noCommentsFound": "لم يتم العثور على تعليقات",
           "totalComments": "إجمالي التعليقات",
           "todaysComments": "تعليقات اليوم",
+          "postsWithComments": "منشورات بها تعليقات",
           "body": "التعليق",
           "bodyPlaceholder": "أدخل محتوى التعليق",
           "postTitle": "عنوان المنشور",
@@ -2480,7 +3324,7 @@
           "selectGroup": "اختر مجموعة",
           "allGroups": "جميع المجموعات",
           "selectGroupPlaceholder": "اختر مجموعة للتصفية",
-          "contentDescription": "مراقبة وإدارة جميع المحتوى عبر المجموعات",
+          "contentDescription": "مراقبة وإدارة جميع الرسائل عبر المجموعات",
           "membersDescription": "إدارة جميع الأعضاء عبر المنصة",
           "reportsDescription": "مراجعة ومعالجة بلاغات المستخدمين",
           "quickActionsDesc": "وصول سريع للمهام الإدارية الشائعة",
@@ -2745,7 +3589,7 @@
           }
         },
         "content": {
-          "title": "إدارة المحتوى",
+          "title": "مراجعة الرسائل",
           "messageModerated": "تمت إدارة الرسالة بنجاح",
           "moderationError": "فشل في إدارة الرسالة",
           "moderateMessage": "إدارة الرسالة",

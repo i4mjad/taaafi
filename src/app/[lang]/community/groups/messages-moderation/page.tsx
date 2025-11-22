@@ -41,7 +41,7 @@ export default function SystemAdminContentPage() {
   });
 
   const headerDictionary = {
-    documents: t('modules.admin.content.title') || 'Content Moderation',
+    documents: t('modules.admin.content.title') || 'Messages Moderation',
   };
 
   // Fetch all groups
