@@ -187,6 +187,7 @@ class ChecklistProgressScreen extends ConsumerWidget {
                     type: ChecklistItemType.accountAge7Days,
                     item: entity.accountAge7Days,
                     signupDate: entity.signupDate,
+                    isReadOnly: !isViewingOwnProgress,
                   ),
                   const SizedBox(height: 12),
 
@@ -194,6 +195,7 @@ class ChecklistProgressScreen extends ConsumerWidget {
                   ChecklistItemWidget(
                     type: ChecklistItemType.forumPosts3,
                     item: entity.forumPosts3,
+                    isReadOnly: !isViewingOwnProgress,
                   ),
                   const SizedBox(height: 12),
 
@@ -201,6 +203,7 @@ class ChecklistProgressScreen extends ConsumerWidget {
                   ChecklistItemWidget(
                     type: ChecklistItemType.interactions5,
                     item: entity.interactions5,
+                    isReadOnly: !isViewingOwnProgress,
                   ),
                   const SizedBox(height: 12),
 
@@ -208,6 +211,7 @@ class ChecklistProgressScreen extends ConsumerWidget {
                   ChecklistItemWidget(
                     type: ChecklistItemType.groupJoined,
                     item: entity.groupJoined,
+                    isReadOnly: !isViewingOwnProgress,
                   ),
                   const SizedBox(height: 12),
 
@@ -215,6 +219,7 @@ class ChecklistProgressScreen extends ConsumerWidget {
                   ChecklistItemWidget(
                     type: ChecklistItemType.groupMessages3,
                     item: entity.groupMessages3,
+                    isReadOnly: !isViewingOwnProgress,
                   ),
                   const SizedBox(height: 12),
 
@@ -222,6 +227,7 @@ class ChecklistProgressScreen extends ConsumerWidget {
                   ChecklistItemWidget(
                     type: ChecklistItemType.activityStarted,
                     item: entity.activityStarted,
+                    isReadOnly: !isViewingOwnProgress,
                   ),
                   const SizedBox(height: 20),
 

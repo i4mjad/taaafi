@@ -23,12 +23,14 @@ class ChecklistItemWidget extends ConsumerWidget {
   final ChecklistItemType type;
   final ChecklistItemEntity item;
   final DateTime? signupDate;
+  final bool isReadOnly;
 
   const ChecklistItemWidget({
     super.key,
     required this.type,
     required this.item,
     this.signupDate,
+    this.isReadOnly = false,
   });
 
   @override
@@ -124,8 +126,8 @@ class ChecklistItemWidget extends ConsumerWidget {
                     ),
                   ),
 
-                  // Action button for incomplete items
-                  if (_hasActionButton()) ...[
+                  // Action button for incomplete items (ONLY if not read-only)
+                  if (!isReadOnly && _hasActionButton()) ...[
                     const SizedBox(height: 12),
                     SizedBox(
                       width: double.infinity,
