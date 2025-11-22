@@ -4,11 +4,11 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../../core/localization/localization.dart';
 import '../../../../core/shared_widgets/app_bar.dart';
+import '../../../../core/shared_widgets/container.dart';
 import '../../../../core/shared_widgets/spinner.dart';
 import '../../../../core/theming/app-themes.dart';
 import '../../../../core/theming/text_styles.dart';
 import '../providers/referral_dashboard_provider.dart';
-import '../widgets/checklist_item_widget.dart';
 import '../widgets/verification_progress_header.dart';
 
 /// Checklist Progress Screen
