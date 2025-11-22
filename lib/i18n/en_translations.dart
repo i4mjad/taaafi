@@ -4021,6 +4021,9 @@ const Map<String, String> kEn = {
 
   // Checklist Progress UI
   'referral.checklist.title': 'Verification Progress',
+  'referral.checklist.user_progress': 'User Progress',
+  'referral.checklist.no_referral_data': 'No Referral Data',
+  'referral.checklist.user_not_referred': 'This user was not referred through the referral program.',
   'referral.checklist.progress': '{completed} of {total} tasks',
   'referral.checklist.subtitle': 'Complete tasks to unlock Premium!',
   'referral.checklist.all_complete_message':

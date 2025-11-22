@@ -3930,6 +3930,9 @@ const Map<String, String> kAr = {
 
   // Checklist Progress UI
   'referral.checklist.title': 'تقدم التحقق',
+  'referral.checklist.user_progress': 'تقدم المستخدم',
+  'referral.checklist.no_referral_data': 'لا توجد بيانات إحالة',
+  'referral.checklist.user_not_referred': 'لم تتم إحالة هذا المستخدم من خلال برنامج الإحالة.',
   'referral.checklist.progress': '{completed} من {total} مهام',
   'referral.checklist.subtitle': 'أكمل المهام لفتح الباقة المميزة!',
   'referral.checklist.all_complete_message': 'رائع! لقد أكملت جميع المهام!',

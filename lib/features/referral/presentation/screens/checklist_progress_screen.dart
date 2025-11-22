@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../../../core/localization/localization.dart';
 import '../../../../core/shared_widgets/app_bar.dart';
@@ -27,6 +28,11 @@ class ChecklistProgressScreen extends ConsumerWidget {
     final theme = AppTheme.of(context);
     final l10n = AppLocalizations.of(context);
 
+    // Get current logged-in user ID
+    final currentUserId = FirebaseAuth.instance.currentUser?.uid;
+    // Check if user is viewing their own progress or someone else's
+    final isViewingOwnProgress = currentUserId == userId;
+
     // Watch the real-time stream of verification progress
     final verificationAsync = ref.watch(userVerificationProgressProvider(userId));
 
@@ -35,14 +41,16 @@ class ChecklistProgressScreen extends ConsumerWidget {
       appBar: appBar(
         context,
         ref,
-        'referral.checklist.title',
+        isViewingOwnProgress 
+            ? 'referral.checklist.title'
+            : 'referral.checklist.user_progress',
         false,
         true,
       ),
       body: verificationAsync.when(
         data: (verification) {
           if (verification == null) {
-            return _buildNoDataState(context, theme, l10n);
+            return _buildNoDataState(context, theme, l10n, isViewingOwnProgress);
           }
 
           final entity = verification.toEntity();
@@ -62,8 +70,8 @@ class ChecklistProgressScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Referrer info card (if not completed)
-                  if (!entity.isVerified) ...[
+                  // Referrer info card (if viewing own progress and not completed)
+                  if (isViewingOwnProgress && !entity.isVerified) ...[
                     FutureBuilder<String>(
                       future: _getReferrerName(ref, entity.referrerId),
                       builder: (context, snapshot) {
@@ -85,9 +93,11 @@ class ChecklistProgressScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 20),
 
-                  // Show rewards list
-                  RefereeRewardsListWidget(userId: userId),
-                  const SizedBox(height: 20),
+                  // Show rewards list ONLY if viewing own progress
+                  if (isViewingOwnProgress) ...[
+                    RefereeRewardsListWidget(userId: userId),
+                    const SizedBox(height: 20),
+                  ],
 
                   // Checklist items
                   Text(
@@ -197,7 +207,7 @@ class ChecklistProgressScreen extends ConsumerWidget {
   }
 
   Widget _buildNoDataState(
-      BuildContext context, dynamic theme, AppLocalizations l10n) {
+      BuildContext context, dynamic theme, AppLocalizations l10n, bool isViewingOwnProgress) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -211,7 +221,9 @@ class ChecklistProgressScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              l10n.translate('referral.checklist.no_data_title'),
+              isViewingOwnProgress
+                  ? l10n.translate('referral.checklist.no_data_title')
+                  : l10n.translate('referral.checklist.no_referral_data'),
               style: TextStyles.h5.copyWith(
                 color: theme.grey[900],
                 fontWeight: FontWeight.w700,
@@ -220,7 +232,9 @@ class ChecklistProgressScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              l10n.translate('referral.checklist.no_data_message'),
+              isViewingOwnProgress
+                  ? l10n.translate('referral.checklist.no_data_message')
+                  : l10n.translate('referral.checklist.user_not_referred'),
               style: TextStyles.body.copyWith(
                 color: theme.grey[600],
               ),
