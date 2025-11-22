@@ -7,6 +7,7 @@ import '../../../../core/shared_widgets/spinner.dart';
 import '../../../../core/theming/app-themes.dart';
 import '../../../../core/theming/text_styles.dart';
 import '../../application/referral_providers.dart';
+import '../providers/referral_dashboard_provider.dart';
 
 /// Bottom sheet for entering referral code after signup
 class ReferralCodeInputSheet extends ConsumerStatefulWidget {
@@ -211,7 +212,7 @@ class _ReferralCodeInputSheetState
         ref.invalidate(referralStatsProvider);
       } else {
         // Show error
-        _showErrorDialog(result.errorKey);
+        _showErrorDialog(result.errorMessage ?? 'referral.input.invalid');
       }
     } catch (e) {
       if (mounted) {
