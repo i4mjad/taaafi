@@ -70,6 +70,42 @@ class ChecklistProgressScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Banner showing who's progress this is (for referrers viewing referees)
+                  if (!isViewingOwnProgress) ...[
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: theme.primary[50],
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: theme.primary[200]!,
+                          width: 2,
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            LucideIcons.eye,
+                            color: theme.primary[600],
+                            size: 20,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              l10n.translate('referral.checklist.viewing_progress'),
+                              style: TextStyles.body.copyWith(
+                                color: theme.primary[900],
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                  
                   // Referrer info card (if viewing own progress and not completed)
                   if (isViewingOwnProgress && !entity.isVerified) ...[
                     FutureBuilder<String>(
@@ -100,12 +136,49 @@ class ChecklistProgressScreen extends ConsumerWidget {
                   ],
 
                   // Checklist items
-                  Text(
-                    l10n.translate('referral.checklist.tasks_title'),
-                    style: TextStyles.h6.copyWith(
-                      color: theme.grey[900],
-                      fontWeight: FontWeight.w700,
-                    ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          isViewingOwnProgress
+                              ? l10n.translate('referral.checklist.tasks_title')
+                              : l10n.translate('referral.checklist.their_tasks'),
+                          style: TextStyles.h6.copyWith(
+                            color: theme.grey[900],
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                      if (!isViewingOwnProgress)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: theme.grey[100],
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                LucideIcons.info,
+                                size: 14,
+                                color: theme.grey[600],
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                l10n.translate('referral.checklist.read_only'),
+                                style: TextStyles.caption.copyWith(
+                                  color: theme.grey[700],
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
                   ),
                   const SizedBox(height: 12),
 
