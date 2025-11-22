@@ -9,11 +9,13 @@ import '../../../../core/shared_widgets/container.dart';
 class VerificationProgressHeader extends ConsumerWidget {
   final int completedItems;
   final int totalItems;
+  final bool isReadOnly;
 
   const VerificationProgressHeader({
     super.key,
     required this.completedItems,
     required this.totalItems,
+    this.isReadOnly = false,
   });
 
   @override
@@ -113,16 +115,32 @@ class VerificationProgressHeader extends ConsumerWidget {
 
   String _getMotivationalMessage(
       int completed, int total, AppLocalizations l10n) {
-    if (completed == total) {
-      return l10n.translate('referral.checklist.all_complete_message');
-    } else if (completed >= total * 0.7) {
-      return l10n.translate('referral.checklist.almost_there');
-    } else if (completed >= total * 0.4) {
-      return l10n.translate('referral.checklist.great_progress');
-    } else if (completed > 0) {
-      return l10n.translate('referral.checklist.keep_going');
+    if (isReadOnly) {
+      // Read-only: Third person messages
+      if (completed == total) {
+        return l10n.translate('referral.checklist.all_complete_message_readonly');
+      } else if (completed >= total * 0.7) {
+        return l10n.translate('referral.checklist.almost_there_readonly');
+      } else if (completed >= total * 0.4) {
+        return l10n.translate('referral.checklist.great_progress_readonly');
+      } else if (completed > 0) {
+        return l10n.translate('referral.checklist.keep_going_readonly');
+      } else {
+        return l10n.translate('referral.checklist.subtitle_readonly');
+      }
     } else {
-      return l10n.translate('referral.checklist.subtitle');
+      // Interactive: Second person messages (talking to the user)
+      if (completed == total) {
+        return l10n.translate('referral.checklist.all_complete_message');
+      } else if (completed >= total * 0.7) {
+        return l10n.translate('referral.checklist.almost_there');
+      } else if (completed >= total * 0.4) {
+        return l10n.translate('referral.checklist.great_progress');
+      } else if (completed > 0) {
+        return l10n.translate('referral.checklist.keep_going');
+      } else {
+        return l10n.translate('referral.checklist.subtitle');
+      }
     }
   }
 }

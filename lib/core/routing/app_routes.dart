@@ -32,6 +32,7 @@ import 'package:reboot_app_3/features/authentication/presentation/login_screen.d
 import 'package:reboot_app_3/features/authentication/presentation/signup_screen.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
 import 'package:reboot_app_3/features/authentication/data/repositories/auth_repository.dart';
+import 'package:reboot_app_3/features/referral/presentation/screens/my_verification_progress_screen.dart';
 import 'package:reboot_app_3/features/referral/presentation/screens/referral_code_input_screen.dart';
 import 'package:reboot_app_3/features/referral/presentation/screens/referral_dashboard_screen.dart';
 import 'package:reboot_app_3/features/referral/presentation/screens/checklist_progress_screen.dart';
@@ -769,7 +770,7 @@ GoRouter goRouter(Ref<GoRouter> ref) {
                   GoRoute(
                     path: 'my-verification-progress',
                     name: RouteNames.myVerificationProgress.name,
-                    pageBuilder: (context, state) => const MaterialPage(
+                    pageBuilder: (context, state) => MaterialPage(
                       name: RouteNames.myVerificationProgress.name,
                       child: MyVerificationProgressScreen(),
                     ),

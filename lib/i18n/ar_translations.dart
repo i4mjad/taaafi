@@ -3945,6 +3945,11 @@ const Map<String, String> kAr = {
   'referral.checklist.almost_there': 'أنت على وشك الانتهاء! استمر!',
   'referral.checklist.great_progress': 'تقدم رائع! أنت تقوم بعمل جيد!',
   'referral.checklist.keep_going': 'استمر! أنت تحرز تقدماً!',
+  'referral.checklist.keep_going_readonly': 'المستخدم يحرز تقدماً',
+  'referral.checklist.great_progress_readonly': 'تقدم جيد حتى الآن',
+  'referral.checklist.almost_there_readonly': 'على وشك الإكمال',
+  'referral.checklist.all_complete_message_readonly': 'جميع المهام مكتملة',
+  'referral.checklist.subtitle_readonly': 'المهام المطلوب إكمالها',
   'referral.checklist.tasks_title': 'مهام التحقق',
 
   // Checklist Items

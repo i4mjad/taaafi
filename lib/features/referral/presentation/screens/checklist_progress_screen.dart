@@ -96,10 +96,11 @@ class ChecklistProgressScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 16),
 
-                  // Progress header
+                  // Progress header (always read-only for this screen)
                   VerificationProgressHeader(
                     completedItems: entity.completedItemsCount,
                     totalItems: entity.totalItemsCount,
+                    isReadOnly: true,
                   ),
                   const SizedBox(height: 20),
 
