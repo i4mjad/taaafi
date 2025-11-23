@@ -2,8 +2,7 @@
 
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { useTranslation } from '@/contexts/TranslationContext';
-import { useCollection } from 'react-firebase-hooks/firestore';
-import { collection, query, orderBy, where, deleteDoc, doc, updateDoc } from 'firebase/firestore';
+import { collection, query, orderBy, where, deleteDoc, doc, updateDoc, getDocs, QueryDocumentSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Search, MessageSquare, User, MoreHorizontal, Eye, Edit, Trash2, EyeOff, Plus, Pin, PinOff, X, AlertCircle, Shield } from 'lucide-react';
+import { Search, MessageSquare, User, MoreHorizontal, Eye, Edit, Trash2, EyeOff, Plus, Pin, PinOff, X, AlertCircle, Shield, RefreshCw } from 'lucide-react';
 import { ForumModerationBadge } from '@/components/forum/ForumModerationBadge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import ModerationActionDialog from './ModerationActionDialog';
@@ -47,35 +46,76 @@ export default function ForumPostsManagement() {
   const [bulkActionLoading, setBulkActionLoading] = useState(false);
   const [previewPostId, setPreviewPostId] = useState<string | null>(null);
 
-  // Fetch forum posts
-  const [postsValue, postsLoading, postsError] = useCollection(
-    query(collection(db, 'forumPosts'), orderBy('createdAt', 'desc'))
-  );
+  // Fetch data (one-time fetch instead of real-time listeners)
+  const [postsValue, setPostsValue] = useState<any>(null);
+  const [postsLoading, setPostsLoading] = useState(true);
+  const [postsError, setPostsError] = useState<Error | null>(null);
+  const [commentsValue, setCommentsValue] = useState<any>(null);
+  const [interactionsValue, setInteractionsValue] = useState<any>(null);
+  const [categoriesValue, setCategoriesValue] = useState<any>(null);
+  const [profilesValue, setProfilesValue] = useState<any>(null);
 
-  // Fetch comments
-  const [commentsValue] = useCollection(
-    query(collection(db, 'comments'), orderBy('createdAt', 'desc'))
-  );
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setPostsLoading(true);
+        const [postsSnap, commentsSnap, interactionsSnap, categoriesSnap, profilesSnap] = await Promise.all([
+          getDocs(query(collection(db, 'forumPosts'), orderBy('createdAt', 'desc'))),
+          getDocs(query(collection(db, 'comments'), orderBy('createdAt', 'desc'))),
+          getDocs(query(collection(db, 'interactions'), orderBy('createdAt', 'desc'))),
+          getDocs(query(collection(db, 'postCategories'), orderBy('sortOrder'))),
+          getDocs(query(collection(db, 'communityProfiles')))
+        ]);
+        
+        setPostsValue(postsSnap);
+        setCommentsValue(commentsSnap);
+        setInteractionsValue(interactionsSnap);
+        setCategoriesValue(categoriesSnap);
+        setProfilesValue(profilesSnap);
+        setPostsError(null);
+      } catch (error) {
+        console.error('Error fetching forum data:', error);
+        setPostsError(error as Error);
+      } finally {
+        setPostsLoading(false);
+      }
+    };
+    
+    fetchData();
+  }, []); // Only fetch once on mount
 
-  // Fetch interactions
-  const [interactionsValue] = useCollection(
-    query(collection(db, 'interactions'), orderBy('createdAt', 'desc'))
-  );
-
-  // Fetch post categories
-  const [categoriesValue] = useCollection(
-    query(collection(db, 'postCategories'), orderBy('sortOrder'))
-  );
-
-  // Fetch community profiles to derive gender by authorCPId
-  const [profilesValue] = useCollection(
-    query(collection(db, 'communityProfiles'))
-  );
+  // Refresh function to manually reload data
+  const handleRefresh = async () => {
+    try {
+      setPostsLoading(true);
+      const [postsSnap, commentsSnap, interactionsSnap, categoriesSnap, profilesSnap] = await Promise.all([
+        getDocs(query(collection(db, 'forumPosts'), orderBy('createdAt', 'desc'))),
+        getDocs(query(collection(db, 'comments'), orderBy('createdAt', 'desc'))),
+        getDocs(query(collection(db, 'interactions'), orderBy('createdAt', 'desc'))),
+        getDocs(query(collection(db, 'postCategories'), orderBy('sortOrder'))),
+        getDocs(query(collection(db, 'communityProfiles')))
+      ]);
+      
+      setPostsValue(postsSnap);
+      setCommentsValue(commentsSnap);
+      setInteractionsValue(interactionsSnap);
+      setCategoriesValue(categoriesSnap);
+      setProfilesValue(profilesSnap);
+      setPostsError(null);
+      toast.success(t('common.refreshSuccess') || 'Data refreshed');
+    } catch (error) {
+      console.error('Error refreshing forum data:', error);
+      setPostsError(error as Error);
+      toast.error(t('common.refreshError') || 'Failed to refresh data');
+    } finally {
+      setPostsLoading(false);
+    }
+  };
 
   const posts = useMemo(() => {
     if (!postsValue) return [];
     
-    return postsValue.docs.map(doc => ({
+    return postsValue.docs.map((doc: QueryDocumentSnapshot) => ({
       id: doc.id,
       ...doc.data(),
       createdAt: doc.data().createdAt?.toDate() || new Date(),
@@ -86,7 +126,7 @@ export default function ForumPostsManagement() {
   const comments = useMemo(() => {
     if (!commentsValue) return [];
     
-    return commentsValue.docs.map(doc => ({
+    return commentsValue.docs.map((doc: QueryDocumentSnapshot) => ({
       id: doc.id,
       ...doc.data(),
       createdAt: doc.data().createdAt?.toDate() || new Date(),
@@ -97,7 +137,7 @@ export default function ForumPostsManagement() {
   const interactions = useMemo(() => {
     if (!interactionsValue) return [];
     
-    return interactionsValue.docs.map(doc => ({
+    return interactionsValue.docs.map((doc: QueryDocumentSnapshot) => ({
       id: doc.id,
       ...doc.data(),
       createdAt: doc.data().createdAt?.toDate() || new Date(),
@@ -106,14 +146,14 @@ export default function ForumPostsManagement() {
   }, [interactionsValue]);
 
   const categories = useMemo(() => {
-    if (!categoriesValue) return [];
+    if (!categoriesValue) return [] as Array<{ id: string; name: string; nameAr: string; [key: string]: any }>;
     
-    return categoriesValue.docs.map(doc => ({
+    return categoriesValue.docs.map((doc: QueryDocumentSnapshot) => ({
       id: doc.id,
       name: doc.data().name || 'Unknown',
       nameAr: doc.data().nameAr || 'غير معروف',
       ...doc.data(),
-    }));
+    })) as Array<{ id: string; name: string; nameAr: string; [key: string]: any }>;
   }, [categoriesValue]);
 
   const cpGenderById = useMemo(() => {
@@ -396,10 +436,16 @@ export default function ForumPostsManagement() {
             {t('modules.community.posts.description')}
           </p>
         </div>
-        <Button onClick={() => setShowCreateDialog(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          {t('modules.community.posts.createPost')}
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={handleRefresh} disabled={postsLoading}>
+            <RefreshCw className={`mr-2 h-4 w-4 ${postsLoading ? 'animate-spin' : ''}`} />
+            {t('common.refresh') || 'Refresh'}
+          </Button>
+          <Button onClick={() => setShowCreateDialog(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            {t('modules.community.posts.createPost')}
+          </Button>
+        </div>
       </div>
 
       {/* Stats Cards */}

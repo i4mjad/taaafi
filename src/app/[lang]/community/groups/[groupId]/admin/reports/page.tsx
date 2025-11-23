@@ -1,10 +1,9 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { useTranslation } from '@/contexts/TranslationContext';
-import { useCollection } from 'react-firebase-hooks/firestore';
-import { collection, query, where, orderBy, doc, updateDoc } from 'firebase/firestore';
+import { collection, query, where, orderBy, doc, updateDoc, getDocs, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useGroup } from '@/hooks/useGroupAdmin';
 import { GroupMessage } from '@/types/community';
@@ -29,7 +28,8 @@ import {
   AlertTriangle,
   Clock,
   User,
-  MessageSquare
+  MessageSquare,
+  RefreshCw
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
@@ -68,56 +68,122 @@ export default function GroupReportsPage() {
   const [actionReason, setActionReason] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
 
-  // Fetch reports for this group
-  const [reportsSnapshot, reportsLoading, reportsError] = useCollection(
-    query(
-      collection(db, 'usersReports'),
-      where('relatedContent.type', 'in', ['group_message', 'group_member', 'group_challenge', 'group_task']),
-      where('relatedContent.groupId', '==', groupId),
-      orderBy('time', 'desc')
-    )
-  );
+  // State for reports and messages
+  const [reports, setReports] = useState<UserReport[]>([]);
+  const [reportsLoading, setReportsLoading] = useState(true);
+  const [reportsError, setReportsError] = useState<Error | null>(null);
+  const [messages, setMessages] = useState<Record<string, GroupMessage>>({});
+  const [usersData, setUsersData] = useState<Map<string, { displayName: string; email: string }>>(new Map());
+  const [usersLoading, setUsersLoading] = useState(false);
 
-  // Fetch group messages to show context
-  const [messagesSnapshot] = useCollection(
-    collection(db, 'group_messages')
-  );
-
-  const reports = useMemo(() => {
-    if (!reportsSnapshot) return [];
-    
-    return reportsSnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-      time: doc.data().time?.toDate() || new Date(),
-      lastUpdated: doc.data().lastUpdated?.toDate() || new Date(),
-    })) as UserReport[];
-  }, [reportsSnapshot]);
-
-  const messages = useMemo(() => {
-    if (!messagesSnapshot) return {};
-    
-    return messagesSnapshot.docs.reduce((acc, doc) => {
-      const data = doc.data();
-      acc[doc.id] = {
+  // Fetch reports and related data
+  const fetchReportsData = async () => {
+    setReportsLoading(true);
+    setReportsError(null);
+    try {
+      // Fetch reports for this group
+      const reportsQuery = query(
+        collection(db, 'usersReports'),
+        where('relatedContent.type', 'in', ['group_message', 'group_member', 'group_challenge', 'group_task']),
+        where('relatedContent.groupId', '==', groupId),
+        orderBy('time', 'desc')
+      );
+      const reportsSnapshot = await getDocs(reportsQuery);
+      
+      const reportsData = reportsSnapshot.docs.map(doc => ({
         id: doc.id,
-        groupId: data.groupId,
-        senderCpId: data.senderCpId,
-        body: data.body,
-        replyToMessageId: data.replyToMessageId,
-        quotedPreview: data.quotedPreview,
-        mentions: data.mentions || [],
-        mentionHandles: data.mentionHandles || [],
-        tokens: data.tokens || [],
-        isDeleted: data.isDeleted || false,
-        isHidden: data.isHidden || false,
-        moderation: data.moderation,
-        createdAt: data.createdAt?.toDate() || new Date(),
-        senderDisplayName: data.senderDisplayName,
-      } as GroupMessage;
-      return acc;
-    }, {} as Record<string, GroupMessage>);
-  }, [messagesSnapshot]);
+        ...doc.data(),
+        time: doc.data().time?.toDate() || new Date(),
+        lastUpdated: doc.data().lastUpdated?.toDate() || new Date(),
+      })) as UserReport[];
+      
+      setReports(reportsData);
+
+      // Extract unique message IDs from reports
+      const messageIds = new Set<string>();
+      const userIds = new Set<string>();
+      
+      reportsData.forEach(report => {
+        // Add reporter UID
+        userIds.add(report.uid);
+        
+        // Add message ID if it's a message report
+        if (report.relatedContent.type === 'group_message') {
+          messageIds.add(report.relatedContent.contentId);
+        }
+      });
+
+      // Fetch only the messages that are reported
+      if (messageIds.size > 0) {
+        const messagesMap: Record<string, GroupMessage> = {};
+        const messagePromises = Array.from(messageIds).map(async (messageId) => {
+          const messageDoc = await getDoc(doc(db, 'group_messages', messageId));
+          if (messageDoc.exists()) {
+            const data = messageDoc.data();
+            messagesMap[messageId] = {
+              id: messageDoc.id,
+              groupId: data.groupId,
+              senderCpId: data.senderCpId,
+              body: data.body,
+              replyToMessageId: data.replyToMessageId,
+              quotedPreview: data.quotedPreview,
+              mentions: data.mentions || [],
+              mentionHandles: data.mentionHandles || [],
+              tokens: data.tokens || [],
+              isDeleted: data.isDeleted || false,
+              isHidden: data.isHidden || false,
+              moderation: data.moderation,
+              createdAt: data.createdAt?.toDate() || new Date(),
+              senderDisplayName: data.senderDisplayName,
+            } as GroupMessage;
+            // Add message sender to userIds
+            if (data.senderCpId) {
+              userIds.add(data.senderCpId);
+            }
+          }
+        });
+        await Promise.all(messagePromises);
+        setMessages(messagesMap);
+      }
+
+      // Fetch user details for all unique users (reporters and message senders)
+      if (userIds.size > 0) {
+        setUsersLoading(true);
+        const userPromises = Array.from(userIds).map(async (userId) => {
+          const userDoc = await getDoc(doc(db, 'users', userId));
+          return { userId, data: userDoc.exists() ? userDoc.data() : null };
+        });
+        
+        const userResults = await Promise.all(userPromises);
+        const newUsersMap = new Map<string, { displayName: string; email: string }>();
+        
+        userResults.forEach(({ userId, data }) => {
+          if (data) {
+            newUsersMap.set(userId, {
+              displayName: data.displayName || 'Unknown User',
+              email: data.email || '',
+            });
+          } else {
+            newUsersMap.set(userId, { displayName: 'Unknown User', email: '' });
+          }
+        });
+        
+        setUsersData(newUsersMap);
+        setUsersLoading(false);
+      }
+
+    } catch (error) {
+      console.error('Error fetching reports data:', error);
+      setReportsError(error as Error);
+      toast.error(t('admin.reports.loadError'));
+    } finally {
+      setReportsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchReportsData();
+  }, [groupId]);
 
   // Filter reports
   const filteredReports = useMemo(() => {
@@ -379,13 +445,28 @@ export default function GroupReportsPage() {
 
           {/* Reports List */}
           <Card>
-            <CardHeader>
-              <CardTitle>
-                {t('admin.reports.list.title')} ({filteredReports.length})
-              </CardTitle>
-              <CardDescription>
-                {t('admin.reports.list.description')}
-              </CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>
+                  {t('admin.reports.list.title')} ({filteredReports.length})
+                </CardTitle>
+                <CardDescription>
+                  {t('admin.reports.list.description')}
+                </CardDescription>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={fetchReportsData}
+                disabled={reportsLoading}
+              >
+                {reportsLoading ? (
+                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                )}
+                {t('common.refresh')}
+              </Button>
             </CardHeader>
             <CardContent>
               {filteredReports.length === 0 ? (
@@ -418,14 +499,33 @@ export default function GroupReportsPage() {
                             </div>
                             
                             <div className="mb-2">
-                              <p className="text-sm font-medium mb-1">Reported by: {report.uid}</p>
+                              <p className="text-sm font-medium mb-1">
+                                Reported by: {usersLoading ? (
+                                  <span className="text-muted-foreground">{t('common.loading')}...</span>
+                                ) : (
+                                  <>
+                                    {usersData.get(report.uid)?.displayName || report.uid}
+                                    {usersData.get(report.uid)?.email && (
+                                      <span className="text-xs text-muted-foreground ml-1">
+                                        ({usersData.get(report.uid)?.email})
+                                      </span>
+                                    )}
+                                  </>
+                                )}
+                              </p>
                               <p className="text-sm text-muted-foreground mb-2">{report.initialMessage}</p>
                               
                               {report.relatedContent.type === 'group_message' && (
                                 <div className="p-2 bg-muted/50 rounded border-l-2 border-orange-500">
                                   <p className="text-xs text-muted-foreground">Reported content:</p>
                                   <p className="text-sm">{content.preview}</p>
-                                  <p className="text-xs text-muted-foreground mt-1">by {content.sender}</p>
+                                  <p className="text-xs text-muted-foreground mt-1">
+                                    by {usersLoading ? (
+                                      <span>{t('common.loading')}...</span>
+                                    ) : (
+                                      usersData.get(content.sender)?.displayName || content.sender
+                                    )}
+                                  </p>
                                 </div>
                               )}
                             </div>
@@ -497,7 +597,20 @@ export default function GroupReportsPage() {
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
                       <label className="font-medium">{t('admin.reports.details.reporter')}</label>
-                      <p>{selectedReport.uid}</p>
+                      <p>
+                        {usersLoading ? (
+                          <span className="text-muted-foreground">{t('common.loading')}...</span>
+                        ) : (
+                          <>
+                            {usersData.get(selectedReport.uid)?.displayName || selectedReport.uid}
+                            {usersData.get(selectedReport.uid)?.email && (
+                              <span className="text-xs text-muted-foreground block">
+                                {usersData.get(selectedReport.uid)?.email}
+                              </span>
+                            )}
+                          </>
+                        )}
+                      </p>
                     </div>
                     <div>
                       <label className="font-medium">{t('admin.reports.details.status')}</label>
@@ -528,7 +641,13 @@ export default function GroupReportsPage() {
                           const content = getReportedContent(selectedReport);
                           return (
                             <div>
-                              <p className="text-xs text-muted-foreground mb-1">Sent by {content.sender}</p>
+                              <p className="text-xs text-muted-foreground mb-1">
+                                Sent by {usersLoading ? (
+                                  <span>{t('common.loading')}...</span>
+                                ) : (
+                                  usersData.get(content.sender)?.displayName || content.sender
+                                )}
+                              </p>
                               <p>{content.preview}</p>
                             </div>
                           );

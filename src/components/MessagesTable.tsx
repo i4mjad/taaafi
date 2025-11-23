@@ -49,7 +49,8 @@ import {
   Users,
   ChevronLeft,
   ChevronRight,
-  Loader2
+  Loader2,
+  RefreshCw
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
@@ -192,62 +193,35 @@ export function MessagesTable({
     return constraints;
   };
 
-  // Fetch all messages for statistics calculation
-  const fetchAllMessagesForStats = async () => {
-    try {
-      const constraints = buildQueryConstraints(false); // No pagination for stats
-      const messagesQuery = query(collection(db, 'group_messages'), ...constraints);
-      const snapshot = await getDocs(messagesQuery);
-      
-      let fetchedMessages = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        createdAt: doc.data().createdAt?.toDate() || new Date(),
-      })) as GroupMessage[];
-
-      // Apply client-side filtering
-      if (searchQuery) {
-        fetchedMessages = fetchedMessages.filter(message => 
-          message.body?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          message.senderCpId?.toLowerCase().includes(searchQuery.toLowerCase())
-        );
-      }
-
-      if (statusFilter === 'reported') {
-        fetchedMessages = fetchedMessages.filter(message => 
-          reportedMessageIds.has(message.id)
-        );
-      }
-
-      setAllMessages(fetchedMessages);
-      calculateAndReportStats(fetchedMessages);
-      
-      return fetchedMessages;
-    } catch (error) {
-      console.error('Error fetching all messages for stats:', error);
-      return [];
-    }
+  // Calculate stats from current page messages (optimized - no full fetch)
+  const calculateStatsFromCurrentPage = (currentMessages: GroupMessage[]) => {
+    // Note: These are approximate stats based on current page
+    // For exact counts, consider using Firestore count() aggregation queries
+    setAllMessages(currentMessages);
+    calculateAndReportStats(currentMessages);
   };
 
-  // Calculate and report statistics to parent
-  const calculateAndReportStats = (allMsgs: GroupMessage[]) => {
+  // Calculate and report statistics to parent (based on current page)
+  const calculateAndReportStats = (currentPageMsgs: GroupMessage[]) => {
     if (!onStatsUpdate) return;
 
+    // Note: These are stats from the current page only
+    // For exact global counts, implement Firestore aggregation queries
     const stats: MessageStats = {
-      total: allMsgs.length,
-      pending: allMsgs.filter(m => m.moderation?.status === 'pending' || !m.moderation?.status).length,
-      approved: allMsgs.filter(m => m.moderation?.status === 'approved').length,
-      blocked: allMsgs.filter(m => m.moderation?.status === 'blocked').length,
-      manual_review: allMsgs.filter(m => m.moderation?.status === 'manual_review').length,
-      reported: allMsgs.filter(m => reportedMessageIds.has(m.id)).length,
-      hidden: allMsgs.filter(m => m.isHidden && !m.isDeleted).length,
-      deleted: allMsgs.filter(m => m.isDeleted).length,
+      total: currentPageMsgs.length,
+      pending: currentPageMsgs.filter(m => m.moderation?.status === 'pending' || !m.moderation?.status).length,
+      approved: currentPageMsgs.filter(m => m.moderation?.status === 'approved').length,
+      blocked: currentPageMsgs.filter(m => m.moderation?.status === 'blocked').length,
+      manual_review: currentPageMsgs.filter(m => m.moderation?.status === 'manual_review').length,
+      reported: currentPageMsgs.filter(m => reportedMessageIds.has(m.id)).length,
+      hidden: currentPageMsgs.filter(m => m.isHidden && !m.isDeleted).length,
+      deleted: currentPageMsgs.filter(m => m.isDeleted).length,
       currentPage,
-      totalPages: Math.max(1, Math.ceil(allMsgs.length / pageSize)),
-      itemsShown: messages.length
+      totalPages: 1, // Can't calculate accurate total pages without full count
+      itemsShown: currentPageMsgs.length
     };
 
-    setTotalPages(stats.totalPages);
+    setTotalPages(1);
     onStatsUpdate(stats);
   };
 
@@ -255,11 +229,6 @@ export function MessagesTable({
   const fetchMessages = async (direction: 'first' | 'next' | 'prev' = 'first', cursor?: DocumentSnapshot) => {
     setLoading(true);
     try {
-      // Fetch all messages for statistics on first load or filter changes
-      if (direction === 'first') {
-        await fetchAllMessagesForStats();
-      }
-
       let constraints = buildQueryConstraints(true);
       
       if (direction === 'next' && cursor) {
@@ -315,10 +284,8 @@ export function MessagesTable({
       setHasNext(hasMoreDocs);
       setHasPrev(currentPage > 1);
 
-      // Update stats with current messages shown
-      if (direction !== 'first' && allMessages.length > 0) {
-        calculateAndReportStats(allMessages);
-      }
+      // Calculate stats from current page (optimized approach)
+      calculateStatsFromCurrentPage(filteredMessages);
       
     } catch (error) {
       console.error('Error fetching messages:', error);
@@ -522,11 +489,20 @@ export function MessagesTable({
 
       {/* Messages Table */}
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>
             {t('modules.admin.content.messages.title')} 
             {!loading && ` (${messages.length} ${t('common.shown')})`}
           </CardTitle>
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => fetchMessages('first')} 
+            disabled={loading}
+          >
+            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+            {t('common.refresh') || 'Refresh'}
+          </Button>
         </CardHeader>
         <CardContent>
           {loading ? (
@@ -688,9 +664,9 @@ export function MessagesTable({
               {/* Pagination */}
               <div className="flex items-center justify-between pt-4">
                 <div className="text-sm text-muted-foreground">
-                  {allMessages.length > 0 ? (
+                  {messages.length > 0 ? (
                     <>
-                      {t('common.showing')} {((currentPage - 1) * pageSize) + 1} - {Math.min(currentPage * pageSize, allMessages.length)} {t('common.of')} {allMessages.length} {t('common.items')}
+                      {t('common.showing')} {messages.length} {t('common.items')} {t('common.page')} {currentPage}
                     </>
                   ) : (
                     t('common.noItemsFound')
@@ -721,9 +697,6 @@ export function MessagesTable({
                         ))}
                       </SelectContent>
                     </Select>
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    {t('common.page')} {currentPage} {t('common.of')} {totalPages}
                   </div>
                   <div className="flex items-center gap-2">
                     <Button

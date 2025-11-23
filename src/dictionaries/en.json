@@ -486,64 +486,6 @@
             "adjustments": "Adjustments",
             "analytics": "Analytics"
           },
-          "fraudQueue": {
-          "title": "Fraud Detection Queue",
-          "description": "Review and manage flagged referral accounts",
-          "loading": "Loading fraud queue...",
-          "errorLoading": "Error Loading Fraud Queue",
-          "noFlaggedUsers": "All Clear!",
-          "noFlaggedUsersDesc": "No users are currently flagged for fraud review.",
-          "bulkApprove": "Approve Selected",
-          "bulkBlock": "Block Selected",
-          "riskLevels": {
-            "low": "Low Risk",
-            "medium": "Medium Risk",
-            "high": "High Risk"
-          },
-          "filters": {
-            "scoreRange": "Score Range",
-            "allScores": "All Scores",
-            "mediumRisk": "Medium Risk (40-70)",
-            "highRisk": "High Risk (71+)",
-            "status": "Status",
-            "allStatuses": "All Statuses",
-            "pending": "Pending",
-            "blocked": "Blocked"
-          },
-          "table": {
-            "user": "User",
-            "fraudScore": "Fraud Score",
-            "flags": "Flags",
-            "referrer": "Referrer",
-            "status": "Status",
-            "actions": "Actions"
-          },
-          "detailsModal": {
-            "title": "Fraud Detection Details",
-            "description": "Detailed fraud analysis and user information",
-            "userInfo": "User Information",
-            "displayName": "Display Name",
-            "email": "Email",
-            "signupDate": "Signup Date",
-            "status": "Status",
-            "fraudScore": "Fraud Score",
-            "scoreOutOf100": "Out of 100",
-            "lastChecked": "Last Checked",
-            "lowRiskThreshold": "0-39: Low Risk (Auto-approved)",
-            "mediumRiskThreshold": "40-70: Medium Risk (Manual review)",
-            "highRiskThreshold": "71-100: High Risk (Auto-blocked)",
-            "checkBreakdown": "Fraud Check Breakdown",
-            "checkBreakdownDesc": "Individual fraud checks that contributed to the score",
-            "noFlagsDetected": "No fraud flags detected",
-            "points": "points",
-            "referrerInfo": "Referrer Information",
-            "referrerId": "Referrer ID",
-            "referralCode": "Referral Code",
-            "close": "Close",
-            "approve": "Approve User",
-            "block": "Block User"
-          }
-        },
         "userLookup": {
           "title": "Search Users",
           "description": "Search for users by email, ID, or referral code",
@@ -693,6 +635,64 @@
           "cohortPerformanceDesc": "Detailed metrics for each cohort period",
           "cohort": "Cohort",
           "avgTimeToVerify": "Avg Time to Verify"
+        }
+      },
+      "fraudQueue": {
+        "title": "Fraud Detection Queue",
+        "description": "Review and manage flagged referral accounts",
+        "loading": "Loading fraud queue...",
+        "errorLoading": "Error Loading Fraud Queue",
+        "noFlaggedUsers": "All Clear!",
+        "noFlaggedUsersDesc": "No users are currently flagged for fraud review.",
+        "bulkApprove": "Approve Selected",
+        "bulkBlock": "Block Selected",
+        "riskLevels": {
+          "low": "Low Risk",
+          "medium": "Medium Risk",
+          "high": "High Risk"
+        },
+        "filters": {
+          "scoreRange": "Score Range",
+          "allScores": "All Scores",
+          "mediumRisk": "Medium Risk (40-70)",
+          "highRisk": "High Risk (71+)",
+          "status": "Status",
+          "allStatuses": "All Statuses",
+          "pending": "Pending",
+          "blocked": "Blocked"
+        },
+        "table": {
+          "user": "User",
+          "fraudScore": "Fraud Score",
+          "flags": "Flags",
+          "referrer": "Referrer",
+          "status": "Status",
+          "actions": "Actions"
+        },
+        "detailsModal": {
+          "title": "Fraud Detection Details",
+          "description": "Detailed fraud analysis and user information",
+          "userInfo": "User Information",
+          "displayName": "Display Name",
+          "email": "Email",
+          "signupDate": "Signup Date",
+          "status": "Status",
+          "fraudScore": "Fraud Score",
+          "scoreOutOf100": "Out of 100",
+          "lastChecked": "Last Checked",
+          "lowRiskThreshold": "0-39: Low Risk (Auto-approved)",
+          "mediumRiskThreshold": "40-70: Medium Risk (Manual review)",
+          "highRiskThreshold": "71-100: High Risk (Auto-blocked)",
+          "checkBreakdown": "Fraud Check Breakdown",
+          "checkBreakdownDesc": "Individual fraud checks that contributed to the score",
+          "noFlagsDetected": "No fraud flags detected",
+          "points": "points",
+          "referrerInfo": "Referrer Information",
+          "referrerId": "Referrer ID",
+          "referralCode": "Referral Code",
+          "close": "Close",
+          "approve": "Approve User",
+          "block": "Block User"
         }
       },
       "users": "Users",
@@ -2583,6 +2583,7 @@
             "group_message": "Group Message"
           },
           "common": {
+            "refersh": "Refresh",
             "search": "Search...",
             "filter": "Filter",
             "export": "Export",
@@ -4030,6 +4031,7 @@
       }
     },
     "common": {
+      "refersh": "Refresh",
       "search": "Search",
       "edit": "Edit",
       "delete": "Delete",

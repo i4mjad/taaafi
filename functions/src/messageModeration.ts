@@ -1,7 +1,11 @@
 import { onDocumentCreated } from 'firebase-functions/v2/firestore';
 import { setGlobalOptions } from 'firebase-functions/v2';
+import { defineString } from 'firebase-functions/params';
 import * as admin from 'firebase-admin';
 import OpenAI from 'openai';
+
+// Define environment parameters
+const openaiApiKey = defineString('OPENAI_API_KEY');
 
 // Set global options for all functions
 setGlobalOptions({
@@ -16,10 +20,8 @@ if (!admin.apps.length) {
   admin.initializeApp();
 }
 
-// Initialize OpenAI
-const openai = new OpenAI({
-  apiKey: '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', 
-});
+// Initialize OpenAI (will be initialized when the function runs)
+let openai: OpenAI;
 
 /**
  * TypeScript Interfaces
@@ -754,6 +756,16 @@ function synthesizeDecision(
  */
 async function checkWithOpenAI(text: string): Promise<OpenAIModerationResult> {
   console.log('🤖 Starting OpenAI analysis with custom prompts...');
+  
+  // Initialize OpenAI client if not already initialized
+  if (!openai) {
+    const apiKey = openaiApiKey.value();
+    if (!apiKey) {
+      throw new Error('OPENAI_API_KEY is not configured');
+    }
+    openai = new OpenAI({ apiKey });
+    console.log('✅ OpenAI client initialized');
+  }
   
   try {
     // Step 1: Detect message language

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -34,11 +34,11 @@ import {
   Eye,
   EyeOff,
   Settings,
+  RefreshCw,
 } from 'lucide-react';
 
 // Firebase imports
-import { useCollection } from 'react-firebase-hooks/firestore';
-import { collection, query, orderBy, deleteDoc, doc, updateDoc, Timestamp } from 'firebase/firestore';
+import { collection, query, orderBy, deleteDoc, doc, updateDoc, Timestamp, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 
 // Import our custom dialog
@@ -69,29 +69,48 @@ export default function ReportTypesManagement({ trigger }: ReportTypesManagement
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [reportTypeToDelete, setReportTypeToDelete] = useState<ReportType | null>(null);
 
-  // Fetch report types using react-firebase-hooks
-  const [reportTypesSnapshot, reportTypesLoading, reportTypesError] = useCollection(
-    query(
-      collection(db, 'reportTypes'),
-      orderBy('updatedAt', 'desc')
-    )
-  );
+  // State for report types
+  const [allReportTypes, setAllReportTypes] = useState<ReportType[]>([]);
+  const [reportTypesLoading, setReportTypesLoading] = useState(false);
+  const [reportTypesError, setReportTypesError] = useState<Error | null>(null);
 
-  // Convert Firebase data to ReportType objects
-  const allReportTypes: ReportType[] = useMemo(() => {
-    if (!reportTypesSnapshot) return [];
-    
-    return reportTypesSnapshot.docs.map(doc => ({
-      id: doc.id,
-      nameEn: doc.data().nameEn || '',
-      nameAr: doc.data().nameAr || '',
-      descriptionEn: doc.data().descriptionEn || '',
-      descriptionAr: doc.data().descriptionAr || '',
-      isActive: doc.data().isActive ?? true,
-      createdAt: doc.data().createdAt || Timestamp.now(),
-      updatedAt: doc.data().updatedAt || Timestamp.now(),
-    }));
-  }, [reportTypesSnapshot]);
+  // Fetch report types
+  const fetchReportTypes = async () => {
+    setReportTypesLoading(true);
+    setReportTypesError(null);
+    try {
+      const q = query(
+        collection(db, 'reportTypes'),
+        orderBy('updatedAt', 'desc')
+      );
+      const snapshot = await getDocs(q);
+      
+      const types = snapshot.docs.map(doc => ({
+        id: doc.id,
+        nameEn: doc.data().nameEn || '',
+        nameAr: doc.data().nameAr || '',
+        descriptionEn: doc.data().descriptionEn || '',
+        descriptionAr: doc.data().descriptionAr || '',
+        isActive: doc.data().isActive ?? true,
+        createdAt: doc.data().createdAt || Timestamp.now(),
+        updatedAt: doc.data().updatedAt || Timestamp.now(),
+      }));
+      
+      setAllReportTypes(types);
+    } catch (error) {
+      console.error('Error fetching report types:', error);
+      setReportTypesError(error as Error);
+    } finally {
+      setReportTypesLoading(false);
+    }
+  };
+
+  // Fetch report types only when dialog is opened
+  useEffect(() => {
+    if (isOpen) {
+      fetchReportTypes();
+    }
+  }, [isOpen]);
 
   // Filter report types based on search
   const filteredReportTypes = useMemo(() => {
@@ -152,6 +171,8 @@ export default function ReportTypesManagement({ trigger }: ReportTypesManagement
       });
 
       toast.success(t('modules.userManagement.reports.reportTypes.statusUpdateSuccess') || 'Status updated successfully');
+      // Refresh the data after update
+      fetchReportTypes();
     } catch (error) {
       console.error('Error updating report type status:', error);
       toast.error(t('modules.userManagement.reports.reportTypes.statusUpdateError') || 'Failed to update status');
@@ -163,6 +184,13 @@ export default function ReportTypesManagement({ trigger }: ReportTypesManagement
     setDeleteDialogOpen(true);
   };
 
+  const handleDialogSuccess = () => {
+    // Refresh the data after create/update
+    fetchReportTypes();
+    setIsReportTypeDialogOpen(false);
+    setSelectedReportType(null);
+  };
+
   const handleDeleteConfirm = async () => {
     if (!reportTypeToDelete) return;
 
@@ -171,16 +199,12 @@ export default function ReportTypesManagement({ trigger }: ReportTypesManagement
       toast.success(t('modules.userManagement.reports.reportTypes.deleteSuccess') || 'Report type deleted successfully');
       setDeleteDialogOpen(false);
       setReportTypeToDelete(null);
+      // Refresh the data after delete
+      fetchReportTypes();
     } catch (error) {
       console.error('Error deleting report type:', error);
       toast.error(t('modules.userManagement.reports.reportTypes.deleteError') || 'Failed to delete report type');
     }
-  };
-
-  const handleDialogSuccess = () => {
-    // The useCollection hook will automatically refresh the data
-    setIsReportTypeDialogOpen(false);
-    setSelectedReportType(null);
   };
 
   return (
@@ -204,10 +228,25 @@ export default function ReportTypesManagement({ trigger }: ReportTypesManagement
               <p className="text-muted-foreground">
                 {t('modules.userManagement.reports.reportTypes.description') || 'Define and manage different types of reports that users can submit'}
               </p>
-              <Button onClick={handleCreateNew}>
-                <Plus className="h-4 w-4 mr-2" />
-                {t('modules.userManagement.reports.reportTypes.create') || 'Create Report Type'}
-              </Button>
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={fetchReportTypes}
+                  disabled={reportTypesLoading}
+                >
+                  {reportTypesLoading ? (
+                    <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                  )}
+                  {t('common.refresh') || 'Refresh'}
+                </Button>
+                <Button onClick={handleCreateNew}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  {t('modules.userManagement.reports.reportTypes.create') || 'Create Report Type'}
+                </Button>
+              </div>
             </div>
 
             {/* Stats Cards */}
@@ -264,7 +303,7 @@ export default function ReportTypesManagement({ trigger }: ReportTypesManagement
             <div className="flex-1 overflow-auto">
               {reportTypesError ? (
                 <div className="text-center py-8">
-                  <p className="text-red-500">Error loading report types: {reportTypesError.message}</p>
+                  <p className="text-red-500">Error loading report types: {reportTypesError?.message || 'Unknown error'}</p>
                 </div>
               ) : reportTypesLoading ? (
                 <div className="space-y-3">

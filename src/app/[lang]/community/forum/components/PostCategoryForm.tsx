@@ -9,12 +9,11 @@ import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Plus, Edit, Trash2, Search, ChevronUp, ChevronDown } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, ChevronUp, ChevronDown, RefreshCw } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
-import { useCollection } from 'react-firebase-hooks/firestore';
-import { collection, addDoc, updateDoc, deleteDoc, doc, query, orderBy } from 'firebase/firestore';
+import { collection, addDoc, updateDoc, deleteDoc, doc, query, orderBy, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 
 interface PostCategory {
@@ -258,10 +257,10 @@ function PostCategoryForm({ category, onSubmit, onCancel, isLoading, isOpen }: P
 export default function PostCategoriesManagement() {
   const { t } = useTranslation();
   
-  // Firebase hooks
-  const [snapshot, loading, error] = useCollection(
-    query(collection(db, 'postCategories'), orderBy('sortOrder', 'asc'))
-  );
+  // State for data fetching (one-time fetch instead of real-time listener)
+  const [snapshot, setSnapshot] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
   
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<PostCategory | undefined>(undefined);
@@ -269,9 +268,28 @@ export default function PostCategoriesManagement() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState<PostCategory | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Fetch categories once on mount
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setLoading(true);
+        const categoriesSnap = await getDocs(query(collection(db, 'postCategories'), orderBy('sortOrder', 'asc')));
+        setSnapshot(categoriesSnap);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching categories:', err);
+        setError(err as Error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchCategories();
+  }, []);
   
   // Convert Firestore documents to PostCategory objects
-  const categories: PostCategory[] = snapshot?.docs.map(doc => ({
+  const categories: PostCategory[] = snapshot?.docs.map((doc: any) => ({
     id: doc.id,
     ...doc.data()
   } as PostCategory)) || [];
@@ -282,6 +300,33 @@ export default function PostCategoriesManagement() {
   );
 
   const sortedCategories = [...filteredCategories].sort((a, b) => a.sortOrder - b.sortOrder);
+
+  // Refetch categories after mutations
+  const refetchCategories = async () => {
+    try {
+      const categoriesSnap = await getDocs(query(collection(db, 'postCategories'), orderBy('sortOrder', 'asc')));
+      setSnapshot(categoriesSnap);
+    } catch (err) {
+      console.error('Error refetching categories:', err);
+    }
+  };
+
+  // Refresh function with loading state and toast
+  const handleRefresh = async () => {
+    try {
+      setLoading(true);
+      const categoriesSnap = await getDocs(query(collection(db, 'postCategories'), orderBy('sortOrder', 'asc')));
+      setSnapshot(categoriesSnap);
+      setError(null);
+      toast.success(t('common.refreshSuccess') || 'Data refreshed');
+    } catch (err) {
+      console.error('Error refreshing categories:', err);
+      setError(err as Error);
+      toast.error(t('common.refreshError') || 'Failed to refresh data');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleCreate = () => {
     setSelectedCategory(undefined);
@@ -313,6 +358,7 @@ export default function PostCategoriesManagement() {
 
       setIsFormOpen(false);
       setSelectedCategory(undefined);
+      await refetchCategories(); // Refetch to update UI
     } catch (error) {
       console.error('Error saving category:', error);
       toast.error(
@@ -334,6 +380,7 @@ export default function PostCategoriesManagement() {
       toast.success(t('modules.community.postCategories.deleteSuccess'));
       setIsDeleteDialogOpen(false);
       setCategoryToDelete(undefined);
+      await refetchCategories(); // Refetch to update UI
     } catch (error) {
       console.error('Error deleting category:', error);
       toast.error(t('modules.community.postCategories.deleteError'));
@@ -348,6 +395,7 @@ export default function PostCategoriesManagement() {
         isActive: !category.isActive
       });
       toast.success(t('modules.community.postCategories.statusUpdateSuccess'));
+      await refetchCategories(); // Refetch to update UI
     } catch (error) {
       console.error('Error toggling status:', error);
       toast.error(t('modules.community.postCategories.statusUpdateError'));
@@ -360,6 +408,7 @@ export default function PostCategoriesManagement() {
         isForAdminOnly: !category.isForAdminOnly
       });
       toast.success(t('modules.community.postCategories.statusUpdateSuccess'));
+      await refetchCategories(); // Refetch to update UI
     } catch (error) {
       console.error('Error toggling admin-only status:', error);
       toast.error(t('modules.community.postCategories.statusUpdateError'));
@@ -512,10 +561,16 @@ export default function PostCategoriesManagement() {
             className="pl-10"
           />
         </div>
-        <Button onClick={handleCreate}>
-          <Plus className="h-4 w-4 mr-2" />
-          {t('modules.community.postCategories.create')}
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={handleRefresh} disabled={loading}>
+            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+            {t('common.refresh') || 'Refresh'}
+          </Button>
+          <Button onClick={handleCreate}>
+            <Plus className="h-4 w-4 mr-2" />
+            {t('modules.community.postCategories.create')}
+          </Button>
+        </div>
       </div>
 
       {/* Categories Table */}

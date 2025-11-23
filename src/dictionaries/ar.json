@@ -487,64 +487,6 @@
             "adjustments": "التعديلات",
             "analytics": "التحليلات"
           },
-          "fraudQueue": {
-          "title": "قائمة كشف الاحتيال",
-          "description": "مراجعة وإدارة الحسابات المشبوهة في الإحالات",
-          "loading": "جاري تحميل قائمة الاحتيال...",
-          "errorLoading": "خطأ في تحميل قائمة الاحتيال",
-          "noFlaggedUsers": "كل شيء على ما يرام!",
-          "noFlaggedUsersDesc": "لا يوجد مستخدمون مُعلّمون لمراجعة الاحتيال حالياً.",
-          "bulkApprove": "الموافقة على المحددين",
-          "bulkBlock": "حظر المحددين",
-          "riskLevels": {
-            "low": "خطر منخفض",
-            "medium": "خطر متوسط",
-            "high": "خطر عالي"
-          },
-          "filters": {
-            "scoreRange": "نطاق النقاط",
-            "allScores": "كل النقاط",
-            "mediumRisk": "خطر متوسط (40-70)",
-            "highRisk": "خطر عالي (71+)",
-            "status": "الحالة",
-            "allStatuses": "كل الحالات",
-            "pending": "قيد الانتظار",
-            "blocked": "محظور"
-          },
-          "table": {
-            "user": "المستخدم",
-            "fraudScore": "نقاط الاحتيال",
-            "flags": "العلامات",
-            "referrer": "المُحيل",
-            "status": "الحالة",
-            "actions": "الإجراءات"
-          },
-          "detailsModal": {
-            "title": "تفاصيل كشف الاحتيال",
-            "description": "تحليل مفصل للاحتيال ومعلومات المستخدم",
-            "userInfo": "معلومات المستخدم",
-            "displayName": "الاسم المعروض",
-            "email": "البريد الإلكتروني",
-            "signupDate": "تاريخ التسجيل",
-            "status": "الحالة",
-            "fraudScore": "نقاط الاحتيال",
-            "scoreOutOf100": "من 100",
-            "lastChecked": "آخر فحص",
-            "lowRiskThreshold": "0-39: خطر منخفض (موافقة تلقائية)",
-            "mediumRiskThreshold": "40-70: خطر متوسط (مراجعة يدوية)",
-            "highRiskThreshold": "71-100: خطر عالي (حظر تلقائي)",
-            "checkBreakdown": "تفصيل فحوصات الاحتيال",
-            "checkBreakdownDesc": "فحوصات الاحتيال الفردية التي ساهمت في النقاط",
-            "noFlagsDetected": "لم يتم اكتشاف علامات احتيال",
-            "points": "نقاط",
-            "referrerInfo": "معلومات المُحيل",
-            "referrerId": "معرف المُحيل",
-            "referralCode": "رمز الإحالة",
-            "close": "إغلاق",
-            "approve": "الموافقة على المستخدم",
-            "block": "حظر المستخدم"
-          }
-        },
         "userLookup": {
           "title": "البحث عن المستخدمين",
           "description": "ابحث عن المستخدمين بواسطة البريد الإلكتروني أو المعرف أو رمز الإحالة",
@@ -694,6 +636,64 @@
           "cohortPerformanceDesc": "مقاييس مفصلة لكل فترة مجموعة",
           "cohort": "المجموعة",
           "avgTimeToVerify": "متوسط وقت التحقق"
+        }
+      },
+      "fraudQueue": {
+        "title": "قائمة كشف الاحتيال",
+        "description": "مراجعة وإدارة الحسابات المشبوهة في الإحالات",
+        "loading": "جاري تحميل قائمة الاحتيال...",
+        "errorLoading": "خطأ في تحميل قائمة الاحتيال",
+        "noFlaggedUsers": "كل شيء على ما يرام!",
+        "noFlaggedUsersDesc": "لا يوجد مستخدمون مُعلّمون لمراجعة الاحتيال حالياً.",
+        "bulkApprove": "الموافقة على المحددين",
+        "bulkBlock": "حظر المحددين",
+        "riskLevels": {
+          "low": "خطر منخفض",
+          "medium": "خطر متوسط",
+          "high": "خطر عالي"
+        },
+        "filters": {
+          "scoreRange": "نطاق النقاط",
+          "allScores": "كل النقاط",
+          "mediumRisk": "خطر متوسط (40-70)",
+          "highRisk": "خطر عالي (71+)",
+          "status": "الحالة",
+          "allStatuses": "كل الحالات",
+          "pending": "قيد الانتظار",
+          "blocked": "محظور"
+        },
+        "table": {
+          "user": "المستخدم",
+          "fraudScore": "نقاط الاحتيال",
+          "flags": "العلامات",
+          "referrer": "المُحيل",
+          "status": "الحالة",
+          "actions": "الإجراءات"
+        },
+        "detailsModal": {
+          "title": "تفاصيل كشف الاحتيال",
+          "description": "تحليل مفصل للاحتيال ومعلومات المستخدم",
+          "userInfo": "معلومات المستخدم",
+          "displayName": "الاسم المعروض",
+          "email": "البريد الإلكتروني",
+          "signupDate": "تاريخ التسجيل",
+          "status": "الحالة",
+          "fraudScore": "نقاط الاحتيال",
+          "scoreOutOf100": "من 100",
+          "lastChecked": "آخر فحص",
+          "lowRiskThreshold": "0-39: خطر منخفض (موافقة تلقائية)",
+          "mediumRiskThreshold": "40-70: خطر متوسط (مراجعة يدوية)",
+          "highRiskThreshold": "71-100: خطر عالي (حظر تلقائي)",
+          "checkBreakdown": "تفصيل فحوصات الاحتيال",
+          "checkBreakdownDesc": "فحوصات الاحتيال الفردية التي ساهمت في النقاط",
+          "noFlagsDetected": "لم يتم اكتشاف علامات احتيال",
+          "points": "نقاط",
+          "referrerInfo": "معلومات المُحيل",
+          "referrerId": "معرف المُحيل",
+          "referralCode": "رمز الإحالة",
+          "close": "إغلاق",
+          "approve": "الموافقة على المستخدم",
+          "block": "حظر المستخدم"
         }
       },
       "users": "المستخدمون",
@@ -3679,6 +3679,7 @@
       }
     },
     "common": {
+      "refersh": "تحديث",
       "search": "بحث",
       "edit": "تعديل",
       "delete": "حذف",

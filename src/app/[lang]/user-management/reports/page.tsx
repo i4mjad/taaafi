@@ -55,6 +55,7 @@ import {
   ChevronUp,
   ChevronDown,
   MessageCircle,
+  RefreshCw,
 } from 'lucide-react';
 
 // Import the report types management component
@@ -62,8 +63,7 @@ import ReportTypesManagement from './components/ReportTypesManagement';
 import Link from 'next/link';
 import { toast } from 'sonner';
 
-// Firebase imports - using react-firebase-hooks
-import { useCollection } from 'react-firebase-hooks/firestore';
+// Firebase imports
 import { collection, query, orderBy, where, Timestamp, deleteDoc, doc, limit, startAfter, getDocs, getDoc, QueryDocumentSnapshot, DocumentData, updateDoc, writeBatch, addDoc, increment, FieldValue } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -86,7 +86,6 @@ interface UserReport {
   // User data
   isPlusUser?: boolean;
   userDisplayName?: string;
-  isVerified?: boolean;
 }
 
 interface ReportMessage {
@@ -144,25 +143,6 @@ export default function UserReportsPage() {
   const [reportsLoading, setReportsLoading] = useState(true);
   const [reportsError, setReportsError] = useState<Error | null>(null);
   const [lastMessagesLoading, setLastMessagesLoading] = useState(false);
-  const userVerifiedCache = useRef<Map<string, boolean>>(new Map());
-
-  // Fetch user emailVerified status from Auth via admin API and cache per session
-  const fetchUserVerifiedStatus = async (userId: string): Promise<boolean> => {
-    if (userVerifiedCache.current.has(userId)) {
-      return userVerifiedCache.current.get(userId) || false;
-    }
-    try {
-      const resp = await fetch(`/api/admin/users/${userId}`);
-      if (!resp.ok) return false;
-      const data = await resp.json();
-      const isVerified = data?.user?.emailVerified || false;
-      userVerifiedCache.current.set(userId, isVerified);
-      return isVerified;
-    } catch (e) {
-      console.warn('Failed to fetch verified status for user', userId, e);
-    }
-    return false;
-  };
   
   // Status counts state
   const [statusCounts, setStatusCounts] = useState({
@@ -176,12 +156,28 @@ export default function UserReportsPage() {
   const [statusCountsLoading, setStatusCountsLoading] = useState(true);
 
   // Fetch report types for dynamic display
-  const [reportTypesSnapshot, reportTypesLoading] = useCollection(
-    query(
-      collection(db, 'reportTypes'),
-      orderBy('updatedAt', 'desc')
-    )
-  );
+  const [reportTypes, setReportTypes] = useState<any[]>([]);
+  const [reportTypesLoading, setReportTypesLoading] = useState(true);
+
+  const fetchReportTypes = async () => {
+    setReportTypesLoading(true);
+    try {
+      const q = query(
+        collection(db, 'reportTypes'),
+        orderBy('updatedAt', 'desc')
+      );
+      const snapshot = await getDocs(q);
+      setReportTypes(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    } catch (error) {
+      console.error('Error fetching report types:', error);
+    } finally {
+      setReportTypesLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchReportTypes();
+  }, []);
 
   // Function to fetch actual status counts from database
   const fetchStatusCounts = async () => {
@@ -672,34 +668,46 @@ export default function UserReportsPage() {
         messagesCount: doc.data().messagesCount || 1,
       }));
       
-      // Fetch user data for each report
-      return await Promise.all(reports.map(async (report) => {
+      // Batch fetch user data for all reports
+      const uniqueUserIds = Array.from(new Set(reports.map(r => r.uid)));
+      const userDataMap = new Map<string, { isPlusUser: boolean; displayName: string }>();
+      
+      await Promise.all(uniqueUserIds.map(async (userId) => {
         try {
-          const userQuery = query(collection(db, 'users'), where('__name__', '==', report.uid));
-          const userSnapshot = await getDocs(userQuery);
-          
-          if (!userSnapshot.empty) {
-            const userData = userSnapshot.docs[0].data();
-            const isVerified = await fetchUserVerifiedStatus(report.uid);
-            return {
-              ...report,
+          const userDoc = await getDoc(doc(db, 'users', userId));
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            userDataMap.set(userId, {
               isPlusUser: userData.isPlusUser || false,
-              userDisplayName: userData.displayName || '',
-              isVerified: isVerified,
-            };
+              displayName: userData.displayName || '',
+            });
+          } else {
+            userDataMap.set(userId, {
+              isPlusUser: false,
+              displayName: '',
+            });
           }
         } catch (error) {
-          console.error(`Error fetching user data for ${report.uid}:`, error);
+          console.error(`Error fetching user data for ${userId}:`, error);
+          userDataMap.set(userId, {
+            isPlusUser: false,
+            displayName: '',
+          });
         }
-        
-        const isVerified = await fetchUserVerifiedStatus(report.uid);
+      }));
+      
+      // Map user data to reports
+      return reports.map(report => {
+        const userData = userDataMap.get(report.uid) || {
+          isPlusUser: false,
+          displayName: '',
+        };
         return {
           ...report,
-          isPlusUser: false,
-          userDisplayName: '',
-          isVerified: isVerified,
+          isPlusUser: userData.isPlusUser,
+          userDisplayName: userData.displayName,
         };
-      }));
+      });
     }
 
     // For 'all' status and 'all' report type, fetch pending first, then others to fill the page
@@ -718,52 +726,64 @@ export default function UserReportsPage() {
       );
 
       const statusSnapshot = await getDocs(statusQuery);
-      const statusReports = await Promise.all(statusSnapshot.docs.map(async (doc) => {
-        const reportData = {
-          id: doc.id,
-          uid: doc.data().uid || '',
-          time: doc.data().time || Timestamp.now(),
-          reportTypeId: doc.data().reportTypeId || doc.data().reportType || 'dataError',
-          status: doc.data().status || 'pending',
-          initialMessage: doc.data().initialMessage || doc.data().userJustification || '',
-          lastUpdated: doc.data().lastUpdated || doc.data().time || Timestamp.now(),
-          messagesCount: doc.data().messagesCount || 1,
-        };
-        
-        // Fetch user data for each report
+      const statusReports = statusSnapshot.docs.map(doc => ({
+        id: doc.id,
+        uid: doc.data().uid || '',
+        time: doc.data().time || Timestamp.now(),
+        reportTypeId: doc.data().reportTypeId || doc.data().reportType || 'dataError',
+        status: doc.data().status || 'pending',
+        initialMessage: doc.data().initialMessage || doc.data().userJustification || '',
+        lastUpdated: doc.data().lastUpdated || doc.data().time || Timestamp.now(),
+        messagesCount: doc.data().messagesCount || 1,
+      }));
+      
+      // Batch fetch user data for this batch of reports
+      const uniqueUserIds = Array.from(new Set(statusReports.map(r => r.uid)));
+      const userDataMap = new Map<string, { isPlusUser: boolean; displayName: string }>();
+      
+      await Promise.all(uniqueUserIds.map(async (userId) => {
         try {
-          const userQuery = query(collection(db, 'users'), where('__name__', '==', reportData.uid));
-          const userSnapshot = await getDocs(userQuery);
-          
-          if (!userSnapshot.empty) {
-            const userData = userSnapshot.docs[0].data();
-            const isVerified = await fetchUserVerifiedStatus(reportData.uid);
-            return {
-              ...reportData,
+          const userDoc = await getDoc(doc(db, 'users', userId));
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            userDataMap.set(userId, {
               isPlusUser: userData.isPlusUser || false,
-              userDisplayName: userData.displayName || '',
-              isVerified: isVerified,
-            };
+              displayName: userData.displayName || '',
+            });
+          } else {
+            userDataMap.set(userId, {
+              isPlusUser: false,
+              displayName: '',
+            });
           }
         } catch (error) {
-          console.error(`Error fetching user data for ${reportData.uid}:`, error);
+          console.error(`Error fetching user data for ${userId}:`, error);
+          userDataMap.set(userId, {
+            isPlusUser: false,
+            displayName: '',
+          });
         }
-        
-        const isVerified = await fetchUserVerifiedStatus(reportData.uid);
-        return {
-          ...reportData,
-          isPlusUser: false,
-          userDisplayName: '',
-          isVerified: isVerified,
-        };
       }));
+      
+      // Map user data to reports
+      const statusReportsWithUserData = statusReports.map(report => {
+        const userData = userDataMap.get(report.uid) || {
+          isPlusUser: false,
+          displayName: '',
+        };
+        return {
+          ...report,
+          isPlusUser: userData.isPlusUser,
+          userDisplayName: userData.displayName,
+        };
+      });
 
       // Handle pagination by skipping already shown reports
-      const reportsToAdd = statusReports.slice(Math.max(0, skipCount), skipCount + remainingSlots);
+      const reportsToAdd = statusReportsWithUserData.slice(Math.max(0, skipCount), skipCount + remainingSlots);
       reports.push(...reportsToAdd);
       
       remainingSlots -= reportsToAdd.length;
-      skipCount = Math.max(0, skipCount - statusReports.length);
+      skipCount = Math.max(0, skipCount - statusReportsWithUserData.length);
     }
 
     return reports;
@@ -847,22 +867,19 @@ export default function UserReportsPage() {
 
   // Convert report types to a lookup map
   const reportTypesMap = useMemo(() => {
-    if (!reportTypesSnapshot) return new Map();
-    
     const map = new Map();
-    reportTypesSnapshot.docs.forEach(doc => {
-      const data = doc.data();
-      map.set(doc.id, {
-        id: doc.id,
-        nameEn: data.nameEn || '',
-        nameAr: data.nameAr || '',
-        descriptionEn: data.descriptionEn || '',
-        descriptionAr: data.descriptionAr || '',
-        isActive: data.isActive ?? true,
+    reportTypes.forEach(reportType => {
+      map.set(reportType.id, {
+        id: reportType.id,
+        nameEn: reportType.nameEn || '',
+        nameAr: reportType.nameAr || '',
+        descriptionEn: reportType.descriptionEn || '',
+        descriptionAr: reportType.descriptionAr || '',
+        isActive: reportType.isActive ?? true,
       });
     });
     return map;
-  }, [reportTypesSnapshot]);
+  }, [reportTypes]);
 
   // Function to get report type name based on locale
   const getReportTypeName = (reportTypeId: string) => {
@@ -1024,6 +1041,15 @@ export default function UserReportsPage() {
     toast.info(`${format.toUpperCase()} export feature coming soon`);
   };
 
+  const handleRefresh = async () => {
+    await Promise.all([
+      fetchReports(currentPage, false),
+      fetchStatusCounts(),
+      fetchReportTypes()
+    ]);
+    toast.success(t('common.refreshed') || 'Data refreshed successfully');
+  };
+
   // Handle report deletion
   const handleDeleteReport = async () => {
     if (!reportToDelete) return;
@@ -1082,6 +1108,20 @@ export default function UserReportsPage() {
                 </p>
               </div>
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-2 w-full sm:w-auto">
+                <Button 
+                  variant="outline" 
+                  onClick={handleRefresh} 
+                  disabled={reportsLoading || isLoadingPage}
+                  className="h-9 text-sm w-full sm:w-auto"
+                >
+                  {(reportsLoading || isLoadingPage) ? (
+                    <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                  )}
+                  <span className="hidden sm:inline">{t('common.refresh') || 'Refresh'}</span>
+                  <span className="sm:hidden">Refresh</span>
+                </Button>
                 <ReportTypesManagement 
                   trigger={
                     <Button variant="outline" className="h-9 text-sm w-full sm:w-auto">
@@ -1246,12 +1286,11 @@ export default function UserReportsPage() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">{t('modules.userManagement.reports.statusAll') || 'All Types'}</SelectItem>
-                        {reportTypesSnapshot && reportTypesSnapshot.docs.map((doc) => {
-                          const reportType = doc.data();
+                        {reportTypes.map((reportType) => {
                           const name = locale === 'ar' ? reportType.nameAr : reportType.nameEn;
                           return (
-                            <SelectItem key={doc.id} value={doc.id}>
-                              {name || doc.id}
+                            <SelectItem key={reportType.id} value={reportType.id}>
+                              {name || reportType.id}
                             </SelectItem>
                           );
                         })}
@@ -1413,7 +1452,6 @@ export default function UserReportsPage() {
                           <TableHead className="hidden xl:table-cell">{t('modules.userManagement.reports.initialMessage') || 'Initial Message'}</TableHead>
                           <TableHead className="hidden sm:table-cell">{t('modules.userManagement.reports.messagesCount') || 'Messages'}</TableHead>
                           <TableHead className="hidden lg:table-cell">{t('modules.userManagement.reports.lastMessageFrom') || 'Last Message From'}</TableHead>
-                          <TableHead className="hidden md:table-cell">{t('modules.userManagement.reports.verified') || 'Verified'}</TableHead>
                           <TableHead className="text-right">{t('modules.userManagement.reports.actions') || 'Actions'}</TableHead>
                         </TableRow>
                       </TableHeader>
@@ -1428,7 +1466,6 @@ export default function UserReportsPage() {
                               <TableCell className="hidden xl:table-cell"><Skeleton className="h-4 w-40" /></TableCell>
                               <TableCell className="hidden sm:table-cell"><Skeleton className="h-4 w-12" /></TableCell>
                               <TableCell className="hidden lg:table-cell"><Skeleton className="h-4 w-16" /></TableCell>
-                              <TableCell className="hidden md:table-cell"><Skeleton className="h-4 w-16" /></TableCell>
                               <TableCell className="text-right"><Skeleton className="h-4 w-16" /></TableCell>
                             </TableRow>
                           ))
@@ -1484,19 +1521,6 @@ export default function UserReportsPage() {
                                       </Badge>
                                     )}
                                   </div>
-                                )}
-                              </TableCell>
-                              <TableCell className="hidden md:table-cell">
-                                {report.isVerified ? (
-                                  <Badge variant="default" className="bg-green-600 hover:bg-green-700 text-xs">
-                                    <CheckCircle className="h-3 w-3 mr-1" />
-                                    {t('modules.userManagement.reports.verified') || 'Verified'}
-                                  </Badge>
-                                ) : (
-                                  <Badge variant="outline" className="text-xs text-muted-foreground">
-                                    <XCircle className="h-3 w-3 mr-1" />
-                                    {t('modules.userManagement.reports.unverified') || 'Not Verified'}
-                                  </Badge>
                                 )}
                               </TableCell>
                               <TableCell className="text-right">

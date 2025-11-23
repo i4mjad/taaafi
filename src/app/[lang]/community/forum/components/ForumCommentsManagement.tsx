@@ -1,10 +1,9 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useTranslation } from '@/contexts/TranslationContext';
-import { useCollection } from 'react-firebase-hooks/firestore';
-import { collection, doc, orderBy, query, updateDoc } from 'firebase/firestore';
+import { collection, doc, orderBy, query, updateDoc, getDocs, QueryDocumentSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MessageSquare, MoreHorizontal, Eye, EyeOff, Trash2, ExternalLink, AlertCircle, User, Shield, CheckCircle, XCircle } from 'lucide-react';
+import { MessageSquare, MoreHorizontal, Eye, EyeOff, Trash2, ExternalLink, AlertCircle, User, Shield, CheckCircle, XCircle, RefreshCw } from 'lucide-react';
 import { ForumModerationBadge } from '@/components/forum/ForumModerationBadge';
 import { ModerationDetailPanel } from '@/components/forum/ModerationDetailPanel';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
@@ -39,16 +38,59 @@ export default function ForumCommentsManagement() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
-  const [commentsValue, commentsLoading, commentsError] = useCollection(
-    query(collection(db, 'comments'), orderBy('createdAt', 'desc'))
-  );
-  const [postsValue] = useCollection(
-    query(collection(db, 'forumPosts'), orderBy('createdAt', 'desc'))
-  );
+  const [commentsValue, setCommentsValue] = useState<any>(null);
+  const [commentsLoading, setCommentsLoading] = useState(true);
+  const [commentsError, setCommentsError] = useState<Error | null>(null);
+  const [postsValue, setPostsValue] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setCommentsLoading(true);
+        const [commentsSnap, postsSnap] = await Promise.all([
+          getDocs(query(collection(db, 'comments'), orderBy('createdAt', 'desc'))),
+          getDocs(query(collection(db, 'forumPosts'), orderBy('createdAt', 'desc')))
+        ]);
+        
+        setCommentsValue(commentsSnap);
+        setPostsValue(postsSnap);
+        setCommentsError(null);
+      } catch (error) {
+        console.error('Error fetching comments data:', error);
+        setCommentsError(error as Error);
+      } finally {
+        setCommentsLoading(false);
+      }
+    };
+    
+    fetchData();
+  }, []); // Only fetch once on mount
+
+  // Refresh function to manually reload data
+  const handleRefresh = async () => {
+    try {
+      setCommentsLoading(true);
+      const [commentsSnap, postsSnap] = await Promise.all([
+        getDocs(query(collection(db, 'comments'), orderBy('createdAt', 'desc'))),
+        getDocs(query(collection(db, 'forumPosts'), orderBy('createdAt', 'desc')))
+      ]);
+      
+      setCommentsValue(commentsSnap);
+      setPostsValue(postsSnap);
+      setCommentsError(null);
+      toast.success(t('common.refreshSuccess') || 'Data refreshed');
+    } catch (error) {
+      console.error('Error refreshing comments data:', error);
+      setCommentsError(error as Error);
+      toast.error(t('common.refreshError') || 'Failed to refresh data');
+    } finally {
+      setCommentsLoading(false);
+    }
+  };
 
   const comments = useMemo(() => {
     if (!commentsValue) return [] as Comment[];
-    return commentsValue.docs.map((d) => ({
+    return commentsValue.docs.map((d: QueryDocumentSnapshot) => ({
       id: d.id,
       ...d.data(),
       createdAt: d.data().createdAt?.toDate() || new Date(),
@@ -167,9 +209,15 @@ export default function ForumCommentsManagement() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold tracking-tight">{t('modules.community.comments.title')}</h2>
-        <p className="text-muted-foreground">{t('modules.community.comments.listDescription')}</p>
+      <div className="flex justify-between items-start">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight">{t('modules.community.comments.title')}</h2>
+          <p className="text-muted-foreground">{t('modules.community.comments.listDescription')}</p>
+        </div>
+        <Button variant="outline" onClick={handleRefresh} disabled={commentsLoading}>
+          <RefreshCw className={`mr-2 h-4 w-4 ${commentsLoading ? 'animate-spin' : ''}`} />
+          {t('common.refresh') || 'Refresh'}
+        </Button>
       </div>
 
       {/* Stats Cards */}

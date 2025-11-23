@@ -46,8 +46,11 @@ exports.synthesizeDecision = synthesizeDecision;
 exports.mapSpansToOriginal = mapSpansToOriginal;
 const firestore_1 = require("firebase-functions/v2/firestore");
 const v2_1 = require("firebase-functions/v2");
+const params_1 = require("firebase-functions/params");
 const admin = __importStar(require("firebase-admin"));
 const openai_1 = __importDefault(require("openai"));
+// Define environment parameters
+const openaiApiKey = (0, params_1.defineString)('OPENAI_API_KEY');
 // Set global options for all functions
 (0, v2_1.setGlobalOptions)({
     region: 'us-central1',
@@ -59,10 +62,8 @@ const openai_1 = __importDefault(require("openai"));
 if (!admin.apps.length) {
     admin.initializeApp();
 }
-// Initialize OpenAI
-const openai = new openai_1.default({
-    apiKey: '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',
-});
+// Initialize OpenAI (will be initialized when the function runs)
+let openai;
 /**
  * Localized violation messages
  */
@@ -638,6 +639,15 @@ function synthesizeDecision(openaiResult, customRuleResults, processingTime) {
 async function checkWithOpenAI(text) {
     var _a, _b;
     console.log('🤖 Starting OpenAI analysis with custom prompts...');
+    // Initialize OpenAI client if not already initialized
+    if (!openai) {
+        const apiKey = openaiApiKey.value();
+        if (!apiKey) {
+            throw new Error('OPENAI_API_KEY is not configured');
+        }
+        openai = new openai_1.default({ apiKey });
+        console.log('✅ OpenAI client initialized');
+    }
     try {
         // Step 1: Detect message language
         const detectedLanguage = detectMessageLanguage(text);
