@@ -63,7 +63,7 @@ export const notificationTemplates: NotificationTemplates = {
     },
     [NotificationType.VERIFICATION_COMPLETE]: {
       title: '🎉 You\'re Verified!',
-      body: 'Congrats! You earned 3 days of Premium access. Explore now!'
+      body: 'Congrats! You earned 1 month of Premium access. Explore now!'
     },
     [NotificationType.PREMIUM_ACTIVATED]: {
       title: '💎 Premium Activated!',
@@ -113,7 +113,7 @@ export const notificationTemplates: NotificationTemplates = {
     },
     [NotificationType.VERIFICATION_COMPLETE]: {
       title: '🎉 تم التحقق منك!',
-      body: 'تهانينا! حصلت على 3 أيام بريميوم. استكشف الآن!'
+      body: 'تهانينا! حصلت على شهر بريميوم مجاني. استكشف الآن!'
     },
     [NotificationType.PREMIUM_ACTIVATED]: {
       title: '💎 تم تفعيل البريميوم!',

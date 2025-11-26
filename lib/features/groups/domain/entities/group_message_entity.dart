@@ -130,19 +130,23 @@ class GroupMessageEntity {
 class ModerationStatus {
   final ModerationStatusType status;
   final String? reason;
+  final double? confidence; // AI confidence score (0.0-1.0)
 
   const ModerationStatus({
     this.status = ModerationStatusType.pending,
     this.reason,
+    this.confidence,
   });
 
   ModerationStatus copyWith({
     ModerationStatusType? status,
     String? reason,
+    double? confidence,
   }) {
     return ModerationStatus(
       status: status ?? this.status,
       reason: reason ?? this.reason,
+      confidence: confidence ?? this.confidence,
     );
   }
 
@@ -150,15 +154,30 @@ class ModerationStatus {
     return {
       'status': status.value,
       if (reason != null) 'reason': reason,
+      if (confidence != null) 'confidence': confidence,
     };
   }
 
   factory ModerationStatus.fromMap(Map<String, dynamic>? map) {
     if (map == null) return const ModerationStatus();
 
+    // Extract confidence from finalDecision if available
+    double? confidence;
+    final finalDecision = map['finalDecision'] as Map<String, dynamic>?;
+    if (finalDecision != null) {
+      final confValue = finalDecision['confidence'];
+      if (confValue != null) {
+        // Handle both 0-1 range and 0-100 range
+        if (confValue is num) {
+          confidence = confValue > 1.0 ? confValue / 100.0 : confValue.toDouble();
+        }
+      }
+    }
+
     return ModerationStatus(
       status: ModerationStatusType.fromString(map['status'] ?? 'pending'),
       reason: map['reason'],
+      confidence: confidence,
     );
   }
 
@@ -168,10 +187,11 @@ class ModerationStatus {
       other is ModerationStatus &&
           runtimeType == other.runtimeType &&
           status == other.status &&
-          reason == other.reason;
+          reason == other.reason &&
+          confidence == other.confidence;
 
   @override
-  int get hashCode => status.hashCode ^ reason.hashCode;
+  int get hashCode => status.hashCode ^ reason.hashCode ^ (confidence?.hashCode ?? 0);
 }
 
 /// Enumeration for moderation status types

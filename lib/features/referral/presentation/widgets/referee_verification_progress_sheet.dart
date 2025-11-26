@@ -142,14 +142,6 @@ class RefereeVerificationProgressSheet extends ConsumerWidget {
                       const SizedBox(height: 12),
 
                       ChecklistItemWidget(
-                        type: ChecklistItemType.accountAge7Days,
-                        item: entity.accountAge7Days,
-                        signupDate: entity.signupDate,
-                        isReadOnly: false,
-                      ),
-                      const SizedBox(height: 12),
-
-                      ChecklistItemWidget(
                         type: ChecklistItemType.forumPosts3,
                         item: entity.forumPosts3,
                         isReadOnly: false,

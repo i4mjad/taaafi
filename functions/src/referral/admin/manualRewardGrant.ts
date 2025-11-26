@@ -11,7 +11,7 @@ import { grantPromotionalEntitlement } from "../revenuecat/revenuecatHelper";
 const db = admin.firestore();
 
 /**
- * Manually grant 3-day reward to verified referee
+ * Manually grant 30-day reward to verified referee
  * ADMIN ONLY - Requires authentication
  */
 export const manuallyGrantRefereeReward = functions.https.onCall(
@@ -74,8 +74,8 @@ export const manuallyGrantRefereeReward = functions.https.onCall(
 
       console.log(`✅ User ${userId} is eligible for manual reward grant`);
 
-      // Grant 3-day Premium reward
-      const rewardResult = await grantPromotionalEntitlement(userId, 3);
+      // Grant 30-day Premium reward (1 month)
+      const rewardResult = await grantPromotionalEntitlement(userId, 30);
 
       if (!rewardResult.success) {
         throw new functions.https.HttpsError(
@@ -88,8 +88,8 @@ export const manuallyGrantRefereeReward = functions.https.onCall(
       await db.collection("referralRewards").add({
         referrerId: userId,
         type: "referee_reward_manual",
-        amount: "3 days",
-        daysGranted: 3,
+        amount: "1 month",
+        daysGranted: 30,
         verifiedUserIds: [userId],
         revenueCatResponse: {
           expiresAt: rewardResult.expiresAt.toISOString(),
@@ -110,12 +110,12 @@ export const manuallyGrantRefereeReward = functions.https.onCall(
           rewardAwardedAt: admin.firestore.FieldValue.serverTimestamp(),
         });
 
-      console.log(`✅ Successfully granted 3-day reward to ${userId} manually`);
+      console.log(`✅ Successfully granted 30-day reward to ${userId} manually`);
 
       return {
         success: true,
         message: "Reward granted successfully",
-        daysGranted: 3,
+        daysGranted: 30,
         expiresAt: rewardResult.expiresAt.toISOString(),
       };
     } catch (error) {
@@ -132,4 +132,3 @@ export const manuallyGrantRefereeReward = functions.https.onCall(
     }
   }
 );
-

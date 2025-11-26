@@ -4,13 +4,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../../core/localization/localization.dart';
 import '../../../../core/shared_widgets/snackbar.dart';
 import '../../../../core/theming/app-themes.dart';
 import '../../../../core/theming/text_styles.dart';
-import '../../data/services/referral_share_service.dart';
-import 'share_options_sheet.dart';
 
 class ReferralCodeCard extends ConsumerWidget {
   final String code;
@@ -80,10 +79,12 @@ class ReferralCodeCard extends ConsumerWidget {
               const SizedBox(width: 8),
 
               // Share button
-              _ActionButton(
-                icon: LucideIcons.share2,
-                onTap: () => _shareCode(context, l10n),
-                theme: theme,
+              Builder(
+                builder: (buttonContext) => _ActionButton(
+                  icon: LucideIcons.share2,
+                  onTap: () => _shareCode(buttonContext, l10n),
+                  theme: theme,
+                ),
               ),
             ],
           ),
@@ -98,78 +99,38 @@ class ReferralCodeCard extends ConsumerWidget {
   }
 
   void _shareCode(BuildContext context, AppLocalizations l10n) {
-    // Show share options bottom sheet
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (context) => ShareOptionsSheet(
-        referralCode: code,
-        onShareMethodSelected: (method) =>
-            _handleShareMethod(context, method, l10n),
-      ),
+    // Use generic share message
+    final shareMessage = l10n
+        .translate('referral.share.generic_message')
+        .replaceAll('{code}', code)
+        .replaceAll('{userName}', l10n.translate('referral.share.default_user'));
+
+    // Get the position of the share button for iPad popover
+    final box = context.findRenderObject() as RenderBox?;
+    final sharePositionOrigin = box != null
+        ? box.localToGlobal(Offset.zero) & box.size
+        : null;
+
+    // Share using the system share sheet
+    Share.share(
+      shareMessage,
+      subject: l10n.translate('referral.share.subject'),
+      sharePositionOrigin: sharePositionOrigin,
     );
-  }
 
-  Future<void> _handleShareMethod(
-    BuildContext context,
-    ShareMethod method,
-    AppLocalizations l10n,
-  ) async {
-    final shareService = ReferralShareService(l10n);
-    bool success = false;
-    String methodName = '';
-
-    try {
-      switch (method) {
-        case ShareMethod.whatsapp:
-          methodName = 'whatsapp';
-          success = await shareService.shareViaWhatsApp(code);
-          break;
-        case ShareMethod.sms:
-          methodName = 'sms';
-          success = await shareService.shareViaSMS(code);
-          break;
-        case ShareMethod.email:
-          methodName = 'email';
-          success = await shareService.shareViaEmail(code);
-          break;
-        case ShareMethod.copyLink:
-          methodName = 'copy_link';
-          success = await shareService.copyToClipboard(code);
-          if (success && context.mounted) {
-            getSuccessSnackBar(context, 'referral.share.copied_success');
-          }
-          break;
-        case ShareMethod.more:
-          methodName = 'generic';
-          success = await shareService.shareGeneric(code);
-          break;
-      }
-
-      // Track analytics
-      _trackShareEvent(methodName, success);
-
-      // Callback for parent widget
-      if (onShare != null) {
-        onShare!();
-      }
-    } catch (e) {
-      if (context.mounted) {
-        getErrorSnackBar(context, 'referral.share.share_failed');
-      }
-    }
-  }
-
-  void _trackShareEvent(String method, bool success) {
+    // Track analytics
     FirebaseAnalytics.instance.logEvent(
       name: 'referral_code_shared',
       parameters: {
-        'method': method,
+        'method': 'generic_share',
         'referral_code': code,
-        'success': success,
       },
     );
+
+    // Callback for parent widget
+    if (onShare != null) {
+      onShare!();
+    }
   }
 }
 

@@ -48,6 +48,7 @@ class ChatMessage {
   final bool isHidden; // Whether this message was hidden by admin
   final ModerationStatusType? moderationStatus; // Moderation status
   final String? moderationReason; // Moderation reason if blocked
+  final double? moderationConfidence; // AI confidence score (0.0-1.0)
   final bool isPinned; // Whether this message is pinned
   final Map<String, List<String>> reactions; // Emoji reactions on this message
 
@@ -67,6 +68,7 @@ class ChatMessage {
     this.isHidden = false,
     this.moderationStatus,
     this.moderationReason,
+    this.moderationConfidence,
     this.isPinned = false,
     this.reactions = const {},
   });
@@ -87,6 +89,7 @@ class ChatMessage {
     bool? isHidden,
     ModerationStatusType? moderationStatus,
     String? moderationReason,
+    double? moderationConfidence,
     bool? isPinned,
     Map<String, List<String>>? reactions,
   }) {
@@ -106,6 +109,7 @@ class ChatMessage {
       isHidden: isHidden ?? this.isHidden,
       moderationStatus: moderationStatus ?? this.moderationStatus,
       moderationReason: moderationReason ?? this.moderationReason,
+      moderationConfidence: moderationConfidence ?? this.moderationConfidence,
       isPinned: isPinned ?? this.isPinned,
       reactions: reactions ?? this.reactions,
     );
@@ -463,8 +467,18 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
         if (currentCpId != null && entity.senderCpId == currentCpId) {
           uniqueEntities[entity.id] = entity;
         }
+      } else if (entity.moderation.status == ModerationStatusType.manual_review) {
+        // For manual_review, hide messages with confidence >= 0.85
+        final confidence = entity.moderation.confidence ?? 0.0;
+        if (confidence >= 0.85) {
+          // Hide high-confidence violations from everyone
+          continue;
+        } else {
+          // Show low-confidence manual reviews
+          uniqueEntities[entity.id] = entity;
+        }
       } else {
-        // Show all other messages (pending, approved, manual_review)
+        // Show all other messages (pending, approved)
         uniqueEntities[entity.id] = entity;
       }
     }
@@ -521,6 +535,7 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
             isHidden: replyTarget.isHidden,
             moderationStatus: replyTarget.moderation.status,
             moderationReason: replyTarget.moderation.reason,
+            moderationConfidence: replyTarget.moderation.confidence,
           );
         }
       }
@@ -541,6 +556,7 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
         isHidden: entity.isHidden,
         moderationStatus: entity.moderation.status,
         moderationReason: entity.moderation.reason,
+        moderationConfidence: entity.moderation.confidence,
         isPinned: entity.isPinned,
         reactions: entity.reactions,
       );
@@ -828,11 +844,6 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
                                 ModerationStatusType.blocked &&
                             message.isCurrentUser)
                           _buildBlockedMessageContent(context, theme, message)
-                        else if (message.moderationStatus ==
-                                ModerationStatusType.manual_review &&
-                            message.isCurrentUser)
-                          _buildMessageWithReviewIndicator(
-                              context, theme, message, chatTextSize)
                         else
                           // Regular message content
                           Text(
@@ -2260,15 +2271,19 @@ ${l10n.translate('reported-message')}:
                   color: theme.primary[600],
                 ),
                 const SizedBox(width: 4),
-                Text(
-                  originalMessage.senderName,
-                  style: TextStyles.caption.copyWith(
-                    color: theme.primary[700],
-                    fontWeight: FontWeight.w600,
-                    fontSize: 11,
+                Flexible(
+                  child: Text(
+                    originalMessage.senderName,
+                    style: TextStyles.caption.copyWith(
+                      color: theme.primary[700],
+                      fontWeight: FontWeight.w600,
+                      fontSize: 11,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
                   ),
                 ),
-                const Spacer(),
+                const SizedBox(width: 4),
                 // Add visual indicator that this is tappable
                 Icon(
                   LucideIcons.externalLink,
@@ -2446,51 +2461,6 @@ ${l10n.translate('reported-message')}:
     );
   }
 
-  /// Manual review indicator (subtle)
-  Widget _buildMessageWithReviewIndicator(BuildContext context,
-      CustomThemeData theme, ChatMessage message, ChatTextSize chatTextSize) {
-    return Stack(
-      children: [
-        // Regular message content
-        Text(
-          message.isHidden
-              ? AppLocalizations.of(context)
-                  .translate('message-hidden-by-admin')
-              : message.content,
-          style: chatTextSize.textStyle.copyWith(
-            color: message.isHidden ? theme.grey[500] : theme.grey[800],
-            height: 1.5,
-            fontStyle: message.isHidden ? FontStyle.italic : FontStyle.normal,
-          ),
-          textAlign: Directionality.of(context) == TextDirection.rtl
-              ? TextAlign.right
-              : TextAlign.left,
-          softWrap: true,
-          overflow: TextOverflow.visible,
-        ),
-        // Review indicator overlay
-        Positioned(
-          top: 0,
-          right: Directionality.of(context) == TextDirection.rtl ? 0 : null,
-          left: Directionality.of(context) == TextDirection.ltr ? 0 : null,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-            decoration: BoxDecoration(
-              color: Colors.orange.shade100,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              'قيد المراجعة', // 'Under Review' in Arabic
-              style: TextStyles.tiny.copyWith(
-                color: Colors.orange.shade700,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
 
   /// Navigate to chat settings screen
   void _navigateToChatSettings(BuildContext context) {

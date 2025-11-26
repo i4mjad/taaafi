@@ -124,26 +124,6 @@ class ChecklistProgressScreen extends ConsumerWidget {
                         _buildCompactTaskItem(
                             theme,
                             l10n,
-                            '⏳',
-                            l10n.translate('referral.checklist.account_age'),
-                            entity.accountAge7Days.completed
-                                ? l10n.translate('referral.checklist.completed')
-                                : l10n
-                                    .translate(
-                                        'referral.checklist.days_remaining')
-                                    .replaceAll(
-                                        '{days}',
-                                        (7 -
-                                                DateTime.now()
-                                                    .difference(
-                                                        entity.signupDate)
-                                                    .inDays)
-                                            .toString()),
-                            entity.accountAge7Days.completed),
-
-                        _buildCompactTaskItem(
-                            theme,
-                            l10n,
                             entity.forumPosts3.completed ? '✅' : '⏸️',
                             l10n.translate('referral.checklist.forum_posts'),
                             '${entity.forumPosts3.current ?? 0}/3 ${l10n.translate('referral.checklist.posts')}',

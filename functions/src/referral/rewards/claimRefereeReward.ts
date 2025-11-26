@@ -1,6 +1,6 @@
 /**
  * Claim Referee Reward
- * Allows verified referees to manually claim their 3-day Premium reward
+ * Allows verified referees to manually claim their 30-day Premium reward
  * if it wasn't auto-granted during verification
  */
 
@@ -13,7 +13,7 @@ import { NotificationType } from "../notifications/notificationTypes";
 const db = admin.firestore();
 
 /**
- * Claim 3-day Premium reward for verified referee
+ * Claim 30-day Premium reward for verified referee
  * User-facing function that verified users can call themselves
  */
 export const claimRefereeReward = functions.https.onCall(
@@ -56,7 +56,7 @@ export const claimRefereeReward = functions.https.onCall(
 
         return {
           success: false,
-          message: `You already claimed your 3-day Premium reward on ${awardedAtStr}!`,
+          message: `You already claimed your 1-month Premium reward on ${awardedAtStr}!`,
           alreadyClaimed: true,
           awardedAt: awardedAtStr,
         };
@@ -80,8 +80,8 @@ export const claimRefereeReward = functions.https.onCall(
 
       console.log(`✅ User ${userId} is eligible to claim reward`);
 
-      // Grant 3-day Premium reward via RevenueCat
-      const rewardResult = await grantPromotionalEntitlement(userId, 3);
+      // Grant 30-day Premium reward via RevenueCat
+      const rewardResult = await grantPromotionalEntitlement(userId, 30);
 
       if (!rewardResult.success) {
         console.error(
@@ -97,8 +97,8 @@ export const claimRefereeReward = functions.https.onCall(
       await db.collection("referralRewards").add({
         referrerId: userId,
         type: "referee_reward",
-        amount: "3 days",
-        daysGranted: 3,
+        amount: "1 month",
+        daysGranted: 30,
         verifiedUserIds: [userId],
         revenueCatResponse: {
           expiresAt: rewardResult.expiresAt.toISOString(),
@@ -119,7 +119,7 @@ export const claimRefereeReward = functions.https.onCall(
         });
 
       console.log(
-        `✅ Successfully granted 3-day reward to ${userId} via manual claim`
+        `✅ Successfully granted 30-day reward to ${userId} via manual claim`
       );
 
       // Send success notification
@@ -136,8 +136,8 @@ export const claimRefereeReward = functions.https.onCall(
 
       return {
         success: true,
-        message: "Congratulations! You now have 3 days of Premium access!",
-        daysGranted: 3,
+        message: "Congratulations! You now have 1 month of Premium access!",
+        daysGranted: 30,
         expiresAt: rewardResult.expiresAt.toISOString(),
         activatedNow: true,
       };
@@ -155,4 +155,3 @@ export const claimRefereeReward = functions.https.onCall(
     }
   }
 );
-

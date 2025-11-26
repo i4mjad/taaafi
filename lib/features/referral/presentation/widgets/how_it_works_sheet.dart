@@ -82,7 +82,6 @@ class HowItWorksSheet extends ConsumerWidget {
                 description:
                     l10n.translate('referral.how_it_works.step2_description'),
                 checklistItems: [
-                  l10n.translate('referral.how_it_works.checklist_active_7_days'),
                   l10n.translate('referral.how_it_works.checklist_forum_posts'),
                   l10n.translate('referral.how_it_works.checklist_interactions'),
                   l10n.translate('referral.how_it_works.checklist_group_join'),

@@ -141,20 +141,20 @@ export async function handleVerificationCompletion(userId: string): Promise<void
       console.error("⚠️ Error sending verification notifications:", notificationError);
     }
     
-    // Grant 3-day Premium reward to referee (Sprint 11)
+    // Grant 30-day Premium reward to referee (1 month)
     try {
       const { grantPromotionalEntitlement } = require('../revenuecat/revenuecatHelper');
       
-      console.log(`🎁 Granting 3-day Premium reward to referee ${userId}`);
-      const rewardResult = await grantPromotionalEntitlement(userId, 3);
+      console.log(`🎁 Granting 30-day Premium reward to referee ${userId}`);
+      const rewardResult = await grantPromotionalEntitlement(userId, 30);
       
       if (rewardResult.success) {
         // Log reward in referralRewards collection
         await db.collection('referralRewards').add({
           referrerId: userId,
           type: 'referee_reward',
-          amount: '3 days',
-          daysGranted: 3,
+          amount: '1 month',
+          daysGranted: 30,
           verifiedUserIds: [userId],
           revenueCatResponse: {
             expiresAt: rewardResult.expiresAt.toISOString(),
@@ -164,7 +164,7 @@ export async function handleVerificationCompletion(userId: string): Promise<void
           status: 'awarded',
         });
         
-        console.log(`✅ Successfully granted 3-day reward to ${userId}`);
+        console.log(`✅ Successfully granted 30-day reward to ${userId}`);
       } else {
         console.error(`❌ Failed to grant reward to ${userId}: ${rewardResult.error}`);
       }

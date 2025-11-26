@@ -680,15 +680,24 @@ class MessagingService with WidgetsBindingObserver {
             if (messageId != null) {
               // Navigate to group chat with message highlight
               try {
-                GoRouter.of(ctx)
-                    .go('/groups/$groupId/chat?messageId=$messageId');
+                GoRouter.of(ctx).goNamed(
+                  RouteNames.groupChat.name,
+                  pathParameters: {'groupId': groupId},
+                  queryParameters: {'messageId': messageId},
+                );
               } catch (e) {
                 // Fallback to basic group chat navigation
-                GoRouter.of(ctx).go('/groups/$groupId/chat');
+                GoRouter.of(ctx).goNamed(
+                  RouteNames.groupChat.name,
+                  pathParameters: {'groupId': groupId},
+                );
               }
             } else {
               // Navigate to group chat normally
-              GoRouter.of(ctx).go('/groups/$groupId/chat');
+              GoRouter.of(ctx).goNamed(
+                RouteNames.groupChat.name,
+                pathParameters: {'groupId': groupId},
+              );
             }
             return;
           }
@@ -712,7 +721,10 @@ class MessagingService with WidgetsBindingObserver {
           // Try to extract groupId and navigate to group chat
           final groupId = data['groupId'];
           if (groupId != null) {
-            GoRouter.of(ctx).go('/groups/$groupId/chat');
+            GoRouter.of(ctx).goNamed(
+              RouteNames.groupChat.name,
+              pathParameters: {'groupId': groupId},
+            );
           } else {
             GoRouter.of(ctx).goNamed(RouteNames.groups.name);
           }

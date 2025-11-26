@@ -84,9 +84,9 @@ class ReferralVerificationEntity {
   });
 
   /// Get total checklist items completed
+  /// Note: accountAge7Days requirement removed - users can verify immediately
   int get completedItemsCount {
     int count = 0;
-    if (accountAge7Days.completed) count++;
     if (forumPosts3.completed) count++;
     if (interactions5.completed) count++;
     if (groupJoined.completed) count++;
@@ -95,8 +95,8 @@ class ReferralVerificationEntity {
     return count;
   }
 
-  /// Total checklist items
-  int get totalItemsCount => 6;
+  /// Total checklist items (accountAge7Days removed)
+  int get totalItemsCount => 5;
 
   /// Progress percentage (0-100)
   double get progressPercentage {

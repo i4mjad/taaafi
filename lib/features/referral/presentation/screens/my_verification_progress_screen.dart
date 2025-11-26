@@ -107,15 +107,6 @@ class MyVerificationProgressScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 12),
 
-                  // Account Age (interactive for user)
-                  ChecklistItemWidget(
-                    type: ChecklistItemType.accountAge7Days,
-                    item: entity.accountAge7Days,
-                    signupDate: entity.signupDate,
-                    isReadOnly: false,
-                  ),
-                  const SizedBox(height: 12),
-
                   // Forum Posts (interactive)
                   ChecklistItemWidget(
                     type: ChecklistItemType.forumPosts3,

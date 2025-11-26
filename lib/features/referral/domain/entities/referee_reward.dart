@@ -33,9 +33,9 @@ class RefereeReward {
     return RefereeReward(
       id: 'verification_reward',
       type: 'verification',
-      title: '3 Days Premium',
+      title: '1 Month Premium',
       description: 'Complete all verification tasks to unlock',
-      daysGranted: 3,
+      daysGranted: 30,
       isClaimed: isClaimed,
       claimedAt: claimedAt,
       expiresAt: expiresAt,

@@ -3265,6 +3265,21 @@ const Map<String, String> kEn = {
   "subscription-active-title": "Active Subscription",
   "subscription-active-message":
       "You have an active Ta3afi+ subscription. Please cancel your subscription first before deleting your account. You can cancel your subscription in the App Store.",
+  "subscription-active-warning": "Active Subscription Detected",
+  "subscription-active-warning-desc":
+      "You have an active Ta3afi+ subscription. Please cancel your subscription in the App Store before deleting your account.",
+
+  // Retention offer (delete account screen)
+  "retention-offer-badge": "Special Offer",
+  "retention-offer-title": "Wait! Here's 1 Month Free",
+  "retention-offer-description":
+      "Before you go, we'd love for you to experience Ta3afi+ for free. Get a full month of premium features on us - no strings attached.",
+  "retention-offer-claim-button": "Claim My Free Month",
+  "retention-offer-skip": "I don't want a free month, proceed to delete my account",
+  "retention-offer-reconsider": "Changed your mind? Claim your free month",
+  "retention-reward-claimed": "Your free month has been activated!",
+  "retention-reward-already-claimed": "You've already claimed this offer",
+  "retention-reward-failed": "Failed to claim reward. Please try again.",
 
   // Profile image
   "select-image-source": "Select Image Source",
@@ -3915,7 +3930,7 @@ const Map<String, String> kEn = {
   'referral.dashboard.share_code': 'Share Code',
   'referral.dashboard.share_subject': 'Join me on Ta3afi',
   'referral.dashboard.share_message':
-      'Join me on Ta3afi for recovery support!\n\nUse my code: {code}\nGet 3 days Premium free when you verify your account.\n\nDownload now!',
+      'Join me on Ta3afi for recovery support!\n\nUse my code: {code}\nGet 1 month Premium free when you verify your account.\n\nDownload now!',
 
   // Share Feature
   'referral.share.sheet_title': 'Share Your Referral Code',
@@ -3931,16 +3946,16 @@ const Map<String, String> kEn = {
 
   // Share Templates
   'referral.share.generic_message':
-      '🌟 Join me on Ta3afi!\n\nI\'m using Ta3afi for recovery support and it\'s been amazing. Join me and get 3 days of Premium features free!\n\nUse my code: {code}\n\nLet\'s support each other on this journey! 💪',
+      '🌟 Join me on Ta3afi!\n\nI\'m using Ta3afi for recovery support and it\'s been amazing. Join me and get 1 month of Premium features free!\n\nUse my code: {code}\n\nLet\'s support each other on this journey! 💪',
   'referral.share.whatsapp_message':
-      '🌟 Join me on Ta3afi!\n\nI\'m on a recovery journey with Ta3afi and would love your support. Use my code *{code}* to join and get 3 days Premium free! 💪',
+      '🌟 Join me on Ta3afi!\n\nI\'m on a recovery journey with Ta3afi and would love your support. Use my code *{code}* to join and get 1 month Premium free! 💪',
   'referral.share.sms_message':
-      'Join me on Ta3afi for recovery support! Use code: {code} to get 3 days Premium free.',
+      'Join me on Ta3afi for recovery support! Use code: {code} to get 1 month Premium free.',
   'referral.share.email_subject': 'Join me on Ta3afi - Recovery Support',
   'referral.share.email_message':
-      'Hi,\n\nI wanted to share something important with you. I\'ve been using Ta3afi for recovery support and it\'s been making a real difference in my life.\n\nI thought you might find it helpful too. When you sign up with my referral code ({code}), you\'ll get 3 days of Premium features completely free.\n\nTa3afi offers:\n• Daily motivation and support\n• Recovery tracking tools\n• A supportive community\n• Helpful resources and guides\n\nUse my code: {code}\n\nLet\'s support each other on this journey!\n\nBest regards',
+      'Hi,\n\nI wanted to share something important with you. I\'ve been using Ta3afi for recovery support and it\'s been making a real difference in my life.\n\nI thought you might find it helpful too. When you sign up with my referral code ({code}), you\'ll get 1 month of Premium features completely free.\n\nTa3afi offers:\n• Daily motivation and support\n• Recovery tracking tools\n• A supportive community\n• Helpful resources and guides\n\nUse my code: {code}\n\nLet\'s support each other on this journey!\n\nBest regards',
   'referral.share.copy_link_message':
-      'Join me on Ta3afi! Use code {code} for 3 days Premium free.',
+      'Join me on Ta3afi! Use code {code} for 1 month Premium free.',
 
   // Share Success Messages
   'referral.share.copied_success': 'Message copied to clipboard!',
@@ -4089,12 +4104,12 @@ const Map<String, String> kEn = {
   // Celebration
   'referral.checklist.celebration_title': 'Congratulations! 🎉',
   'referral.checklist.celebration_message':
-      'You\'re verified! You\'ve unlocked 3 days of Premium access as your reward.',
-  'referral.checklist.premium_reward': '3 Days Premium (Your Reward)',
+      'You\'re verified! You\'ve unlocked 1 month of Premium access as your reward.',
+  'referral.checklist.premium_reward': '1 Month Premium (Your Reward)',
   'referral.checklist.explore_premium': 'Explore Your Premium Features',
   'referral.checklist.referrer_notified':
       'The friend who referred you has been notified!',
-  'referral.checklist.claim_my_reward': 'Claim My 3-Day Reward',
+  'referral.checklist.claim_my_reward': 'Claim My 1-Month Reward',
   'referral.checklist.claiming_reward': 'Activating your Premium access...',
   'referral.checklist.reward_claimed': 'Reward Claimed!',
   'referral.checklist.days_activated':
@@ -4116,21 +4131,21 @@ const Map<String, String> kEn = {
 
   // Referee Banner (shown in account screen)
   'referral.banner.reward_ready': '🎁 Your Reward is Ready!',
-  'referral.banner.claim_3_days': 'Claim your 3 days Premium now',
+  'referral.banner.claim_3_days': 'Claim your 1 month Premium now',
   'referral.banner.progress_title': 'Verification: {completed}/{total} tasks',
-  'referral.banner.complete_tasks': 'Complete tasks to unlock 3 days Premium',
+  'referral.banner.complete_tasks': 'Complete tasks to unlock 1 month Premium',
 
   // Late Referral Code Banner
   'referral.late_code.title': 'Have a Referral Code?',
   'referral.late_code.subtitle':
-      'Enter it within {days} days to get 3 days Premium!',
+      'Enter it within {days} days to get 1 month Premium!',
   'referral.late_code.sheet_title': 'Enter Referral Code',
   'referral.late_code.description':
-      'If a friend referred you, enter their code below to unlock 3 days of Premium access.',
+      'If a friend referred you, enter their code below to unlock 1 month of Premium access.',
   'referral.late_code.submit': 'Redeem Code',
   'referral.late_code.success_title': 'Code Redeemed!',
   'referral.late_code.success_message':
-      'Great! Complete the verification tasks to unlock your 3-day Premium reward.',
+      'Great! Complete the verification tasks to unlock your 1-month Premium reward.',
 
   // States
   'referral.checklist.under_review': 'Under Review',
@@ -4143,15 +4158,15 @@ const Map<String, String> kEn = {
   // What Happens Next
   'referral.checklist.what_happens_next': 'What Happens Next?',
   'referral.checklist.what_happens_title': 'After Verification',
-  'referral.checklist.step1_title': '✅ You Get 3 Days Premium',
+  'referral.checklist.step1_title': '✅ You Get 1 Month Premium',
   'referral.checklist.step1_message':
-      'As the referred user, YOU receive 3 days of Premium access immediately!',
+      'As the referred user, YOU receive 1 month of Premium access immediately!',
   'referral.checklist.step2_title': '🎁 Your Friend Gets Progress',
   'referral.checklist.step2_message':
       'The friend who referred you moves closer to their rewards (1 month per 2 verified users).',
   'referral.checklist.step3_title': '🚀 Enjoy Premium Now',
   'referral.checklist.step3_message':
-      'Your 3-day Premium access is active. Explore all features immediately!',
+      'Your 1-month Premium access is active. Explore all features immediately!',
   'referral.checklist.step4_title': '💎 Bonus: Subscribe = Gift Friend',
   'referral.checklist.step4_message':
       'If you love Premium and subscribe, your friend gets a bonus 2 weeks free!',

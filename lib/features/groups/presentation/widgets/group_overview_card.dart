@@ -429,6 +429,7 @@ class GroupOverviewCard extends ConsumerWidget {
                     l10n.translate('open-join-info'),
                     style: TextStyles.small.copyWith(
                       color: theme.primary[700],
+                      height: 1.3,
                       fontSize: 11,
                     ),
                   ),

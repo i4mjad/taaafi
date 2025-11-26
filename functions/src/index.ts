@@ -1717,6 +1717,9 @@ export { claimRefereeReward } from './referral/rewards/claimRefereeReward';
 export { manuallyGrantRefereeReward } from './referral/admin/manualRewardGrant';
 export { onActivitySubscribed } from './referral/triggers/activityTrigger';
 
+// Retention Rewards
+export { claimRetentionReward, checkRetentionRewardStatus } from './referral/rewards/claimRetentionReward';
+
 // Export referral scheduled functions
 export { checkPendingVerificationAges } from './referral/scheduledChecks';
 

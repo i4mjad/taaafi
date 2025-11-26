@@ -240,6 +240,49 @@ bool hasActiveSubscription(Ref ref) {
   );
 }
 
+// Provider to check if subscription is active AND will renew (not cancelled)
+// Used for delete account screen - if subscription is set to cancel, user can proceed
+@riverpod
+bool hasActiveRenewingSubscription(Ref ref) {
+  final user = ref.watch(userNotifierProvider);
+  final subscriptionAsync = ref.watch(subscriptionNotifierProvider);
+
+  return user.when(
+    data: (userData) {
+      if (userData == null) {
+        return false;
+      }
+
+      return subscriptionAsync.when(
+        data: (subscription) {
+          // Must have active plus subscription
+          if (subscription.status != SubscriptionStatus.plus ||
+              !subscription.isActive) {
+            return false;
+          }
+
+          // Check if subscription will renew (not cancelled)
+          final customerInfo = subscription.customerInfo;
+          if (customerInfo != null) {
+            final entitlement = customerInfo.entitlements.active['taaafi_plus'];
+            if (entitlement != null) {
+              // If willRenew is false, subscription is set to cancel
+              return entitlement.willRenew;
+            }
+          }
+
+          // Fallback: if we can't determine willRenew, assume it will renew
+          return true;
+        },
+        loading: () => false,
+        error: (_, __) => false,
+      );
+    },
+    loading: () => false,
+    error: (_, __) => false,
+  );
+}
+
 // Provider to check if premium analytics is available
 @riverpod
 Future<bool> isPremiumAnalyticsAvailable(Ref ref) async {
