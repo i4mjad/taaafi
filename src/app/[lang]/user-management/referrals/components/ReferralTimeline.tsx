@@ -115,11 +115,16 @@ export function ReferralTimeline({ userId }: ReferralTimelineProps) {
       if (verificationData) {
         if (verificationData.verifiedAt) {
           const verifiedAt = verificationData.verifiedAt?.toDate();
+          // Build description with reward info if user was referred
+          const verifiedDescription = verificationData.referrerId
+            ? `${t('modules.userManagement.referralDashboard.timeline.verifiedDesc')} - ${t('modules.userManagement.referralDashboard.timeline.verifiedReward')}`
+            : t('modules.userManagement.referralDashboard.timeline.verifiedDesc');
+          
           timelineEvents.push({
             id: 'verified',
             type: 'verification',
             title: t('modules.userManagement.referralDashboard.timeline.verified'),
-            description: t('modules.userManagement.referralDashboard.timeline.verifiedDesc'),
+            description: verifiedDescription,
             timestamp: verifiedAt,
             icon: <CheckCircle className="h-4 w-4" />,
             color: 'bg-green-500',

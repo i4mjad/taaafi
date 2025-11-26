@@ -191,6 +191,12 @@ export function ManualAdjustmentsTab() {
       case 'rewards':
         return (
           <div className="space-y-4">
+            <Alert className="bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-900">
+              <Award className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+              <AlertDescription className="text-blue-800 dark:text-blue-200">
+                {t('modules.userManagement.referralDashboard.manualAdjustments.refereeRewardInfo')}
+              </AlertDescription>
+            </Alert>
             <div>
               <Label htmlFor="adjustmentValue">
                 {t('modules.userManagement.referralDashboard.manualAdjustments.rewardDays')}

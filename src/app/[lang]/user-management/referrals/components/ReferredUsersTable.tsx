@@ -16,7 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Loader2, User, AlertCircle } from 'lucide-react';
+import { Loader2, User, AlertCircle, Award } from 'lucide-react';
 import { useDocument } from 'react-firebase-hooks/firestore';
 import { doc } from 'firebase/firestore';
 
@@ -41,7 +41,7 @@ function ReferredUserRow({ userId }: { userId: string }) {
   if (userLoading || verificationLoading) {
     return (
       <TableRow>
-        <TableCell colSpan={5} className="text-center py-4">
+        <TableCell colSpan={6} className="text-center py-4">
           <Loader2 className="h-4 w-4 animate-spin inline-block" />
         </TableCell>
       </TableRow>
@@ -113,6 +113,20 @@ function ReferredUserRow({ userId }: { userId: string }) {
         {verificationData?.verifiedAt
           ? formatDate(verificationData.verifiedAt)
           : t('modules.userManagement.referralDashboard.referredUsers.notVerified')}
+      </TableCell>
+      <TableCell>
+        {verificationData?.verificationStatus === 'verified' ? (
+          <div className="flex items-center gap-1 text-green-600">
+            <Award className="h-4 w-4" />
+            <span className="text-xs font-medium">
+              {t('modules.userManagement.referralDashboard.referredUsers.rewardGranted')}
+            </span>
+          </div>
+        ) : (
+          <span className="text-xs text-muted-foreground">
+            {t('modules.userManagement.referralDashboard.referredUsers.rewardPending')}
+          </span>
+        )}
       </TableCell>
     </TableRow>
   );
@@ -229,6 +243,9 @@ export function ReferredUsersTable({ referrerId }: ReferredUsersTableProps) {
                 </TableHead>
                 <TableHead>
                   {t('modules.userManagement.referralDashboard.referredUsers.verified')}
+                </TableHead>
+                <TableHead>
+                  {t('modules.userManagement.referralDashboard.referredUsers.reward')}
                 </TableHead>
               </TableRow>
             </TableHeader>

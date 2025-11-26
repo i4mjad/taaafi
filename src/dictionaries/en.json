@@ -525,6 +525,10 @@
           "fraudScore": "Fraud Score",
           "referrerId": "Referrer ID",
           "verifiedAt": "Verified At",
+          "refereeReward": "Referee Reward",
+          "refereeRewardValue": "1 Month Premium (30 days)",
+          "rewardGranted": "Reward Granted",
+          "rewardPending": "Reward Pending",
           "tabs": {
             "referredUsers": "Referred Users",
             "timeline": "Activity Timeline"
@@ -541,7 +545,10 @@
           "fraudScore": "Fraud Score",
           "joined": "Joined",
           "verified": "Verified",
-          "notVerified": "Not verified"
+          "notVerified": "Not verified",
+          "reward": "Reward",
+          "rewardGranted": "1 Month Premium Granted",
+          "rewardPending": "Pending Verification"
         },
         "timeline": {
           "title": "Activity Timeline",
@@ -552,6 +559,7 @@
           "userJoinedPlatform": "User joined the platform",
           "verified": "Verified",
           "verifiedDesc": "User successfully completed verification",
+          "verifiedReward": "Eligible for 1 Month Premium (30 days)",
           "blocked": "Blocked by Admin",
           "blockedDesc": "User was blocked due to fraud detection",
           "adminApproved": "Approved by Admin",
@@ -559,6 +567,8 @@
           "adminAction": "Admin performed a manual action",
           "referredUser": "Referred a New User",
           "referredUserDesc": "User referred new signup (ID: {{userId}}...)",
+          "rewardGranted": "Reward Granted",
+          "rewardGrantedDesc": "1 Month Premium (30 days) granted to referee",
           "error": "Error Loading Timeline",
           "errorHint": "This may require a Firestore composite index. Check the browser console for details."
         },
@@ -577,7 +587,8 @@
           "overrideFraud": "Override Fraud",
           "updateStats": "Update Stats",
           "rewardDays": "Adjustment Days",
-          "rewardDaysHint": "Enter positive number to add days, negative to subtract",
+          "rewardDaysHint": "Enter positive number to add days, negative to subtract. Standard referee reward is 30 days (1 Month Premium).",
+          "refereeRewardInfo": "Standard referee reward: 1 Month Premium (30 days)",
           "verificationResetWarning": "This will reset the user's verification checklist to initial state. All progress will be lost.",
           "fraudOverrideWarning": "This will clear all fraud flags and reset the fraud score to 0. Use with caution.",
           "statsUpdateHint": "Leave fields empty to keep current values. Only fill fields you want to update.",
