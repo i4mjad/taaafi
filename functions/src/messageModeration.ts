@@ -700,7 +700,12 @@ function mapSpansToOriginal(
 /**
  * Synthesize final moderation decision with fixed precedence
  * Step 6: block > review > allow_with_redaction > allow
+ * 
+ * NOTE: Messages are only flagged for review when confidence >= REVIEW_THRESHOLD
+ * Low confidence detections are allowed through to prevent over-moderation
  */
+const REVIEW_CONFIDENCE_THRESHOLD = 0.75; // Only flag for review if confidence is 75% or higher
+
 function synthesizeDecision(
   openaiResult: OpenAIModerationResult,
   customRuleResults: CustomRuleResult[],
@@ -708,25 +713,44 @@ function synthesizeDecision(
 ): FinalModerationDecision {
   console.log('⚖️ Synthesizing final moderation decision...');
   
-  // New policy: never auto-block. If any detection occurs, route to manual review.
+  // Calculate confidence from all sources
   const anyCustomDetection = customRuleResults.some(r => r.detected);
-  if (openaiResult.shouldBlock || anyCustomDetection) {
-    console.log('⚠️ REVIEW: Detection present (OpenAI or custom rules). Routing to manual review.');
+  const confidence = Math.max(
+    openaiResult.shouldBlock ? (openaiResult.confidence || 0) : 0,
+    ...customRuleResults.filter(r => r.detected).map(r => r.confidence || 0),
+    0
+  );
+  
+  console.log(`📊 Detection confidence: ${confidence}, Threshold: ${REVIEW_CONFIDENCE_THRESHOLD}`);
+  
+  // Only route to review if detection is present AND confidence meets threshold
+  if ((openaiResult.shouldBlock || anyCustomDetection) && confidence >= REVIEW_CONFIDENCE_THRESHOLD) {
+    console.log('⚠️ REVIEW: High-confidence detection present. Routing to manual review.');
     const reason = openaiResult.shouldBlock
       ? `Requires review: ${openaiResult.reason}`
       : customRuleResults.find(r => r.detected)?.reason || 'Requires review based on custom rules';
     const violationType = openaiResult.shouldBlock
       ? openaiResult.violationType
       : customRuleResults.find(r => r.detected)?.type;
-    const confidence = Math.max(
-      openaiResult.confidence || 0,
-      ...customRuleResults.filter(r => r.detected).map(r => r.confidence || 0),
-      0.6
-    );
     return {
       action: 'review',
       reason,
       violationType,
+      confidence,
+      processingDetails: {
+        openaiUsed: true,
+        customRulesUsed: true,
+        processingTime
+      }
+    };
+  }
+  
+  // Low confidence detection - allow through but log for monitoring
+  if (openaiResult.shouldBlock || anyCustomDetection) {
+    console.log(`✅ ALLOW (LOW CONFIDENCE): Detection present but confidence ${confidence} < threshold ${REVIEW_CONFIDENCE_THRESHOLD}. Allowing through.`);
+    return {
+      action: 'allow',
+      reason: `Low confidence detection (${(confidence * 100).toFixed(1)}%) - allowed through`,
       confidence,
       processingDetails: {
         openaiUsed: true,

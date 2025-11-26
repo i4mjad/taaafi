@@ -21,6 +21,7 @@ import {
   DocumentData,
   where,
   getCountFromServer,
+  QueryConstraint,
 } from "firebase/firestore";
 import { useCollection } from "react-firebase-hooks/firestore";
 import { db } from "@/lib/firebase";
@@ -190,7 +191,7 @@ export function MessagesTable({
 
   // Build the Firestore query with pagination at DB level
   const messagesQuery = useMemo(() => {
-    const constraints = [orderBy("createdAt", "desc")];
+    const constraints: QueryConstraint[] = [orderBy("createdAt", "desc")];
 
     if (groupFilter && groupFilter !== "all") {
       constraints.push(where("groupId", "==", groupFilter));
