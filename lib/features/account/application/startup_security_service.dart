@@ -16,12 +16,13 @@ class StartupSecurityService {
         _auth = auth ?? FirebaseAuth.instance;
 
   /// Initialize security and device tracking during app startup
+  /// 🚀 OPTIMIZED: Removed expensive feature access map generation
+  /// Feature access is now checked lazily when needed
   Future<SecurityStartupResult> initializeAppSecurity() async {
     try {
-      // Step 1: Initialize device tracking
+      // Step 1 & 2: Initialize device tracking and get device ID in parallel-ish
+      // (initializeDeviceTracking internally gets device ID anyway)
       await _facade.initializeDeviceTracking();
-
-      // Step 2: Get device ID for ban checking
       final deviceId = await _facade.getCurrentDeviceId();
 
       // Step 3: Check for device-wide bans (HIGHEST PRIORITY - blocks all access)
@@ -51,12 +52,14 @@ class StartupSecurityService {
         }
       }
 
-      // Step 5: Pre-load feature access map for performance
-      final featureAccessMap = await _facade.generateFeatureAccessMap();
+      // 🚀 OPTIMIZATION: Removed generateFeatureAccessMap() call
+      // This was making N Firestore queries (one per feature) at startup
+      // Feature access is now checked lazily when the user accesses a feature
+      // This saves significant startup time (potentially seconds)
 
       return SecurityStartupResult.success(
         message: 'Security initialization completed successfully',
-        featureAccessMap: featureAccessMap,
+        featureAccessMap: null, // Lazy load instead
         deviceId: deviceId,
       );
     } catch (e) {

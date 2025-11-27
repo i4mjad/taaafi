@@ -1,4 +1,4 @@
-import 'dart:async';
+import 'dart:async' show unawaited;
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -25,26 +25,29 @@ void main() async {
 
 Future<void> runMainApp() async {
   WidgetsFlutterBinding.ensureInitialized();
-  //Initalize Firebase
+
+  // Initialize Firebase first (required for other services)
   await initFirebase();
 
   final container = ProviderContainer();
-  // Track app opened event
 
-  // * Preload MixpanelAnalyticsClient, so we can make unawaited analytics calls
-  await container.read(mixpanelAnalyticsClientProvider.future);
-
-  // * Set global container reference for FCM service
+  // * Set global container reference for FCM service (sync - fast)
   MessagingService.setGlobalContainer(container);
 
-  // * Initialize Notification settings
-  await MessagingService.instance.init();
-
-  // * Initialize Device Tracking Service
-  await DeviceTrackingService.instance.init();
-
-  //Setup error handeling pages
+  // Setup error handling pages (sync - fast)
   registerErrorHandlers(container);
+
+  // 🚀 OPTIMIZATION: Lazy load Mixpanel - fire and forget
+  // Mixpanel will initialize in background, doesn't block startup
+  unawaited(container.read(mixpanelAnalyticsClientProvider.future));
+
+  // 🚀 OPTIMIZATION: Run critical initializations in parallel
+  await Future.wait([
+    // Initialize FCM Notification settings
+    MessagingService.instance.init(),
+    // Initialize Device Tracking Service
+    DeviceTrackingService.instance.init(),
+  ]);
 
   runApp(
     ProviderScope(

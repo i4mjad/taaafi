@@ -58,63 +58,72 @@ class MessagingService with WidgetsBindingObserver {
     // Add lifecycle observer to listen for app state changes
     WidgetsBinding.instance.addObserver(this);
 
+    // 🚀 OPTIMIZATION: Run permission request, message handler setup, and initial message check in parallel
+    // These operations don't depend on each other
+    print('📱 FCM SERVICE: Running parallel initialization...');
+    
+    await Future.wait([
+      // 1. Request permission
+      _requestPermissionSafe(),
+      // 2. Setup message handler
+      _setupMessageHandlerSafe(),
+      // 3. Check for initial message (from cold start notification tap)
+      _checkInitialMessageSafe(),
+    ]);
+
+    // 4. Setup auth state listener (sync - fast)
+    _setupAuthStateListener();
+
+    // 🚀 OPTIMIZATION: Defer FCM token update to background
+    // This writes to Firestore and can happen after app is visible
+    _updateFCMTokenSafe();
+    
+    print('🎉 FCM SERVICE: Initialization complete!');
+  }
+
+  /// Safe permission request that won't throw
+  Future<void> _requestPermissionSafe() async {
     try {
-      print('📱 FCM SERVICE: Step 1 - Requesting permissions...');
-      //1. Request permission
       await requestPermission();
       print('✅ FCM SERVICE: Permissions requested');
     } catch (e) {
       print('❌ FCM SERVICE: Permission error: $e');
-      // Continue with initialization even if permissions fail
     }
+  }
 
+  /// Safe message handler setup that won't throw
+  Future<void> _setupMessageHandlerSafe() async {
     try {
-      print('📬 FCM SERVICE: Step 2 - Setting up message handler...');
-      //2. Setup message handler
       await _setupMessageHandler();
       print('✅ FCM SERVICE: Message handler set up');
     } catch (e) {
       print('❌ FCM SERVICE: Message handler error: $e');
-      // Continue with initialization
     }
+  }
 
+  /// Safe initial message check that won't throw
+  Future<void> _checkInitialMessageSafe() async {
     try {
-      print('🔑 FCM SERVICE: Step 3 - Getting FCM token...');
-      //3. Get FCM token
-      final token = await getFCMToken();
-      print('✅ FCM SERVICE: Got FCM token: ${token?.substring(0, 20)}...');
+      final initialMessage = await _messaging.getInitialMessage();
+      if (initialMessage != null) {
+        print('📥 FCM SERVICE: Found initial message, queuing for later processing');
+        _queuedMessage = initialMessage;
+      }
     } catch (e) {
-      print('❌ FCM SERVICE: Get token error: $e');
-      // Continue with initialization
+      print('❌ FCM SERVICE: Initial message check error: $e');
     }
+  }
 
-    try {
-      print('💾 FCM SERVICE: Step 4 - Updating FCM token in Firestore...');
-      //4. Update FCM token
-      await updateFCMToken();
-      print('✅ FCM SERVICE: FCM token update completed');
-    } catch (e) {
-      print('❌ FCM SERVICE: Update token error: $e');
-      // Continue with initialization
-    }
-
-    print('👂 FCM SERVICE: Step 5 - Setting up auth state listener...');
-    //5. Setup auth state listener for topic subscription
-    _setupAuthStateListener();
-
-    print('📨 FCM SERVICE: Step 6 - Checking for initial message...');
-    //6. Check if app was opened from a notification when terminated
-    final initialMessage = await _messaging.getInitialMessage();
-    if (initialMessage != null) {
-      print('📥 FCM SERVICE: Found initial message, queuing for later processing');
-      // Defer navigation until after the UI (and GoRouter) have been
-      // completely built. We'll process this message later from MyApp.
-      _queuedMessage = initialMessage;
-    } else {
-      print('ℹ️ FCM SERVICE: No initial message found');
-    }
-    
-    print('🎉 FCM SERVICE: Initialization complete!');
+  /// Safe FCM token update (fire and forget)
+  void _updateFCMTokenSafe() {
+    Future(() async {
+      try {
+        await updateFCMToken();
+        print('✅ FCM SERVICE: FCM token update completed');
+      } catch (e) {
+        print('❌ FCM SERVICE: Update token error: $e');
+      }
+    });
   }
 
   @override
