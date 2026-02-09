@@ -3,8 +3,9 @@ import { LocaleSwitcher } from "@/components/locale-switcher"
 import { getDictionary } from "@/app/[lang]/dashboard/dictionaries"
 import { Locale } from "../../../../i18n.config"
 
-export default async function LoginPage({ params }: { params: Promise<{ lang: Locale }> }) {
-  const { lang } = await params
+export default async function LoginPage({ params }: { params: Promise<{ lang: string }> }) {
+  const { lang: rawLang } = await params
+  const lang = rawLang as Locale
   const dict = await getDictionary(lang)
   
   return (

@@ -27,9 +27,10 @@ const metadataByLocale: Record<Locale, Metadata> = {
 }
 
 export async function generateMetadata(
-  { params }: { params: Promise<{ lang: Locale }> }
+  { params }: { params: Promise<{ lang: string }> }
 ): Promise<Metadata> {
-  const { lang } = await params
+  const { lang: rawLang } = await params
+  const lang = rawLang as Locale
   return metadataByLocale[lang] ?? metadataByLocale.ar
 }
 
@@ -38,10 +39,11 @@ export default async function RootLayout({
   params,
 }: Readonly<{
   children: React.ReactNode
-  params: Promise<{ lang: Locale }>
+  params: Promise<{ lang: string }>
 }>) {
   // In Next.js 15, `params` is asynchronous. Await it before using its properties.
-  const { lang } = await params;
+  const { lang: rawLang } = await params;
+  const lang = (i18n.locales.includes(rawLang as Locale) ? rawLang : i18n.defaultLocale) as Locale;
   
   // Load dictionary for translation context
   const dictionary = await getDictionary(lang);
