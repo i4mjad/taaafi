@@ -121,26 +121,28 @@ export default function SystemAdminContentPage() {
   };
 
   // Handle bulk moderation actions
-  const handleBulkModeration = async (selectedIds: string[], action: 'approve' | 'hide' | 'delete', reason?: string) => {
+  const handleBulkModeration = async (selectedIds: string[], action: 'approve' | 'block' | 'hide' | 'unhide' | 'delete', reason?: string) => {
     const batch = writeBatch(db);
 
     selectedIds.forEach(messageId => {
       const messageRef = doc(db, 'group_messages', messageId);
       const updates: any = {
         moderation: {
-          status: action === 'approve' ? 'approved' : 'blocked',
+          status: (action === 'approve' || action === 'unhide') ? 'approved' : 'blocked',
           reason: reason || undefined,
           moderatedBy: 'admin', // TODO: Get actual admin ID
           moderatedAt: new Date(),
         }
       };
 
-      if (action === 'hide') {
+      if (action === 'block') {
+        updates.isHidden = true;
+      } else if (action === 'hide') {
         updates.isHidden = true;
       } else if (action === 'delete') {
         updates.isDeleted = true;
-      } else if (action === 'approve') {
-        updates.isHidden = false; // Unhide the message when approving
+      } else if (action === 'approve' || action === 'unhide') {
+        updates.isHidden = false;
       }
 
       batch.update(messageRef, updates);

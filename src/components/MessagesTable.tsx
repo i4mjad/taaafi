@@ -138,7 +138,7 @@ interface MessagesTableProps {
   reports: Array<{ relatedContent?: { contentId: string } }>;
   onBulkAction?: (
     selectedIds: string[],
-    action: "approve" | "hide" | "delete",
+    action: "approve" | "block" | "hide" | "unhide" | "delete",
     reason?: string
   ) => Promise<void>;
   onMessageModeration?: (
@@ -189,7 +189,7 @@ export function MessagesTable({
 
   // Bulk action dialog state
   const [showBulkDialog, setShowBulkDialog] = useState(false);
-  const [bulkAction, setBulkAction] = useState<"approve" | "hide" | "delete">(
+  const [bulkAction, setBulkAction] = useState<"approve" | "block" | "hide" | "unhide" | "delete">(
     "approve"
   );
   const [bulkReason, setBulkReason] = useState("");
@@ -645,17 +645,20 @@ export function MessagesTable({
   // Handle navigate to user profile
   const handleNavigateToUser = useCallback(
     async (cpId: string) => {
+      // Open window synchronously to avoid popup blocker
+      // (async gap before window.open causes browsers to block it)
+      const newWindow = window.open("", "_blank");
       const profile = await resolveAndCacheProfile(cpId);
       if (!profile) {
+        newWindow?.close();
         toast.error(
           t("modules.admin.content.quickActions.profileNotFound")
         );
         return;
       }
-      window.open(
-        `/${currentLocale}/user-management/users/${profile.userUID}`,
-        "_blank"
-      );
+      if (newWindow) {
+        newWindow.location.href = `/${currentLocale}/user-management/users/${profile.userUID}`;
+      }
     },
     [currentLocale, t, resolveAndCacheProfile]
   );
@@ -895,7 +898,7 @@ export function MessagesTable({
   };
 
   // Handle bulk actions
-  const handleBulkAction = async (action: "approve" | "hide" | "delete") => {
+  const handleBulkAction = async (action: "approve" | "block" | "hide" | "unhide" | "delete") => {
     if (selectedIds.length === 0) {
       toast.error(t("modules.admin.content.bulk.error"));
       return;
@@ -963,10 +966,26 @@ export function MessagesTable({
                 <Button
                   size="sm"
                   variant="outline"
+                  onClick={() => handleBulkAction("block")}
+                >
+                  <Flag className="h-4 w-4 mr-2" />
+                  {t("modules.admin.content.actions.block")}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
                   onClick={() => handleBulkAction("hide")}
                 >
                   <EyeOff className="h-4 w-4 mr-2" />
                   {t("modules.admin.content.actions.hide")}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleBulkAction("unhide")}
+                >
+                  <Eye className="h-4 w-4 mr-2" />
+                  {t("modules.admin.content.actions.unhide")}
                 </Button>
                 <Button
                   size="sm"
@@ -1362,8 +1381,12 @@ export function MessagesTable({
             <DialogTitle>
               {bulkAction === "approve" &&
                 t("modules.admin.content.bulk.approveTitle")}
+              {bulkAction === "block" &&
+                (t("modules.admin.content.bulk.blockTitle") || t("modules.admin.content.blockMessage"))}
               {bulkAction === "hide" &&
                 t("modules.admin.content.bulk.hideTitle")}
+              {bulkAction === "unhide" &&
+                (t("modules.admin.content.bulk.unhideTitle") || t("modules.admin.content.unhideMessage"))}
               {bulkAction === "delete" &&
                 t("modules.admin.content.bulk.deleteTitle")}
             </DialogTitle>
