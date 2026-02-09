@@ -206,13 +206,20 @@ export default function ConversationView({ reportId, reportStatus, onStatusChang
         }),
       });
 
-      if (response.ok) {
-        console.log('Message notification sent to user');
-      } else {
-        console.error('Failed to send message notification');
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        const errorMessage = errorData?.error || `HTTP ${response.status}: ${response.statusText}`;
+        console.error('Failed to send message notification:', errorMessage);
+        // Don't throw - notification failure shouldn't block message sending
+        return;
       }
+
+      const result = await response.json();
+      console.log('Message notification sent to user:', result.messageId);
     } catch (error) {
-      console.error('Error sending message notification:', error);
+      // Log error but don't throw - notification failure shouldn't block message sending
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.error('Error sending message notification:', errorMessage);
     }
   };
 

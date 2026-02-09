@@ -312,7 +312,7 @@ export function UserDetailsModal({ userId, open, onClose }: UserDetailsModalProp
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
                     <div>
                       <p className="text-muted-foreground mb-1">
                         {t('modules.userManagement.referralDashboard.userDetails.verificationStatus')}
@@ -337,6 +337,26 @@ export function UserDetailsModal({ userId, open, onClose }: UserDetailsModalProp
                       </p>
                       <p className="text-sm">{formatDate(verificationData.verifiedAt)}</p>
                     </div>
+                    {verificationData.referrerId && (
+                      <div>
+                        <p className="text-muted-foreground mb-1">
+                          {t('modules.userManagement.referralDashboard.userDetails.refereeReward')}
+                        </p>
+                        <Badge variant={verificationData.verificationStatus === 'verified' ? 'default' : 'secondary'}>
+                          {t('modules.userManagement.referralDashboard.userDetails.refereeRewardValue')}
+                        </Badge>
+                        {verificationData.verificationStatus === 'verified' && (
+                          <p className="text-xs text-green-600 mt-1">
+                            {t('modules.userManagement.referralDashboard.userDetails.rewardGranted')}
+                          </p>
+                        )}
+                        {verificationData.verificationStatus === 'pending' && (
+                          <p className="text-xs text-orange-600 mt-1">
+                            {t('modules.userManagement.referralDashboard.userDetails.rewardPending')}
+                          </p>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>

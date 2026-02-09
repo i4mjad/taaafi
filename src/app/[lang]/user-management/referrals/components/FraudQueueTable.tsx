@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useCollection } from 'react-firebase-hooks/firestore';
-import { collection, query, where, orderBy, limit as firestoreLimit } from 'firebase/firestore';
+import { collection, query, where, orderBy, limit as firestoreLimit, doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useTranslation } from '@/contexts/TranslationContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -56,6 +56,8 @@ export function FraudQueueTable() {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [isBulkApproving, setIsBulkApproving] = useState(false);
   const [isBulkBlocking, setIsBulkBlocking] = useState(false);
+  const [usersData, setUsersData] = useState<Map<string, { displayName: string; email: string }>>(new Map());
+  const [loadingUsers, setLoadingUsers] = useState(false);
 
   // Query for flagged users (fraud score >= 40)
   const [snapshot, loading, error] = useCollection(
@@ -67,16 +69,51 @@ export function FraudQueueTable() {
     )
   );
 
+  // Fetch user data for each flagged user
+  useEffect(() => {
+    if (!snapshot) return;
+
+    const fetchUsersData = async () => {
+      setLoadingUsers(true);
+      const userIds = snapshot.docs.map(doc => doc.id);
+      const usersMap = new Map<string, { displayName: string; email: string }>();
+
+      await Promise.all(
+        userIds.map(async (userId) => {
+          try {
+            const userDoc = await getDoc(doc(db, 'users', userId));
+            if (userDoc.exists()) {
+              const userData = userDoc.data();
+              usersMap.set(userId, {
+                displayName: userData.displayName || userData.email || 'Unknown User',
+                email: userData.email || ''
+              });
+            }
+          } catch (err) {
+            console.error(`Error fetching user ${userId}:`, err);
+          }
+        })
+      );
+
+      setUsersData(usersMap);
+      setLoadingUsers(false);
+    };
+
+    fetchUsersData();
+  }, [snapshot]);
+
   // Process and filter data
   const flaggedUsers = useMemo(() => {
     if (!snapshot) return [];
 
     let users = snapshot.docs.map(doc => {
       const data = doc.data();
+      const userData = usersData.get(doc.id);
+      
       return {
         userId: doc.id,
-        displayName: data.displayName || 'Unknown User',
-        email: data.email || '',
+        displayName: userData?.displayName || 'Unknown User',
+        email: userData?.email || '',
         fraudScore: data.fraudScore || 0,
         fraudFlags: data.fraudFlags || [],
         referrerId: data.referrerId || '',
@@ -102,7 +139,7 @@ export function FraudQueueTable() {
     }
 
     return users;
-  }, [snapshot, scoreFilter, statusFilter]);
+  }, [snapshot, scoreFilter, statusFilter, usersData]);
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
@@ -221,7 +258,7 @@ export function FraudQueueTable() {
     return t('modules.userManagement.fraudQueue.riskLevels.low');
   };
 
-  if (loading) {
+  if (loading || loadingUsers) {
     return (
       <Card>
         <CardContent className="flex items-center justify-center py-12">

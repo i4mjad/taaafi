@@ -1,11 +1,10 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { useTranslation } from '@/contexts/TranslationContext';
 import { SiteHeader } from '@/components/site-header';
-import { useCollection } from 'react-firebase-hooks/firestore';
-import { collection, query, orderBy, doc, writeBatch, updateDoc } from 'firebase/firestore';
+import { collection, query, orderBy, doc, writeBatch, updateDoc, getDocs, QueryDocumentSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -44,19 +43,25 @@ export default function SystemAdminContentPage() {
     documents: t('modules.admin.content.title') || 'Messages Moderation',
   };
 
-  // Fetch all groups
-  const [groupsSnapshot] = useCollection(
-    query(collection(db, 'groups'), orderBy('createdAt', 'desc'))
-  );
+  // Fetch all groups (ONE-TIME FETCH instead of real-time listener)
+  const [groupsSnapshot, setGroupsSnapshot] = useState<any>(null);
+  const [reportsSnapshot, setReportsSnapshot] = useState<any>(null);
 
-  // Fetch all reports
-  const [reportsSnapshot] = useCollection(
-    collection(db, 'usersReports')
-  );
+  useEffect(() => {
+    const fetchData = async () => {
+      const groupsQuery = query(collection(db, 'groups'), orderBy('createdAt', 'desc'));
+      const groupsSnap = await getDocs(groupsQuery);
+      setGroupsSnapshot(groupsSnap);
+
+      const reportsSnap = await getDocs(collection(db, 'usersReports'));
+      setReportsSnapshot(reportsSnap);
+    };
+    fetchData();
+  }, []); // Only fetch once on mount
 
   const groups = useMemo(() => {
     if (!groupsSnapshot) return [];
-    return groupsSnapshot.docs.map(doc => ({
+    return groupsSnapshot.docs.map((doc: QueryDocumentSnapshot) => ({
       id: doc.id,
       ...doc.data(),
     })) as Array<{id: string; name: string}>;
@@ -64,9 +69,9 @@ export default function SystemAdminContentPage() {
 
   const reports = useMemo(() => {
     if (!reportsSnapshot) return [];
-    return reportsSnapshot.docs.filter(doc => 
+    return reportsSnapshot.docs.filter((doc: QueryDocumentSnapshot) => 
       doc.data().relatedContent?.type === 'group_message'
-    ).map(doc => doc.data());
+    ).map((doc: QueryDocumentSnapshot) => doc.data());
   }, [reportsSnapshot]);
 
   // Handle individual message moderation

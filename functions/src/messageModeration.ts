@@ -1,7 +1,11 @@
 import { onDocumentCreated } from 'firebase-functions/v2/firestore';
 import { setGlobalOptions } from 'firebase-functions/v2';
+import { defineString } from 'firebase-functions/params';
 import * as admin from 'firebase-admin';
 import OpenAI from 'openai';
+
+// Define environment parameters
+const openaiApiKey = defineString('OPENAI_API_KEY');
 
 // Set global options for all functions
 setGlobalOptions({
@@ -16,10 +20,8 @@ if (!admin.apps.length) {
   admin.initializeApp();
 }
 
-// Initialize OpenAI
-const openai = new OpenAI({
-  apiKey: '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', 
-});
+// Initialize OpenAI (will be initialized when the function runs)
+let openai: OpenAI;
 
 /**
  * TypeScript Interfaces
@@ -698,7 +700,12 @@ function mapSpansToOriginal(
 /**
  * Synthesize final moderation decision with fixed precedence
  * Step 6: block > review > allow_with_redaction > allow
+ * 
+ * NOTE: Messages are only flagged for review when confidence >= REVIEW_THRESHOLD
+ * Low confidence detections are allowed through to prevent over-moderation
  */
+const REVIEW_CONFIDENCE_THRESHOLD = 0.75; // Only flag for review if confidence is 75% or higher
+
 function synthesizeDecision(
   openaiResult: OpenAIModerationResult,
   customRuleResults: CustomRuleResult[],
@@ -706,25 +713,44 @@ function synthesizeDecision(
 ): FinalModerationDecision {
   console.log('⚖️ Synthesizing final moderation decision...');
   
-  // New policy: never auto-block. If any detection occurs, route to manual review.
+  // Calculate confidence from all sources
   const anyCustomDetection = customRuleResults.some(r => r.detected);
-  if (openaiResult.shouldBlock || anyCustomDetection) {
-    console.log('⚠️ REVIEW: Detection present (OpenAI or custom rules). Routing to manual review.');
+  const confidence = Math.max(
+    openaiResult.shouldBlock ? (openaiResult.confidence || 0) : 0,
+    ...customRuleResults.filter(r => r.detected).map(r => r.confidence || 0),
+    0
+  );
+  
+  console.log(`📊 Detection confidence: ${confidence}, Threshold: ${REVIEW_CONFIDENCE_THRESHOLD}`);
+  
+  // Only route to review if detection is present AND confidence meets threshold
+  if ((openaiResult.shouldBlock || anyCustomDetection) && confidence >= REVIEW_CONFIDENCE_THRESHOLD) {
+    console.log('⚠️ REVIEW: High-confidence detection present. Routing to manual review.');
     const reason = openaiResult.shouldBlock
       ? `Requires review: ${openaiResult.reason}`
       : customRuleResults.find(r => r.detected)?.reason || 'Requires review based on custom rules';
     const violationType = openaiResult.shouldBlock
       ? openaiResult.violationType
       : customRuleResults.find(r => r.detected)?.type;
-    const confidence = Math.max(
-      openaiResult.confidence || 0,
-      ...customRuleResults.filter(r => r.detected).map(r => r.confidence || 0),
-      0.6
-    );
     return {
       action: 'review',
       reason,
       violationType,
+      confidence,
+      processingDetails: {
+        openaiUsed: true,
+        customRulesUsed: true,
+        processingTime
+      }
+    };
+  }
+  
+  // Low confidence detection - allow through but log for monitoring
+  if (openaiResult.shouldBlock || anyCustomDetection) {
+    console.log(`✅ ALLOW (LOW CONFIDENCE): Detection present but confidence ${confidence} < threshold ${REVIEW_CONFIDENCE_THRESHOLD}. Allowing through.`);
+    return {
+      action: 'allow',
+      reason: `Low confidence detection (${(confidence * 100).toFixed(1)}%) - allowed through`,
       confidence,
       processingDetails: {
         openaiUsed: true,
@@ -754,6 +780,16 @@ function synthesizeDecision(
  */
 async function checkWithOpenAI(text: string): Promise<OpenAIModerationResult> {
   console.log('🤖 Starting OpenAI analysis with custom prompts...');
+  
+  // Initialize OpenAI client if not already initialized
+  if (!openai) {
+    const apiKey = openaiApiKey.value();
+    if (!apiKey) {
+      throw new Error('OPENAI_API_KEY is not configured');
+    }
+    openai = new OpenAI({ apiKey });
+    console.log('✅ OpenAI client initialized');
+  }
   
   try {
     // Step 1: Detect message language

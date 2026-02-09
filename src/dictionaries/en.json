@@ -486,64 +486,6 @@
             "adjustments": "Adjustments",
             "analytics": "Analytics"
           },
-          "fraudQueue": {
-          "title": "Fraud Detection Queue",
-          "description": "Review and manage flagged referral accounts",
-          "loading": "Loading fraud queue...",
-          "errorLoading": "Error Loading Fraud Queue",
-          "noFlaggedUsers": "All Clear!",
-          "noFlaggedUsersDesc": "No users are currently flagged for fraud review.",
-          "bulkApprove": "Approve Selected",
-          "bulkBlock": "Block Selected",
-          "riskLevels": {
-            "low": "Low Risk",
-            "medium": "Medium Risk",
-            "high": "High Risk"
-          },
-          "filters": {
-            "scoreRange": "Score Range",
-            "allScores": "All Scores",
-            "mediumRisk": "Medium Risk (40-70)",
-            "highRisk": "High Risk (71+)",
-            "status": "Status",
-            "allStatuses": "All Statuses",
-            "pending": "Pending",
-            "blocked": "Blocked"
-          },
-          "table": {
-            "user": "User",
-            "fraudScore": "Fraud Score",
-            "flags": "Flags",
-            "referrer": "Referrer",
-            "status": "Status",
-            "actions": "Actions"
-          },
-          "detailsModal": {
-            "title": "Fraud Detection Details",
-            "description": "Detailed fraud analysis and user information",
-            "userInfo": "User Information",
-            "displayName": "Display Name",
-            "email": "Email",
-            "signupDate": "Signup Date",
-            "status": "Status",
-            "fraudScore": "Fraud Score",
-            "scoreOutOf100": "Out of 100",
-            "lastChecked": "Last Checked",
-            "lowRiskThreshold": "0-39: Low Risk (Auto-approved)",
-            "mediumRiskThreshold": "40-70: Medium Risk (Manual review)",
-            "highRiskThreshold": "71-100: High Risk (Auto-blocked)",
-            "checkBreakdown": "Fraud Check Breakdown",
-            "checkBreakdownDesc": "Individual fraud checks that contributed to the score",
-            "noFlagsDetected": "No fraud flags detected",
-            "points": "points",
-            "referrerInfo": "Referrer Information",
-            "referrerId": "Referrer ID",
-            "referralCode": "Referral Code",
-            "close": "Close",
-            "approve": "Approve User",
-            "block": "Block User"
-          }
-        },
         "userLookup": {
           "title": "Search Users",
           "description": "Search for users by email, ID, or referral code",
@@ -583,6 +525,10 @@
           "fraudScore": "Fraud Score",
           "referrerId": "Referrer ID",
           "verifiedAt": "Verified At",
+          "refereeReward": "Referee Reward",
+          "refereeRewardValue": "1 Month Premium (30 days)",
+          "rewardGranted": "Reward Granted",
+          "rewardPending": "Reward Pending",
           "tabs": {
             "referredUsers": "Referred Users",
             "timeline": "Activity Timeline"
@@ -599,7 +545,10 @@
           "fraudScore": "Fraud Score",
           "joined": "Joined",
           "verified": "Verified",
-          "notVerified": "Not verified"
+          "notVerified": "Not verified",
+          "reward": "Reward",
+          "rewardGranted": "1 Month Premium Granted",
+          "rewardPending": "Pending Verification"
         },
         "timeline": {
           "title": "Activity Timeline",
@@ -610,6 +559,7 @@
           "userJoinedPlatform": "User joined the platform",
           "verified": "Verified",
           "verifiedDesc": "User successfully completed verification",
+          "verifiedReward": "Eligible for 1 Month Premium (30 days)",
           "blocked": "Blocked by Admin",
           "blockedDesc": "User was blocked due to fraud detection",
           "adminApproved": "Approved by Admin",
@@ -617,6 +567,8 @@
           "adminAction": "Admin performed a manual action",
           "referredUser": "Referred a New User",
           "referredUserDesc": "User referred new signup (ID: {{userId}}...)",
+          "rewardGranted": "Reward Granted",
+          "rewardGrantedDesc": "1 Month Premium (30 days) granted to referee",
           "error": "Error Loading Timeline",
           "errorHint": "This may require a Firestore composite index. Check the browser console for details."
         },
@@ -635,7 +587,8 @@
           "overrideFraud": "Override Fraud",
           "updateStats": "Update Stats",
           "rewardDays": "Adjustment Days",
-          "rewardDaysHint": "Enter positive number to add days, negative to subtract",
+          "rewardDaysHint": "Enter positive number to add days, negative to subtract. Standard referee reward is 30 days (1 Month Premium).",
+          "refereeRewardInfo": "Standard referee reward: 1 Month Premium (30 days)",
           "verificationResetWarning": "This will reset the user's verification checklist to initial state. All progress will be lost.",
           "fraudOverrideWarning": "This will clear all fraud flags and reset the fraud score to 0. Use with caution.",
           "statsUpdateHint": "Leave fields empty to keep current values. Only fill fields you want to update.",
@@ -693,6 +646,64 @@
           "cohortPerformanceDesc": "Detailed metrics for each cohort period",
           "cohort": "Cohort",
           "avgTimeToVerify": "Avg Time to Verify"
+        }
+      },
+      "fraudQueue": {
+        "title": "Fraud Detection Queue",
+        "description": "Review and manage flagged referral accounts",
+        "loading": "Loading fraud queue...",
+        "errorLoading": "Error Loading Fraud Queue",
+        "noFlaggedUsers": "All Clear!",
+        "noFlaggedUsersDesc": "No users are currently flagged for fraud review.",
+        "bulkApprove": "Approve Selected",
+        "bulkBlock": "Block Selected",
+        "riskLevels": {
+          "low": "Low Risk",
+          "medium": "Medium Risk",
+          "high": "High Risk"
+        },
+        "filters": {
+          "scoreRange": "Score Range",
+          "allScores": "All Scores",
+          "mediumRisk": "Medium Risk (40-70)",
+          "highRisk": "High Risk (71+)",
+          "status": "Status",
+          "allStatuses": "All Statuses",
+          "pending": "Pending",
+          "blocked": "Blocked"
+        },
+        "table": {
+          "user": "User",
+          "fraudScore": "Fraud Score",
+          "flags": "Flags",
+          "referrer": "Referrer",
+          "status": "Status",
+          "actions": "Actions"
+        },
+        "detailsModal": {
+          "title": "Fraud Detection Details",
+          "description": "Detailed fraud analysis and user information",
+          "userInfo": "User Information",
+          "displayName": "Display Name",
+          "email": "Email",
+          "signupDate": "Signup Date",
+          "status": "Status",
+          "fraudScore": "Fraud Score",
+          "scoreOutOf100": "Out of 100",
+          "lastChecked": "Last Checked",
+          "lowRiskThreshold": "0-39: Low Risk (Auto-approved)",
+          "mediumRiskThreshold": "40-70: Medium Risk (Manual review)",
+          "highRiskThreshold": "71-100: High Risk (Auto-blocked)",
+          "checkBreakdown": "Fraud Check Breakdown",
+          "checkBreakdownDesc": "Individual fraud checks that contributed to the score",
+          "noFlagsDetected": "No fraud flags detected",
+          "points": "points",
+          "referrerInfo": "Referrer Information",
+          "referrerId": "Referrer ID",
+          "referralCode": "Referral Code",
+          "close": "Close",
+          "approve": "Approve User",
+          "block": "Block User"
         }
       },
       "users": "Users",
@@ -2583,6 +2594,7 @@
             "group_message": "Group Message"
           },
           "common": {
+            "refersh": "Refresh",
             "search": "Search...",
             "filter": "Filter",
             "export": "Export",
@@ -3713,6 +3725,30 @@
             "deleteTitle": "Delete Messages",
             "confirmAction": "Are you sure you want to {action} the {count} selected messages?",
             "confirm": "{action} Selected"
+          },
+          "quickActions": {
+            "senderActions": "Sender Actions",
+            "warnUser": "Warn User",
+            "banUser": "Ban User",
+            "viewUserProfile": "View User Profile",
+            "resolvingProfile": "Resolving user profile...",
+            "profileNotFound": "Community profile not found for this sender",
+            "userUidNotFound": "Could not resolve user UID for this sender",
+            "navigatingToProfile": "Opening user profile...",
+            "warnDialogTitle": "Warn Message Sender",
+            "warnDialogDescription": "Issue a warning to {displayName} for the message below",
+            "banDialogTitle": "Ban Message Sender",
+            "banDialogDescription": "Issue a ban to {displayName} for the message below",
+            "offendingMessage": "Offending Message",
+            "senderInfo": "Sender Information",
+            "displayName": "Display Name",
+            "communityProfileId": "Community Profile ID",
+            "userUid": "User UID",
+            "warningIssued": "Warning issued successfully",
+            "warningFailed": "Failed to issue warning",
+            "banIssued": "Ban issued successfully",
+            "banFailed": "Failed to issue ban",
+            "notificationFailed": "Action completed but notification failed to send"
           }
         },
         "systemAdmin": {
@@ -4030,6 +4066,7 @@
       }
     },
     "common": {
+      "refersh": "Refresh",
       "search": "Search",
       "edit": "Edit",
       "delete": "Delete",
