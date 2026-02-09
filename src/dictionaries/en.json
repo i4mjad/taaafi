@@ -3725,6 +3725,30 @@
             "deleteTitle": "Delete Messages",
             "confirmAction": "Are you sure you want to {action} the {count} selected messages?",
             "confirm": "{action} Selected"
+          },
+          "quickActions": {
+            "senderActions": "Sender Actions",
+            "warnUser": "Warn User",
+            "banUser": "Ban User",
+            "viewUserProfile": "View User Profile",
+            "resolvingProfile": "Resolving user profile...",
+            "profileNotFound": "Community profile not found for this sender",
+            "userUidNotFound": "Could not resolve user UID for this sender",
+            "navigatingToProfile": "Opening user profile...",
+            "warnDialogTitle": "Warn Message Sender",
+            "warnDialogDescription": "Issue a warning to {displayName} for the message below",
+            "banDialogTitle": "Ban Message Sender",
+            "banDialogDescription": "Issue a ban to {displayName} for the message below",
+            "offendingMessage": "Offending Message",
+            "senderInfo": "Sender Information",
+            "displayName": "Display Name",
+            "communityProfileId": "Community Profile ID",
+            "userUid": "User UID",
+            "warningIssued": "Warning issued successfully",
+            "warningFailed": "Failed to issue warning",
+            "banIssued": "Ban issued successfully",
+            "banFailed": "Failed to issue ban",
+            "notificationFailed": "Action completed but notification failed to send"
           }
         },
         "systemAdmin": {

@@ -22,6 +22,10 @@ import {
   where,
   getCountFromServer,
   QueryConstraint,
+  addDoc,
+  getDocs,
+  serverTimestamp,
+  Timestamp,
 } from "firebase/firestore";
 import { useCollection } from "react-firebase-hooks/firestore";
 import { db } from "@/lib/firebase";
@@ -40,6 +44,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -51,6 +56,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Table,
@@ -73,9 +79,27 @@ import {
   ChevronRight,
   Loader2,
   RefreshCw,
+  AlertTriangle,
+  Shield,
+  User,
+  ExternalLink,
 } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import {
+  resolveCommunityProfile,
+  ResolvedProfile,
+} from "@/utils/communityProfileResolver";
+import { useAuth } from "@/auth/AuthProvider";
+import { createWarningNotificationPayload } from "@/utils/notificationPayloads";
+import { createBanNotificationPayload } from "@/utils/notificationPayloads";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { CalendarIcon, ChevronDown as ChevronDownIcon } from "lucide-react";
 
 interface GroupMessage {
   id: string;
@@ -154,7 +178,8 @@ export function MessagesTable({
   onStatsUpdate,
   locale = "en",
 }: MessagesTableProps) {
-  const { t } = useTranslation();
+  const { t, locale: currentLocale } = useTranslation();
+  const { user: currentUser } = useAuth();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(PAGE_SIZE);
@@ -188,6 +213,42 @@ export function MessagesTable({
   const [moderationReason, setModerationReason] = useState("");
   const [violationType, setViolationType] = useState("");
   const [isProcessingModeration, setIsProcessingModeration] = useState(false);
+
+  // Quick action dialog state (warn/ban)
+  const [showQuickWarnDialog, setShowQuickWarnDialog] = useState(false);
+  const [showQuickBanDialog, setShowQuickBanDialog] = useState(false);
+  const [quickActionMessage, setQuickActionMessage] =
+    useState<GroupMessage | null>(null);
+  const [quickActionProfile, setQuickActionProfile] =
+    useState<ResolvedProfile | null>(null);
+  const [isResolvingProfile, setIsResolvingProfile] = useState(false);
+  const [isSubmittingQuickAction, setIsSubmittingQuickAction] = useState(false);
+
+  // Quick warn form state
+  const [warnFormData, setWarnFormData] = useState({
+    type: "content_violation" as string,
+    severity: "medium" as string,
+    reason: "",
+    description: "",
+  });
+
+  // Quick ban form state
+  const [banFormData, setBanFormData] = useState({
+    type: "feature_ban" as string,
+    scope: "feature_specific" as string,
+    severity: "temporary" as string,
+    reason: "",
+    description: "",
+    expiresDate: undefined as Date | undefined,
+    expiresTime: "",
+    restrictedFeatures: [] as string[],
+  });
+  const [isBanDatePickerOpen, setIsBanDatePickerOpen] = useState(false);
+
+  // Resolved display names cache for sender column
+  const [displayNameCache, setDisplayNameCache] = useState<
+    Record<string, string>
+  >({});
 
   // Build the Firestore query with pagination at DB level
   const messagesQuery = useMemo(() => {
@@ -540,6 +601,299 @@ export function MessagesTable({
     }
   };
 
+  // Resolve community profile and cache display name
+  const resolveAndCacheProfile = useCallback(
+    async (cpId: string): Promise<ResolvedProfile | null> => {
+      setIsResolvingProfile(true);
+      try {
+        const profile = await resolveCommunityProfile(cpId);
+        if (profile) {
+          setDisplayNameCache((prev) => ({
+            ...prev,
+            [cpId]: profile.displayName,
+          }));
+        }
+        return profile;
+      } finally {
+        setIsResolvingProfile(false);
+      }
+    },
+    []
+  );
+
+  // Batch-resolve display names for visible messages
+  useEffect(() => {
+    const unresolvedCpIds = filteredMessages
+      .map((m) => m.senderCpId)
+      .filter((cpId) => cpId && !displayNameCache[cpId]);
+
+    const uniqueIds = [...new Set(unresolvedCpIds)];
+    if (uniqueIds.length === 0) return;
+
+    uniqueIds.forEach((cpId) => {
+      resolveCommunityProfile(cpId).then((profile) => {
+        if (profile) {
+          setDisplayNameCache((prev) => ({
+            ...prev,
+            [cpId]: profile.displayName,
+          }));
+        }
+      });
+    });
+  }, [filteredMessages, displayNameCache]);
+
+  // Handle navigate to user profile
+  const handleNavigateToUser = useCallback(
+    async (cpId: string) => {
+      const profile = await resolveAndCacheProfile(cpId);
+      if (!profile) {
+        toast.error(
+          t("modules.admin.content.quickActions.profileNotFound")
+        );
+        return;
+      }
+      window.open(
+        `/${currentLocale}/user-management/users/${profile.userUID}`,
+        "_blank"
+      );
+    },
+    [currentLocale, t, resolveAndCacheProfile]
+  );
+
+  // Handle quick warn action
+  const handleQuickWarn = useCallback(
+    async (message: GroupMessage) => {
+      setQuickActionMessage(message);
+      setWarnFormData({
+        type: "content_violation",
+        severity: "medium",
+        reason: "",
+        description: "",
+      });
+      setShowQuickWarnDialog(true);
+
+      const profile = await resolveAndCacheProfile(message.senderCpId);
+      if (!profile) {
+        toast.error(
+          t("modules.admin.content.quickActions.profileNotFound")
+        );
+        setShowQuickWarnDialog(false);
+        return;
+      }
+      setQuickActionProfile(profile);
+    },
+    [t, resolveAndCacheProfile]
+  );
+
+  // Handle quick ban action
+  const handleQuickBan = useCallback(
+    async (message: GroupMessage) => {
+      setQuickActionMessage(message);
+      setBanFormData({
+        type: "feature_ban",
+        scope: "feature_specific",
+        severity: "temporary",
+        reason: "",
+        description: "",
+        expiresDate: undefined,
+        expiresTime: "",
+        restrictedFeatures: ["sending_in_groups"],
+      });
+      setShowQuickBanDialog(true);
+
+      const profile = await resolveAndCacheProfile(message.senderCpId);
+      if (!profile) {
+        toast.error(
+          t("modules.admin.content.quickActions.profileNotFound")
+        );
+        setShowQuickBanDialog(false);
+        return;
+      }
+      setQuickActionProfile(profile);
+    },
+    [t, resolveAndCacheProfile]
+  );
+
+  // Send notification helper
+  const sendUserNotification = async (
+    userId: string,
+    payload: ReturnType<typeof createWarningNotificationPayload>
+  ) => {
+    try {
+      const userQuery = query(
+        collection(db, "users"),
+        where("__name__", "==", userId)
+      );
+      const userSnapshot = await getDocs(userQuery);
+
+      if (!userSnapshot.empty) {
+        const userData = userSnapshot.docs[0].data();
+        const userMessagingToken = userData.messagingToken;
+
+        if (userMessagingToken) {
+          await fetch("/api/admin/notifications/send", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              token: userMessagingToken,
+              ...payload,
+            }),
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error sending notification:", error);
+      toast.error(
+        t("modules.admin.content.quickActions.notificationFailed")
+      );
+    }
+  };
+
+  // Submit quick warn
+  const submitQuickWarn = async () => {
+    if (!quickActionProfile || !quickActionMessage) return;
+    if (!warnFormData.reason.trim()) {
+      toast.error(t("modules.userManagement.warnings.errors.reasonRequired"));
+      return;
+    }
+
+    setIsSubmittingQuickAction(true);
+    try {
+      const warningData = {
+        userId: quickActionProfile.userUID,
+        type: warnFormData.type,
+        reason: warnFormData.reason.trim(),
+        description: warnFormData.description.trim() || null,
+        severity: warnFormData.severity,
+        issuedBy: currentUser?.uid || "unknown-admin",
+        issuedAt: serverTimestamp(),
+        isActive: true,
+        relatedContent: {
+          type: "message",
+          id: quickActionMessage.id,
+          title: quickActionMessage.body.slice(0, 100),
+        },
+      };
+
+      await addDoc(collection(db, "warnings"), warningData);
+
+      // Send notification
+      const userLocale = "en"; // Default; actual locale resolved in sendUserNotification
+      const payload = createWarningNotificationPayload(
+        t("modules.userManagement.warnings.notification.title"),
+        t(
+          `modules.userManagement.warnings.notification.body.${warnFormData.type}`
+        ) ||
+          t("modules.userManagement.warnings.notification.body.other"),
+        quickActionProfile.userUID,
+        warnFormData.type,
+        warnFormData.severity,
+        userLocale
+      );
+      await sendUserNotification(quickActionProfile.userUID, payload);
+
+      toast.success(
+        t("modules.admin.content.quickActions.warningIssued")
+      );
+      setShowQuickWarnDialog(false);
+      setQuickActionProfile(null);
+      setQuickActionMessage(null);
+    } catch (error) {
+      console.error("Error issuing warning:", error);
+      toast.error(t("modules.admin.content.quickActions.warningFailed"));
+    } finally {
+      setIsSubmittingQuickAction(false);
+    }
+  };
+
+  // Submit quick ban
+  const submitQuickBan = async () => {
+    if (!quickActionProfile || !quickActionMessage) return;
+    if (!banFormData.reason.trim()) {
+      toast.error(t("modules.userManagement.bans.errors.reasonRequired"));
+      return;
+    }
+
+    if (
+      banFormData.severity === "temporary" &&
+      (!banFormData.expiresDate || !banFormData.expiresTime.trim())
+    ) {
+      toast.error(t("modules.userManagement.bans.dateRequired"));
+      return;
+    }
+
+    setIsSubmittingQuickAction(true);
+    try {
+      let expiresAt = null;
+      if (
+        banFormData.severity === "temporary" &&
+        banFormData.expiresDate &&
+        banFormData.expiresTime
+      ) {
+        const [hours, minutes] = banFormData.expiresTime
+          .split(":")
+          .map(Number);
+        const expirationDate = new Date(banFormData.expiresDate);
+        expirationDate.setHours(hours, minutes, 0, 0);
+        expiresAt = Timestamp.fromDate(expirationDate);
+      }
+
+      const banData = {
+        userId: quickActionProfile.userUID,
+        type: banFormData.type,
+        scope: banFormData.scope,
+        reason: banFormData.reason.trim(),
+        description: banFormData.description.trim() || null,
+        severity: banFormData.severity,
+        issuedBy: currentUser?.uid || "unknown-admin",
+        issuedAt: serverTimestamp(),
+        expiresAt,
+        isActive: true,
+        restrictedFeatures:
+          banFormData.scope === "feature_specific"
+            ? banFormData.restrictedFeatures
+            : null,
+        relatedContent: {
+          type: "message",
+          id: quickActionMessage.id,
+          title: quickActionMessage.body.slice(0, 100),
+        },
+      };
+
+      await addDoc(collection(db, "bans"), banData);
+
+      // Send notification
+      const notificationTitle =
+        banFormData.severity === "permanent"
+          ? t("modules.userManagement.bans.notification.title.permanent")
+          : t("modules.userManagement.bans.notification.title.temporary");
+      const notificationKey = `${banFormData.type}_${banFormData.severity}`;
+      const notificationBody = t(
+        `modules.userManagement.bans.notification.body.${notificationKey}`
+      );
+
+      const payload = createBanNotificationPayload(
+        notificationTitle,
+        notificationBody,
+        quickActionProfile.userUID,
+        banFormData.type,
+        banFormData.severity,
+        "en"
+      );
+      await sendUserNotification(quickActionProfile.userUID, payload);
+
+      toast.success(t("modules.admin.content.quickActions.banIssued"));
+      setShowQuickBanDialog(false);
+      setQuickActionProfile(null);
+      setQuickActionMessage(null);
+    } catch (error) {
+      console.error("Error issuing ban:", error);
+      toast.error(t("modules.admin.content.quickActions.banFailed"));
+    } finally {
+      setIsSubmittingQuickAction(false);
+    }
+  };
+
   // Handle bulk actions
   const handleBulkAction = async (action: "approve" | "hide" | "delete") => {
     if (selectedIds.length === 0) {
@@ -737,7 +1091,26 @@ export function MessagesTable({
                           )}
                         </TableCell>
                         <TableCell className="font-medium">
-                          {message.senderCpId}
+                          <button
+                            className="text-start hover:underline cursor-pointer text-primary"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleNavigateToUser(message.senderCpId);
+                            }}
+                            title={t(
+                              "modules.admin.content.quickActions.viewUserProfile"
+                            )}
+                          >
+                            <div className="text-sm">
+                              {displayNameCache[message.senderCpId] ||
+                                message.senderCpId}
+                            </div>
+                            {displayNameCache[message.senderCpId] && (
+                              <div className="text-xs text-muted-foreground font-normal">
+                                {message.senderCpId}
+                              </div>
+                            )}
+                          </button>
                         </TableCell>
                         <TableCell className="max-w-[300px]">
                           {message.isDeleted ? (
@@ -881,6 +1254,36 @@ export function MessagesTable({
                                   </DropdownMenuItem>
                                 </>
                               )}
+
+                              {/* Sender Quick Actions */}
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  handleNavigateToUser(message.senderCpId)
+                                }
+                              >
+                                <ExternalLink className="mr-2 h-4 w-4" />
+                                {t(
+                                  "modules.admin.content.quickActions.viewUserProfile"
+                                )}
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => handleQuickWarn(message)}
+                              >
+                                <AlertTriangle className="mr-2 h-4 w-4 text-orange-500" />
+                                {t(
+                                  "modules.admin.content.quickActions.warnUser"
+                                )}
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => handleQuickBan(message)}
+                                className="text-destructive"
+                              >
+                                <Shield className="mr-2 h-4 w-4" />
+                                {t(
+                                  "modules.admin.content.quickActions.banUser"
+                                )}
+                              </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </TableCell>
@@ -1028,9 +1431,20 @@ export function MessagesTable({
                   <Label className="text-sm font-medium">
                     {t("modules.admin.content.messageDetails.sender")}
                   </Label>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedMessage.senderCpId}
-                  </p>
+                  <button
+                    className="text-sm text-primary hover:underline cursor-pointer block text-start"
+                    onClick={() =>
+                      handleNavigateToUser(selectedMessage.senderCpId)
+                    }
+                  >
+                    {displayNameCache[selectedMessage.senderCpId] ||
+                      selectedMessage.senderCpId}
+                  </button>
+                  {displayNameCache[selectedMessage.senderCpId] && (
+                    <p className="text-xs text-muted-foreground">
+                      {selectedMessage.senderCpId}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <Label className="text-sm font-medium">
@@ -1355,6 +1769,522 @@ export function MessagesTable({
           </DialogContent>
         </Dialog>
       )}
+
+      {/* Quick Warn Dialog */}
+      <Dialog
+        open={showQuickWarnDialog}
+        onOpenChange={(open) => {
+          setShowQuickWarnDialog(open);
+          if (!open) {
+            setQuickActionProfile(null);
+            setQuickActionMessage(null);
+          }
+        }}
+      >
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>
+              {t("modules.admin.content.quickActions.warnDialogTitle")}
+            </DialogTitle>
+            <DialogDescription>
+              {quickActionProfile
+                ? t(
+                    "modules.admin.content.quickActions.warnDialogDescription",
+                    { displayName: quickActionProfile.displayName }
+                  )
+                : t("modules.admin.content.quickActions.resolvingProfile")}
+            </DialogDescription>
+          </DialogHeader>
+
+          {isResolvingProfile && !quickActionProfile ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-8 w-8 animate-spin" />
+            </div>
+          ) : quickActionProfile && quickActionMessage ? (
+            <div className="space-y-4">
+              {/* Sender Info */}
+              <div className="p-3 bg-muted rounded-md space-y-1">
+                <Label className="text-sm font-medium">
+                  {t("modules.admin.content.quickActions.senderInfo")}
+                </Label>
+                <div className="grid grid-cols-3 gap-2 text-sm">
+                  <div>
+                    <span className="text-muted-foreground">
+                      {t("modules.admin.content.quickActions.displayName")}:
+                    </span>{" "}
+                    {quickActionProfile.displayName}
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">
+                      {t(
+                        "modules.admin.content.quickActions.communityProfileId"
+                      )}
+                      :
+                    </span>{" "}
+                    {quickActionProfile.cpId}
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">
+                      {t("modules.admin.content.quickActions.userUid")}:
+                    </span>{" "}
+                    {quickActionProfile.userUID}
+                  </div>
+                </div>
+              </div>
+
+              {/* Offending Message */}
+              <div>
+                <Label className="text-sm font-medium">
+                  {t("modules.admin.content.quickActions.offendingMessage")}
+                </Label>
+                <div className="mt-1 p-3 bg-muted rounded-md">
+                  <p className="text-sm whitespace-pre-wrap">
+                    {quickActionMessage.body}
+                  </p>
+                </div>
+              </div>
+
+              {/* Warning Form */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>
+                    {t("modules.userManagement.warnings.type.label")}
+                  </Label>
+                  <Select
+                    value={warnFormData.type}
+                    onValueChange={(value) =>
+                      setWarnFormData({ ...warnFormData, type: value })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="content_violation">
+                        {t(
+                          "modules.userManagement.warnings.type.contentViolation"
+                        )}
+                      </SelectItem>
+                      <SelectItem value="inappropriate_behavior">
+                        {t(
+                          "modules.userManagement.warnings.type.inappropriateBehavior"
+                        )}
+                      </SelectItem>
+                      <SelectItem value="spam">
+                        {t("modules.userManagement.warnings.type.spam")}
+                      </SelectItem>
+                      <SelectItem value="harassment">
+                        {t("modules.userManagement.warnings.type.harassment")}
+                      </SelectItem>
+                      <SelectItem value="group_harassment">
+                        {t(
+                          "modules.userManagement.warnings.type.groupHarassment"
+                        )}
+                      </SelectItem>
+                      <SelectItem value="group_spam">
+                        {t("modules.userManagement.warnings.type.groupSpam")}
+                      </SelectItem>
+                      <SelectItem value="group_inappropriate_content">
+                        {t(
+                          "modules.userManagement.warnings.type.groupInappropriateContent"
+                        )}
+                      </SelectItem>
+                      <SelectItem value="group_disruption">
+                        {t(
+                          "modules.userManagement.warnings.type.groupDisruption"
+                        )}
+                      </SelectItem>
+                      <SelectItem value="other">
+                        {t("modules.userManagement.warnings.type.other")}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>
+                    {t("modules.userManagement.warnings.severity.label")}
+                  </Label>
+                  <Select
+                    value={warnFormData.severity}
+                    onValueChange={(value) =>
+                      setWarnFormData({ ...warnFormData, severity: value })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="low">
+                        {t("modules.userManagement.warnings.severity.low")}
+                      </SelectItem>
+                      <SelectItem value="medium">
+                        {t("modules.userManagement.warnings.severity.medium")}
+                      </SelectItem>
+                      <SelectItem value="high">
+                        {t("modules.userManagement.warnings.severity.high")}
+                      </SelectItem>
+                      <SelectItem value="critical">
+                        {t("modules.userManagement.warnings.severity.critical")}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>
+                  {t("modules.userManagement.warnings.reason")}
+                </Label>
+                <Input
+                  value={warnFormData.reason}
+                  onChange={(e) =>
+                    setWarnFormData({ ...warnFormData, reason: e.target.value })
+                  }
+                  placeholder={t(
+                    "modules.userManagement.warnings.reasonPlaceholder"
+                  )}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>
+                  {t("modules.userManagement.warnings.description")}
+                </Label>
+                <Textarea
+                  value={warnFormData.description}
+                  onChange={(e) =>
+                    setWarnFormData({
+                      ...warnFormData,
+                      description: e.target.value,
+                    })
+                  }
+                  placeholder={t(
+                    "modules.userManagement.warnings.descriptionPlaceholder"
+                  )}
+                />
+              </div>
+            </div>
+          ) : null}
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowQuickWarnDialog(false)}
+            >
+              {t("common.cancel")}
+            </Button>
+            <Button
+              onClick={submitQuickWarn}
+              disabled={isSubmittingQuickAction || !quickActionProfile}
+            >
+              {isSubmittingQuickAction ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  {t("modules.admin.content.processing")}
+                </>
+              ) : (
+                <>
+                  <AlertTriangle className="mr-2 h-4 w-4" />
+                  {t("modules.userManagement.warnings.issueWarning")}
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Quick Ban Dialog */}
+      <Dialog
+        open={showQuickBanDialog}
+        onOpenChange={(open) => {
+          setShowQuickBanDialog(open);
+          if (!open) {
+            setQuickActionProfile(null);
+            setQuickActionMessage(null);
+          }
+        }}
+      >
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>
+              {t("modules.admin.content.quickActions.banDialogTitle")}
+            </DialogTitle>
+            <DialogDescription>
+              {quickActionProfile
+                ? t(
+                    "modules.admin.content.quickActions.banDialogDescription",
+                    { displayName: quickActionProfile.displayName }
+                  )
+                : t("modules.admin.content.quickActions.resolvingProfile")}
+            </DialogDescription>
+          </DialogHeader>
+
+          {isResolvingProfile && !quickActionProfile ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-8 w-8 animate-spin" />
+            </div>
+          ) : quickActionProfile && quickActionMessage ? (
+            <div className="space-y-4">
+              {/* Sender Info */}
+              <div className="p-3 bg-muted rounded-md space-y-1">
+                <Label className="text-sm font-medium">
+                  {t("modules.admin.content.quickActions.senderInfo")}
+                </Label>
+                <div className="grid grid-cols-3 gap-2 text-sm">
+                  <div>
+                    <span className="text-muted-foreground">
+                      {t("modules.admin.content.quickActions.displayName")}:
+                    </span>{" "}
+                    {quickActionProfile.displayName}
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">
+                      {t(
+                        "modules.admin.content.quickActions.communityProfileId"
+                      )}
+                      :
+                    </span>{" "}
+                    {quickActionProfile.cpId}
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">
+                      {t("modules.admin.content.quickActions.userUid")}:
+                    </span>{" "}
+                    {quickActionProfile.userUID}
+                  </div>
+                </div>
+              </div>
+
+              {/* Offending Message */}
+              <div>
+                <Label className="text-sm font-medium">
+                  {t("modules.admin.content.quickActions.offendingMessage")}
+                </Label>
+                <div className="mt-1 p-3 bg-muted rounded-md">
+                  <p className="text-sm whitespace-pre-wrap">
+                    {quickActionMessage.body}
+                  </p>
+                </div>
+              </div>
+
+              {/* Ban Form */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>
+                    {t("modules.userManagement.bans.type.label")}
+                  </Label>
+                  <Select
+                    value={banFormData.type}
+                    onValueChange={(value) =>
+                      setBanFormData({
+                        ...banFormData,
+                        type: value,
+                        scope:
+                          value === "device_ban" || value === "user_ban"
+                            ? "app_wide"
+                            : banFormData.scope,
+                      })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="feature_ban">
+                        {t("modules.userManagement.bans.type.featureBan")}
+                      </SelectItem>
+                      <SelectItem value="user_ban">
+                        {t("modules.userManagement.bans.type.userBan")}
+                      </SelectItem>
+                      <SelectItem value="device_ban">
+                        {t("modules.userManagement.bans.type.deviceBan")}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>
+                    {t("modules.userManagement.bans.scope.label")}
+                  </Label>
+                  <Select
+                    value={banFormData.scope}
+                    onValueChange={(value) =>
+                      setBanFormData({ ...banFormData, scope: value })
+                    }
+                    disabled={
+                      banFormData.type === "device_ban" ||
+                      banFormData.type === "user_ban"
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="feature_specific">
+                        {t(
+                          "modules.userManagement.bans.scope.featureSpecific"
+                        )}
+                      </SelectItem>
+                      <SelectItem value="app_wide">
+                        {t("modules.userManagement.bans.scope.appWide")}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {(banFormData.type === "device_ban" ||
+                    banFormData.type === "user_ban") && (
+                    <p className="text-xs text-muted-foreground">
+                      {banFormData.type === "device_ban"
+                        ? t("modules.userManagement.bans.deviceBanNote")
+                        : t("modules.userManagement.bans.userBanNote")}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>
+                    {t("modules.userManagement.bans.severity.label")}
+                  </Label>
+                  <Select
+                    value={banFormData.severity}
+                    onValueChange={(value) =>
+                      setBanFormData({ ...banFormData, severity: value })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="temporary">
+                        {t("modules.userManagement.bans.severity.temporary")}
+                      </SelectItem>
+                      <SelectItem value="permanent">
+                        {t("modules.userManagement.bans.severity.permanent")}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {banFormData.severity === "permanent" && (
+                    <p className="text-xs text-destructive">
+                      {t("modules.userManagement.bans.permanentWarning")}
+                    </p>
+                  )}
+                </div>
+
+                {banFormData.severity === "temporary" && (
+                  <div className="space-y-2">
+                    <Label>
+                      {t("modules.userManagement.bans.expiresAt")}
+                    </Label>
+                    <div className="flex gap-2">
+                      <Popover
+                        open={isBanDatePickerOpen}
+                        onOpenChange={setIsBanDatePickerOpen}
+                      >
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className="w-full justify-start text-left font-normal"
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {banFormData.expiresDate
+                              ? format(banFormData.expiresDate, "MMM dd, yyyy")
+                              : t("modules.userManagement.bans.selectDate")}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={banFormData.expiresDate}
+                            onSelect={(date) => {
+                              setBanFormData({
+                                ...banFormData,
+                                expiresDate: date,
+                              });
+                              setIsBanDatePickerOpen(false);
+                            }}
+                            disabled={(date) => date < new Date()}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <Input
+                        type="time"
+                        value={banFormData.expiresTime}
+                        onChange={(e) =>
+                          setBanFormData({
+                            ...banFormData,
+                            expiresTime: e.target.value,
+                          })
+                        }
+                        className="w-32"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label>{t("modules.userManagement.bans.reason")}</Label>
+                <Input
+                  value={banFormData.reason}
+                  onChange={(e) =>
+                    setBanFormData({ ...banFormData, reason: e.target.value })
+                  }
+                  placeholder={t(
+                    "modules.userManagement.bans.reasonPlaceholder"
+                  )}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>
+                  {t("modules.userManagement.bans.description")}
+                </Label>
+                <Textarea
+                  value={banFormData.description}
+                  onChange={(e) =>
+                    setBanFormData({
+                      ...banFormData,
+                      description: e.target.value,
+                    })
+                  }
+                  placeholder={t(
+                    "modules.userManagement.bans.descriptionPlaceholder"
+                  )}
+                />
+              </div>
+            </div>
+          ) : null}
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowQuickBanDialog(false)}
+            >
+              {t("common.cancel")}
+            </Button>
+            <Button
+              onClick={submitQuickBan}
+              disabled={isSubmittingQuickAction || !quickActionProfile}
+              variant="destructive"
+            >
+              {isSubmittingQuickAction ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  {t("modules.admin.content.processing")}
+                </>
+              ) : (
+                <>
+                  <Shield className="mr-2 h-4 w-4" />
+                  {t("modules.userManagement.bans.issueBan")}
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
