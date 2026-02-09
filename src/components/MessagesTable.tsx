@@ -1769,6 +1769,522 @@ export function MessagesTable({
           </DialogContent>
         </Dialog>
       )}
+
+      {/* Quick Warn Dialog */}
+      <Dialog
+        open={showQuickWarnDialog}
+        onOpenChange={(open) => {
+          setShowQuickWarnDialog(open);
+          if (!open) {
+            setQuickActionProfile(null);
+            setQuickActionMessage(null);
+          }
+        }}
+      >
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>
+              {t("modules.admin.content.quickActions.warnDialogTitle")}
+            </DialogTitle>
+            <DialogDescription>
+              {quickActionProfile
+                ? t(
+                    "modules.admin.content.quickActions.warnDialogDescription",
+                    { displayName: quickActionProfile.displayName }
+                  )
+                : t("modules.admin.content.quickActions.resolvingProfile")}
+            </DialogDescription>
+          </DialogHeader>
+
+          {isResolvingProfile && !quickActionProfile ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-8 w-8 animate-spin" />
+            </div>
+          ) : quickActionProfile && quickActionMessage ? (
+            <div className="space-y-4">
+              {/* Sender Info */}
+              <div className="p-3 bg-muted rounded-md space-y-1">
+                <Label className="text-sm font-medium">
+                  {t("modules.admin.content.quickActions.senderInfo")}
+                </Label>
+                <div className="grid grid-cols-3 gap-2 text-sm">
+                  <div>
+                    <span className="text-muted-foreground">
+                      {t("modules.admin.content.quickActions.displayName")}:
+                    </span>{" "}
+                    {quickActionProfile.displayName}
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">
+                      {t(
+                        "modules.admin.content.quickActions.communityProfileId"
+                      )}
+                      :
+                    </span>{" "}
+                    {quickActionProfile.cpId}
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">
+                      {t("modules.admin.content.quickActions.userUid")}:
+                    </span>{" "}
+                    {quickActionProfile.userUID}
+                  </div>
+                </div>
+              </div>
+
+              {/* Offending Message */}
+              <div>
+                <Label className="text-sm font-medium">
+                  {t("modules.admin.content.quickActions.offendingMessage")}
+                </Label>
+                <div className="mt-1 p-3 bg-muted rounded-md">
+                  <p className="text-sm whitespace-pre-wrap">
+                    {quickActionMessage.body}
+                  </p>
+                </div>
+              </div>
+
+              {/* Warning Form */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>
+                    {t("modules.userManagement.warnings.type.label")}
+                  </Label>
+                  <Select
+                    value={warnFormData.type}
+                    onValueChange={(value) =>
+                      setWarnFormData({ ...warnFormData, type: value })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="content_violation">
+                        {t(
+                          "modules.userManagement.warnings.type.contentViolation"
+                        )}
+                      </SelectItem>
+                      <SelectItem value="inappropriate_behavior">
+                        {t(
+                          "modules.userManagement.warnings.type.inappropriateBehavior"
+                        )}
+                      </SelectItem>
+                      <SelectItem value="spam">
+                        {t("modules.userManagement.warnings.type.spam")}
+                      </SelectItem>
+                      <SelectItem value="harassment">
+                        {t("modules.userManagement.warnings.type.harassment")}
+                      </SelectItem>
+                      <SelectItem value="group_harassment">
+                        {t(
+                          "modules.userManagement.warnings.type.groupHarassment"
+                        )}
+                      </SelectItem>
+                      <SelectItem value="group_spam">
+                        {t("modules.userManagement.warnings.type.groupSpam")}
+                      </SelectItem>
+                      <SelectItem value="group_inappropriate_content">
+                        {t(
+                          "modules.userManagement.warnings.type.groupInappropriateContent"
+                        )}
+                      </SelectItem>
+                      <SelectItem value="group_disruption">
+                        {t(
+                          "modules.userManagement.warnings.type.groupDisruption"
+                        )}
+                      </SelectItem>
+                      <SelectItem value="other">
+                        {t("modules.userManagement.warnings.type.other")}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>
+                    {t("modules.userManagement.warnings.severity.label")}
+                  </Label>
+                  <Select
+                    value={warnFormData.severity}
+                    onValueChange={(value) =>
+                      setWarnFormData({ ...warnFormData, severity: value })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="low">
+                        {t("modules.userManagement.warnings.severity.low")}
+                      </SelectItem>
+                      <SelectItem value="medium">
+                        {t("modules.userManagement.warnings.severity.medium")}
+                      </SelectItem>
+                      <SelectItem value="high">
+                        {t("modules.userManagement.warnings.severity.high")}
+                      </SelectItem>
+                      <SelectItem value="critical">
+                        {t("modules.userManagement.warnings.severity.critical")}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>
+                  {t("modules.userManagement.warnings.reason")}
+                </Label>
+                <Input
+                  value={warnFormData.reason}
+                  onChange={(e) =>
+                    setWarnFormData({ ...warnFormData, reason: e.target.value })
+                  }
+                  placeholder={t(
+                    "modules.userManagement.warnings.reasonPlaceholder"
+                  )}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>
+                  {t("modules.userManagement.warnings.description")}
+                </Label>
+                <Textarea
+                  value={warnFormData.description}
+                  onChange={(e) =>
+                    setWarnFormData({
+                      ...warnFormData,
+                      description: e.target.value,
+                    })
+                  }
+                  placeholder={t(
+                    "modules.userManagement.warnings.descriptionPlaceholder"
+                  )}
+                />
+              </div>
+            </div>
+          ) : null}
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowQuickWarnDialog(false)}
+            >
+              {t("common.cancel")}
+            </Button>
+            <Button
+              onClick={submitQuickWarn}
+              disabled={isSubmittingQuickAction || !quickActionProfile}
+            >
+              {isSubmittingQuickAction ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  {t("modules.admin.content.processing")}
+                </>
+              ) : (
+                <>
+                  <AlertTriangle className="mr-2 h-4 w-4" />
+                  {t("modules.userManagement.warnings.issueWarning")}
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Quick Ban Dialog */}
+      <Dialog
+        open={showQuickBanDialog}
+        onOpenChange={(open) => {
+          setShowQuickBanDialog(open);
+          if (!open) {
+            setQuickActionProfile(null);
+            setQuickActionMessage(null);
+          }
+        }}
+      >
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>
+              {t("modules.admin.content.quickActions.banDialogTitle")}
+            </DialogTitle>
+            <DialogDescription>
+              {quickActionProfile
+                ? t(
+                    "modules.admin.content.quickActions.banDialogDescription",
+                    { displayName: quickActionProfile.displayName }
+                  )
+                : t("modules.admin.content.quickActions.resolvingProfile")}
+            </DialogDescription>
+          </DialogHeader>
+
+          {isResolvingProfile && !quickActionProfile ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-8 w-8 animate-spin" />
+            </div>
+          ) : quickActionProfile && quickActionMessage ? (
+            <div className="space-y-4">
+              {/* Sender Info */}
+              <div className="p-3 bg-muted rounded-md space-y-1">
+                <Label className="text-sm font-medium">
+                  {t("modules.admin.content.quickActions.senderInfo")}
+                </Label>
+                <div className="grid grid-cols-3 gap-2 text-sm">
+                  <div>
+                    <span className="text-muted-foreground">
+                      {t("modules.admin.content.quickActions.displayName")}:
+                    </span>{" "}
+                    {quickActionProfile.displayName}
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">
+                      {t(
+                        "modules.admin.content.quickActions.communityProfileId"
+                      )}
+                      :
+                    </span>{" "}
+                    {quickActionProfile.cpId}
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">
+                      {t("modules.admin.content.quickActions.userUid")}:
+                    </span>{" "}
+                    {quickActionProfile.userUID}
+                  </div>
+                </div>
+              </div>
+
+              {/* Offending Message */}
+              <div>
+                <Label className="text-sm font-medium">
+                  {t("modules.admin.content.quickActions.offendingMessage")}
+                </Label>
+                <div className="mt-1 p-3 bg-muted rounded-md">
+                  <p className="text-sm whitespace-pre-wrap">
+                    {quickActionMessage.body}
+                  </p>
+                </div>
+              </div>
+
+              {/* Ban Form */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>
+                    {t("modules.userManagement.bans.type.label")}
+                  </Label>
+                  <Select
+                    value={banFormData.type}
+                    onValueChange={(value) =>
+                      setBanFormData({
+                        ...banFormData,
+                        type: value,
+                        scope:
+                          value === "device_ban" || value === "user_ban"
+                            ? "app_wide"
+                            : banFormData.scope,
+                      })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="feature_ban">
+                        {t("modules.userManagement.bans.type.featureBan")}
+                      </SelectItem>
+                      <SelectItem value="user_ban">
+                        {t("modules.userManagement.bans.type.userBan")}
+                      </SelectItem>
+                      <SelectItem value="device_ban">
+                        {t("modules.userManagement.bans.type.deviceBan")}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>
+                    {t("modules.userManagement.bans.scope.label")}
+                  </Label>
+                  <Select
+                    value={banFormData.scope}
+                    onValueChange={(value) =>
+                      setBanFormData({ ...banFormData, scope: value })
+                    }
+                    disabled={
+                      banFormData.type === "device_ban" ||
+                      banFormData.type === "user_ban"
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="feature_specific">
+                        {t(
+                          "modules.userManagement.bans.scope.featureSpecific"
+                        )}
+                      </SelectItem>
+                      <SelectItem value="app_wide">
+                        {t("modules.userManagement.bans.scope.appWide")}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {(banFormData.type === "device_ban" ||
+                    banFormData.type === "user_ban") && (
+                    <p className="text-xs text-muted-foreground">
+                      {banFormData.type === "device_ban"
+                        ? t("modules.userManagement.bans.deviceBanNote")
+                        : t("modules.userManagement.bans.userBanNote")}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>
+                    {t("modules.userManagement.bans.severity.label")}
+                  </Label>
+                  <Select
+                    value={banFormData.severity}
+                    onValueChange={(value) =>
+                      setBanFormData({ ...banFormData, severity: value })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="temporary">
+                        {t("modules.userManagement.bans.severity.temporary")}
+                      </SelectItem>
+                      <SelectItem value="permanent">
+                        {t("modules.userManagement.bans.severity.permanent")}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {banFormData.severity === "permanent" && (
+                    <p className="text-xs text-destructive">
+                      {t("modules.userManagement.bans.permanentWarning")}
+                    </p>
+                  )}
+                </div>
+
+                {banFormData.severity === "temporary" && (
+                  <div className="space-y-2">
+                    <Label>
+                      {t("modules.userManagement.bans.expiresAt")}
+                    </Label>
+                    <div className="flex gap-2">
+                      <Popover
+                        open={isBanDatePickerOpen}
+                        onOpenChange={setIsBanDatePickerOpen}
+                      >
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className="w-full justify-start text-left font-normal"
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {banFormData.expiresDate
+                              ? format(banFormData.expiresDate, "MMM dd, yyyy")
+                              : t("modules.userManagement.bans.selectDate")}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={banFormData.expiresDate}
+                            onSelect={(date) => {
+                              setBanFormData({
+                                ...banFormData,
+                                expiresDate: date,
+                              });
+                              setIsBanDatePickerOpen(false);
+                            }}
+                            disabled={(date) => date < new Date()}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <Input
+                        type="time"
+                        value={banFormData.expiresTime}
+                        onChange={(e) =>
+                          setBanFormData({
+                            ...banFormData,
+                            expiresTime: e.target.value,
+                          })
+                        }
+                        className="w-32"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label>{t("modules.userManagement.bans.reason")}</Label>
+                <Input
+                  value={banFormData.reason}
+                  onChange={(e) =>
+                    setBanFormData({ ...banFormData, reason: e.target.value })
+                  }
+                  placeholder={t(
+                    "modules.userManagement.bans.reasonPlaceholder"
+                  )}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>
+                  {t("modules.userManagement.bans.description")}
+                </Label>
+                <Textarea
+                  value={banFormData.description}
+                  onChange={(e) =>
+                    setBanFormData({
+                      ...banFormData,
+                      description: e.target.value,
+                    })
+                  }
+                  placeholder={t(
+                    "modules.userManagement.bans.descriptionPlaceholder"
+                  )}
+                />
+              </div>
+            </div>
+          ) : null}
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowQuickBanDialog(false)}
+            >
+              {t("common.cancel")}
+            </Button>
+            <Button
+              onClick={submitQuickBan}
+              disabled={isSubmittingQuickAction || !quickActionProfile}
+              variant="destructive"
+            >
+              {isSubmittingQuickAction ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  {t("modules.admin.content.processing")}
+                </>
+              ) : (
+                <>
+                  <Shield className="mr-2 h-4 w-4" />
+                  {t("modules.userManagement.bans.issueBan")}
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
