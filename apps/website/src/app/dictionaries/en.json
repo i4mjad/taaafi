@@ -1,0 +1,202 @@
+{
+    "comingSoon": "The website is under construction. Coming Soon",
+    "latestVersionAvailable":  "Ta'aafi 5.0.0 is available on Google Play and App Store",
+    "downloadGooglePlay": "Download from Google Play",
+    "downloadAppStore": "Download from App Store",
+    
+    "contactUs": "Contact Us",
+    "contactUsDescription": "For support, please contact us at admin@ta3afi.app",
+    "emailLabel": "Email",
+    "emailDescription": "We respond to all emails within 24 hours.",
+    "email": "admin@ta3afi.app",
+    "socialLabel": "Social Media",
+    "socialDescription": "Follow us on social media for updates and support.",
+    "instagram": "@ta3afi",
+    "twitter": "@ta3afi",
+    "whatsappLabel": "WhatsApp",
+    "whatsappDescription": "Chat with us on WhatsApp.",
+    "whatsapp": "+968 7745 1200",
+    "officeLabel": "Office",
+    "officeDescription": "Drop by our office for a chat.",
+    "officeAddress": "Dubai, UAE",
+    "phoneLabel": "Phone",
+    "phoneDescription": "We're available Mon-Fri, 9am-5pm.",
+    "phone": "+971 4 123 4567",
+    
+    "appName": "Ta'aafi Platform",
+    "features": "Features",
+    "statistics": "Statistics", 
+    "blog": "Blog",
+    "contact": "Contact",
+    "download": "Download",
+    "toggleMenu": "Toggle menu",
+    "english": "English",
+    "arabic": "Arabic",
+    "toastDesktopTitle": "Not available on desktop",
+    "toastDesktopDescription": "Ta'aafi is only available for iOS and Android.",
+    
+    "heroTitle": "Break Free from Addiction with",
+    "heroSubtitle": "Ta'aafi Platform",
+    "heroDescription": "Take control of your life and overcome porn addiction with our comprehensive recovery platform. Join thousands who've found freedom and built healthier habits.",
+    "downloadOnAppStore": "Download on the",
+    "getItOn": "Get it on",
+    "appStore": "App Store",
+    "googlePlay": "Google Play",
+    "googleReviewsRating": "4.6 /5 - from 12k reviews",
+    "appleReviewsRating": "4.8 /5 - from 5k reviews",
+    "google": "Google",
+    "apple": "Apple",
+    "appScreenAlt": "Ta'aafi Platform Recovery Dashboard",
+    
+      "termsAndConditions": "Terms and Conditions",
+      "lastUpdated": "Last Updated",
+      "termsLastUpdateDate": "Jan 21, 2025",
+      "termsContent": [
+        {
+          "title": "1. Acceptance of Terms",
+          "content": "By using Ta'aafi Platform, you agree to these Terms and Conditions. If you do not agree, please do not use the app."
+        },
+        {
+          "title": "2. Use of the App",
+          "content": "You may use the app for personal, non-commercial purposes only. Do not misuse the app or engage in any activity that may harm the app or its users."
+        },
+        {
+          "title": "3. User Accounts",
+          "content": "You are responsible for maintaining the security of your account and for all activities that occur under your account."
+        },
+        {
+          "title": "4. Content",
+          "content": "All content provided in the app is for informational purposes only. We are not responsible for any inaccuracies or errors."
+        },
+        {
+          "title": "5. Not a Medical Substitute",
+          "content": "This app is not intended to diagnose, treat, cure, or prevent any medical condition. It is not a substitute for professional medical advice, diagnosis, or treatment. Always consult a qualified healthcare provider for medical concerns."
+        },
+        {
+          "title": "6. Privacy",
+          "content": "Your privacy is important to us. Please review our Privacy Policy to understand how we collect and use your data."
+        },
+        {
+          "title": "7. Modifications",
+          "content": "We may update these terms at any time. Continued use of the app after changes means you accept the new terms."
+        },
+        {
+          "title": "8. Contact Us",
+          "content": "For any questions, contact us at admin@ta3afi.app."
+        }
+      ],
+      
+      "privacyPolicy": "Privacy Policy",
+      "privacyLastUpdateDate": "Jan 21, 2025",
+      "privacyContent": [
+        {
+          "title": "1. Introduction",
+          "content": "Welcome to Ta'aafi Platform. Your privacy is important to us, and this Privacy Policy explains how we collect, use, and protect your personal information when you use our app."
+        },
+        {
+          "title": "2. Information We Collect",
+          "content": "We may collect the following types of information when you use Ta'aafi Platform:\n\nPersonal Information: Name, email address, and any other details you provide during account registration or usage.\n\nUsage Data: Information about how you interact with the app, including pages visited, features used, and interactions with content.\n\nDevice Information: Data about the device you use, such as device model, operating system, and unique identifiers."
+        },
+        {
+          "title": "3. How We Use Your Information",
+          "content": "We use the collected information to:\n\n- Provide and improve the app's functionality and features.\n- Respond to customer service inquiries and provide support.\n- Analyze usage trends to enhance our services."
+        },
+        {
+          "title": "4. Sharing Your Information",
+          "content": "We do not share your personal information with any third parties."
+        },
+        {
+          "title": "5. Data Security",
+          "content": "We implement appropriate security measures to protect your personal information from unauthorized access, alteration, disclosure, or destruction. However, no data transmission over the internet or storage system can be guaranteed 100% secure."
+        },
+        {
+          "title": "6. Your Rights",
+          "content": "You have the right to:\n\n- Access, update, or delete your personal information by contacting us.\n- Opt out of receiving promotional communications.\n- Withdraw consent for data processing where applicable."
+        },
+        {
+          "title": "7. Third-Party Links",
+          "content": "The app may contain links to third-party websites or services. We are not responsible for the privacy practices of those third parties and encourage you to review their policies."
+        },
+        {
+          "title": "8. Children's Privacy",
+          "content": "Ta'aafi Platform is not intended for users under the age of 13. We do not knowingly collect personal data from children. If we become aware that we have collected data from a child, we will take steps to delete it."
+        },
+        {
+          "title": "9. Changes to This Privacy Policy",
+          "content": "We may update this policy from time to time. Any changes will be posted within the app, and continued use after updates constitutes acceptance of the revised policy."
+        },
+        {
+          "title": "10. Contact Us",
+          "content": "If you have any questions about this Privacy Policy, please contact us at: Email: admin@ta3afi.app"
+        }
+      ],
+      
+      "footerTagline": "Simplifying complexity, one interface at a time.",
+      "footerProduct": "Product",
+      "footerPricing": "Pricing",
+      "footerCompany": "Company",
+      "footerAbout": "About",
+      "footerBlog": "Blog",
+      "footerCareers": "Careers",
+      "footerResources": "Resources",
+      "footerSupport": "Support",
+      "footerLegal": "Legal",
+      "footerPrivacyPolicy": "Privacy Policy",
+      "footerTermsAndConditions": "Terms and Conditions",
+      "footerCopyright": "© 2025 Ta'aafi Platform. All rights reserved.",
+      "footerBackToTop": "Back to top",
+      "followUsOnTwitter": "Follow us on Twitter",
+      "followUsOnInstagram": "Follow us on Instagram",
+      "followUsOnGithub": "Follow us on GitHub",
+      
+      "statsHeading": "Our achievements speak for themselves",
+      "statsDescription": "Since launching Ta'aafi we've hit milestones we're proud of, and we're still working non-stop to give you the best experience.",
+      "averageRatingLabel": "Average rating",
+      "downloadsLabel": "Downloads",
+      "activeUsersLabel": "Daily active users",
+      "usersLabel": "Users",
+      "averageRatingValue": "4.5/5",
+      "downloadsValue": "+500,000",
+      "activeUsersValue": "+5,000",
+      "usersValue": "+340,000",
+      
+      "blogLatestArticles": "Latest Articles",
+      "blogStayUpdated": "Stay updated with our latest insights, tutorials, and updates",
+      "blogViewAllArticles": "View all articles",
+      "blogContentComingSoon": "Fresh insights are brewing—stay tuned!",
+
+      "coreToolsLabel": "Core Tools",
+      "introHeading": "Build Your Recovery",
+      "introDescription1": "Your recovery deserves more than willpower alone. Ta3afi equips you with science-backed digital tools that turn every urge resisted into a step forward.",
+      "introDescription2": "Start building the life you want—one healthy habit, one honest moment, one day at a time.",
+
+      "trackerName": "Tracker",
+      "trackerDescription": "Log every victory—from a ten-second pause to a hundred-day streak—and watch your progress grow.",
+      "insightsName": "Insights",
+      "insightsDescription": "Instant analytics reveal triggers, peak urge times, and patterns that keep you stuck—so you can break them.",
+      "calendarName": "Calendar",
+      "calendarDescription": "Schedule milestones, therapy sessions, and self-care checkpoints; review wins at a glance.",
+      "diariesName": "Diaries",
+      "diariesDescription": "A judgment-free space to record thoughts, emotions, and breakthroughs—encrypted and private.",
+      "activitiesName": "Activities",
+      "activitiesDescription": "Curated tasks and habit-building exercises keep your hands busy and your mind focused on growth.",
+      "libraryName": "Resource Library",
+      "libraryDescription": "Expert-reviewed articles and videos guide you through cravings, relapse prevention, and long-term healing.",
+      "communityName": "Community & Support (Coming Soon)",
+      "communityDescription": "No one fights alone. Our global Community & Support network offers live group chats, themed challenges, and peer accountability so you can celebrate wins, share setbacks, and receive compassionate, science-based guidance whenever temptation strikes.",
+      "groupsName": "Support Groups (Coming Soon)",
+      "groupsDescription": "Real-time group chat, shared challenges, and peer accountability to keep motivation high.",
+      "newToolsName": "New Tools (Coming Soon)",
+      "newToolsDescription": "Personalized AI coaching, relapse-prediction alerts, and mood-tracking integrations—stay tuned!",
+
+      "progressName": "Progress & Insights",
+      "progressDescription": "Capture tiny triumphs and monumental milestones alike. The Tracker records every urge resisted while Insights transforms raw data into actionable clarity—revealing emotional triggers, time-of-day patterns, and hidden victories that boost confidence and sustain momentum.",
+      "planningName": "Planning & Reflection",
+      "planningDescription": "View your journey at a glance. The Calendar renders streaks and daily follow-up notes as a vivid heat-map—tap any date to revisit urges resisted, reflections added, and moods logged—while Diaries remain your encrypted space to capture emotions in full color and nuance.",
+      "growthName": "Guided Growth",
+      "growthDescription": "Banish boredom and fuel neuroplastic change. Bite-sized Activities strengthen willpower, while the Resource Library delivers expert-curated articles, videos, and exercises that rewire habits and keep motivation burning bright through every stage.",
+      "smartName": "Personalized Recovery Plan (Coming Soon)",
+      "smartDescription": "Get ready for a step-by-step Recovery Plan designed around YOU. This upcoming feature blends CBT techniques, habit-stacking exercises, and milestone celebrations into an adaptive roadmap that evolves with your triggers, schedule, and motivations—keeping clarity high and relapse risk low."
+}
+  
+  
