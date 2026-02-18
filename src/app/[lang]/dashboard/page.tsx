@@ -9,8 +9,9 @@ import { getDictionary } from "./dictionaries"
 // Define a type for the dictionary for better type safety
 export type Dictionary = Awaited<ReturnType<typeof getDictionary>>
 
-export default async function Page({ params }: { params: Promise<{ lang: Locale }> }) {
-  const { lang } = await params
+export default async function Page({ params }: { params: Promise<{ lang: string }> }) {
+  const { lang: rawLang } = await params
+  const lang = rawLang as Locale
   const dictionary = await getDictionary(lang)
 
   // For data.json, you might need a more complex solution for full i18n
