@@ -1,0 +1,15 @@
+{
+  "json.validate.enable": true,
+  "json.schemaDownload.enable": true,
+  "[json]": {
+    "editor.quickSuggestions": {
+      "strings": true
+    },
+    "editor.suggest.insertMode": "replace"
+  },
+  "problems.decorations": {
+    "enabled": true
+  },
+  "json.maxItemsComputed": 5000,
+  "typescript.preferences.includePackageJsonAutoImports": "auto"
+} 

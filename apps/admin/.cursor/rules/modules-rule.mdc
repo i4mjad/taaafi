@@ -1,0 +1,660 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Ta'aafi Platform - Universal Module Implementation Rule
+
+## 🎯 **Purpose**
+This rule defines the standard patterns for implementing ANY module in the Ta'aafi Platform. Use this template to ensure consistent architecture, localization, authentication, and UI patterns across all modules.
+
+## 🏗️ **Universal Module Architecture**
+
+### **Directory Structure Template**
+Replace `{MODULE_NAME}` with your module name (kebab-case) and `{ENTITY_NAME}` with your entity name (PascalCase):
+
+```
+src/
+├── app/[lang]/
+│   └── {MODULE_NAME}/                  # e.g., user-management, community, features
+│       ├── page.tsx                    # Main module dashboard/overview
+│       ├── {SUB_MODULE}/               # e.g., users, roles, permissions
+│       │   ├── page.tsx                # Sub-module CRUD page
+│       │   └── components/
+│       │       └── {ENTITY_NAME}Form.tsx # Form component
+│       └── components/                 # Module-level shared components
+├── modules/{module_name}/              # Underscore naming for modules
+│   ├── pages/
+│   │   └── index.tsx                   # Main module page component
+│   ├── components/                     # Reusable module components
+│   ├── services/                       # Business logic services
+│   ├── repositories/                   # Data access layer
+│   └── __mocks__/                      # Test data
+├── types/
+│   └── {module}.ts                     # All module TypeScript definitions
+└── dictionaries/
+    ├── en.json                         # English translations
+    └── ar.json                         # Arabic translations
+```
+
+## 🚀 **Required Infrastructure Integration**
+
+### **1. Route Page Pattern** (app/[lang]/{MODULE_NAME}/page.tsx)
+```typescript
+'use client';
+
+import {ModuleName}Page from "@/modules/{module_name}/pages";
+import { SiteHeader } from '@/components/site-header';
+import { useTranslation } from "@/contexts/TranslationContext";
+
+export default function {ModuleName}Route() {
+  const { t, locale } = useTranslation();
+
+  const headerDictionary = {
+    documents: t('appSidebar.{moduleKey}') || '{Module Display Name}',
+  };
+  
+  return (
+    <>
+      <SiteHeader dictionary={headerDictionary} />
+      <div className="p-6">
+        <{ModuleName}Page t={t} locale={locale} />
+      </div>
+    </>
+  );
+}
+```
+
+### **2. Module Page Component** (modules/{module_name}/pages/index.tsx)
+```typescript
+'use client';
+
+import React from 'react';
+import Link from 'next/link';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Plus, ArrowRight, {ModuleIcon} } from 'lucide-react';
+
+interface {ModuleName}PageProps {
+  t: (key: string) => string;
+  locale: string;
+}
+
+export default function {ModuleName}Page({ t, locale }: {ModuleName}PageProps) {
+  // Module statistics
+  const moduleStats = {
+    total{Entities}: 0,
+    active{Entities}: 0,
+    // Add module-specific stats
+  };
+
+  // Sub-modules navigation
+  const subModules = [
+    {
+      title: t('sidebar.{subModule1}'),
+      description: t('modules.{module}.{subModule1}Description') || 'Description',
+      icon: {SubModuleIcon},
+      href: `/${locale}/{MODULE_NAME}/{sub-module-1}`,
+      stats: `${moduleStats.total{Entities}} items`,
+      color: 'text-blue-600',
+    },
+    // Add more sub-modules
+  ];
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">
+            {t('modules.{module}.title')}
+          </h1>
+          <p className="text-muted-foreground">
+            {t('modules.{module}.description') || 'Module description'}
+          </p>
+        </div>
+        <Button>
+          <Plus className="h-4 w-4 mr-2" />
+          {t('modules.{module}.create') || 'Create New'}
+        </Button>
+      </div>
+
+      {/* Stats Overview */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              {t('modules.{module}.stats.total')}
+            </CardTitle>
+            <{ModuleIcon} className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{moduleStats.total{Entities}}</div>
+            <p className="text-xs text-muted-foreground">
+              {t('modules.{module}.stats.totalDescription')}
+            </p>
+          </CardContent>
+        </Card>
+        {/* Add more stats cards */}
+      </div>
+
+      {/* Sub-modules Grid */}
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {subModules.map((module) => (
+          <Card key={module.title} className="relative overflow-hidden hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <module.icon className={`h-8 w-8 ${module.color}`} />
+              </div>
+              <CardTitle className="text-xl">{module.title}</CardTitle>
+              <CardDescription>{module.description}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-muted-foreground">{module.stats}</p>
+                <Button asChild size="sm">
+                  <Link href={module.href}>
+                    {t('common.manage')}
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                  </Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}
+```
+
+## 🔐 **Authentication Integration**
+
+Authentication is automatically inherited from [layout.tsx](mdc:src/app/[lang]/layout.tsx):
+- `AuthProvider` wraps all routes
+- `AuthGuard` protects access
+- `TranslationProvider` provides localization
+
+### **Role-Based Access (when needed)**
+```typescript
+import { useAuth } from '@/auth/AuthProvider';
+
+const { user, hasRole } = useAuth();
+
+// Protect specific actions
+if (!hasRole(['admin', 'moderator'])) {
+  return <AccessDenied />;
+}
+```
+
+## 🌍 **Localization Pattern**
+
+### **Translation Context Usage**
+All components receive localization via props from the route:
+```typescript
+interface ModuleComponentProps {
+  t: (key: string) => string;  // Translation function
+  locale: string;              // Current locale ('en' | 'ar')
+}
+```
+
+### **Translation Keys Structure**
+Add to [en.json](mdc:src/dictionaries/en.json) and [ar.json](mdc:src/dictionaries/ar.json):
+```json
+{
+  "modules": {
+    "{module}": {
+      "title": "Module Title",
+      "description": "Module description",
+      "create": "Create {Entity}",
+      "edit": "Edit {Entity}",
+      "delete": "Delete {Entity}",
+      "stats": {
+        "total": "Total {Entities}",
+        "active": "Active {Entities}"
+      },
+      "fields": {
+        "name": "Name",
+        "nameAr": "Name (Arabic)",
+        "description": "Description",
+        "isActive": "Active Status"
+      },
+      "errors": {
+        "nameRequired": "Name is required",
+        "loadingFailed": "Failed to load data"
+      }
+    }
+  },
+  "appSidebar": {
+    "{moduleKey}": "Module Name",
+    "{subModuleKey}": "Sub-module Name"
+  }
+}
+```
+
+### **RTL Support Pattern**
+```typescript
+<Input
+  dir={locale === 'ar' ? 'rtl' : 'ltr'}
+  placeholder={t('modules.{module}.placeholders.{field}')}
+  value={formData.{field}Ar}
+/>
+```
+
+## 📝 **Standard Form Component Pattern**
+
+### **CRUD Form Template** (components/{Entity}Form.tsx)
+```typescript
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Loader2 } from 'lucide-react';
+
+interface {Entity}FormProps {
+  {entity}?: {Entity};
+  onSubmit: (data: Create{Entity}Request | Update{Entity}Request) => Promise<void>;
+  onCancel: () => void;
+  isLoading?: boolean;
+  t: (key: string) => string;
+  locale: string;
+}
+
+export default function {Entity}Form({
+  {entity},
+  onSubmit,
+  onCancel,
+  isLoading = false,
+  t,
+  locale,
+}: {Entity}FormProps) {
+  const [formData, setFormData] = useState({
+    name: '',
+    nameAr: '',
+    description: '',
+    isActive: true,
+    // Add module-specific fields
+  });
+
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if ({entity}) {
+      setFormData({
+        name: {entity}.name,
+        nameAr: {entity}.nameAr || '',
+        description: {entity}.description || '',
+        isActive: {entity}.isActive,
+        // Map entity fields
+      });
+    }
+  }, [{entity}]);
+
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.name.trim()) {
+      newErrors.name = t('modules.{module}.errors.nameRequired') || 'Name is required';
+    }
+
+    // Add module-specific validations
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateForm()) return;
+
+    const submitData = {
+      name: formData.name.trim(),
+      nameAr: formData.nameAr.trim() || undefined,
+      description: formData.description.trim(),
+      isActive: formData.isActive,
+      // Add module-specific fields
+    };
+
+    await onSubmit(submitData);
+  };
+
+  const handleInputChange = (field: string, value: string | boolean) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: '' }));
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Name Field */}
+      <div className="space-y-2">
+        <Label htmlFor="name">
+          {t('modules.{module}.fields.name')} *
+        </Label>
+        <Input
+          id="name"
+          value={formData.name}
+          onChange={(e) => handleInputChange('name', e.target.value)}
+          placeholder={t('modules.{module}.placeholders.name')}
+          className={errors.name ? 'border-red-500' : ''}
+        />
+        {errors.name && (
+          <p className="text-sm text-red-600">{errors.name}</p>
+        )}
+      </div>
+
+      {/* Arabic Name Field */}
+      <div className="space-y-2">
+        <Label htmlFor="nameAr">
+          {t('modules.{module}.fields.nameAr')}
+        </Label>
+        <Input
+          id="nameAr"
+          value={formData.nameAr}
+          onChange={(e) => handleInputChange('nameAr', e.target.value)}
+          placeholder={t('modules.{module}.placeholders.nameAr')}
+          dir={locale === 'ar' ? 'rtl' : 'ltr'}
+        />
+      </div>
+
+      {/* Active Status */}
+      <div className="flex items-center justify-between">
+        <div className="space-y-0.5">
+          <Label htmlFor="isActive">
+            {t('modules.{module}.fields.isActive')}
+          </Label>
+          <p className="text-sm text-muted-foreground">
+            {t('modules.{module}.help.isActive')}
+          </p>
+        </div>
+        <Switch
+          id="isActive"
+          checked={formData.isActive}
+          onCheckedChange={(checked) => handleInputChange('isActive', checked)}
+        />
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex justify-end space-x-2 pt-4">
+        <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading}>
+          {t('common.cancel')}
+        </Button>
+        <Button type="submit" disabled={isLoading}>
+          {isLoading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+          {{entity} ? t('common.update') : t('common.create')}
+        </Button>
+      </div>
+    </form>
+  );
+}
+```
+
+## 🗂️ **TypeScript Definitions Pattern**
+
+### **Complete Type Structure** (types/{module}.ts)
+```typescript
+// Base Entity Interface
+export interface {Entity} {
+  id: string;
+  name: string;
+  nameAr?: string;
+  description?: string;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  // Add module-specific fields
+}
+
+// Request Interfaces
+export interface Create{Entity}Request {
+  name: string;
+  nameAr?: string;
+  description?: string;
+  isActive: boolean;
+  // Add module-specific fields
+}
+
+export interface Update{Entity}Request {
+  name?: string;
+  nameAr?: string;
+  description?: string;
+  isActive?: boolean;
+  // Add module-specific fields
+}
+
+// Filter Interface
+export interface {Entity}Filters {
+  search?: string;
+  isActive?: boolean;
+  // Add module-specific filters
+}
+
+// Component Props Interfaces
+export interface {Entity}FormProps {
+  {entity}?: {Entity};
+  onSubmit: (data: Create{Entity}Request | Update{Entity}Request) => Promise<void>;
+  onCancel: () => void;
+  isLoading?: boolean;
+  t: (key: string) => string;
+  locale: string;
+}
+
+export interface {Entity}TableProps {
+  {entities}: {Entity}[];
+  onEdit: ({entity}: {Entity}) => void;
+  onDelete: (id: string) => void;
+  isLoading?: boolean;
+  t: (key: string) => string;
+  locale: string;
+}
+```
+
+## 🔄 **Data Layer Pattern**
+
+### **Repository Interface** (repositories/I{Module}Repository.ts)
+```typescript
+export interface I{Module}Repository {
+  findAll(filters?: {Entity}Filters): Promise<{Entity}[]>;
+  findById(id: string): Promise<{Entity} | null>;
+  create(data: Create{Entity}Request): Promise<{Entity}>;
+  update(id: string, data: Update{Entity}Request): Promise<{Entity}>;
+  delete(id: string): Promise<void>;
+  // Add module-specific methods
+}
+```
+
+### **Firebase Implementation** (repositories/Firebase{Module}Repository.ts)
+```typescript
+import { 
+  collection,
+  doc,
+  getDocs,
+  getDoc,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  query,
+  where,
+  orderBy,
+  Timestamp
+} from 'firebase/firestore';
+import { firestore } from '@/lib/firebase';
+
+export class Firebase{Module}Repository implements I{Module}Repository {
+  private collectionName = '{entities}'; // Firestore collection name
+
+  async findAll(filters?: {Entity}Filters): Promise<{Entity}[]> {
+    try {
+      let q = query(collection(firestore, this.collectionName), orderBy('name'));
+      
+      // Apply filters
+      if (filters?.isActive !== undefined) {
+        q = query(q, where('isActive', '==', filters.isActive));
+      }
+
+      const snapshot = await getDocs(q);
+      return snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data().createdAt?.toDate() || new Date(),
+        updatedAt: doc.data().updatedAt?.toDate() || new Date(),
+      })) as {Entity}[];
+    } catch (error) {
+      console.error('Error fetching {entities}:', error);
+      throw error;
+    }
+  }
+
+  // Implement other CRUD methods following the same pattern
+}
+```
+
+## 🎨 **UI Component Patterns**
+
+### **Data Table Integration**
+```typescript
+import { DataTable } from '@/components/data-table';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { MoreHorizontal, Edit, Trash2 } from 'lucide-react';
+
+const columns = [
+  {
+    accessorKey: 'name',
+    header: t('modules.{module}.fields.name'),
+  },
+  {
+    accessorKey: 'nameAr',
+    header: t('modules.{module}.fields.nameAr'),
+    cell: ({ row }) => row.original.nameAr || '-',
+  },
+  {
+    accessorKey: 'isActive',
+    header: t('modules.{module}.fields.isActive'),
+    cell: ({ row }) => (
+      <Badge variant={row.original.isActive ? 'default' : 'secondary'}>
+        {row.original.isActive ? t('common.active') : t('common.inactive')}
+      </Badge>
+    ),
+  },
+  {
+    id: 'actions',
+    cell: ({ row }) => (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="h-8 w-8 p-0">
+            <MoreHorizontal className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem onClick={() => onEdit(row.original)}>
+            <Edit className="mr-2 h-4 w-4" />
+            {t('common.edit')}
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => onDelete(row.original.id)}>
+            <Trash2 className="mr-2 h-4 w-4" />
+            {t('common.delete')}
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    ),
+  },
+];
+```
+
+### **Loading States Pattern**
+```typescript
+import { Skeleton } from '@/components/ui/skeleton';
+
+// Consistent loading pattern
+{isLoading ? (
+  <div className="p-8">
+    <div className="space-y-4">
+      <Skeleton className="h-8 w-1/3" />
+      <Skeleton className="h-4 w-2/3" />
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {[...Array(4)].map((_, i) => (
+          <Skeleton key={i} className="h-32" />
+        ))}
+      </div>
+    </div>
+  </div>
+) : (
+  <ModuleContent />
+)}
+```
+
+## 🔧 **Navigation Integration**
+
+### **Update Sidebar Navigation**
+Add to [app-sidebar.tsx](mdc:src/components/app-sidebar.tsx):
+```typescript
+const data = {
+  navMain: [
+    {
+      title: t('appSidebar.{moduleKey}'),
+      url: `/${lang}/{MODULE_NAME}`,
+      icon: {ModuleIcon},
+      items: [
+        {
+          title: t('appSidebar.{subModuleKey}'),
+          url: `/${lang}/{MODULE_NAME}/{sub-module}`,
+        },
+      ],
+    },
+  ],
+};
+```
+
+## ✅ **Implementation Checklist**
+
+When implementing a new module using this rule:
+
+### **Setup Phase**
+- [ ] Replace all `{MODULE_NAME}`, `{ENTITY_NAME}` placeholders
+- [ ] Create directory structure
+- [ ] Define TypeScript interfaces in `types/{module}.ts`
+- [ ] Add translation keys to both language files
+
+### **Core Implementation**
+- [ ] Create route pages following the pattern
+- [ ] Implement module page component with stats and navigation
+- [ ] Create CRUD form components with validation
+- [ ] Implement data table with actions
+
+### **Infrastructure Integration**
+- [ ] Verify authentication inheritance works
+- [ ] Test localization with both languages
+- [ ] Ensure RTL support for Arabic inputs
+- [ ] Add navigation to sidebar
+
+### **Data Layer**
+- [ ] Create repository interface
+- [ ] Implement Firebase repository
+- [ ] Add error handling and logging
+- [ ] Create mock repository for testing
+
+### **Testing & Polish**
+- [ ] Test all CRUD operations
+- [ ] Verify responsive design
+- [ ] Test locale switching
+- [ ] Check loading states
+- [ ] Validate form error handling
+
+## 🎯 **Key Principles**
+
+1. **Consistency**: Follow patterns exactly as defined
+2. **Localization**: Every user-facing text must be translatable
+3. **Authentication**: Leverage inherited auth, add role checks when needed
+4. **Types**: Comprehensive TypeScript coverage for all interfaces
+5. **Accessibility**: RTL support, proper ARIA attributes
+6. **Performance**: Efficient loading, proper error boundaries
+7. **Scalability**: Clean separation of concerns
+
+This rule ensures consistent, maintainable, and scalable module implementation across the entire Ta'aafi Platform.
