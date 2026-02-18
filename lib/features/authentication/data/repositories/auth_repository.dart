@@ -41,11 +41,11 @@ class AuthRepository {
       final docRef = await _firestore
           .collection('users')
           .doc(_auth.currentUser?.uid)
-          .get(GetOptions(source: Source.server));
+          .get();
       return docRef.exists;
     } catch (e, stackTrace) {
       ref.read(errorLoggerProvider).logException(e, stackTrace);
-      return false;
+      rethrow; // Propagate error instead of returning false
     }
   }
 

@@ -51,8 +51,10 @@ class UserDocument {
 
   factory UserDocument.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>? ?? {};
+    // Fallback to doc.id if uid field is missing but document exists
+    final uid = data['uid'] ?? (doc.exists && doc.id.isNotEmpty ? doc.id : null);
     return UserDocument(
-      uid: data['uid'],
+      uid: uid,
       devicesIds: data['devicesIds'] != null
           ? List<String>.from(data['devicesIds'])
           : null,

@@ -142,6 +142,7 @@ class HomeScreen extends ConsumerWidget {
                 ),
               );
             case AccountStatus.pendingDeletion:
+            case AccountStatus.error:
               return const Center(
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16.0),

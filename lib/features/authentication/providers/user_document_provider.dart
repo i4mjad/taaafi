@@ -56,7 +56,7 @@ class UserDocumentsNotifier extends _$UserDocumentsNotifier {
       final doc = await _firestore
           .collection('users')
           .doc(uid)
-          .get(GetOptions(source: Source.server));
+          .get();
 
       if (!doc.exists) {
         print('⚠️ USER DOCUMENT: Document does not exist for UID: $uid');
@@ -93,7 +93,7 @@ class UserDocumentsNotifier extends _$UserDocumentsNotifier {
     } catch (e, stackTrace) {
       print('❌ USER DOCUMENT ERROR: $e');
       ref.read(errorLoggerProvider).logException(e, stackTrace);
-      return null;
+      rethrow; // Propagate error instead of returning null to distinguish network errors from missing documents
     }
   }
 

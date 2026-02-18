@@ -12,6 +12,7 @@ enum AccountStatus {
   needConfirmDetails,
   needEmailVerification,
   pendingDeletion,
+  error, // Network/permanent error state - prevents false redirects to registration
 }
 
 @riverpod
@@ -86,8 +87,8 @@ AccountStatus accountStatus(Ref ref) {
           return AccountStatus.ok;
         },
         error: (error, __) {
-          print('❌ ACCOUNT STATUS: needCompleteRegistration (User error: $error)');
-          return AccountStatus.needCompleteRegistration;
+          print('❌ ACCOUNT STATUS: error (User error: $error)');
+          return AccountStatus.error; // Don't redirect to registration on errors
         },
         loading: () {
           print('🔄 ACCOUNT STATUS: Loading (User data)');
@@ -96,8 +97,8 @@ AccountStatus accountStatus(Ref ref) {
       );
     },
     error: (error, __) {
-      print('❌ ACCOUNT STATUS: needCompleteRegistration (Document error: $error)');
-      return AccountStatus.needCompleteRegistration;
+      print('❌ ACCOUNT STATUS: error (Document error: $error)');
+      return AccountStatus.error; // Don't redirect to registration on network/fetch errors
     },
     loading: () {
       print('🔄 ACCOUNT STATUS: Loading (Document data)');

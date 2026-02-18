@@ -1758,6 +1758,8 @@ const Map<String, String> kAr = {
   "shared-challenges": "التحديات",
   "error-no-group-membership": "خطأ: لم يتم العثور على عضوية في زمالة",
   "error": "خطأ",
+  "connection-error": "تعذر التحقق من حالة الحساب",
+  "connection-error-subtitle": "يرجى التحقق من اتصالك والمحاولة مرة أخرى.",
 
   // Coming soon section
   "join-exciting-challenges": "انضم إلى تحديات مثيرة مع دعم المجتمع.",

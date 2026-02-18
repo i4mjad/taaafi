@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__firebase__firestore_get_documents",
+      "mcp__firebase__firestore_query_collection",
+      "Bash(python3:*)",
+      "mcp__firebase__auth_get_users"
+    ]
+  }
+}

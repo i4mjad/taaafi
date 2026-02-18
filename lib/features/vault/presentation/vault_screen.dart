@@ -204,6 +204,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen>
                 ),
               );
             case AccountStatus.pendingDeletion:
+            case AccountStatus.error:
               return const Center(
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16.0),

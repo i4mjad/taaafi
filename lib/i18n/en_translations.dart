@@ -1817,6 +1817,8 @@ const Map<String, String> kEn = {
   "shared-challenges": "Challenges",
   "error-no-group-membership": "Error: No group membership found",
   "error": "Error",
+  "connection-error": "Unable to verify account status",
+  "connection-error-subtitle": "Please check your connection and try again.",
 
   // Coming soon section
   "join-exciting-challenges":
@@ -3275,7 +3277,8 @@ const Map<String, String> kEn = {
   "retention-offer-description":
       "Before you go, we'd love for you to experience Ta3afi+ for free. Get a full month of premium features on us - no strings attached.",
   "retention-offer-claim-button": "Claim My Free Month",
-  "retention-offer-skip": "I don't want a free month, proceed to delete my account",
+  "retention-offer-skip":
+      "I don't want a free month, proceed to delete my account",
   "retention-offer-reconsider": "Changed your mind? Claim your free month",
   "retention-reward-claimed": "Your free month has been activated!",
   "retention-reward-already-claimed": "You've already claimed this offer",

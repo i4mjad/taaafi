@@ -110,17 +110,15 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
     _checkUserStatus();
 
     // Always load pinned and news posts for the sections above tabs
-      ref
-          .read(pinnedPostsPaginationProvider.notifier)
-          .loadPosts(isPinned: true);
-      ref
-          .read(newsPostsPaginationProvider.notifier)
-          .loadPosts(category: 'aqOhcyOg1z8tcij0y1S4');
+    ref.read(pinnedPostsPaginationProvider.notifier).loadPosts(isPinned: true);
+    ref
+        .read(newsPostsPaginationProvider.notifier)
+        .loadPosts(category: 'aqOhcyOg1z8tcij0y1S4');
 
     // Load posts based on initial filter
-      ref
-          .read(postsPaginationProvider.notifier)
-          .loadPosts(category: _getFilterCategory());
+    ref
+        .read(postsPaginationProvider.notifier)
+        .loadPosts(category: _getFilterCategory());
   }
 
   @override
@@ -228,6 +226,7 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
                 ),
               );
             case AccountStatus.pendingDeletion:
+            case AccountStatus.error:
               return const Center(
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16.0),
@@ -535,7 +534,8 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
                       context.push('/community/categories');
                     },
                     child: Text(
-                      AppLocalizations.of(context).translate('community_categories'),
+                      AppLocalizations.of(context)
+                          .translate('community_categories'),
                       style: TextStyles.caption.copyWith(
                         color: AppTheme.of(context).primary[600],
                         fontWeight: FontWeight.w600,
@@ -560,15 +560,15 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
       return RefreshIndicator(
         onRefresh: () async {
           // Refresh pinned and news sections
-              await ref
-                  .read(pinnedPostsPaginationProvider.notifier)
-                  .refresh(isPinned: true);
-              await ref
-                  .read(newsPostsPaginationProvider.notifier)
-                  .refresh(category: 'aqOhcyOg1z8tcij0y1S4');
-          
+          await ref
+              .read(pinnedPostsPaginationProvider.notifier)
+              .refresh(isPinned: true);
+          await ref
+              .read(newsPostsPaginationProvider.notifier)
+              .refresh(category: 'aqOhcyOg1z8tcij0y1S4');
+
           // Refresh posts
-              await ref.read(postsPaginationProvider.notifier).refresh();
+          await ref.read(postsPaginationProvider.notifier).refresh();
         },
         child: scrollView,
       );
@@ -578,7 +578,7 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
   }
 
   Widget _buildMainContent() {
-        return _buildPostsView();
+    return _buildPostsView();
   }
 
   /// Build the pinned posts section that appears above the tabs
@@ -597,7 +597,8 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
       return const SizedBox.shrink();
     }
 
-    final pinnedPosts = postsState.posts.take(6).toList(); // Show max 6 pinned posts
+    final pinnedPosts =
+        postsState.posts.take(6).toList(); // Show max 6 pinned posts
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -612,18 +613,18 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
           },
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Row(
-            children: [
-              Icon(
+            child: Row(
+              children: [
+                Icon(
                   LucideIcons.pin,
                   size: 16,
                   color: const Color(0xFFF59E0B),
                 ),
                 const SizedBox(width: 6),
-              Text(
+                Text(
                   localizations.translate('community_pinned'),
                   style: TextStyles.footnoteSelected.copyWith(
-                  color: theme.grey[900],
+                    color: theme.grey[900],
                   ),
                 ),
                 const Spacer(),
@@ -636,9 +637,9 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
                     color: theme.grey[600],
                   ),
                 ),
-            ],
+              ],
+            ),
           ),
-        ),
         ),
         if (_pinnedExpanded)
           AnimatedOpacity(
@@ -653,14 +654,19 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
                   height: 114, // Increased to give shadows space to breathe
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
                     itemCount: pinnedPosts.length,
                     itemBuilder: (context, index) {
                       final post = pinnedPosts[index];
                       return Padding(
                         padding: EdgeInsets.only(
-                          right: isRTL ? 0 : (index < pinnedPosts.length - 1 ? 12 : 0),
-                          left: isRTL ? (index < pinnedPosts.length - 1 ? 12 : 0) : 0,
+                          right: isRTL
+                              ? 0
+                              : (index < pinnedPosts.length - 1 ? 12 : 0),
+                          left: isRTL
+                              ? (index < pinnedPosts.length - 1 ? 12 : 0)
+                              : 0,
                         ),
                         child: _buildPinnedPostCard(post, theme, localizations),
                       );
@@ -679,9 +685,8 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
   Widget _buildPinnedPostCard(
       Post post, dynamic theme, AppLocalizations localizations) {
     // Get first 50 characters of body
-    final bodyPreview = post.body.length > 50
-        ? '${post.body.substring(0, 50)}...'
-        : post.body;
+    final bodyPreview =
+        post.body.length > 50 ? '${post.body.substring(0, 50)}...' : post.body;
 
     return GestureDetector(
       onTap: () {
@@ -756,7 +761,8 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
       return const SizedBox.shrink();
     }
 
-    final newsPosts = postsState.posts.take(6).toList(); // Show max 6 news posts
+    final newsPosts =
+        postsState.posts.take(6).toList(); // Show max 6 news posts
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -764,29 +770,29 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
         const SizedBox(height: 12),
         // Section header with icon and expand/collapse
         GestureDetector(
-              onTap: () {
+          onTap: () {
             setState(() {
               _newsExpanded = !_newsExpanded;
             });
           },
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                children: [
+            child: Row(
+              children: [
                 Icon(
                   LucideIcons.newspaper,
                   size: 16,
                   color: const Color(0xFF10B981),
                 ),
                 const SizedBox(width: 6),
-                  Text(
+                Text(
                   localizations.translate('community_news'),
                   style: TextStyles.footnoteSelected.copyWith(
                     color: theme.grey[900],
                   ),
                 ),
                 const Spacer(),
-                  AnimatedRotation(
+                AnimatedRotation(
                   turns: _newsExpanded ? 0.5 : 0,
                   duration: const Duration(milliseconds: 300),
                   child: Icon(
@@ -794,11 +800,11 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
                     size: 16,
                     color: theme.grey[600],
                   ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
+        ),
         if (_newsExpanded)
           AnimatedOpacity(
             opacity: _newsExpanded ? 1.0 : 0.0,
@@ -812,14 +818,19 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
                   height: 94, // Increased to give shadows space to breathe
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
                     itemCount: newsPosts.length,
                     itemBuilder: (context, index) {
                       final post = newsPosts[index];
                       return Padding(
                         padding: EdgeInsets.only(
-                          right: isRTL ? 0 : (index < newsPosts.length - 1 ? 12 : 0),
-                          left: isRTL ? (index < newsPosts.length - 1 ? 12 : 0) : 0,
+                          right: isRTL
+                              ? 0
+                              : (index < newsPosts.length - 1 ? 12 : 0),
+                          left: isRTL
+                              ? (index < newsPosts.length - 1 ? 12 : 0)
+                              : 0,
                         ),
                         child: _buildNewsPostCard(post, theme, localizations),
                       );
@@ -838,9 +849,8 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
   Widget _buildNewsPostCard(
       Post post, dynamic theme, AppLocalizations localizations) {
     // Get first 50 characters of body
-    final bodyPreview = post.body.length > 50
-        ? '${post.body.substring(0, 50)}...'
-        : post.body;
+    final bodyPreview =
+        post.body.length > 50 ? '${post.body.substring(0, 50)}...' : post.body;
 
     return GestureDetector(
       onTap: () {
@@ -886,10 +896,9 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
             ),
           ],
         ),
-        ),
-      );
-    }
-
+      ),
+    );
+  }
 
   Widget _buildPaginatedPostsContent(
       dynamic postsState, AppLocalizations localizations, theme) {
@@ -965,8 +974,6 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
       },
     );
   }
-
-
 
   /// Determines if Shorebird update status should block the entire screen
   bool _shouldBlockForShorebirdUpdate(AppUpdateStatus status) {
