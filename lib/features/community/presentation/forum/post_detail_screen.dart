@@ -37,14 +37,8 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
   @override
   void initState() {
     super.initState();
-    // Initialize anonymity state based on user's profile setting
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(currentCommunityProfileProvider).whenData((profile) {
-        if (profile != null) {
-          ref.read(anonymousPostProvider.notifier).state = profile.isAnonymous;
-        }
-      });
-    });
+    // Note: Removed automatic anonymity state initialization
+    // Let users choose per-post anonymity independent of their profile setting
   }
 
   @override
@@ -64,8 +58,17 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
     return postAsync.when(
       data: (post) {
         if (post == null) {
+          print('❌ [POST_DETAIL] Post not found for ID: ${widget.postId}');
           return _buildPostNotFound(theme, localizations);
         }
+
+        print('✅ [POST_DETAIL] Post loaded: ${post.title}');
+        print(
+            '🔍 [POST_DETAIL] Post attachment types: ${post.attachmentTypes}');
+        print(
+            '🔍 [POST_DETAIL] Post attachments summary: ${post.attachmentsSummary}');
+        print(
+            '🔍 [POST_DETAIL] Pending attachments: ${post.pendingAttachments}');
 
         return Scaffold(
             appBar: plainAppBar(
@@ -110,7 +113,13 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                               const SizedBox(height: 16),
 
                               // Post content
-                              PostContentWidget(post: post),
+                              Builder(
+                                builder: (context) {
+                                  print(
+                                      '🎨 [POST_DETAIL] Rendering PostContentWidget with attachments: ${post.attachmentsSummary.length}');
+                                  return PostContentWidget(post: post);
+                                },
+                              ),
                             ],
                           ),
                         ),

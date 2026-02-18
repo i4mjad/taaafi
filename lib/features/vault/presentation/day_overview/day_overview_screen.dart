@@ -148,6 +148,7 @@ class DayEmotions extends StatelessWidget {
                   showModalBottomSheet<void>(
                       context: context,
                       isScrollControlled: true,
+                      useSafeArea: true,
                       builder: (BuildContext context) {
                         return FollowUpSheet(date);
                       });
@@ -254,6 +255,7 @@ class DayFollowUps extends StatelessWidget {
                   showModalBottomSheet<void>(
                       context: context,
                       isScrollControlled: true,
+                      useSafeArea: true,
                       builder: (BuildContext context) {
                         return FollowUpSheet(date);
                       });
@@ -641,6 +643,7 @@ class DayTriggers extends ConsumerWidget {
                     showModalBottomSheet<void>(
                         context: context,
                         isScrollControlled: true,
+                        useSafeArea: true,
                         builder: (BuildContext context) {
                           return FollowUpSheet(date);
                         });

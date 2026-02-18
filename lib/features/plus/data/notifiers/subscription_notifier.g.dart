@@ -24,6 +24,25 @@ final hasActiveSubscriptionProvider = AutoDisposeProvider<bool>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef HasActiveSubscriptionRef = AutoDisposeProviderRef<bool>;
+String _$hasActiveRenewingSubscriptionHash() =>
+    r'13bd696d33ac57a7be6efca9f052f220915a9627';
+
+/// See also [hasActiveRenewingSubscription].
+@ProviderFor(hasActiveRenewingSubscription)
+final hasActiveRenewingSubscriptionProvider =
+    AutoDisposeProvider<bool>.internal(
+  hasActiveRenewingSubscription,
+  name: r'hasActiveRenewingSubscriptionProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$hasActiveRenewingSubscriptionHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef HasActiveRenewingSubscriptionRef = AutoDisposeProviderRef<bool>;
 String _$isPremiumAnalyticsAvailableHash() =>
     r'1e709839b82d9876e332264630cd6ae2a1da09cb';
 
@@ -62,7 +81,7 @@ final availablePackagesProvider =
 // ignore: unused_element
 typedef AvailablePackagesRef = AutoDisposeFutureProviderRef<List<Package>>;
 String _$subscriptionNotifierHash() =>
-    r'2a975e71ee34d033595a9a99c78fee3a99675088';
+    r'4c7d3c1a419a6beb246c7d23106dbab51f052e9e';
 
 /// See also [SubscriptionNotifier].
 @ProviderFor(SubscriptionNotifier)

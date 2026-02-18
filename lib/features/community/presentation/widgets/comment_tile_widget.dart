@@ -7,7 +7,6 @@ import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/community/data/models/comment.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/avatar_with_anonymity.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/community_profile_modal.dart';
-import 'package:reboot_app_3/features/community/presentation/widgets/role_chip.dart';
 import 'package:reboot_app_3/features/community/presentation/widgets/streak_display_widget.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/forum_providers.dart';
@@ -107,14 +106,14 @@ class CommentTileWidget extends ConsumerWidget {
                     isDeleted: authorProfile.isDeleted,
                     cpId: comment.authorCPId,
                     isAnonymous: isAuthorAnonymous,
-                    size: 32,
+                    size: 28,
                     avatarUrl:
                         isAuthorAnonymous ? null : authorProfile.avatarUrl,
                     isPlusUser: isAuthorPlusUser,
                   ),
                 ),
 
-                const SizedBox(width: 16),
+                const SizedBox(width: 8),
 
                 // Comment content
                 Expanded(
@@ -252,187 +251,187 @@ class CommentTileWidget extends ConsumerWidget {
         final displayName =
             _getLocalizedDisplayName(pipelineResult, localizations);
 
+        // Get role icon and color
+        final roleData =
+            _getRoleIconData(authorProfile.role?.toLowerCase() ?? 'member');
+
         return Row(
           children: [
-            // User info section - similar to post header
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // FIRST row for badges, timestamp, and 3-dots
-                  Container(
-                    margin: const EdgeInsets.only(bottom: 4),
-                    child: Row(
-                      children: [
-                        // Badges container - only add spacing between existing badges
-                        Row(
-                          children: [
-                            // Build badges list dynamically to avoid unnecessary spacing
-                            ...() {
-                              final List<Widget> badges = [];
-
-                              // Role chip
-                              if (authorProfile.role != null &&
-                                  authorProfile.role!.isNotEmpty) {
-                                badges.add(RoleChip(role: authorProfile.role));
-                              }
-
-                              // Streak display
-                              if (isAuthorPlusUser &&
-                                  authorProfile.shareRelapseStreaks) {
-                                badges.add(Consumer(
-                                  builder: (context, ref, child) {
-                                    final streakAsync = ref.watch(
-                                        userStreakCalculatorProvider(
-                                            comment.authorCPId));
-
-                                    return streakAsync.when(
-                                      data: (streakDays) {
-                                        if (streakDays == null ||
-                                            streakDays <= 0) {
-                                          return const SizedBox.shrink();
-                                        }
-                                        return StreakDisplayWidget(
-                                          streakDays: streakDays,
-                                          fontSize: 8,
-                                          iconSize: 8,
-                                        );
-                                      },
-                                      loading: () => const SizedBox.shrink(),
-                                      error: (error, stackTrace) =>
-                                          const SizedBox.shrink(),
-                                    );
-                                  },
-                                ));
-                              }
-
-                              // Author badge
-                              if (isAuthor) {
-                                badges.add(Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 6, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    color: theme.primary[50],
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
-                                  child: Text(
-                                    localizations.translate('author'),
-                                    style: TextStyles.tiny.copyWith(
-                                      color: theme.primary[700],
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ));
-                              }
-
-                              // Add spacing only between existing badges
-                              final List<Widget> spacedBadges = [];
-                              for (int i = 0; i < badges.length; i++) {
-                                spacedBadges.add(badges[i]);
-                                // Add spacing between badges (not after the last one)
-                                if (i < badges.length - 1) {
-                                  spacedBadges.add(const SizedBox(width: 6));
-                                }
-                              }
-
-                              return spacedBadges;
-                            }(),
-                          ],
-                        ),
-
-                        // Spacer between badges and timestamp/3dots
-                        const Spacer(),
-
-                        // Timestamp
-                        Text(
-                          _formatTimestamp(comment.createdAt),
-                          style: TextStyles.caption.copyWith(
-                            color: theme.grey[600],
-                            fontSize: 12,
-                          ),
-                        ),
-
-                        const SizedBox(width: 8),
-
-                        // 3 dots button
-                        if (onMoreTap != null)
-                          GestureDetector(
-                            onTap: onMoreTap,
-                            child: Container(
-                              padding: const EdgeInsets.all(4),
-                              child: Icon(
-                                LucideIcons.moreHorizontal,
-                                size: 16,
-                                color: theme.grey[500],
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
+            // Display name with role icon and anonymity logic - clickable
+            GestureDetector(
+              onTap: () => showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                builder: (context) => Padding(
+                  padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom,
                   ),
-
-                  // SECOND row for name only
-                  Row(
-                    children: [
-                      // Display name - clickable
-                      GestureDetector(
-                        onTap: () => showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          backgroundColor: Colors.transparent,
-                          builder: (context) => Padding(
-                            padding: EdgeInsets.only(
-                              bottom: MediaQuery.of(context).viewInsets.bottom,
-                            ),
-                            child: CommunityProfileModal(
-                              communityProfileId: comment.authorCPId,
-                              displayName: authorProfile.displayName,
-                              avatarUrl: authorProfile.avatarUrl,
-                              isAnonymous: isAuthorAnonymous,
-                              isPlusUser: isAuthorPlusUser,
-                            ),
-                          ),
-                        ),
-                        child: Text(
-                          displayName,
-                          style: TextStyles.footnoteSelected.copyWith(
-                            color: theme.primary[700],
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                  child: CommunityProfileModal(
+                    communityProfileId: comment.authorCPId,
+                    displayName: authorProfile.displayName,
+                    avatarUrl: authorProfile.avatarUrl,
+                    isAnonymous: isAuthorAnonymous,
+                    isPlusUser: isAuthorPlusUser,
+                  ),
+                ),
+              ),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 150),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Role icon (only show for founder and admin)
+                    if (authorProfile.role?.toLowerCase() == 'founder' ||
+                        authorProfile.role?.toLowerCase() == 'admin') ...[
+                      Icon(
+                        roleData.icon,
+                        size: 14,
+                        color: roleData.color,
                       ),
+                      const SizedBox(width: 4),
                     ],
-                  ),
-                ],
+                    Flexible(
+                      child: Text(
+                        displayName,
+                        style: TextStyles.smallBold.copyWith(
+                          color: (authorProfile.role?.toLowerCase() ==
+                                      'founder' ||
+                                  authorProfile.role?.toLowerCase() == 'admin')
+                              ? roleData.color
+                              : theme.grey[900],
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
+
+            // const SizedBox(width: 8),
+
+            // Badges section
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Streak display
+                if (isAuthorPlusUser && authorProfile.shareRelapseStreaks)
+                  Consumer(
+                    builder: (context, ref, child) {
+                      final streakAsync = ref.watch(
+                          userStreakCalculatorProvider(comment.authorCPId));
+
+                      return streakAsync.when(
+                        data: (streakDays) {
+                          if (streakDays == null || streakDays <= 0) {
+                            return const SizedBox.shrink();
+                          }
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 8),
+                            child: StreakDisplayWidget(
+                              streakDays: streakDays,
+                              fontSize: 8,
+                              iconSize: 8,
+                            ),
+                          );
+                        },
+                        loading: () => const SizedBox.shrink(),
+                        error: (error, stackTrace) => const SizedBox.shrink(),
+                      );
+                    },
+                  ),
+
+                // Author badge
+                if (isAuthor)
+                  Container(
+                    margin: const EdgeInsets.only(right: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: theme.primary[50],
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      localizations.translate('author'),
+                      style: TextStyles.tiny.copyWith(
+                        color: theme.primary[700],
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+
+            const Spacer(),
+
+            // Timestamp
+            Text(
+              _formatTimestamp(comment.createdAt),
+              style: TextStyles.caption.copyWith(
+                color: theme.grey[600],
+                fontSize: 12,
+              ),
+            ),
+
+            const SizedBox(width: 8),
+
+            // 3 dots button
+            if (onMoreTap != null)
+              GestureDetector(
+                onTap: onMoreTap,
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  child: Icon(
+                    LucideIcons.moreHorizontal,
+                    size: 16,
+                    color: theme.grey[500],
+                  ),
+                ),
+              ),
           ],
         );
       },
       loading: () => Row(
         children: [
-          Expanded(
-            child: Text(
-              'Loading...',
-              style: TextStyles.footnoteSelected.copyWith(
-                color: theme.grey[700],
-                fontSize: 14,
-              ),
+          Container(
+            width: 80,
+            height: 16,
+            decoration: BoxDecoration(
+              color: theme.grey[200],
+              borderRadius: BorderRadius.circular(4),
+            ),
+          ),
+          const Spacer(),
+          Text(
+            'Loading...',
+            style: TextStyles.caption.copyWith(
+              color: theme.grey[600],
+              fontSize: 12,
             ),
           ),
         ],
       ),
       error: (error, stackTrace) => Row(
         children: [
-          Expanded(
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 150),
             child: Text(
               'Unknown User',
-              style: TextStyles.footnoteSelected.copyWith(
-                color: theme.grey[700],
-                fontSize: 14,
+              style: TextStyles.smallBold.copyWith(
+                color: theme.grey[600],
               ),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
+          ),
+          const Spacer(),
+          Text(
+            _formatTimestamp(comment.createdAt),
+            style: TextStyles.caption.copyWith(
+              color: theme.grey[600],
+              fontSize: 12,
             ),
           ),
         ],
@@ -527,6 +526,39 @@ class CommentTileWidget extends ConsumerWidget {
       return '${timestamp.day}/${timestamp.month}/${timestamp.year}';
     }
   }
+
+  /// Get role icon and color data based on role
+  _RoleIconData _getRoleIconData(String role) {
+    switch (role) {
+      case 'admin':
+        return _RoleIconData(
+          icon: LucideIcons.shield,
+          color: const Color(0xFF2563EB), // Blue color for admin
+        );
+      case 'founder':
+        return _RoleIconData(
+          icon: LucideIcons.personStanding,
+          color: const Color(0xFF7C3AED), // Purple color for founder
+        );
+      case 'member':
+      default:
+        return _RoleIconData(
+          icon: LucideIcons.user,
+          color: const Color(0xFF6B7280), // Gray color for member
+        );
+    }
+  }
+}
+
+/// Data class for role icon information
+class _RoleIconData {
+  final IconData icon;
+  final Color color;
+
+  const _RoleIconData({
+    required this.icon,
+    required this.color,
+  });
 }
 
 /// Separate widget to handle comment interaction state

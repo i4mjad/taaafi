@@ -12,11 +12,19 @@ class AppFeaturesConfig {
   static const String postCreation = 'post_creation';
   static const String commentCreation = 'comment_creation';
 
-  // static const String directMessaging = 'direct_messaging';
-  // static const String groupCreation = 'group_creation';
-  // static const String feedbackSubmission = 'feedback_submission';
-  // static const String profileUpdate = 'profile_update';
-  // static const String communityAccess = 'community_access';
+  // Messaging features
+  /// Used for sending messages in groups
+  /// Also checked for direct messaging (shared permission)
+  static const String sendMessage = 'sending_in_groups';
+
+  /// Used for starting new direct message conversations
+  /// Checked when user clicks "message" button on profile or tries to create new DM
+  static const String startConversation = 'start_conversation';
+
+  // Feature access guard
+  static const String createPoll = 'create_a_poll';
+  static const String shareMedia = 'share_a_media';
+  static const String createOrJoinGroups = 'create_or_join_a_group';
 
   /// Get all active app features from Firestore
   static Future<List<AppFeature>> getAllFeatures() async {

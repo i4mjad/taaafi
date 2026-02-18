@@ -5,7 +5,6 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
-import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
@@ -27,14 +26,6 @@ class ActivitiesScreen extends ConsumerWidget {
     final height = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: theme.backgroundColor,
-      appBar: appBar(context, ref, "activities", false, true, actions: [
-        IconButton(
-          onPressed: () {
-            context.goNamed(RouteNames.addActivity.name);
-          },
-          icon: Icon(LucideIcons.plus),
-        )
-      ]),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),

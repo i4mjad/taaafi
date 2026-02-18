@@ -180,20 +180,17 @@ class _UpdateUserProfileModalSheetState
                   enabled: false,
                 ),
                 verticalSpace(Spacing.points8),
-                CustomSegmentedButton(
-                  label: AppLocalizations.of(context).translate('gender'),
-                  options: [
-                    SegmentedButtonOption(
-                        value: 'male', translationKey: 'male'),
-                    SegmentedButtonOption(
-                        value: 'female', translationKey: 'female')
-                  ],
-                  selectedOption: selectedGender,
-                  onChanged: (selection) {
-                    setState(() {
-                      selectedGender = selection;
-                    });
+                CustomTextField(
+                  validator: (value) {
+                    return null;
                   },
+                  controller: TextEditingController(
+                    text: AppLocalizations.of(context).translate(selectedGender.translationKey),
+                  ),
+                  prefixIcon: LucideIcons.users,
+                  inputType: TextInputType.text,
+                  hint: AppLocalizations.of(context).translate('gender'),
+                  enabled: false,
                 ),
                 verticalSpace(Spacing.points8),
                 CustomSegmentedButton(

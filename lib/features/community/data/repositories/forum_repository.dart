@@ -970,8 +970,7 @@ class ForumRepository {
       final QuerySnapshot snapshot = await _comments
           .where('parentFor', isEqualTo: 'comment')
           .where('parentId', isEqualTo: commentId)
-          .orderBy(
-              'createdAt') // TODO: Index required - see firestore_indexes_required.md
+          .orderBy('createdAt')
           .get();
 
       final comments = snapshot.docs
@@ -1171,6 +1170,7 @@ class ForumRepository {
     required String content,
     String? categoryId,
     List<String>? attachmentUrls,
+    bool hasAttachments = false,
   }) async {
     try {
       final now = DateTime.now();
@@ -1188,9 +1188,22 @@ class ForumRepository {
         'score': 0,
         'likeCount': 0,
         'dislikeCount': 0,
-        'createdAt': Timestamp.fromDate(now),
-        'updatedAt': null,
-        // Note: attachmentUrls not implemented yet
+        'createdAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+        // New attachment fields per migration spec
+        'pendingAttachments': hasAttachments,
+        'expectedAttachmentsCount':
+            hasAttachments ? 1 : 0, // Will be updated by client
+        'attachmentsFinalizedAt':
+            hasAttachments ? null : FieldValue.serverTimestamp(),
+        'attachmentsSummaryById': <String, Map<String, dynamic>>{},
+        'attachmentsOrder': <String>[],
+        'attachmentTypes': <String>[],
+        'hasAttachments': hasAttachments,
+        'attachmentCount': 0,
+        'attachmentsPreview': null,
+        'attachmentsVersion': 1,
+        'attachmentsComputedAt': FieldValue.serverTimestamp(),
       };
 
       // Add to Firestore and get the document reference
@@ -1796,6 +1809,223 @@ class ForumRepository {
         // Permission denied - likely new profile timing issue, returning empty list
       }
       return [];
+    }
+  }
+
+  // =============================================================================
+  // ATTACHMENT METHODS
+  // =============================================================================
+
+  /// Creates or overwrites an attachment in the post's subcollection at the provided attachmentId.
+  /// Uses stable IDs based on content hash for idempotent retries.
+  Future<void> createAttachment({
+    required String postId,
+    required String attachmentId,
+    required Map<String, dynamic> attachmentData,
+  }) async {
+    try {
+      final attachmentRef =
+          _posts.doc(postId).collection('attachments').doc(attachmentId);
+
+      // Add common fields required by new spec
+      final enhancedData = {
+        ...attachmentData,
+        'createdAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+        'status': attachmentData['status'] ?? 'active',
+      };
+
+      await attachmentRef.set(enhancedData, SetOptions(merge: true));
+    } catch (e) {
+      throw Exception('Failed to create attachment: $e');
+    }
+  }
+
+  /// Generate stable attachment ID based on content hash
+  String generateStableAttachmentId(String postId, String contentHash) {
+    final shortHash =
+        contentHash.length > 12 ? contentHash.substring(0, 12) : contentHash;
+    return '${postId}-${shortHash}';
+  }
+
+  /// Updates post with expected attachments count (called by client before uploading)
+  Future<void> setExpectedAttachmentsCount({
+    required String postId,
+    required int expectedCount,
+  }) async {
+    try {
+      await _posts.doc(postId).update({
+        'expectedAttachmentsCount': expectedCount,
+        'pendingAttachments': expectedCount > 0,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      throw Exception('Failed to set expected attachments count: $e');
+    }
+  }
+
+  /// TEMPORARY: Update post with attachment summary (client-side)
+  /// This will be replaced by Cloud Functions once deployed
+  Future<void> updatePostWithAttachmentSummary({
+    required String postId,
+    required List<Map<String, dynamic>> attachmentsSummary,
+    required List<String> attachmentTypes,
+  }) async {
+    try {
+      // Convert list-based summary to map-based for new structure
+      final Map<String, Map<String, dynamic>> summaryById = {};
+      final List<String> order = [];
+
+      for (final summary in attachmentsSummary) {
+        final id = summary['id'] as String;
+        order.add(id);
+        summaryById[id] = Map<String, dynamic>.from(summary)..remove('id');
+      }
+
+      await _posts.doc(postId).update({
+        // New structure
+        'attachmentsSummaryById': summaryById,
+        'attachmentsOrder': order,
+        'attachmentTypes': attachmentTypes,
+        'hasAttachments': attachmentsSummary.isNotEmpty,
+        'attachmentCount': attachmentsSummary.length,
+        'attachmentsPreview': null, // Will be set if images exist
+        'attachmentsVersion': 1,
+        'attachmentsComputedAt': FieldValue.serverTimestamp(),
+        // Legacy structure for backward compatibility
+        'attachmentsSummary': attachmentsSummary,
+        'pendingAttachments': false,
+        'attachmentsFinalizedAt': FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      throw Exception('Failed to update post with attachment summary: $e');
+    }
+  }
+
+  /// This method is now handled by Cloud Functions automatically
+  /// when attachment count matches expected count
+  @deprecated
+  Future<void> finalizePostAttachments({
+    required String postId,
+    required List<Map<String, dynamic>> attachmentsSummary,
+    required List<String> attachmentTypes,
+  }) async {
+    // This is now handled automatically by Cloud Functions
+    // Client should not call this directly
+    throw Exception(
+        'finalizePostAttachments is deprecated. Finalization is handled automatically by Cloud Functions.');
+  }
+
+  /// Gets attachments for a post
+  Future<List<Map<String, dynamic>>> getPostAttachments(String postId) async {
+    try {
+      final snapshot = await _posts
+          .doc(postId)
+          .collection('attachments')
+          .where('status', isEqualTo: 'active')
+          .get();
+
+      final attachments =
+          snapshot.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList();
+
+      return attachments;
+    } catch (e) {
+      throw Exception('Failed to get post attachments: $e');
+    }
+  }
+
+  /// Streams attachments for a post
+  Stream<List<Map<String, dynamic>>> watchPostAttachments(String postId) {
+    return _posts
+        .doc(postId)
+        .collection('attachments')
+        .where('status', isEqualTo: 'active')
+        .snapshots()
+        .map((snapshot) =>
+            snapshot.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList());
+  }
+
+  /// Creates a poll vote - now using attachments/{pollId}/votes/{cpId} structure
+  Future<void> createPollVote({
+    required String postId,
+    required String pollId,
+    required String cpId,
+    required List<String> selectedOptionIds,
+  }) async {
+    try {
+      await _posts
+          .doc(postId)
+          .collection('attachments')
+          .doc(pollId)
+          .collection('votes')
+          .doc(cpId)
+          .set({
+        'selectedOptionIds': selectedOptionIds,
+        'votedAt': FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      throw Exception('Failed to create poll vote: $e');
+    }
+  }
+
+  /// Gets poll votes for a specific poll attachment
+  Future<List<Map<String, dynamic>>> getPollVotes(
+      String postId, String pollId) async {
+    try {
+      final snapshot = await _posts
+          .doc(postId)
+          .collection('attachments')
+          .doc(pollId)
+          .collection('votes')
+          .get();
+
+      return snapshot.docs
+          .map((doc) => {'cpId': doc.id, ...doc.data()})
+          .toList();
+    } catch (e) {
+      throw Exception('Failed to get poll votes: $e');
+    }
+  }
+
+  /// Gets a specific user's vote for a poll (efficient single document read)
+  Future<Map<String, dynamic>?> getUserPollVote(
+      String postId, String pollId, String cpId) async {
+    try {
+      final doc = await _posts
+          .doc(postId)
+          .collection('attachments')
+          .doc(pollId)
+          .collection('votes')
+          .doc(cpId)
+          .get();
+
+      if (doc.exists) {
+        return {'cpId': doc.id, ...doc.data()!};
+      }
+      return null;
+    } catch (e) {
+      throw Exception('Failed to get user poll vote: $e');
+    }
+  }
+
+  /// Updates poll aggregates
+  Future<void> updatePollAggregates({
+    required String postId,
+    required String pollAttachmentId,
+    required int totalVotes,
+    required List<int> optionCounts,
+  }) async {
+    try {
+      await _posts
+          .doc(postId)
+          .collection('attachments')
+          .doc(pollAttachmentId)
+          .update({
+        'totalVotes': totalVotes,
+        'optionCounts': optionCounts,
+      });
+    } catch (e) {
+      throw Exception('Failed to update poll aggregates: $e');
     }
   }
 }

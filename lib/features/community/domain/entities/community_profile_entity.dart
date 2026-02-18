@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:reboot_app_3/features/community/data/models/notification_preferences.dart';
 
 /// Community Profile Entity
 ///
@@ -19,6 +20,15 @@ class CommunityProfileEntity {
   final String role; // 'member', 'admin', 'moderator'
   final DateTime createdAt;
   final DateTime? updatedAt;
+  final NotificationPreferences? notificationPreferences;
+  
+  // Privacy settings
+  final bool allowDirectMessages; // Allow receiving direct messages
+  
+  // Group-specific fields (Sprint 4 - Feature 4.1)
+  final String? groupBio; // Max 200 chars
+  final List<String> interests; // Tags/categories
+  final List<String> groupAchievements; // Achievement IDs
 
   const CommunityProfileEntity({
     required this.id,
@@ -35,6 +45,11 @@ class CommunityProfileEntity {
     required this.role,
     required this.createdAt,
     this.updatedAt,
+    this.notificationPreferences,
+    this.allowDirectMessages = true, // Default to true
+    this.groupBio,
+    this.interests = const [],
+    this.groupAchievements = const [],
   });
 
   /// Helper method to convert timestamp fields from Firestore or JSON
@@ -73,6 +88,18 @@ class CommunityProfileEntity {
       role: json['role'] as String,
       createdAt: _parseTimestamp(json['createdAt'])!,
       updatedAt: _parseTimestamp(json['updatedAt']),
+      notificationPreferences: json['notificationPreferences'] != null
+          ? NotificationPreferences.fromJson(
+              json['notificationPreferences'] as Map<String, dynamic>)
+          : null,
+      allowDirectMessages: json['allowDirectMessages'] as bool? ?? true,
+      groupBio: json['groupBio'] as String?,
+      interests: json['interests'] != null 
+          ? List<String>.from(json['interests'] as List)
+          : const [],
+      groupAchievements: json['groupAchievements'] != null
+          ? List<String>.from(json['groupAchievements'] as List)
+          : const [],
     );
   }
 
@@ -92,6 +119,11 @@ class CommunityProfileEntity {
       // Streak data is read directly from user documents, not stored in community profiles
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
+      'notificationPreferences': notificationPreferences?.toJson(),
+      'allowDirectMessages': allowDirectMessages,
+      'groupBio': groupBio,
+      'interests': interests,
+      'groupAchievements': groupAchievements,
     };
   }
 
@@ -210,6 +242,11 @@ class CommunityProfileEntity {
     String? role,
     DateTime? createdAt,
     DateTime? updatedAt,
+    NotificationPreferences? notificationPreferences,
+    bool? allowDirectMessages,
+    String? groupBio,
+    List<String>? interests,
+    List<String>? groupAchievements,
   }) {
     return CommunityProfileEntity(
       id: id ?? this.id,
@@ -226,6 +263,12 @@ class CommunityProfileEntity {
       role: role ?? this.role,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      notificationPreferences:
+          notificationPreferences ?? this.notificationPreferences,
+      allowDirectMessages: allowDirectMessages ?? this.allowDirectMessages,
+      groupBio: groupBio ?? this.groupBio,
+      interests: interests ?? this.interests,
+      groupAchievements: groupAchievements ?? this.groupAchievements,
     );
   }
 
@@ -246,7 +289,11 @@ class CommunityProfileEntity {
         other.streakLastUpdated == streakLastUpdated &&
         other.role == role &&
         other.createdAt == createdAt &&
-        other.updatedAt == updatedAt;
+        other.updatedAt == updatedAt &&
+        other.notificationPreferences == notificationPreferences &&
+        other.groupBio == groupBio &&
+        other.interests == interests &&
+        other.groupAchievements == groupAchievements;
   }
 
   @override
@@ -264,11 +311,35 @@ class CommunityProfileEntity {
         streakLastUpdated.hashCode ^
         role.hashCode ^
         createdAt.hashCode ^
-        updatedAt.hashCode;
+        updatedAt.hashCode ^
+        notificationPreferences.hashCode ^
+        groupBio.hashCode ^
+        interests.hashCode ^
+        groupAchievements.hashCode;
   }
 
   @override
   String toString() {
-    return 'CommunityProfileEntity(id: $id, userUID: $userUID, displayName: $displayName, gender: $gender, avatarUrl: $avatarUrl, isAnonymous: $isAnonymous, isDeleted: $isDeleted, isPlusUser: $isPlusUser, shareRelapseStreaks: $shareRelapseStreaks, currentStreakDays: $currentStreakDays, streakLastUpdated: $streakLastUpdated, role: $role, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'CommunityProfileEntity(id: $id, userUID: $userUID, displayName: $displayName, gender: $gender, avatarUrl: $avatarUrl, isAnonymous: $isAnonymous, isDeleted: $isDeleted, isPlusUser: $isPlusUser, shareRelapseStreaks: $shareRelapseStreaks, currentStreakDays: $currentStreakDays, streakLastUpdated: $streakLastUpdated, role: $role, createdAt: $createdAt, updatedAt: $updatedAt, notificationPreferences: $notificationPreferences, groupBio: $groupBio, interests: $interests, groupAchievements: $groupAchievements)';
+  }
+  
+  /// Business logic: Validate bio length
+  bool isValidBio() {
+    return groupBio == null || groupBio!.length <= 200;
+  }
+  
+  /// Business logic: Check if profile has bio
+  bool hasBio() {
+    return groupBio != null && groupBio!.isNotEmpty;
+  }
+  
+  /// Business logic: Check if profile has interests
+  bool hasInterests() {
+    return interests.isNotEmpty;
+  }
+  
+  /// Business logic: Check if profile has achievements
+  bool hasAchievements() {
+    return groupAchievements.isNotEmpty;
   }
 }

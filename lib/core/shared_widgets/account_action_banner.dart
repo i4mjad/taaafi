@@ -12,6 +12,7 @@ import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/authentication/providers/account_status_provider.dart';
+import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
 
 class AccountActionBanner extends ConsumerWidget {
   const AccountActionBanner({
@@ -30,6 +31,11 @@ class AccountActionBanner extends ConsumerWidget {
     if (accountStatus == AccountStatus.ok ||
         accountStatus == AccountStatus.loading) {
       return const SizedBox.shrink();
+    }
+
+    // Handle error state with retry option
+    if (accountStatus == AccountStatus.error) {
+      return _buildErrorBanner(context, ref, theme);
     }
 
     // Handle pending deletion with specialized banner
@@ -182,8 +188,88 @@ class AccountActionBanner extends ConsumerWidget {
       case AccountStatus.loading:
       case AccountStatus.ok:
       case AccountStatus.pendingDeletion:
+      case AccountStatus.error:
         return null;
     }
+  }
+
+  Widget _buildErrorBanner(BuildContext context, WidgetRef ref, dynamic theme) {
+    return WidgetsContainer(
+      backgroundColor: theme.backgroundColor,
+      borderSide: isFullScreen
+          ? BorderSide.none
+          : BorderSide(color: theme.warn[200]!, width: 1),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  LucideIcons.wifiOff,
+                  color: theme.warn[600],
+                  size: 24,
+                ),
+                horizontalSpace(Spacing.points12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        AppLocalizations.of(context)
+                            .translate('connection-error'),
+                        style: TextStyles.footnote.copyWith(
+                          color: theme.warn[800],
+                          fontWeight: FontWeight.w500,
+                          height: 1.4,
+                        ),
+                      ),
+                      verticalSpace(Spacing.points4),
+                      Text(
+                        AppLocalizations.of(context)
+                            .translate('connection-error-subtitle'),
+                        style: TextStyles.small.copyWith(
+                          color: theme.grey[600],
+                          height: 1.3,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            verticalSpace(Spacing.points12),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  HapticFeedback.lightImpact();
+                  // Invalidate the providers to trigger a retry
+                  ref.invalidate(userDocumentsNotifierProvider);
+                  ref.invalidate(accountStatusProvider);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: theme.warn[600],
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: Text(
+                  AppLocalizations.of(context).translate('retry'),
+                  style: TextStyles.footnote.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 

@@ -3,8 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:go_router/go_router.dart';
 import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
-import '../../providers/ban_warning_providers.dart';
-import '../../providers/clean_ban_warning_providers.dart';
+import '../../providers/ban_warning_providers.dart' as ban_providers;
 import '../../data/models/ban.dart';
 import '../../utils/ban_display_formatter.dart';
 import '../../../../core/localization/localization.dart';
@@ -105,7 +104,9 @@ class _FeatureAccessModalState extends ConsumerState<_FeatureAccessModal> {
       } else {
         // User is banned, get ban details
         final ban = await ref.read(
-          currentUserFeatureBanProvider(widget.featureUniqueName).future,
+          ban_providers
+              .currentUserFeatureBanProvider(widget.featureUniqueName)
+              .future,
         );
 
         if (mounted) {
@@ -435,13 +436,13 @@ class SilentFeatureGuard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final featureAccessAsync = ref.watch(featureAccessProvider);
+    // 🚀 OPTIMIZED: Use lazy loading for specific feature only
+    final featureAccessAsync = ref
+        .watch(ban_providers.specificFeatureAccessProvider(featureUniqueName));
     return featureAccessAsync.when(
       loading: () => const SizedBox.shrink(),
       error: (e, _) => const SizedBox.shrink(),
-      data: (accessMap) {
-        final canAccess = accessMap[featureUniqueName] ?? true;
-
+      data: (canAccess) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (canAccess) {
             onAccessGranted();
@@ -457,12 +458,17 @@ class SilentFeatureGuard extends ConsumerWidget {
 }
 
 /// Helper function to check feature access programmatically
+/// 🚀 OPTIMIZED: Uses lazy loading - only checks the specific feature needed
 Future<bool> checkFeatureAccess(WidgetRef ref, String featureUniqueName) async {
-  final accessMap = await ref.read(featureAccessProvider.future);
-
-  final canAccess =
-      (accessMap != null ? accessMap[featureUniqueName] : true) ?? true;
-  return canAccess;
+  try {
+    // Use the new lazy loading provider - much faster!
+    final canAccess = await ref.read(
+        ban_providers.specificFeatureAccessProvider(featureUniqueName).future);
+    return canAccess;
+  } catch (e) {
+    // Fail-safe: allow access on error
+    return true;
+  }
 }
 
 /// Helper function to show ban message dialog
@@ -530,7 +536,7 @@ Future<bool> checkFeatureAccessAndShowBanSnackbar(
   if (!canAccess) {
     // Get ban details to determine if it's permanent or temporary
     final ban = await ref.read(
-      currentUserFeatureBanProvider(featureUniqueName).future,
+      ban_providers.currentUserFeatureBanProvider(featureUniqueName).future,
     );
 
     final isPermanent = ban?.severity == BanSeverity.permanent;
@@ -658,7 +664,9 @@ class _QuickActionGuardState extends ConsumerState<QuickActionGuard>
     if (!mounted) return;
 
     final ban = await ref.read(
-      currentUserFeatureBanProvider(widget.featureUniqueName).future,
+      ban_providers
+          .currentUserFeatureBanProvider(widget.featureUniqueName)
+          .future,
     );
 
     final isPermanent = ban?.severity == BanSeverity.permanent;

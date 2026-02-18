@@ -187,7 +187,9 @@ class FeaturedListItemWidget extends StatelessWidget {
               ),
             ),
             Icon(
-              LucideIcons.arrowLeft,
+              Directionality.of(context) == TextDirection.rtl
+                  ? LucideIcons.arrowLeft
+                  : LucideIcons.arrowRight,
               size: 16,
               color: theme.grey[500],
             ),

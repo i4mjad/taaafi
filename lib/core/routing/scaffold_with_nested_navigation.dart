@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -15,7 +16,7 @@ class ScaffoldWithNestedNavigation extends ConsumerWidget {
   final StatefulNavigationShell navigationShell;
 
   void _goBranch(int index, WidgetRef ref) {
-    // Community tab index is 2 (home=0, vault=1, community=2, groups=3, account=4)
+    // Tab indices: home=0, vault=1, community=2, account=3
     const int communityTabIndex = 2;
 
     if (index == communityTabIndex) {
@@ -79,16 +80,9 @@ class ScaffoldWithNestedNavigation extends ConsumerWidget {
                 ),
               ),
               NavigationDestination(
-                label: AppLocalizations.of(context).translate("group"),
-                icon: Icon(
-                  LucideIcons.heartHandshake,
-                  size: 20,
-                ),
-              ),
-              NavigationDestination(
                 label: AppLocalizations.of(context).translate("account"),
                 icon: Icon(
-                  LucideIcons.user2,
+                  LucideIcons.user,
                   size: 20,
                 ),
               ),

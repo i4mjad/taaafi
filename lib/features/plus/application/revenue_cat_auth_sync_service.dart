@@ -27,6 +27,7 @@ class RevenueCatAuthSyncService {
       _startAuthStateListener();
     } on RevenueCatNotAvailableException catch (e) {
       // Don't start auth listener if RevenueCat isn't available
+      print('RevenueCat Auth Sync: RevenueCat not available: $e');
     } catch (e) {
       // Still start auth listener for when RevenueCat becomes available
       _startAuthStateListener();

@@ -124,6 +124,14 @@ final communityProfileByIdProvider = StreamProvider.family
       role: role, // Handle missing role field
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       updatedAt: (data['updatedAt'] as Timestamp?)?.toDate(),
+      // Sprint 4 - Group-specific profile fields
+      groupBio: data['groupBio'] as String?,
+      interests: data['interests'] != null 
+          ? List<String>.from(data['interests'] as List)
+          : const [],
+      groupAchievements: data['groupAchievements'] != null
+          ? List<String>.from(data['groupAchievements'] as List)
+          : const [],
     );
   });
 });
@@ -479,6 +487,7 @@ class CommunityProfileUpdateNotifier extends StateNotifier<AsyncValue<void>> {
     bool? isAnonymous,
     String? avatarUrl,
     bool? shareRelapseStreaks,
+    bool? allowDirectMessages,
   }) async {
     state = const AsyncValue.loading();
 
@@ -489,6 +498,7 @@ class CommunityProfileUpdateNotifier extends StateNotifier<AsyncValue<void>> {
         isAnonymous: isAnonymous,
         avatarUrl: avatarUrl,
         shareRelapseStreaks: shareRelapseStreaks,
+        allowDirectMessages: allowDirectMessages,
       );
       state = const AsyncValue.data(null);
     } catch (error, stackTrace) {

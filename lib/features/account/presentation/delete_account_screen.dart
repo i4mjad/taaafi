@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -32,10 +33,98 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
   bool showDetails = false;
   bool isSubmitting = false;
 
+  // Retention offer state
+  bool _hasSkippedRetentionOffer = false;
+  bool _hasClaimedRetentionReward = false;
+  bool _isCheckingRetention = true;
+  bool _isClaimingReward = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkRetentionRewardStatus();
+  }
+
   @override
   void dispose() {
     _detailsController.dispose();
     super.dispose();
+  }
+
+  Future<void> _checkRetentionRewardStatus() async {
+    try {
+      final functions = FirebaseFunctions.instance;
+      final callable = functions.httpsCallable('checkRetentionRewardStatus');
+      final result = await callable.call();
+
+      if (mounted) {
+        setState(() {
+          _hasClaimedRetentionReward = result.data['alreadyClaimed'] == true;
+          _isCheckingRetention = false;
+        });
+      }
+    } catch (e) {
+      print('Error checking retention reward status: $e');
+      if (mounted) {
+        setState(() {
+          _isCheckingRetention = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _claimRetentionReward() async {
+    setState(() {
+      _isClaimingReward = true;
+    });
+
+    try {
+      final functions = FirebaseFunctions.instance;
+      final callable = functions.httpsCallable('claimRetentionReward');
+      final result = await callable.call();
+
+      if (mounted) {
+        if (result.data['success'] == true) {
+          getSuccessSnackBar(context, 'retention-reward-claimed');
+          // Navigate back after successful claim
+          Navigator.of(context).pop();
+        } else if (result.data['alreadyClaimed'] == true) {
+          setState(() {
+            _hasClaimedRetentionReward = true;
+          });
+          getErrorSnackBar(context, 'retention-reward-already-claimed');
+        }
+      }
+    } catch (e) {
+      print('Error claiming retention reward: $e');
+      if (mounted) {
+        getErrorSnackBar(context, 'retention-reward-failed');
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isClaimingReward = false;
+        });
+      }
+    }
+  }
+
+  void _skipRetentionOffer() {
+    setState(() {
+      _hasSkippedRetentionOffer = true;
+    });
+  }
+
+  bool _shouldShowRetentionOffer(bool hasActiveSubscription) {
+    // Don't show if user has active subscription (they already have premium)
+    if (hasActiveSubscription) return false;
+    // Don't show if still checking
+    if (_isCheckingRetention) return false;
+    // Don't show if already claimed
+    if (_hasClaimedRetentionReward) return false;
+    // Don't show if user skipped
+    if (_hasSkippedRetentionOffer) return false;
+    return true;
   }
 
   @override
@@ -43,7 +132,8 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
     final theme = AppTheme.of(context);
     final accountStatus = ref.watch(accountStatusProvider);
     final userProfileAsync = ref.watch(userProfileNotifierProvider);
-    final hasActiveSubscription = ref.watch(hasActiveSubscriptionProvider);
+    // Use hasActiveRenewingSubscription to allow users with cancelled subscriptions to proceed
+    final hasActiveSubscription = ref.watch(hasActiveRenewingSubscriptionProvider);
 
     // Screen accessible regardless of account status; banners shown at top
 
@@ -118,180 +208,232 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
 
               verticalSpace(Spacing.points16),
 
-              // Reason Options
-              ...DeletionReasons.reasons
-                  .map((reason) => _buildReasonOption(reason, theme))
-                  .toList(),
+              // Show retention offer OR deletion flow
+              if (_shouldShowRetentionOffer(hasActiveSubscription)) ...[
+                // Retention Offer Section
+                _buildRetentionOfferSection(theme),
+              ] else ...[
+                // Normal deletion flow
 
-              // Details Text Field (conditional)
-              if (showDetails) ...[
-                verticalSpace(Spacing.points16),
-                Text(
-                  AppLocalizations.of(context)
-                      .translate('deletion-reason-details'),
-                  style: TextStyles.footnoteSelected
-                      .copyWith(color: theme.grey[900]),
-                ),
-                verticalSpace(Spacing.points8),
-                Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: theme.grey[300]!),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: TextField(
-                    controller: _detailsController,
-                    maxLines: 3,
-                    maxLength: 300,
-                    decoration: InputDecoration(
-                      hintText: AppLocalizations.of(context)
-                          .translate('deletion-reason-details-hint'),
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.all(16),
-                      hintStyle:
-                          TextStyles.body.copyWith(color: theme.grey[500]),
-                    ),
-                    style: TextStyles.body.copyWith(color: theme.grey[900]),
-                  ),
-                ),
-              ],
+                // Reason Options
+                ...DeletionReasons.reasons
+                    .map((reason) => _buildReasonOption(reason, theme))
+                    .toList(),
 
-              verticalSpace(Spacing.points16),
-
-              // Subscription warning (if user has active subscription)
-              if (hasActiveSubscription) ...[
-                WidgetsContainer(
-                  backgroundColor: theme.warn[50],
-                  borderSide: BorderSide(color: theme.warn[300]!, width: 1),
-                  padding: EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          Icon(
-                            LucideIcons.star,
-                            color: theme.warn[600],
-                            size: 24,
-                          ),
-                          horizontalSpace(Spacing.points12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  AppLocalizations.of(context)
-                                      .translate('subscription-active-warning'),
-                                  style: TextStyles.footnote.copyWith(
-                                    color: theme.warn[800],
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                verticalSpace(Spacing.points4),
-                                Text(
-                                  AppLocalizations.of(context).translate(
-                                      'subscription-active-warning-desc'),
-                                  style: TextStyles.small.copyWith(
-                                    color: theme.warn[700],
-                                    height: 1.4,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                verticalSpace(Spacing.points16),
-              ],
-
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
+                // Details Text Field (conditional)
+                if (showDetails) ...[
+                  verticalSpace(Spacing.points16),
                   Text(
                     AppLocalizations.of(context)
-                        .translate('delete-account-warning'),
-                    style: TextStyles.body.copyWith(
-                        color: theme.error[600], fontWeight: FontWeight.bold),
+                        .translate('deletion-reason-details'),
+                    style: TextStyles.footnoteSelected
+                        .copyWith(color: theme.grey[900]),
                   ),
                   verticalSpace(Spacing.points8),
-                  Text(
-                    AppLocalizations.of(context)
-                        .translate('delete-account-final-warning'),
-                    style: TextStyles.small.copyWith(
-                      height: 1.75,
-                      color: theme.error[600],
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: theme.grey[300]!),
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                    textAlign: TextAlign.center,
+                    child: TextField(
+                      controller: _detailsController,
+                      maxLines: 3,
+                      maxLength: 300,
+                      decoration: InputDecoration(
+                        hintText: AppLocalizations.of(context)
+                            .translate('deletion-reason-details-hint'),
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.all(16),
+                        hintStyle:
+                            TextStyles.body.copyWith(color: theme.grey[500]),
+                      ),
+                      style: TextStyles.body.copyWith(color: theme.grey[900]),
+                    ),
                   ),
                 ],
-              ),
-              verticalSpace(Spacing.points24),
 
-              // Delete Button (enabled only if reason selected and no active subscription)
-              Consumer(
-                builder: (context, ref, child) {
-                  final hasActiveSubscription =
-                      ref.watch(hasActiveSubscriptionProvider);
-                  final reasonSelected = selectedReasonId != null &&
-                      (!showDetails ||
-                          _detailsController.text.trim().isNotEmpty);
-                  final canDelete =
-                      reasonSelected && !isSubmitting && !hasActiveSubscription;
+                verticalSpace(Spacing.points16),
 
-                  return GestureDetector(
+                // Subscription warning (if user has active subscription)
+                if (hasActiveSubscription) ...[
+                  WidgetsContainer(
+                    backgroundColor: theme.warn[50],
+                    borderSide: BorderSide(color: theme.warn[300]!, width: 1),
+                    padding: EdgeInsets.all(16),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              LucideIcons.star,
+                              color: theme.warn[600],
+                              size: 24,
+                            ),
+                            horizontalSpace(Spacing.points12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    AppLocalizations.of(context)
+                                        .translate('subscription-active-warning'),
+                                    style: TextStyles.footnote.copyWith(
+                                      color: theme.warn[800],
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  verticalSpace(Spacing.points4),
+                                  Text(
+                                    AppLocalizations.of(context).translate(
+                                        'subscription-active-warning-desc'),
+                                    style: TextStyles.small.copyWith(
+                                      color: theme.warn[700],
+                                      height: 1.4,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  verticalSpace(Spacing.points16),
+                ],
+
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      AppLocalizations.of(context)
+                          .translate('delete-account-warning'),
+                      style: TextStyles.body.copyWith(
+                          color: theme.error[600], fontWeight: FontWeight.bold),
+                    ),
+                    verticalSpace(Spacing.points8),
+                    Text(
+                      AppLocalizations.of(context)
+                          .translate('delete-account-final-warning'),
+                      style: TextStyles.small.copyWith(
+                        height: 1.75,
+                        color: theme.error[600],
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+                verticalSpace(Spacing.points16),
+
+                // Show "reconsider" link if user skipped the retention offer
+                if (_hasSkippedRetentionOffer &&
+                    !_hasClaimedRetentionReward &&
+                    !hasActiveSubscription) ...[
+                  GestureDetector(
                     onTap: () {
-                      if (hasActiveSubscription) {
-                        _showSubscriptionBlockDialog(context);
-                      } else if (reasonSelected && !isSubmitting) {
-                        _showDeleteConfirmationDialog(context);
-                      }
+                      setState(() {
+                        _hasSkippedRetentionOffer = false;
+                      });
                     },
-                    child: WidgetsContainer(
-                      backgroundColor:
-                          canDelete ? theme.error[600] : theme.grey[300],
-                      width: MediaQuery.of(context).size.width - 32,
-                      padding: EdgeInsets.all(16),
-                      borderSide: BorderSide(
-                          width: 0,
-                          color:
-                              canDelete ? theme.error[900]! : theme.grey[400]!),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: theme.primary[50],
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: theme.primary[200]!),
+                      ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          if (isSubmitting) ...[
-                            SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  canDelete ? Colors.white : theme.grey[500]!,
-                                ),
+                          Icon(
+                            LucideIcons.gift,
+                            color: theme.primary[600],
+                            size: 18,
+                          ),
+                          horizontalSpace(Spacing.points8),
+                          Flexible(
+                            child: Text(
+                              AppLocalizations.of(context)
+                                  .translate('retention-offer-reconsider'),
+                              style: TextStyles.small.copyWith(
+                                color: theme.primary[700],
+                                fontWeight: FontWeight.w500,
                               ),
-                            ),
-                            horizontalSpace(Spacing.points8),
-                          ] else ...[
-                            Icon(
-                              LucideIcons.userX,
-                              color: canDelete ? Colors.white : theme.grey[500],
-                              size: 20,
-                            ),
-                            horizontalSpace(Spacing.points8),
-                          ],
-                          Text(
-                            AppLocalizations.of(context)
-                                .translate('delete-account'),
-                            style: TextStyles.footnoteSelected.copyWith(
-                              color: canDelete ? Colors.white : theme.grey[500],
                             ),
                           ),
                         ],
                       ),
                     ),
-                  );
-                },
-              ),
+                  ),
+                  verticalSpace(Spacing.points16),
+                ],
+
+                // Delete Button (enabled only if reason selected and no active subscription)
+                Consumer(
+                  builder: (context, ref, child) {
+                    final hasActiveSubscription =
+                        ref.watch(hasActiveRenewingSubscriptionProvider);
+                    final reasonSelected = selectedReasonId != null &&
+                        (!showDetails ||
+                            _detailsController.text.trim().isNotEmpty);
+                    final canDelete =
+                        reasonSelected && !isSubmitting && !hasActiveSubscription;
+
+                    return GestureDetector(
+                      onTap: () {
+                        if (hasActiveSubscription) {
+                          _showSubscriptionBlockDialog(context);
+                        } else if (reasonSelected && !isSubmitting) {
+                          _showDeleteConfirmationDialog(context);
+                        }
+                      },
+                      child: WidgetsContainer(
+                        backgroundColor:
+                            canDelete ? theme.error[600] : theme.grey[300],
+                        width: MediaQuery.of(context).size.width - 32,
+                        padding: EdgeInsets.all(16),
+                        borderSide: BorderSide(
+                            width: 0,
+                            color:
+                                canDelete ? theme.error[900]! : theme.grey[400]!),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            if (isSubmitting) ...[
+                              SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    canDelete ? Colors.white : theme.grey[500]!,
+                                  ),
+                                ),
+                              ),
+                              horizontalSpace(Spacing.points8),
+                            ] else ...[
+                              Icon(
+                                LucideIcons.userX,
+                                color: canDelete ? Colors.white : theme.grey[500],
+                                size: 20,
+                              ),
+                              horizontalSpace(Spacing.points8),
+                            ],
+                            Text(
+                              AppLocalizations.of(context)
+                                  .translate('delete-account'),
+                              style: TextStyles.footnoteSelected.copyWith(
+                                color: canDelete ? Colors.white : theme.grey[500],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
             ],
           ),
         ),
@@ -344,6 +486,164 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildRetentionOfferSection(dynamic theme) {
+    return Column(
+      children: [
+        // Promotional offer card
+        Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                theme.primary[600]!,
+                theme.primary[700]!,
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: theme.primary[600]!.withOpacity(0.3),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Gift icon and badge
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      LucideIcons.gift,
+                      color: Colors.white,
+                      size: 28,
+                    ),
+                  ),
+                  horizontalSpace(Spacing.points12),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      AppLocalizations.of(context)
+                          .translate('retention-offer-badge'),
+                      style: TextStyles.small.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              verticalSpace(Spacing.points16),
+
+              // Title
+              Text(
+                AppLocalizations.of(context)
+                    .translate('retention-offer-title'),
+                style: TextStyles.h5.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              verticalSpace(Spacing.points8),
+
+              // Description
+              Text(
+                AppLocalizations.of(context)
+                    .translate('retention-offer-description'),
+                style: TextStyles.body.copyWith(
+                  color: Colors.white.withOpacity(0.9),
+                  height: 1.5,
+                ),
+              ),
+              verticalSpace(Spacing.points20),
+
+              // Claim button
+              GestureDetector(
+                onTap: _isClaimingReward ? null : _claimRetentionReward,
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (_isClaimingReward) ...[
+                        SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              theme.primary[600]!,
+                            ),
+                          ),
+                        ),
+                        horizontalSpace(Spacing.points8),
+                      ] else ...[
+                        Icon(
+                          LucideIcons.sparkles,
+                          color: theme.primary[600],
+                          size: 20,
+                        ),
+                        horizontalSpace(Spacing.points8),
+                      ],
+                      Text(
+                        AppLocalizations.of(context)
+                            .translate('retention-offer-claim-button'),
+                        style: TextStyles.footnoteSelected.copyWith(
+                          color: theme.primary[600],
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        verticalSpace(Spacing.points24),
+
+        // Skip link
+        GestureDetector(
+          onTap: _skipRetentionOffer,
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            child: Text(
+              AppLocalizations.of(context)
+                  .translate('retention-offer-skip'),
+              style: TextStyles.small.copyWith(
+                color: theme.grey[500],
+                decoration: TextDecoration.underline,
+                decorationColor: theme.grey[500],
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      ],
     );
   }
 

@@ -29,10 +29,11 @@ class UserReportsNotifier extends _$UserReportsNotifier {
       if (result.isSuccess) {
         // Refresh the reports after submission
         state = AsyncValue.data(await service.getUserReports());
-        return result.data!;
+        return result.data ?? '';
       } else {
-        state = AsyncValue.error(result.errorKey!, StackTrace.current);
-        throw Exception(result.errorKey!);
+        final errorKey = result.errorKey ?? 'report-submission-failed';
+        state = AsyncValue.error(errorKey, StackTrace.current);
+        throw Exception(errorKey);
       }
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -53,10 +54,11 @@ class UserReportsNotifier extends _$UserReportsNotifier {
       if (result.isSuccess) {
         // Refresh the reports after submission
         state = AsyncValue.data(await service.getUserReports());
-        return result.data!;
+        return result.data ?? '';
       } else {
-        state = AsyncValue.error(result.errorKey!, StackTrace.current);
-        throw Exception(result.errorKey!);
+        final errorKey = result.errorKey ?? 'report-submission-failed';
+        state = AsyncValue.error(errorKey, StackTrace.current);
+        throw Exception(errorKey);
       }
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -77,10 +79,11 @@ class UserReportsNotifier extends _$UserReportsNotifier {
       if (result.isSuccess) {
         // Refresh the reports after submission
         state = AsyncValue.data(await service.getUserReports());
-        return result.data!;
+        return result.data ?? '';
       } else {
-        state = AsyncValue.error(result.errorKey!, StackTrace.current);
-        throw Exception(result.errorKey!);
+        final errorKey = result.errorKey ?? 'report-submission-failed';
+        state = AsyncValue.error(errorKey, StackTrace.current);
+        throw Exception(errorKey);
       }
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -101,10 +104,11 @@ class UserReportsNotifier extends _$UserReportsNotifier {
       if (result.isSuccess) {
         // Refresh the reports after submission
         state = AsyncValue.data(await service.getUserReports());
-        return result.data!;
+        return result.data ?? '';
       } else {
-        state = AsyncValue.error(result.errorKey!, StackTrace.current);
-        throw Exception(result.errorKey!);
+        final errorKey = result.errorKey ?? 'report-submission-failed';
+        state = AsyncValue.error(errorKey, StackTrace.current);
+        throw Exception(errorKey);
       }
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -127,10 +131,11 @@ class UserReportsNotifier extends _$UserReportsNotifier {
       if (result.isSuccess) {
         // Refresh the reports after submission
         state = AsyncValue.data(await service.getUserReports());
-        return result.data!;
+        return result.data ?? '';
       } else {
-        state = AsyncValue.error(result.errorKey!, StackTrace.current);
-        throw Exception(result.errorKey!);
+        final errorKey = result.errorKey ?? 'report-submission-failed';
+        state = AsyncValue.error(errorKey, StackTrace.current);
+        throw Exception(errorKey);
       }
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -153,10 +158,11 @@ class UserReportsNotifier extends _$UserReportsNotifier {
       if (result.isSuccess) {
         // Refresh the reports after submission
         state = AsyncValue.data(await service.getUserReports());
-        return result.data!;
+        return result.data ?? '';
       } else {
-        state = AsyncValue.error(result.errorKey!, StackTrace.current);
-        throw Exception(result.errorKey!);
+        final errorKey = result.errorKey ?? 'report-submission-failed';
+        state = AsyncValue.error(errorKey, StackTrace.current);
+        throw Exception(errorKey);
       }
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -179,10 +185,71 @@ class UserReportsNotifier extends _$UserReportsNotifier {
       if (result.isSuccess) {
         // Refresh the reports after submission
         state = AsyncValue.data(await service.getUserReports());
-        return result.data!;
+        return result.data ?? '';
       } else {
-        state = AsyncValue.error(result.errorKey!, StackTrace.current);
-        throw Exception(result.errorKey!);
+        final errorKey = result.errorKey ?? 'report-submission-failed';
+        state = AsyncValue.error(errorKey, StackTrace.current);
+        throw Exception(errorKey);
+      }
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      rethrow;
+    }
+  }
+
+  /// Submit a new message report
+  Future<String> submitMessageReport({
+    required String messageId,
+    required String groupId,
+    required String userMessage,
+    String? messageSender,
+    String? messageContent,
+  }) async {
+    state = const AsyncValue.loading();
+    try {
+      final result = await service.submitMessageReport(
+        messageId: messageId,
+        groupId: groupId,
+        userMessage: userMessage,
+        messageSender: messageSender,
+        messageContent: messageContent,
+      );
+
+      if (result.isSuccess) {
+        // Refresh the reports after submission
+        state = AsyncValue.data(await service.getUserReports());
+        return result.data ?? '';
+      } else {
+        final errorKey = result.errorKey ?? 'report-submission-failed';
+        state = AsyncValue.error(errorKey, StackTrace.current);
+        throw Exception(errorKey);
+      }
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      rethrow;
+    }
+  }
+
+  /// Submit a new group update report
+  Future<String> submitGroupUpdateReport({
+    required String updateId,
+    required String userMessage,
+  }) async {
+    state = const AsyncValue.loading();
+    try {
+      final result = await service.submitGroupUpdateReport(
+        updateId: updateId,
+        userMessage: userMessage,
+      );
+
+      if (result.isSuccess) {
+        // Refresh the reports after submission
+        state = AsyncValue.data(await service.getUserReports());
+        return result.data ?? '';
+      } else {
+        final errorKey = result.errorKey ?? 'report-submission-failed';
+        state = AsyncValue.error(errorKey, StackTrace.current);
+        throw Exception(errorKey);
       }
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -202,7 +269,7 @@ class UserReportsNotifier extends _$UserReportsNotifier {
       );
 
       if (!result.isSuccess) {
-        throw Exception(result.errorKey!);
+        throw Exception(result.errorKey ?? 'report-submission-failed');
       }
 
       // Refresh the reports after adding message

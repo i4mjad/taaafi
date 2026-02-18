@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:reboot_app_3/features/account/data/models/user_profile.dart';
+import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -48,7 +49,20 @@ class UserProfileNotifier extends _$UserProfileNotifier {
   }) async {
     try {
       final uid = await _getUserId();
-      if (uid == null) return;
+      if (uid == null) {
+        print('❌ UPDATE PROFILE: No user ID found');
+        return;
+      }
+
+      print('=== UPDATING USER PROFILE ===');
+      print('👤 UID: $uid');
+      print('📝 Display Name: $displayName');
+      print('📧 Email: $email');
+      print('👥 Gender: $gender');
+      print('🌍 Locale: $locale');
+      print('🎂 DOB: $dayOfBirth');
+      print('📅 First Date: $userFirstDate');
+      print('👔 Role: $role');
 
       final userProfile = UserProfile(
         uid: uid,
@@ -61,11 +75,19 @@ class UserProfileNotifier extends _$UserProfileNotifier {
         role: role,
       );
 
+      print('📄 Profile Map to be saved:');
+      final profileMap = userProfile.toMap();
+      profileMap.forEach((key, value) {
+        print('   - $key: $value');
+      });
+
       // Update user document
       await _firestore
           .collection('users')
           .doc(uid)
-          .set(userProfile.toMap(), SetOptions(merge: true));
+          .set(profileMap, SetOptions(merge: true));
+
+      print('✅ UPDATE PROFILE: Successfully saved to Firestore');
 
       // Also update community profile gender if it exists
       try {
@@ -78,17 +100,29 @@ class UserProfileNotifier extends _$UserProfileNotifier {
             await communityService.updateProfile(
               gender: gender.toLowerCase(),
             );
-            print('UserProfile: Updated community profile gender to $gender');
+            print('✅ UPDATE PROFILE: Updated community profile gender to $gender');
           }
         }
       } catch (e) {
         // Don't fail the entire operation if community profile update fails
-        print('UserProfile: Failed to update community profile gender - $e');
+        print('⚠️ UPDATE PROFILE: Failed to update community profile gender - $e');
       }
 
       state = AsyncValue.data(userProfile); // Update state
-    } catch (e) {
-      state = AsyncValue.error(e, StackTrace.current); // Handle error
+      print('✅ UPDATE PROFILE: State updated successfully');
+      
+      // IMPORTANT: Invalidate user document provider to refresh the data
+      // This ensures the account status provider gets the updated document
+      print('🔄 UPDATE PROFILE: Invalidating user document provider to refresh...');
+      ref.invalidate(userDocumentsNotifierProvider);
+      
+      // Wait a bit for Firestore to propagate the changes
+      await Future.delayed(Duration(milliseconds: 500));
+      print('✅ UPDATE PROFILE: User document provider invalidated and refreshed');
+    } catch (e, stackTrace) {
+      print('❌ UPDATE PROFILE ERROR: $e');
+      print('Stack trace: $stackTrace');
+      state = AsyncValue.error(e, stackTrace); // Handle error
     }
   }
 

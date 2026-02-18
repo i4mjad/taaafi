@@ -81,10 +81,10 @@ final vaultLayoutProvider =
 class VaultLayoutNotifier extends StateNotifier<VaultLayoutSettings> {
   static const List<String> _defaultVaultElementsOrder = [
     'currentStreaks',
-    'streakAverages',
     'statistics',
-    'riskClock',
     'calendar',
+    'streakAverages',
+    'riskClock',
     'heatMapCalendar',
     'triggerRadar',
     'moodCorrelation',

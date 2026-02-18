@@ -32,7 +32,12 @@ class NotificationsScreen extends ConsumerWidget {
           style: TextStyles.h5.copyWith(color: theme.grey[900]),
         ),
         leading: IconButton(
-          icon: Icon(LucideIcons.arrowLeft, color: theme.grey[900]),
+          icon: Icon(
+            Directionality.of(context) == TextDirection.rtl
+                ? LucideIcons.arrowRight
+                : LucideIcons.arrowLeft,
+            color: theme.grey[900],
+          ),
           onPressed: () => context.pop(),
         ),
         actions: [

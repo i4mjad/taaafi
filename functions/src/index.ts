@@ -1,6 +1,8 @@
 import {onRequest} from 'firebase-functions/v2/https';
 import {onCall} from 'firebase-functions/v2/https';
-import {onDocumentCreated, onDocumentUpdated} from 'firebase-functions/v2/firestore';
+import {onDocumentCreated, onDocumentUpdated, onDocumentDeleted} from 'firebase-functions/v2/firestore';
+import { onSchedule } from 'firebase-functions/v2/scheduler';
+import { logger } from 'firebase-functions';
 import * as admin from 'firebase-admin';
 
 // Initialize Firebase Admin
@@ -353,12 +355,58 @@ async function getUserGender(communityProfileId: string): Promise<string | null>
   }
 }
 
+// Helper function to check if user has founder or admin role
+async function isUserFounderOrAdmin(communityProfileId: string): Promise<boolean> {
+  try {
+    console.log(`🔍 Checking if user ${communityProfileId} has founder or admin role`);
+    
+    // Get community profile to find userUID
+    const communityProfileDoc = await admin.firestore().collection('communityProfiles').doc(communityProfileId).get();
+    if (!communityProfileDoc.exists) {
+      console.log(`⚠️ Community profile not found: ${communityProfileId}`);
+      return false;
+    }
+    
+    const communityProfileData = communityProfileDoc.data()!;
+    const userUID = communityProfileData.userUID;
+    
+    if (!userUID) {
+      console.log(`⚠️ Community profile ${communityProfileId} missing userUID`);
+      return false;
+    }
+    
+    // Get user document to check roles
+    const userDoc = await admin.firestore().collection('users').doc(userUID).get();
+    if (!userDoc.exists) {
+      console.log(`⚠️ User document not found: ${userUID}`);
+      return false;
+    }
+    
+    const userData = userDoc.data()!;
+    const userRole = userData.role;
+    
+    console.log(`👑 User ${communityProfileId} role: ${userRole}`);
+    
+    return userRole === 'admin' || userRole === 'founder';
+  } catch (error) {
+    console.error(`❌ Error checking user roles for ${communityProfileId}:`, error);
+    return false;
+  }
+}
+
 // Helper function to check gender compatibility and mark comment as deleted if needed
 async function checkGenderCompatibilityAndMarkDeleted(commentData: any, commentId: string): Promise<void> {
   try {
     const { authorCPId: commenterCPId, parentFor, parentId } = commentData;
     
     console.log(`🔍 Checking gender compatibility for comment ${commentId} by ${commenterCPId} (parentFor: ${parentFor}, parentId: ${parentId})`);
+    
+    // Check if commenter is founder or admin - if so, skip gender check
+    const isCommenterFounderOrAdmin = await isUserFounderOrAdmin(commenterCPId);
+    if (isCommenterFounderOrAdmin) {
+      console.log(`👑 Commenter ${commenterCPId} has founder/admin role, skipping gender check`);
+      return;
+    }
     
     // Get commenter's gender
     const commenterGender = await getUserGender(commenterCPId);
@@ -922,15 +970,19 @@ export const deleteUserAccount = onCall(
         console.log('🏦 Deleting vault data...');
         await deleteVaultData(db, userId, deletionSummary);
         
-        // 3. Delete User Profile and Main Document
+        // 3. Handle Referral Data (notify referrer, update stats)
+        console.log('🔗 Handling referral data...');
+        await handleReferralDataOnDeletion(db, userId, deletionSummary);
+        
+        // 4. Delete User Profile and Main Document
         console.log('👤 Deleting user profile...');
         await deleteUserProfile(db, userId, deletionSummary);
         
-        // 4. Delete Authentication Records
+        // 5. Delete Authentication Records
         console.log('🔐 Deleting authentication records...');
         await deleteAuthenticationData(db, userId, deletionSummary);
         
-        // 5. Add deletion record for audit purposes
+        // 6. Add deletion record for audit purposes
         console.log('📝 Creating deletion audit record...');
         await createDeletionAuditRecord(db, deletionSummary);
         
@@ -1072,6 +1124,36 @@ async function deleteCommunityData(
   }
 }
 
+// Helper function to handle referral data on user deletion
+async function handleReferralDataOnDeletion(
+  db: FirebaseFirestore.Firestore,
+  userId: string,
+  summary: any
+): Promise<void> {
+  try {
+    // Import the handler (dynamic import to avoid circular dependencies)
+    const { handleReferralUserDeletion } = await import('./referral/handlers/userDeletionHandler');
+    
+    const result = await handleReferralUserDeletion(userId);
+    
+    summary.collections.referralVerifications = result.verificationsMarked;
+    summary.collections.referralNotifications = result.referrerNotified ? 1 : 0;
+    summary.collections.referralStats = result.statsUpdated ? 1 : 0;
+    
+    if (result.errors.length > 0) {
+      console.warn(`⚠️ Referral cleanup had errors: ${result.errors.join(', ')}`);
+      summary.errors.push(...result.errors);
+    } else {
+      console.log('✅ Referral data handled successfully');
+    }
+    
+  } catch (error) {
+    console.error('❌ Error handling referral data:', error);
+    summary.errors.push(`Referral cleanup failed: ${error.message}`);
+    // Don't throw - referral cleanup failure shouldn't block account deletion
+  }
+}
+
 // Helper function to delete vault data
 async function deleteVaultData(
   db: FirebaseFirestore.Firestore, 
@@ -1207,6 +1289,98 @@ async function createDeletionAuditRecord(
   }
 }
 
+// Import group message notification functions
+import { 
+  sendGroupMessageNotification, 
+  updateNotificationSubscriptions 
+} from './groupMessageNotifications';
+
+// Import group member management notification functions
+import { 
+  sendMemberManagementNotification
+} from './groupMemberManagementNotifications';
+
+// Import direct message notification functions
+import { 
+  sendDirectMessageNotification 
+} from './directMessageNotifications';
+
+// Import direct message moderation function
+import { 
+  moderateDirectMessage 
+} from './moderateDirectMessage';
+
+// Import group update moderation function
+import { 
+  moderateGroupUpdate 
+} from './moderateGroupUpdate';
+
+// Import forum post moderation function
+import {
+  moderateForumPost
+} from './moderateForumPost';
+
+// Import comment moderation function
+import {
+  moderateComment
+} from './moderateComment';
+
+// Import groups activity backfill function
+import { 
+  backfillMemberActivity 
+} from './groups/backfillMemberActivity';
+
+// Import groups achievements check function
+import { 
+  checkAndAwardAchievements 
+} from './groups/checkAndAwardAchievements';
+
+// Export group message notification functions
+export { 
+  sendGroupMessageNotification,
+  updateNotificationSubscriptions
+};
+
+// Export group member management notification functions
+export {
+  sendMemberManagementNotification
+};
+
+// Export direct message notification functions
+export {
+  sendDirectMessageNotification
+};
+
+// Export direct message moderation function
+export {
+  moderateDirectMessage
+};
+
+// Export group update moderation function
+export {
+  moderateGroupUpdate
+};
+
+// Export forum post moderation function
+export {
+  moderateForumPost
+};
+
+// Export comment moderation function
+export {
+  moderateComment
+};
+
+// Export groups activity backfill function
+export {
+  backfillMemberActivity
+};
+
+// Export groups achievements check function (scheduled)
+export {
+  checkAndAwardAchievements
+};
+
 // Community Notification Triggers
 
 // Trigger when a new comment is created
@@ -1231,6 +1405,201 @@ export const onCommentCreate = onDocumentCreated(
     
     // Handle notifications
     await handleCommentNotification(commentData, commentId);
+  }
+);
+
+// ===============================
+// NEW ATTACHMENT SYSTEM - Essential Cloud Functions
+// ===============================
+
+// Poll vote aggregation (essential for vote counting)
+export const onPollVoteWriteNew = onDocumentCreated(
+  {
+    document: 'forumPosts/{postId}/attachments/{pollId}/votes/{cpId}',
+    region: 'us-central1',
+  },
+  async (event) => {
+    const db = admin.firestore();
+    const { postId, pollId } = event.params as { postId: string; pollId: string };
+    
+    try {
+      console.log(`[POLL_VOTE_NEW] Processing vote for poll ${pollId} in post ${postId}`);
+      
+      const pollRef = db.collection('forumPosts').doc(postId).collection('attachments').doc(pollId);
+      
+      await db.runTransaction(async (transaction) => {
+        const pollDoc = await transaction.get(pollRef);
+        
+        if (!pollDoc.exists || pollDoc.data()?.type !== 'poll') {
+          console.error(`[POLL_VOTE_NEW] Poll ${pollId} not found or invalid`);
+          return;
+        }
+        
+        // Get all votes for this poll
+        const votesSnap = await transaction.get(
+          pollRef.collection('votes')
+        );
+        
+        const pollData = pollDoc.data()!;
+        const options: Array<{ id: string; text: string }> = pollData.options || [];
+        const optionCounts: Record<string, number> = {};
+        
+        // Initialize counts
+        options.forEach(opt => optionCounts[opt.id] = 0);
+        
+        let totalVotes = 0;
+        votesSnap.docs.forEach((voteDoc) => {
+          const voteData = voteDoc.data();
+          const selectedOptionIds: string[] = voteData.selectedOptionIds || [];
+          
+          if (selectedOptionIds.length > 0) {
+            totalVotes += 1;
+            selectedOptionIds.forEach((optionId) => {
+              if (optionCounts[optionId] !== undefined) {
+                optionCounts[optionId] += 1;
+              }
+            });
+          }
+        });
+        
+        transaction.update(pollRef, {
+          totalVotes,
+          optionCounts,
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+        
+        console.log(`[POLL_VOTE_NEW] Updated poll ${pollId} aggregates: totalVotes=${totalVotes}`);
+      });
+      
+    } catch (error) {
+      console.error(`[POLL_VOTE_NEW] Error updating poll counters:`, error);
+    }
+  }
+);
+
+// Legacy poll aggregation function (deprecated - replaced by onPollVoteWriteUpdateCounters)
+// Keeping for backward compatibility during transition
+export const onPollVoteWrite = onDocumentCreated(
+  {
+    document: 'forumPosts/{postId}/pollVotes/{cpId}',
+    region: 'us-central1',
+  },
+  async (event) => {
+    logger.warn('[DEPRECATED] onPollVoteWrite is deprecated. Use onPollVoteWriteUpdateCounters instead.');
+    // This function is now deprecated and will be removed in a future version
+    // The new vote structure uses forumPosts/{postId}/attachments/{pollId}/votes/{cpId}
+  }
+);
+
+// ===============================
+// Attachments: Invite maintenance
+// ===============================
+
+// On group membership updates: if inviter leaves group, revoke their invites
+export const onMembershipUpdateExpireInvites = onDocumentUpdated(
+  {
+    document: 'group_memberships/{membershipId}',
+    region: 'us-central1',
+  },
+  async (event) => {
+    const db = admin.firestore();
+    const before = event.data?.before.data();
+    const after = event.data?.after.data();
+    if (!before || !after) return;
+
+    // If membership became inactive, expire invites created by this cpId for that group
+    if (before.isActive === true && after.isActive === false) {
+      const inviterCpId = after.cpId as string;
+      const groupId = after.groupId as string;
+      try {
+        // Find posts with attachments from inviter to this group
+        const postsSnap = await db
+          .collection('forumPosts')
+          .where('attachmentTypes', 'array-contains', 'group_invite')
+          .get();
+
+        const batch = db.batch();
+        postsSnap.docs.forEach((postDoc) => {
+          const ref = postDoc.ref.collection('attachments');
+          // We cannot do server-side joins; we scan in memory per post
+          // In production consider an index or a top-level invites collection
+          // For now, fetch attachments for this post
+          batch; // placeholder to keep scope used
+        });
+
+        // Brute-force scan attachments for matching invites
+        for (const postDoc of postsSnap.docs) {
+          const atts = await postDoc.ref
+            .collection('attachments')
+            .where('type', '==', 'group_invite')
+            .where('inviterCpId', '==', inviterCpId)
+            .where('groupId', '==', groupId)
+            .get();
+
+          atts.docs.forEach((attDoc) => {
+            batch.update(attDoc.ref, { status: 'revoked' });
+          });
+        }
+
+        await batch.commit();
+        logger.info(`[INVITES] Revoked invites for inviter ${inviterCpId} in group ${groupId}`);
+      } catch (error) {
+        logger.error('[INVITES] Error revoking invites on membership update:', error);
+      }
+    }
+  }
+);
+
+// Scheduled job to expire invites past expiresAt
+export const scheduledExpireInvites = onSchedule('every 60 minutes', async () => {
+  const db = admin.firestore();
+  try {
+    const now = new Date();
+    // Scan posts with group_invite
+    const postsSnap = await db
+      .collection('forumPosts')
+      .where('attachmentTypes', 'array-contains', 'group_invite')
+      .get();
+
+    const batch = db.batch();
+    for (const postDoc of postsSnap.docs) {
+      const atts = await postDoc.ref
+        .collection('attachments')
+        .where('type', '==', 'group_invite')
+        .where('status', '==', 'active')
+        .get();
+
+      atts.docs.forEach((attDoc) => {
+        const d = attDoc.data();
+        const expiresAt = d.expiresAt?.toDate?.() as Date | undefined;
+        if (expiresAt && expiresAt < now) {
+          batch.update(attDoc.ref, { status: 'expired' });
+        }
+      });
+    }
+
+    await batch.commit();
+    logger.info('[INVITES] Scheduled expiry job completed');
+  } catch (error) {
+    logger.error('[INVITES] Scheduled expiry job failed:', error);
+  }
+});
+
+// ===============================
+// Post delete cascade
+// ===============================
+
+// Legacy cascade delete function (deprecated - replaced by modular onPostDeleteCascade)
+// Keeping for backward compatibility during transition
+export const onPostDeleteCascadeLegacy = onDocumentDeleted(
+  {
+    document: 'forumPosts/{postId}',
+    region: 'us-central1',
+  },
+  async (event) => {
+    logger.warn('[DEPRECATED] onPostDeleteCascadeLegacy is deprecated. Use onPostDeleteCascade instead.');
+    // This function is now deprecated and will be removed in a future version
+    // The new cascade delete handles the new attachment structure properly
   }
 );
 
@@ -1279,3 +1648,89 @@ export const onInteractionUpdate = onDocumentUpdated(
     }
   }
 );
+
+// ==================== GROUP UPDATES NOTIFICATIONS ====================
+// Export group update notification functions
+export { sendUpdateNotification, sendCommentNotification } from './groupUpdateNotifications';
+
+// ==================== CHALLENGE TASK COMPLETION NOTIFICATIONS ====================
+// Export challenge task completion notification function
+export { sendChallengeTaskCompletionNotification } from './challengeTaskCompletionNotifications';
+
+// ==================== REFERRAL PROGRAM ====================
+import { initializeReferralConfig } from './referral/initializeConfig';
+
+/**
+ * Initialize Referral Program Configuration
+ * One-time callable function to set up the referral program config document
+ */
+export const initReferralConfig = onCall(
+  {
+    region: 'us-central1',
+  },
+  async (request) => {
+    try {
+      // Check if user is authenticated
+      if (!request.auth) {
+        throw new Error('User must be authenticated');
+      }
+
+      // Check if user is admin
+      const userDoc = await admin.firestore().collection('users').doc(request.auth.uid).get();
+      const userData = userDoc.data();
+      
+      if (!userData || userData.role !== 'admin') {
+        throw new Error('Only admins can initialize referral config');
+      }
+
+      // Initialize the config
+      await initializeReferralConfig();
+
+      return {
+        success: true,
+        message: 'Referral program configuration initialized successfully'
+      };
+
+    } catch (error) {
+      console.error('❌ Error initializing referral config:', error);
+      throw error;
+    }
+  }
+);
+
+// Export referral code generation functions
+export { generateReferralCodeOnUserCreation } from './referral/generateReferralCode';
+export { backfillReferralCodes } from './referral/backfillReferralCodes';
+export { redeemReferralCode } from './referral/redeemReferralCode';
+export { generateUserReferralCode } from './referral/generateUserReferralCode';
+
+// Export referral verification tracking triggers
+export { onForumPostCreated } from './referral/triggers/forumPostTrigger';
+export { onCommentCreated } from './referral/triggers/commentTrigger';
+export { onInteractionCreated } from './referral/triggers/interactionTrigger';
+export { onGroupMembershipCreated } from './referral/triggers/groupMembershipTrigger';
+export { onGroupMessageCreated } from './referral/triggers/groupMessageTrigger';
+
+// Referral Rewards
+export { redeemReferralRewards } from './referral/rewards/redeemRewards';
+export { claimRefereeReward } from './referral/rewards/claimRefereeReward';
+export { manuallyGrantRefereeReward } from './referral/admin/manualRewardGrant';
+export { onActivitySubscribed } from './referral/triggers/activityTrigger';
+
+// Retention Rewards
+export { claimRetentionReward, checkRetentionRewardStatus } from './referral/rewards/claimRetentionReward';
+
+// Export referral scheduled functions
+export { checkPendingVerificationAges } from './referral/scheduledChecks';
+
+// Export referral fraud management admin functions
+export { 
+  approveReferralVerification,
+  blockReferralUser,
+  getFraudDetails,
+  getFlaggedUsers,
+  recalculateFraudScore
+} from './referral/admin/fraudManagement';
+
+// Export referral webhooks (Sprint 11)
+export { handleRevenueCatWebhook } from './referral/webhooks/revenuecatWebhook';

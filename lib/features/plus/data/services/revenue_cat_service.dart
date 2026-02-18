@@ -169,6 +169,22 @@ class RevenueCatService {
     return await Purchases.getOfferings();
   }
 
+  /// Get available offerings with error handling for cross-platform scenarios
+  /// Returns null if offerings can't be fetched (e.g. platform configuration issues)
+  /// but doesn't affect subscription status checking
+  Future<Offerings?> getOfferingsOrNull() async {
+    try {
+      // Ensure correct user is logged in before fetching offerings
+      await ensureCurrentUserLoggedIn();
+      return await Purchases.getOfferings();
+    } catch (e) {
+      print('RevenueCat: Could not fetch offerings for current platform - $e');
+      print(
+          'RevenueCat: This may be due to platform configuration issues but does not affect existing subscriptions');
+      return null;
+    }
+  }
+
   /// Purchase a specific package
   Future<CustomerInfo> purchasePackage(Package package) async {
     // Critical: Force user validation before purchase (no cache)

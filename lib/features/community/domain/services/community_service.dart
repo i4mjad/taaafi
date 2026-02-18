@@ -1,5 +1,6 @@
 import '../entities/community_profile_entity.dart';
 import '../entities/profile_statistics.dart';
+import '../../data/models/notification_preferences.dart';
 
 /// Enum for deletion progress steps
 enum DeletionStep {
@@ -59,6 +60,8 @@ abstract class CommunityService {
     String? avatarUrl,
     bool? isPlusUser,
     bool? shareRelapseStreaks,
+    NotificationPreferences? notificationPreferences,
+    bool? allowDirectMessages,
   });
 
   /// Checks if the current user has a community profile

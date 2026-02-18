@@ -1,0 +1,567 @@
+import 'dart:developer';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+import '../models/group_model.dart';
+import '../models/group_membership_model.dart';
+import 'groups_datasource.dart';
+
+class GroupsFirestoreDataSource implements GroupsDataSource {
+  final FirebaseFirestore _firestore;
+
+  const GroupsFirestoreDataSource(this._firestore);
+
+  @override
+  Future<GroupMembershipModel?> getCurrentMembership(String cpId) async {
+    try {
+      final querySnapshot = await _firestore
+          .collection('group_memberships')
+          .where('cpId', isEqualTo: cpId)
+          .where('isActive', isEqualTo: true)
+          .limit(1)
+          .get();
+
+      if (querySnapshot.docs.isEmpty) return null;
+
+      return GroupMembershipModel.fromFirestore(querySnapshot.docs.first);
+    } catch (e, stackTrace) {
+      log('Error getting current membership: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<GroupModel?> getGroupById(String groupId) async {
+    try {
+      final doc = await _firestore.collection('groups').doc(groupId).get();
+
+      if (!doc.exists) return null;
+
+      return GroupModel.fromFirestore(doc);
+    } catch (e, stackTrace) {
+      log('Error getting group by ID: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Stream<List<GroupModel>> getPublicGroups() {
+    try {
+      return _firestore
+          .collection('groups')
+          .where('visibility', isEqualTo: 'public')
+          .where('isActive', isEqualTo: true)
+          .where('isPaused', isEqualTo: false)
+          .orderBy('createdAt', descending: true)
+          .snapshots()
+          .map((snapshot) => snapshot.docs
+              .map((doc) => GroupModel.fromFirestore(doc))
+              .toList());
+    } catch (e, stackTrace) {
+      log('Error getting public groups: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<String> createGroup(GroupModel group) async {
+    try {
+      final docRef =
+          await _firestore.collection('groups').add(group.toFirestore());
+      return docRef.id;
+    } catch (e, stackTrace) {
+      log('Error creating group: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<String> createMembership(GroupMembershipModel membership) async {
+    try {
+      // Use composite document ID: ${groupId}_${cpId}
+      final docId = '${membership.groupId}_${membership.cpId}';
+      await _firestore
+          .collection('group_memberships')
+          .doc(docId)
+          .set(membership.toFirestore());
+      return docId;
+    } catch (e, stackTrace) {
+      log('Error creating membership: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> updateMembership(GroupMembershipModel membership) async {
+    try {
+      await _firestore
+          .collection('group_memberships')
+          .doc(membership.id)
+          .update(membership.toFirestore());
+    } catch (e, stackTrace) {
+      log('Error updating membership: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<bool> canJoinGroup(String cpId) async {
+    try {
+      // Check if user has cooldown
+      final nextJoinTime = await getNextJoinAllowedAt(cpId);
+      if (nextJoinTime != null && DateTime.now().isBefore(nextJoinTime)) {
+        return false;
+      }
+
+      // Check for active bans on groups feature
+      final banQuery = await _firestore
+          .collection('bans')
+          .where('userId', isEqualTo: await _getUserIdFromCpId(cpId))
+          .where('isActive', isEqualTo: true)
+          .where('restrictedFeatures', arrayContains: 'groups')
+          .limit(1)
+          .get();
+
+      if (banQuery.docs.isNotEmpty) {
+        // Check if ban has expired
+        final banDoc = banQuery.docs.first;
+        final expiresAt = banDoc.data()['expiresAt'] as Timestamp?;
+        if (expiresAt == null || DateTime.now().isBefore(expiresAt.toDate())) {
+          return false;
+        }
+      }
+
+      return true;
+    } catch (e, stackTrace) {
+      log('Error checking if user can join group: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<DateTime?> getNextJoinAllowedAt(String cpId) async {
+    try {
+      final cpDoc =
+          await _firestore.collection('communityProfiles').doc(cpId).get();
+      if (!cpDoc.exists) return null;
+
+      final data = cpDoc.data()!;
+      final nextJoinAllowed = data['nextJoinAllowedAt'] as Timestamp?;
+      final overrideUntil = data['rejoinCooldownOverrideUntil'] as Timestamp?;
+
+      // Check if override is active
+      if (overrideUntil != null &&
+          DateTime.now().isBefore(overrideUntil.toDate())) {
+        return null; // No cooldown due to override
+      }
+
+      return nextJoinAllowed?.toDate();
+    } catch (e, stackTrace) {
+      log('Error getting next join allowed time: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> setCooldown(String cpId, DateTime nextJoinAllowedAt) async {
+    try {
+      await _firestore.collection('communityProfiles').doc(cpId).update({
+        'nextJoinAllowedAt': Timestamp.fromDate(nextJoinAllowedAt),
+      });
+    } catch (e, stackTrace) {
+      log('Error setting cooldown: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<bool> verifyJoinCode(String groupId, String joinCode) async {
+    try {
+      final groupDoc = await _firestore.collection('groups').doc(groupId).get();
+      if (!groupDoc.exists) return false;
+
+      final data = groupDoc.data()!;
+      final storedJoinCode = data['joinCode'] as String?;
+      final expiresAt = data['joinCodeExpiresAt'] as Timestamp?;
+      final maxUses = data['joinCodeMaxUses'] as int?;
+      final useCount = data['joinCodeUseCount'] as int? ?? 0;
+
+      if (storedJoinCode == null) return false;
+
+      // Check expiry
+      if (expiresAt != null && DateTime.now().isAfter(expiresAt.toDate())) {
+        return false;
+      }
+
+      // Check usage limit
+      if (maxUses != null && useCount >= maxUses) {
+        return false;
+      }
+
+      // Direct comparison of plain text join codes
+      return joinCode.trim() == storedJoinCode.trim();
+    } catch (e, stackTrace) {
+      log('Error verifying join code: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> incrementJoinCodeUsage(String groupId) async {
+    try {
+      await _firestore.collection('groups').doc(groupId).update({
+        'joinCodeUseCount': FieldValue.increment(1),
+      });
+    } catch (e, stackTrace) {
+      log('Error incrementing join code usage: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<bool> isUserPlus(String cpId) async {
+    try {
+      final cpDoc =
+          await _firestore.collection('communityProfiles').doc(cpId).get();
+      if (!cpDoc.exists) return false;
+
+      final userUID = cpDoc.data()!['userUID'] as String;
+      final userDoc = await _firestore.collection('users').doc(userUID).get();
+      if (!userDoc.exists) return false;
+
+      return userDoc.data()!['isPlusUser'] as bool? ?? false;
+    } catch (e, stackTrace) {
+      log('Error checking Plus status: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<String?> getUserGender(String cpId) async {
+    try {
+      final cpDoc =
+          await _firestore.collection('communityProfiles').doc(cpId).get();
+      if (!cpDoc.exists) return null;
+
+      return cpDoc.data()!['gender'] as String?;
+    } catch (e, stackTrace) {
+      log('Error getting user gender: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<int> getGroupMemberCount(String groupId) async {
+    try {
+      final querySnapshot = await _firestore
+          .collection('group_memberships')
+          .where('groupId', isEqualTo: groupId)
+          .where('isActive', isEqualTo: true)
+          .get();
+
+      return querySnapshot.docs.length;
+    } catch (e, stackTrace) {
+      log('Error getting group member count: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<List<GroupMembershipModel>> getGroupMembers(String groupId) async {
+    try {
+      final querySnapshot = await _firestore
+          .collection('group_memberships')
+          .where('groupId', isEqualTo: groupId)
+          .where('isActive', isEqualTo: true)
+          .orderBy('joinedAt', descending: false)
+          .get();
+
+      return querySnapshot.docs
+          .map((doc) => GroupMembershipModel.fromFirestore(doc))
+          .toList();
+    } catch (e, stackTrace) {
+      log('Error getting group members: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<List<GroupMembershipModel>> getActiveGroupMembersSorted(
+      String groupId) async {
+    try {
+      final querySnapshot = await _firestore
+          .collection('group_memberships')
+          .where('groupId', isEqualTo: groupId)
+          .where('isActive', isEqualTo: true)
+          .orderBy('joinedAt', descending: false) // oldest first
+          .get();
+
+      return querySnapshot.docs
+          .map((doc) => GroupMembershipModel.fromFirestore(doc))
+          .toList();
+    } catch (e, stackTrace) {
+      log('Error getting active group members sorted: $e',
+          stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> updateGroup(GroupModel group) async {
+    try {
+      await _firestore
+          .collection('groups')
+          .doc(group.id)
+          .update(group.toFirestore());
+    } catch (e, stackTrace) {
+      log('Error updating group: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> updateGroupCapacityTransactional({
+    required String groupId,
+    required int newCapacity,
+  }) async {
+    try {
+      await _firestore.runTransaction((transaction) async {
+        // Get group document reference
+        final groupRef = _firestore.collection('groups').doc(groupId);
+        final groupSnapshot = await transaction.get(groupRef);
+
+        if (!groupSnapshot.exists) {
+          throw Exception('error-group-not-found');
+        }
+
+        // Get current member count within transaction
+        final membershipsQuery = await _firestore
+            .collection('group_memberships')
+            .where('groupId', isEqualTo: groupId)
+            .where('isActive', isEqualTo: true)
+            .get();
+
+        final currentMemberCount = membershipsQuery.docs.length;
+
+        // Validate capacity against current member count
+        if (newCapacity < currentMemberCount) {
+          throw Exception('error-capacity-below-member-count');
+        }
+
+        // Update capacity atomically
+        transaction.update(groupRef, {
+          'memberCapacity': newCapacity,
+          'updatedAt': Timestamp.now(),
+        });
+      });
+    } catch (e, stackTrace) {
+      log('Error updating group capacity transactionally: $e',
+          stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> updateGroupDetailsTransactional({
+    required String groupId,
+    required String name,
+    required String description,
+  }) async {
+    try {
+      await _firestore.runTransaction((transaction) async {
+        // Get group document reference
+        final groupRef = _firestore.collection('groups').doc(groupId);
+        final groupSnapshot = await transaction.get(groupRef);
+
+        if (!groupSnapshot.exists) {
+          throw Exception('error-group-not-found');
+        }
+
+        // Update details atomically
+        transaction.update(groupRef, {
+          'name': name,
+          'description': description,
+          'updatedAt': Timestamp.now(),
+        });
+      });
+    } catch (e, stackTrace) {
+      log('Error updating group details transactionally: $e',
+          stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> promoteMemberToAdmin({
+    required String groupId,
+    required String cpId,
+  }) async {
+    try {
+      final membershipId = '${groupId}_$cpId';
+      await _firestore
+          .collection('group_memberships')
+          .doc(membershipId)
+          .update({'role': 'admin'});
+    } catch (e, stackTrace) {
+      log('Error promoting member to admin: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> demoteMemberToMember({
+    required String groupId,
+    required String cpId,
+  }) async {
+    try {
+      final membershipId = '${groupId}_$cpId';
+      await _firestore
+          .collection('group_memberships')
+          .doc(membershipId)
+          .update({'role': 'member'});
+    } catch (e, stackTrace) {
+      log('Error demoting member to member: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> removeMemberFromGroup({
+    required String groupId,
+    required String cpId,
+  }) async {
+    try {
+      final membershipId = '${groupId}_$cpId';
+      final now = Timestamp.now();
+      
+      // Update membership to inactive
+      await _firestore
+          .collection('group_memberships')
+          .doc(membershipId)
+          .update({
+        'isActive': false,
+        'leftAt': now,
+      });
+
+      // Set 24-hour cooldown (same as leaving voluntarily)
+      final nextJoinAllowedAt = DateTime.now().add(const Duration(hours: 24));
+      await setCooldown(cpId, nextJoinAllowedAt);
+    } catch (e, stackTrace) {
+      log('Error removing member from group: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> markGroupAsInactive(String groupId) async {
+    try {
+      await _firestore.collection('groups').doc(groupId).update({
+        'isActive': false,
+        'updatedAt': Timestamp.now(),
+      });
+    } catch (e, stackTrace) {
+      log('Error marking group as inactive: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<GroupModel?> findGroupByJoinCode(String joinCode) async {
+    try {
+      // Query groups where joinCode matches and group is active
+      // Include both 'code_only' and 'any' join methods since both can accept join codes
+      final querySnapshot = await _firestore
+          .collection('groups')
+          .where('joinCode', isEqualTo: joinCode)
+          .where('isActive', isEqualTo: true)
+          .where('joinMethod', whereIn: ['code_only', 'any'])
+          .limit(1)
+          .get();
+
+      if (querySnapshot.docs.isEmpty) return null;
+
+      // Verify the join code is still valid
+      final groupDoc = querySnapshot.docs.first;
+      final data = groupDoc.data();
+
+      // Check expiry
+      final expiresAt = data['joinCodeExpiresAt'] as Timestamp?;
+      if (expiresAt != null && DateTime.now().isAfter(expiresAt.toDate())) {
+        return null;
+      }
+
+      // Check usage limit
+      final maxUses = data['joinCodeMaxUses'] as int?;
+      final useCount = data['joinCodeUseCount'] as int? ?? 0;
+      if (maxUses != null && useCount >= maxUses) {
+        return null;
+      }
+
+      return GroupModel.fromFirestore(groupDoc);
+    } catch (e, stackTrace) {
+      log('Error finding group by join code: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  // ==================== ACTIVITY TRACKING (Sprint 2 - Feature 2.1) ====================
+
+  @override
+  Future<void> updateMemberActivity({
+    required String groupId,
+    required String cpId,
+  }) async {
+    try {
+      final membershipId = '${groupId}_$cpId';
+      final now = Timestamp.now();
+
+      // Get current membership data
+      final membershipDoc = await _firestore
+          .collection('group_memberships')
+          .doc(membershipId)
+          .get();
+
+      if (!membershipDoc.exists) {
+        log('Membership not found for $membershipId');
+        return;
+      }
+
+      final data = membershipDoc.data()!;
+      final currentMessageCount = data['messageCount'] as int? ?? 0;
+      final newMessageCount = currentMessageCount + 1;
+
+      // Calculate engagement score
+      // Formula: messageCount × 2 + activity bonuses
+      int engagementScore = newMessageCount * 2;
+
+      // Active in last 24 hours = +10
+      engagementScore += 10;
+
+      // Ensure score is never negative
+      engagementScore = engagementScore.clamp(0, 999);
+
+      // Update membership with new activity data
+      // Use set with merge to create fields if they don't exist
+      await _firestore
+          .collection('group_memberships')
+          .doc(membershipId)
+          .set({
+        'lastActiveAt': now,
+        'messageCount': newMessageCount,
+        'engagementScore': engagementScore,
+      }, SetOptions(merge: true));
+
+      log('✅ Updated activity for member $cpId in group $groupId: messages=$newMessageCount, engagement=$engagementScore');
+    } catch (e, stackTrace) {
+      log('Error updating member activity: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  // Helper method to get user ID from community profile ID
+  Future<String> _getUserIdFromCpId(String cpId) async {
+    final cpDoc =
+        await _firestore.collection('communityProfiles').doc(cpId).get();
+    if (!cpDoc.exists) throw Exception('Community profile not found');
+    return cpDoc.data()!['userUID'] as String;
+  }
+}

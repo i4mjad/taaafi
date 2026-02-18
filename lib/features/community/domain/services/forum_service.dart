@@ -7,7 +7,11 @@ import 'package:reboot_app_3/features/community/data/repositories/forum_reposito
 import 'package:reboot_app_3/features/community/domain/services/post_validation_service.dart';
 import 'package:reboot_app_3/features/community/data/exceptions/forum_exceptions.dart';
 import 'package:reboot_app_3/features/community/application/gender_interaction_validator.dart';
+import 'package:reboot_app_3/features/community/application/attachment_image_service.dart';
+import 'package:reboot_app_3/features/community/application/attachment_group_service.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/features/community/data/models/post_attachment_data.dart';
+import 'package:reboot_app_3/features/community/data/models/attachment.dart';
 import '../../../account/data/app_features_config.dart';
 import '../../../account/application/ban_warning_facade.dart';
 import '../../../account/data/models/ban.dart';
@@ -44,6 +48,8 @@ class ForumService {
   final FirebaseAuth _auth;
   final FirebaseFirestore _firestore;
   final GenderInteractionValidator _genderValidator;
+  final AttachmentImageService _imageService;
+  final AttachmentGroupService _groupService;
 
   /// Creates a new ForumService instance
   ///
@@ -57,6 +63,8 @@ class ForumService {
     this._auth,
     this._firestore,
     this._genderValidator,
+    this._imageService,
+    this._groupService,
   );
 
   /// Helper method to get community profile ID from user mapping
@@ -107,9 +115,12 @@ class ForumService {
   /// 3. Checks user permissions
   /// 4. Sanitizes data
   /// 5. Creates the post
+  /// 6. Creates attachments if provided
+  /// 7. Finalizes post with attachment summary
   ///
   /// [postData] - The post data to create
   /// [localizations] - Localization helper for error messages
+  /// [attachmentData] - Optional attachment data (images, poll, or group invite)
   ///
   /// Returns the ID of the created post
   ///
@@ -121,8 +132,9 @@ class ForumService {
   /// - [ForumNetworkException] if network error occurs
   Future<String> createPost(
     PostFormData postData,
-    AppLocalizations localizations,
-  ) async {
+    AppLocalizations localizations, {
+    PostAttachmentsState? attachmentData,
+  }) async {
     try {
       // 1. Check authentication
       await _ensureAuthenticated();
@@ -152,6 +164,7 @@ class ForumService {
       final authorCPId = await _getCommunityProfileId(currentUser.uid);
 
       // 7. Create the post
+      final hasAttachments = attachmentData?.hasAttachments ?? false;
 
       final postId = await _repository.createPost(
         authorCPId: authorCPId,
@@ -159,9 +172,16 @@ class ForumService {
         content: sanitizedData.content,
         categoryId: sanitizedData.categoryId,
         attachmentUrls: sanitizedData.attachmentUrls,
+        hasAttachments: hasAttachments,
       );
 
-      // 8. Log the action for analytics
+      // 8. Create attachments if provided
+      if (hasAttachments && attachmentData != null) {
+        await _createAndFinalizeAttachments(
+            postId, attachmentData, authorCPId, localizations);
+      }
+
+      // 9. Log the action for analytics
       await _logPostCreation(postId, sanitizedData);
 
       return postId;
@@ -701,6 +721,218 @@ class ForumService {
         : value == -1
             ? 'dislike'
             : 'neutral';
+  }
+
+  /// Creates attachments and finalizes the post
+  ///
+  /// This method handles the multi-step finalization process:
+  /// 1. Create attachment subdocuments based on type
+  /// 2. Build attachment summaries
+  /// 3. Finalize post with summary and types
+  ///
+  /// [postId] - The ID of the post to attach to
+  /// [attachmentData] - The attachment data to create
+  /// [authorCpId] - The author's community profile ID
+  /// [localizations] - Localization helper for error messages
+  ///
+  /// Throws [PostCreationException] if attachment creation fails
+  Future<void> _createAndFinalizeAttachments(
+    String postId,
+    PostAttachmentsState attachmentData,
+    String authorCpId,
+    AppLocalizations localizations,
+  ) async {
+    try {
+      final List<Map<String, dynamic>> attachmentsSummary = [];
+      final List<String> attachmentTypes = [];
+
+      switch (attachmentData.selectedType!) {
+        case AttachmentType.image:
+          await _createImageAttachments(
+            postId,
+            attachmentData.attachmentData as ImageAttachmentData,
+            authorCpId,
+            attachmentsSummary,
+            attachmentTypes,
+          );
+          break;
+
+        case AttachmentType.poll:
+          await _createPollAttachment(
+            postId,
+            attachmentData.attachmentData as PollAttachmentData,
+            authorCpId,
+            attachmentsSummary,
+            attachmentTypes,
+          );
+          break;
+
+        case AttachmentType.groupInvite:
+          await _createGroupInviteAttachment(
+            postId,
+            attachmentData.attachmentData as GroupInviteAttachmentData,
+            authorCpId,
+            attachmentsSummary,
+            attachmentTypes,
+          );
+          break;
+      }
+
+      // TEMPORARY: Until Cloud Functions are deployed, manually update the summary
+      // This will be replaced by automatic Cloud Function processing
+      await _repository.updatePostWithAttachmentSummary(
+        postId: postId,
+        attachmentsSummary: attachmentsSummary,
+        attachmentTypes: attachmentTypes,
+      );
+    } catch (e) {
+      throw PostCreationException(
+        localizations.translate('post_creation_failed'),
+        reason: 'attachment_creation_error',
+        details: e.toString(),
+        code: 'ATTACHMENT_CREATION_FAILED',
+      );
+    }
+  }
+
+  /// Creates image attachments with Firebase Storage upload
+  Future<void> _createImageAttachments(
+    String postId,
+    ImageAttachmentData imageData,
+    String authorCpId,
+    List<Map<String, dynamic>> summaryList,
+    List<String> typesList,
+  ) async {
+    if (imageData.images.isEmpty) return;
+
+    try {
+      // Upload all images to Firebase Storage
+      final uploadedImages = await _imageService.uploadImages(
+        postId: postId,
+        images: imageData.images,
+        onProgress: (current, total, fileName) {
+          // Progress tracking can be handled by UI layer
+          // For now, just continue silently
+        },
+      );
+
+      // Create attachment documents for each uploaded image
+      for (final uploadedImage in uploadedImages) {
+        // Use the uploaded image id as a stable suffix to ensure idempotency on retries
+        final attachmentId = 'img_${uploadedImage.id}';
+
+        final imageAttachment = ImageAttachment(
+          id: attachmentId,
+          schemaVersion: '1.0',
+          createdAt: DateTime.now(),
+          createdByCpId: authorCpId,
+          status: 'active',
+          storagePath: uploadedImage.storagePath,
+          downloadUrl: uploadedImage.downloadUrl,
+          width: uploadedImage.width,
+          height: uploadedImage.height,
+          sizeBytes: uploadedImage.sizeBytes,
+          thumbnailUrl: uploadedImage.thumbnailUrl,
+          contentHash: uploadedImage.contentHash,
+        );
+
+        await _repository.createAttachment(
+          postId: postId,
+          attachmentId: attachmentId,
+          attachmentData: imageAttachment.toFirestore(),
+        );
+
+        summaryList.add(imageAttachment.toSummary());
+      }
+
+      typesList.add('image');
+    } catch (e) {
+      // Clean up any temporary files on failure
+      await _imageService.cleanupTempFiles(imageData.images);
+      rethrow;
+    }
+  }
+
+  /// Creates poll attachment
+  Future<void> _createPollAttachment(
+    String postId,
+    PollAttachmentData pollData,
+    String authorCpId,
+    List<Map<String, dynamic>> summaryList,
+    List<String> typesList,
+  ) async {
+    // Stable poll attachment id for idempotency
+    final attachmentId = 'poll_${postId}';
+
+    // Create poll attachment following new spec
+    final pollAttachmentData = {
+      'type': 'poll',
+      'status': 'active',
+      'question': pollData.question,
+      'options': pollData.options
+          .map((opt) => {
+                'id': opt.id,
+                'text': opt.text,
+                'order': pollData.options.indexOf(opt),
+              })
+          .toList(),
+      'selectionMode': pollData.isMultiSelect ? 'multiple' : 'single',
+      'isClosed': false,
+      'totalVotes': 0,
+      'optionCounts': <String, int>{}, // Map of optionId -> count
+      'shards': 0, // Start with 0 shards (no sharding initially)
+    };
+
+    if (pollData.closesAt != null) {
+      pollAttachmentData['closesAt'] = Timestamp.fromDate(pollData.closesAt!);
+    }
+
+    await _repository.createAttachment(
+      postId: postId,
+      attachmentId: attachmentId,
+      attachmentData: pollAttachmentData,
+    );
+
+    // Create proper summary for client-side handling
+    summaryList.add({
+      'id': attachmentId,
+      'type': 'poll',
+      'title': pollData.question,
+      'options': pollData.options.length,
+      'isClosed': false,
+    });
+    typesList.add('poll');
+  }
+
+  /// Creates group invite attachment using real group data
+  Future<void> _createGroupInviteAttachment(
+    String postId,
+    GroupInviteAttachmentData inviteData,
+    String authorCpId,
+    List<Map<String, dynamic>> summaryList,
+    List<String> typesList,
+  ) async {
+    try {
+      // Use the group service to create a real group invite attachment
+      final groupInviteAttachment =
+          await _groupService.createGroupInviteAttachment(
+        postId: postId,
+        inviterCpId: authorCpId,
+        groupId: inviteData.groupId,
+      );
+
+      await _repository.createAttachment(
+        postId: postId,
+        attachmentId: groupInviteAttachment.id,
+        attachmentData: groupInviteAttachment.toFirestore(),
+      );
+
+      summaryList.add(groupInviteAttachment.toSummary());
+      typesList.add('group_invite');
+    } catch (e) {
+      // Re-throw with more context
+      throw Exception('Failed to create group invite attachment: $e');
+    }
   }
 
   /// Reply to a comment

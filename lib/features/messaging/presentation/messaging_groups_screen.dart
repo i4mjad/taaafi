@@ -3,9 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
-import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
-import 'package:reboot_app_3/core/shared_widgets/premium_cta_button.dart';
 import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/shared_widgets/ta3afi_platform_icons_icons.dart';
@@ -84,29 +82,6 @@ class _MessagingGroupsScreenState extends ConsumerState<MessagingGroupsScreen> {
 
     return Scaffold(
       backgroundColor: theme.backgroundColor,
-      appBar: appBar(
-        context,
-        ref,
-        'notifications-groups',
-        false,
-        true,
-        actions: [
-          PremiumCtaAppBarIcon(),
-          IconButton(
-            icon: Icon(LucideIcons.refreshCw, color: theme.grey[700]),
-            onPressed: () async {
-              try {
-                HapticFeedback.lightImpact();
-                await ref
-                    .read(messagingGroupsNotifierProvider.notifier)
-                    .refresh();
-              } catch (e) {
-                // Silently handle refresh errors as they're handled by the notifier
-              }
-            },
-          ),
-        ],
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -402,7 +377,7 @@ class _GroupCard extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
-                        Ta3afiPlatformIcons.plus_icon,
+                        Ta3afiPlatformIcons.plus,
                         color: const Color(0xFFFEBA01),
                         size: 12,
                       ),
@@ -483,8 +458,7 @@ class _GroupCard extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Ta3afiPlatformIcons.plus_icon,
-                  size: 16, color: Colors.black),
+              Icon(Ta3afiPlatformIcons.plus, size: 16, color: Colors.black),
               horizontalSpace(Spacing.points8),
               Text(
                 localization.translate('upgrade-to-plus-messaging'),

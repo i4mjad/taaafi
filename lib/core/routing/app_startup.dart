@@ -1,4 +1,4 @@
-import 'dart:async';
+import 'dart:async' show unawaited;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
@@ -30,68 +30,51 @@ Future<SecurityStartupResult> appStartup(Ref ref) async {
     ref.invalidate(userNotifierProvider);
     ref.invalidate(startupSecurityServiceProvider);
     ref.invalidate(localeNotifierProvider);
-    // ref.invalidate(firebaseRemoteConfigProvider);
-    // ref.invalidate(sharedPreferencesProvider);
-    // ref.invalidate(onboardingRepositoryProvider);
   });
 
-  // await Future.delayed(Duration(milliseconds: 500));
+  // 🚀 OPTIMIZATION: Run independent initializations in parallel
+  // SharedPreferences and user provider can load simultaneously
+  await Future.wait([
+    ref.watch(sharedPreferencesProvider.future),
+    ref.read(userNotifierProvider.future),
+  ]);
 
-  //* await for all initialization code to be complete before returning
-  await ref.watch(sharedPreferencesProvider.future);
-  await ref.read(userNotifierProvider.future);
-
-  // Initialize locale provider - this will load saved locale or default to Arabic
+  // Initialize locale provider (sync - fast)
   ref.read(localeNotifierProvider);
 
-  // Initialize RevenueCat with Firebase auth sync
-  try {
-    await ref.read(initializeRevenueCatAuthSyncProvider.future);
-  } catch (e) {
-    // RevenueCat initialization failure should not block app startup
-    debugPrint('RevenueCat initialization failed: $e');
-  }
+  // 🚀 OPTIMIZATION: Fire RevenueCat initialization in background (non-blocking)
+  unawaited(_initializeRevenueCatSafe(ref));
 
-  // Update user subscription status after RevenueCat is initialized
-  try {
-    await ref.read(initializeUserSubscriptionSyncProvider.future);
-  } catch (e) {
-    // Subscription sync failure should not block app startup
-    debugPrint('User subscription sync failed: $e');
-  }
-
-  // Initialize security and check for device/user bans
-  // NOTE: Device bans are checked FIRST (highest priority) before user bans
+  // CRITICAL: Security check must complete and NOT be parallelized
+  // This ensures ban status is properly checked before app loads
   final securityService = ref.watch(startupSecurityServiceProvider);
   final securityResult = await securityService.initializeAppSecurity();
 
-  // Return security result - this will determine if app should load or show ban screen
-  // Device bans take precedence over user bans in the security service
+  // Only sync subscription if security check passed and user is not banned
+  if (!securityResult.isBlocked) {
+    // Defer subscription sync - don't await it
+    unawaited(_initializeSubscriptionSyncSafe(ref));
+  }
+
   return securityResult;
+}
 
-  // If user is logged in, ensure user document is loaded before proceeding
-  // final currentUser = FirebaseAuth.instance.currentUser;
-  // if (currentUser != null) {
-  //   // Wait for user provider to be ready
-  //   await ref.read(userNotifierProvider.future);
+/// Safe RevenueCat initialization that won't throw
+Future<void> _initializeRevenueCatSafe(Ref ref) async {
+  try {
+    await ref.read(initializeRevenueCatAuthSyncProvider.future);
+  } catch (e) {
+    debugPrint('RevenueCat initialization failed: $e');
+  }
+  }
 
-  //   // Wait for user document to be loaded (with timeout)
-  //   try {
-  //     await ref.read(userDocumentsNotifierProvider.future).timeout(
-  //       Duration(seconds: 10), // 10 second timeout
-  //       onTimeout: () {
-  //         // If timeout, return null - this will be handled gracefully
-  //         return null;
-  //       },
-  //     );
-  //   } catch (e) {
-  //     // If there's an error loading the document, continue anyway
-  //     // The account status provider will handle the error state
-  //   }
-  // }
-
-  // await ref.watch(mixpanelAnalyticsClientProvider.future);
-  // await ref.watch(onboardingRepositoryProvider.future);
+/// Safe subscription sync that won't throw
+Future<void> _initializeSubscriptionSyncSafe(Ref ref) async {
+  try {
+    await ref.read(initializeUserSubscriptionSyncProvider.future);
+  } catch (e) {
+    debugPrint('User subscription sync failed: $e');
+  }
 }
 
 /// Widget class to manage asynchronous app initialization with security checks

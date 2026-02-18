@@ -62,6 +62,10 @@ class ShorebirdUpdateNotifier extends StateNotifier<ShorebirdUpdateState> {
     checkForUpdate();
   }
 
+  void forceRefresh() {
+    checkForUpdate();
+  }
+
   Future<void> checkForUpdate() async {
     state = state.copyWith(status: AppUpdateStatus.checking);
 
@@ -153,17 +157,56 @@ class ShorebirdUpdateWidget extends ConsumerWidget {
     final theme = AppTheme.of(context);
     final localization = AppLocalizations.of(context);
 
-    // Only show widget if update is available, downloading, or completed
-    if (updateState.status == AppUpdateStatus.none ||
-        updateState.status == AppUpdateStatus.checking) {
+    // Show refresh option for checking state, hide for none state
+    if (updateState.status == AppUpdateStatus.none) {
       return const SizedBox.shrink();
+    }
+
+    // Show refresh button for checking state
+    if (updateState.status == AppUpdateStatus.checking) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: WidgetsContainer(
+          padding: const EdgeInsets.all(16),
+          backgroundColor: theme.grey[50],
+          borderSide: BorderSide(color: theme.grey[200]!, width: 1),
+          borderRadius: BorderRadius.circular(12),
+          child: Row(
+            children: [
+              SizedBox(
+                width: 20,
+                height: 20,
+                child: Spinner(strokeWidth: 2),
+              ),
+              horizontalSpace(Spacing.points12),
+              Expanded(
+                child: Text(
+                  localization.translate('checking-for-updates'),
+                  style: TextStyles.footnote.copyWith(
+                    color: theme.grey[700],
+                  ),
+                ),
+              ),
+              IconButton(
+                onPressed: () {
+                  HapticFeedback.lightImpact();
+                  ref.read(shorebirdUpdateProvider.notifier).forceRefresh();
+                },
+                icon: Icon(LucideIcons.refreshCw,
+                    size: 18, color: theme.grey[600]),
+                tooltip: localization.translate('check-for-updates'),
+              ),
+            ],
+          ),
+        ),
+      );
     }
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: WidgetsContainer(
         padding: const EdgeInsets.all(16),
-        backgroundColor: theme.primary[50],
+        backgroundColor: theme.backgroundColor,
         borderSide: BorderSide(color: theme.primary[200]!, width: 1),
         borderRadius: BorderRadius.circular(12),
         child: _buildContent(context, ref, updateState, theme, localization),
@@ -186,7 +229,7 @@ class ShorebirdUpdateWidget extends ConsumerWidget {
       case AppUpdateStatus.completed:
         return _buildCompleted(context, ref, theme, localization);
       case AppUpdateStatus.error:
-        return _buildError(context, theme, localization, state.error);
+        return _buildError(context, ref, theme, localization, state.error);
       default:
         return const SizedBox.shrink();
     }
@@ -383,23 +426,489 @@ class ShorebirdUpdateWidget extends ConsumerWidget {
 
   Widget _buildError(
     BuildContext context,
+    WidgetRef ref,
     CustomThemeData theme,
     AppLocalizations localization,
     String? error,
   ) {
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(
-          LucideIcons.alertCircle,
-          size: 20,
-          color: theme.error[600],
+        Row(
+          children: [
+            Icon(
+              LucideIcons.alertCircle,
+              size: 20,
+              color: theme.error[600],
+            ),
+            horizontalSpace(Spacing.points8),
+            Expanded(
+              child: Text(
+                error ?? localization.translate('something-went-wrong'),
+                style: TextStyles.small.copyWith(
+                  color: theme.error[700],
+                ),
+              ),
+            ),
+          ],
         ),
-        horizontalSpace(Spacing.points8),
-        Expanded(
+        verticalSpace(Spacing.points12),
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: () {
+              HapticFeedback.lightImpact();
+              ref.read(shorebirdUpdateProvider.notifier).checkForUpdate();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: theme.primary[600],
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(6),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(LucideIcons.refreshCw, size: 16),
+                horizontalSpace(Spacing.points8),
+                Text(
+                  localization.translate('check-for-updates'),
+                  style: TextStyles.small.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Full-screen blocking Shorebird update widget
+/// This widget takes over the entire screen when a critical update needs to be downloaded
+class ShorebirdUpdateBlockingWidget extends ConsumerWidget {
+  const ShorebirdUpdateBlockingWidget({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final updateState = ref.watch(shorebirdUpdateProvider);
+    final theme = AppTheme.of(context);
+    final localization = AppLocalizations.of(context);
+
+    return Scaffold(
+      backgroundColor: theme.backgroundColor,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Icon based on update status
+              Container(
+                padding: const EdgeInsets.all(32),
+                decoration: BoxDecoration(
+                  color: theme.primary[100],
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  _getIconForStatus(updateState.status),
+                  size: 80,
+                  color: theme.primary[600],
+                ),
+              ),
+
+              verticalSpace(Spacing.points32),
+
+              // Title
+              Text(
+                _getTitleForStatus(updateState.status, localization),
+                style: TextStyles.h1.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: theme.primary[900],
+                ),
+                textAlign: TextAlign.center,
+              ),
+
+              verticalSpace(Spacing.points16),
+
+              // Subtitle
+              Text(
+                _getSubtitleForStatus(updateState.status, localization),
+                style: TextStyles.body.copyWith(
+                  color: theme.primary[700],
+                  height: 1.5,
+                ),
+                textAlign: TextAlign.center,
+              ),
+
+              verticalSpace(Spacing.points32),
+
+              // Content based on status
+              _buildBlockingContent(
+                  context, ref, updateState, theme, localization),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  IconData _getIconForStatus(AppUpdateStatus status) {
+    switch (status) {
+      case AppUpdateStatus.available:
+        return LucideIcons.download;
+      case AppUpdateStatus.downloading:
+        return LucideIcons.downloadCloud;
+      case AppUpdateStatus.completed:
+        return LucideIcons.checkCircle2;
+      case AppUpdateStatus.error:
+        return LucideIcons.alertCircle;
+      default:
+        return LucideIcons.refreshCw;
+    }
+  }
+
+  String _getTitleForStatus(
+      AppUpdateStatus status, AppLocalizations localization) {
+    switch (status) {
+      case AppUpdateStatus.available:
+        return localization.translate('update-required');
+      case AppUpdateStatus.downloading:
+        return localization.translate('updating-app');
+      case AppUpdateStatus.completed:
+        return localization.translate('update-complete');
+      case AppUpdateStatus.error:
+        return localization.translate('update-failed');
+      default:
+        return localization.translate('update-required');
+    }
+  }
+
+  String _getSubtitleForStatus(
+      AppUpdateStatus status, AppLocalizations localization) {
+    switch (status) {
+      case AppUpdateStatus.available:
+        return localization.translate('critical-update-message');
+      case AppUpdateStatus.downloading:
+        return localization.translate('please-wait-updating');
+      case AppUpdateStatus.completed:
+        return localization.translate('restart-required-message');
+      case AppUpdateStatus.error:
+        return localization.translate('update-error-message');
+      default:
+        return localization.translate('critical-update-message');
+    }
+  }
+
+  Widget _buildBlockingContent(
+    BuildContext context,
+    WidgetRef ref,
+    ShorebirdUpdateState state,
+    CustomThemeData theme,
+    AppLocalizations localization,
+  ) {
+    switch (state.status) {
+      case AppUpdateStatus.available:
+        return _buildBlockingUpdateAvailable(context, ref, theme, localization);
+      case AppUpdateStatus.downloading:
+        return _buildBlockingDownloading(context, state, theme, localization);
+      case AppUpdateStatus.completed:
+        return _buildBlockingCompleted(context, ref, theme, localization);
+      case AppUpdateStatus.error:
+        return _buildBlockingError(
+            context, ref, theme, localization, state.error);
+      default:
+        return const SizedBox.shrink();
+    }
+  }
+
+  Widget _buildBlockingUpdateAvailable(
+    BuildContext context,
+    WidgetRef ref,
+    CustomThemeData theme,
+    AppLocalizations localization,
+  ) {
+    return Column(
+      children: [
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: theme.primary[100],
+            borderRadius: BorderRadius.circular(12),
+          ),
           child: Text(
-            error ?? localization.translate('something-went-wrong'),
-            style: TextStyles.small.copyWith(
-              color: theme.error[700],
+            localization.translate('blocking-update-message'),
+            style: TextStyles.body.copyWith(
+              color: theme.primary[800],
+              height: 1.5,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+        verticalSpace(Spacing.points24),
+        Row(
+          children: [
+            Expanded(
+              child: SizedBox(
+                height: 56,
+                child: ElevatedButton(
+                  onPressed: () {
+                    HapticFeedback.lightImpact();
+                    ref.read(shorebirdUpdateProvider.notifier).downloadUpdate();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: theme.primary[600],
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(LucideIcons.download, size: 20),
+                      horizontalSpace(Spacing.points8),
+                      Text(
+                        localization.translate('download-update'),
+                        style: TextStyles.body.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            horizontalSpace(Spacing.points8),
+            SizedBox(
+              width: 48,
+              height: 56,
+              child: ElevatedButton(
+                onPressed: () {
+                  HapticFeedback.lightImpact();
+                  ref.read(shorebirdUpdateProvider.notifier).checkForUpdate();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: theme.primary[100],
+                  foregroundColor: theme.primary[700],
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: EdgeInsets.zero,
+                ),
+                child: Icon(LucideIcons.refreshCw, size: 18),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBlockingDownloading(
+    BuildContext context,
+    ShorebirdUpdateState state,
+    CustomThemeData theme,
+    AppLocalizations localization,
+  ) {
+    return Column(
+      children: [
+        Container(
+          width: 100,
+          height: 100,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              SizedBox(
+                width: 100,
+                height: 100,
+                child: CircularProgressIndicator(
+                  value: state.downloadProgress / 100,
+                  strokeWidth: 6,
+                  backgroundColor: theme.primary[200],
+                  valueColor:
+                      AlwaysStoppedAnimation<Color>(theme.primary[600]!),
+                ),
+              ),
+              Text(
+                '${state.downloadProgress.toStringAsFixed(0)}%',
+                style: TextStyles.h3.copyWith(
+                  color: theme.primary[700],
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
+        verticalSpace(Spacing.points24),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: theme.primary[100],
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Text(
+            localization.translate('download-in-progress-message'),
+            style: TextStyles.body.copyWith(
+              color: theme.primary[800],
+              height: 1.5,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBlockingCompleted(
+    BuildContext context,
+    WidgetRef ref,
+    CustomThemeData theme,
+    AppLocalizations localization,
+  ) {
+    return Column(
+      children: [
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: theme.success[100],
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Text(
+            localization.translate('update-success-restart-message'),
+            style: TextStyles.body.copyWith(
+              color: theme.success[800],
+              height: 1.5,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+        verticalSpace(Spacing.points24),
+        Row(
+          children: [
+            Expanded(
+              child: SizedBox(
+                height: 56,
+                child: ElevatedButton(
+                  onPressed: () {
+                    HapticFeedback.mediumImpact();
+                    ref
+                        .read(shorebirdUpdateProvider.notifier)
+                        .restartApp(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: theme.success[600],
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(LucideIcons.refreshCw, size: 20),
+                      horizontalSpace(Spacing.points8),
+                      Text(
+                        localization.translate('restart-now'),
+                        style: TextStyles.body.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            horizontalSpace(Spacing.points8),
+            SizedBox(
+              width: 48,
+              height: 56,
+              child: ElevatedButton(
+                onPressed: () {
+                  HapticFeedback.lightImpact();
+                  ref.read(shorebirdUpdateProvider.notifier).forceRefresh();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: theme.success[100],
+                  foregroundColor: theme.success[700],
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: EdgeInsets.zero,
+                ),
+                child: Icon(LucideIcons.refreshCw, size: 18),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBlockingError(
+    BuildContext context,
+    WidgetRef ref,
+    CustomThemeData theme,
+    AppLocalizations localization,
+    String? error,
+  ) {
+    return Column(
+      children: [
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: theme.error[100],
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Text(
+            error ?? localization.translate('update-error-generic'),
+            style: TextStyles.body.copyWith(
+              color: theme.error[800],
+              height: 1.5,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+        verticalSpace(Spacing.points24),
+        SizedBox(
+          width: double.infinity,
+          height: 56,
+          child: ElevatedButton(
+            onPressed: () {
+              HapticFeedback.lightImpact();
+              ref.read(shorebirdUpdateProvider.notifier).checkForUpdate();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: theme.primary[600],
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(LucideIcons.refreshCw, size: 20),
+                horizontalSpace(Spacing.points8),
+                Text(
+                  localization.translate('try-again'),
+                  style: TextStyles.body.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
             ),
           ),
         ),

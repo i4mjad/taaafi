@@ -51,49 +51,79 @@ class MessagingService with WidgetsBindingObserver {
   RemoteMessage? _queuedMessage;
 
   Future<void> init() async {
+    print('🚀 FCM SERVICE: Starting initialization...');
+    
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
     // Add lifecycle observer to listen for app state changes
     WidgetsBinding.instance.addObserver(this);
 
-    try {
-      //1. Request permission
-      await requestPermission();
-    } catch (e) {
-      // Continue with initialization even if permissions fail
-    }
+    // 🚀 OPTIMIZATION: Run permission request, message handler setup, and initial message check in parallel
+    // These operations don't depend on each other
+    print('📱 FCM SERVICE: Running parallel initialization...');
+    
+    await Future.wait([
+      // 1. Request permission
+      _requestPermissionSafe(),
+      // 2. Setup message handler
+      _setupMessageHandlerSafe(),
+      // 3. Check for initial message (from cold start notification tap)
+      _checkInitialMessageSafe(),
+    ]);
 
-    try {
-      //2. Setup message handler
-      await _setupMessageHandler();
-    } catch (e) {
-      // Continue with initialization
-    }
-
-    try {
-      //3. Get FCM token
-      await getFCMToken();
-    } catch (e) {
-      // Continue with initialization
-    }
-
-    try {
-      //4. Update FCM token
-      await updateFCMToken();
-    } catch (e) {
-      // Continue with initialization
-    }
-
-    //5. Setup auth state listener for topic subscription
+    // 4. Setup auth state listener (sync - fast)
     _setupAuthStateListener();
 
-    //6. Check if app was opened from a notification when terminated
-    final initialMessage = await _messaging.getInitialMessage();
-    if (initialMessage != null) {
-      // Defer navigation until after the UI (and GoRouter) have been
-      // completely built. We'll process this message later from MyApp.
-      _queuedMessage = initialMessage;
+    // 🚀 OPTIMIZATION: Defer FCM token update to background
+    // This writes to Firestore and can happen after app is visible
+    _updateFCMTokenSafe();
+    
+    print('🎉 FCM SERVICE: Initialization complete!');
+  }
+
+  /// Safe permission request that won't throw
+  Future<void> _requestPermissionSafe() async {
+    try {
+      await requestPermission();
+      print('✅ FCM SERVICE: Permissions requested');
+    } catch (e) {
+      print('❌ FCM SERVICE: Permission error: $e');
     }
+  }
+
+  /// Safe message handler setup that won't throw
+  Future<void> _setupMessageHandlerSafe() async {
+    try {
+      await _setupMessageHandler();
+      print('✅ FCM SERVICE: Message handler set up');
+    } catch (e) {
+      print('❌ FCM SERVICE: Message handler error: $e');
+    }
+  }
+
+  /// Safe initial message check that won't throw
+  Future<void> _checkInitialMessageSafe() async {
+    try {
+      final initialMessage = await _messaging.getInitialMessage();
+      if (initialMessage != null) {
+        print('📥 FCM SERVICE: Found initial message, queuing for later processing');
+        _queuedMessage = initialMessage;
+      }
+    } catch (e) {
+      print('❌ FCM SERVICE: Initial message check error: $e');
+    }
+  }
+
+  /// Safe FCM token update (fire and forget)
+  void _updateFCMTokenSafe() {
+    Future(() async {
+      try {
+        await updateFCMToken();
+        print('✅ FCM SERVICE: FCM token update completed');
+      } catch (e) {
+        print('❌ FCM SERVICE: Update token error: $e');
+      }
+    });
   }
 
   @override
@@ -396,6 +426,19 @@ class MessagingService with WidgetsBindingObserver {
     }
   }
 
+  /// Maps screen parameter string to RouteNames enum value
+  RouteNames? _getRouteFromScreenParameter(String screen) {
+    try {
+      // Convert screen string to RouteNames enum
+      return RouteNames.values.firstWhere(
+        (route) => route.name == screen,
+        orElse: () => throw StateError('Route not found'),
+      );
+    } catch (e) {
+      return null;
+    }
+  }
+
   /// Handles navigation based on notification data
   Future<void> _handleNotificationNavigation(RemoteMessage message) async {
     // Try to obtain a BuildContext from the rootNavigatorKey
@@ -418,21 +461,42 @@ class MessagingService with WidgetsBindingObserver {
 
     final data = message.data;
     final screen = data['screen'];
-
-    if (screen == null) {
-      return;
-    }
+    final route = data['route'];
+    final type = data['type'];
 
     // Add delay to ensure app is ready for navigation
     await Future.delayed(const Duration(milliseconds: 100));
 
     try {
+      // Handle route-based navigation (for group messages)
+      if (route != null && route.isNotEmpty) {
+        await _handleRouteNavigation(ctx, route, data);
+        return;
+      }
+
+      // Handle type-based navigation (fallback for notifications without screen)
+      if (screen == null && type != null) {
+        await _handleTypeBasedNavigation(ctx, type, data);
+        return;
+      }
+
       // If no screen parameter, redirect to notifications
       if (screen == null || screen.isEmpty) {
         GoRouter.of(ctx).goNamed(RouteNames.notifications.name);
         return;
       }
 
+      // Handle special cases with parameters first
+      await _handleSpecialRouteNavigation(ctx, screen, data);
+    } catch (e) {
+      // Silent error handling
+    }
+  }
+
+  /// Handles special route navigation with parameters and fallbacks
+  Future<void> _handleSpecialRouteNavigation(
+      BuildContext ctx, String screen, Map<String, dynamic> data) async {
+    try {
       // Handle special cases with parameters
       if (screen == 'reportConversation' || screen == 'reportDetails') {
         final reportId = data['reportId'];
@@ -446,48 +510,104 @@ class MessagingService with WidgetsBindingObserver {
       }
 
       // Handle community post navigation
-      if (screen == 'postDetails') {
+      if (screen == 'postDetail' || screen == 'postDetails') {
         final postId = data['postId'];
         if (postId != null) {
-          // Navigate to post detail, fallback to community if navigation fails
           try {
             GoRouter.of(ctx).goNamed(
               RouteNames.postDetail.name,
               pathParameters: {'postId': postId},
             );
+            return;
           } catch (e) {
             // If post detail route doesn't exist or navigation fails, go to community
             try {
               GoRouter.of(ctx).goNamed(RouteNames.community.name);
+              return;
             } catch (e2) {
               // Last fallback to notifications
               GoRouter.of(ctx).goNamed(RouteNames.notifications.name);
+              return;
             }
           }
-          return;
         }
       }
 
-      // Direct navigation - screen parameter should match route name
+      // Handle groups navigation for member management notifications
+      if (screen == 'groups') {
+        final notificationType = data['notificationType'];
+        if (notificationType != null &&
+            (notificationType == 'member_promoted' ||
+                notificationType == 'member_demoted' ||
+                notificationType == 'member_removed')) {
+          try {
+            GoRouter.of(ctx).goNamed(RouteNames.groups.name);
+            return;
+          } catch (e) {
+            GoRouter.of(ctx).goNamed(RouteNames.notifications.name);
+            return;
+          }
+        }
+      }
+
+      // Handle general route navigation - try to map screen parameter to RouteNames
+      final routeName = _getRouteFromScreenParameter(screen);
+      if (routeName != null) {
+        try {
+          GoRouter.of(ctx).goNamed(routeName.name);
+          return;
+        } catch (e) {
+          // Navigation failed, continue to fallback
+        }
+      }
+
+      // Final fallback: try direct navigation with screen parameter
       try {
         GoRouter.of(ctx).goNamed(screen);
+        return;
       } catch (e) {
-        // Fallback to notifications if route not found
+        // All navigation attempts failed, go to notifications
         GoRouter.of(ctx).goNamed(RouteNames.notifications.name);
       }
     } catch (e) {
-      // Silent error handling
+      // Silent error handling - fallback to notifications
+      try {
+        GoRouter.of(ctx).goNamed(RouteNames.notifications.name);
+      } catch (e2) {
+        // Silent error - don't clutter logs
+      }
     }
   }
 
   /// Sets up listener for authentication state changes
   /// Subscribes logged-in users to all_users topic
   void _setupAuthStateListener() {
+    print('👂 FCM SERVICE: Setting up auth state listener...');
     _auth.authStateChanges().listen((User? user) async {
       if (user != null) {
+        print('🔐 FCM SERVICE: Auth state changed - User logged in: ${user.uid}');
         // User is signed in - subscribe to all_users topic and update FCM token
+        print('📢 FCM SERVICE: Subscribing to all_users topic...');
         await _subscribeToAllUsersGroup();
+        print('💾 FCM SERVICE: Updating FCM token on auth state change...');
         await updateFCMToken();
+        print('✅ FCM SERVICE: Auth state handling complete');
+      } else {
+        print('🚪 FCM SERVICE: Auth state changed - User logged out');
+      }
+    });
+    
+    // Also listen to token refresh events (when APNS becomes available, etc.)
+    print('👂 FCM SERVICE: Setting up token refresh listener...');
+    _messaging.onTokenRefresh.listen((newToken) async {
+      print('🔄 FCM SERVICE: Token refreshed! New token: ${newToken.substring(0, 20)}...');
+      final user = _auth.currentUser;
+      if (user != null) {
+        print('💾 FCM SERVICE: Updating refreshed token in Firestore...');
+        await updateFCMToken();
+        print('✅ FCM SERVICE: Token refresh update complete');
+      } else {
+        print('ℹ️ FCM SERVICE: Token refreshed but no user logged in, skipping update');
       }
     });
   }
@@ -550,6 +670,132 @@ class MessagingService with WidgetsBindingObserver {
       }
     } catch (e) {
       // Silent error - don't clutter logs
+    }
+  }
+
+  /// Handle route-based navigation (e.g., /groups/{groupId}/chat)
+  Future<void> _handleRouteNavigation(
+      BuildContext ctx, String route, Map<String, dynamic> data) async {
+    try {
+      // Parse route for group chat navigation
+      if (route.startsWith('/groups/') && route.endsWith('/chat')) {
+        // Extract groupId from route like '/groups/{groupId}/chat'
+        final routeParts = route.split('/');
+        if (routeParts.length >= 3) {
+          final groupId = routeParts[2];
+          if (groupId.isNotEmpty) {
+            // Check if we have a specific message to scroll to
+            final messageId = data['messageId'];
+            if (messageId != null) {
+              // Navigate to group chat with message highlight
+              try {
+                GoRouter.of(ctx).goNamed(
+                  RouteNames.groupChat.name,
+                  pathParameters: {'groupId': groupId},
+                  queryParameters: {'messageId': messageId},
+                );
+              } catch (e) {
+                // Fallback to basic group chat navigation
+                GoRouter.of(ctx).goNamed(
+                  RouteNames.groupChat.name,
+                  pathParameters: {'groupId': groupId},
+                );
+              }
+            } else {
+              // Navigate to group chat normally
+              GoRouter.of(ctx).goNamed(
+                RouteNames.groupChat.name,
+                pathParameters: {'groupId': groupId},
+              );
+            }
+            return;
+          }
+        }
+      }
+
+      // If route parsing fails, fallback to groups main
+      GoRouter.of(ctx).goNamed(RouteNames.groups.name);
+    } catch (e) {
+      // Final fallback to notifications
+      GoRouter.of(ctx).goNamed(RouteNames.notifications.name);
+    }
+  }
+
+  /// Handle type-based navigation when no screen is provided
+  Future<void> _handleTypeBasedNavigation(
+      BuildContext ctx, String type, Map<String, dynamic> data) async {
+    try {
+      switch (type) {
+        case 'group_message':
+          // Try to extract groupId and navigate to group chat
+          final groupId = data['groupId'];
+          if (groupId != null) {
+            GoRouter.of(ctx).goNamed(
+              RouteNames.groupChat.name,
+              pathParameters: {'groupId': groupId},
+            );
+          } else {
+            GoRouter.of(ctx).goNamed(RouteNames.groups.name);
+          }
+          break;
+
+        case 'community_notification':
+          // Try to navigate to post details or community
+          final postId = data['postId'];
+          if (postId != null) {
+            try {
+              GoRouter.of(ctx).goNamed(
+                RouteNames.postDetail.name,
+                pathParameters: {'postId': postId},
+              );
+            } catch (e) {
+              GoRouter.of(ctx).goNamed(RouteNames.community.name);
+            }
+          } else {
+            GoRouter.of(ctx).goNamed(RouteNames.community.name);
+          }
+          break;
+
+        case 'smart_alert':
+          // Navigate to appropriate smart alert screen or notifications
+          GoRouter.of(ctx).goNamed(RouteNames.notifications.name);
+          break;
+
+        case 'friend_signed_up':
+        case 'friend_task_progress':
+        case 'friend_verified':
+        case 'friend_subscribed':
+        case 'milestone_reached':
+        case 'reward_ready':
+          // Referral notifications for referrer - navigate to referral dashboard
+          GoRouter.of(ctx).goNamed(RouteNames.referralDashboard.name);
+          break;
+
+        case 'welcome':
+        case 'task_completed':
+        case 'progress_update':
+        case 'verification_complete':
+        case 'premium_activated':
+          // Referral notifications for referee - navigate to checklist progress
+          final userId = data['userId'];
+          if (userId != null && userId.toString().isNotEmpty) {
+            GoRouter.of(ctx).pushNamed(
+              RouteNames.checklistProgress.name,
+              pathParameters: {'userId': userId.toString()},
+            );
+          } else {
+            // Fallback to referral dashboard
+            GoRouter.of(ctx).goNamed(RouteNames.referralDashboard.name);
+          }
+          break;
+
+        default:
+          // Unknown type, fallback to notifications
+          GoRouter.of(ctx).goNamed(RouteNames.notifications.name);
+      }
+    } catch (e) {
+      // Final fallback to notifications
+      GoRouter.of(ctx).goNamed(RouteNames.notifications.name);
     }
   }
 

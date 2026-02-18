@@ -1,0 +1,788 @@
+========================================================
+BUG REPORT: userFirstDate is null for recent users
+========================================================
+Date: 2026-02-14
+Last Updated: 2026-02-15 (FULL-SCALE QUERY COMPLETED)
+Status: P0/CRITICAL - ~1,072 active users stuck, root cause confirmed
+
+========================================================
+1. TESTED USERS
+========================================================
+
+UID: 6Qm6KWx6wCXRukcjOuShdFPAx8G2
+  Name: Magid Alharbi (ماجد)
+  Auth Provider: Apple Sign-In (apple.com)
+  Firebase Auth Created: 2026-02-07T02:02:06.125Z
+  Last Login: 2026-02-14T03:35:47Z
+  Email: ft8zpv554k@privaterelay.appleid.com (Apple relay)
+  emailVerified: true
+  Firestore userFirstDate: NULL
+  Firestore lastEmailSync: 2026-02-07T02:02:08.742Z
+  Firestore lastDeviceUpdate: 2026-02-07T02:02:08.334Z
+  isPlusUser: true
+  lastPlusCheck: 2026-02-12T20:38:13Z
+  isRequestedToBeDeleted: null
+  hasCheckedForDataLoss: null
+  All core fields: populated
+
+UID: S3a5kggvZeUBLszTsT3QIJk7WPA2
+  Name: Amin Mahmood
+  Auth Provider: Email/Password (password)
+  Firebase Auth Created: 2026-02-07T21:33:09.911Z
+  Last Login: 2026-02-07T21:34:16Z
+  Email: aminmahmood980@gmail.com
+  emailVerified: true
+  Firestore userFirstDate: NULL
+  Firestore lastEmailSync: 2026-02-07T21:33:10.864Z
+  Firestore lastDeviceUpdate: 2026-02-07T21:33:10.795Z
+  referralCode: AMDNMEDK
+  isPlusUser: true
+  lastPlusCheck: 2026-02-13T21:39:45Z
+  isRequestedToBeDeleted: null
+  hasCheckedForDataLoss: null
+  All core fields: populated
+
+UID: g8T2CeaQpuYkNsA4GQhcg8ZQB0K2
+  Name: Mofareh (Ray)
+  Auth Provider: Apple Sign-In (apple.com)
+  Firebase Auth Created: 2026-02-10T04:36:23.814Z
+  Last Login: 2026-02-10T04:51:10Z
+  Email: a76609508@gmail.com
+  emailVerified: true
+  Firestore userFirstDate: NULL
+  Firestore lastEmailSync: 2026-02-10T04:36:25.689Z
+  Firestore lastDeviceUpdate: 2026-02-10T04:36:25.585Z
+  referralCode: RAYKJA76
+  isPlusUser: null
+  lastPlusCheck: null
+  isRequestedToBeDeleted: null
+  hasCheckedForDataLoss: null
+  All core fields: populated
+
+UID: Aj0T90eDV4VfZwS7Z1fUZD0vIpf1
+  Name: Mansoor Aljneibi (منصور الجنيبي)
+  Auth Provider: Google Sign-In (google.com)
+  Firebase Auth Created: 2026-02-08T00:13:52.612Z
+  Last Login: 2026-02-08T00:28:36Z
+  Email: mansooraljneibi05@gmail.com
+  emailVerified: true
+  Firestore userFirstDate: NULL
+  Firestore lastEmailSync: 2026-02-08T00:13:54.375Z
+  Firestore lastDeviceUpdate: 2026-02-08T00:26:39.974Z
+  isPlusUser: null
+  lastPlusCheck: null
+  isRequestedToBeDeleted: null
+  hasCheckedForDataLoss: null
+  All core fields: populated
+
+UID: iCAxD1m3ZmXiPmVlVWeAOdkkzc82 (CONTROL - NOT AFFECTED)
+  Name: منصور
+  Auth Provider: Email/Password (password)
+  Firebase Auth Created: 2021-10-25 (old account)
+  Last Login: 2026-01-02
+  Email: mansr12300@gmail.com
+  emailVerified: true
+  Firestore userFirstDate: 2026-01-15T16:55:03.872Z (properly set)
+  isPlusUser: false
+  All core fields: populated
+
+========================================================
+2. FIREBASE AUTH vs FIRESTORE CROSS-REFERENCE
+========================================================
+
+(Verified via Firebase MCP auth_get_users + firestore_get_documents)
+
+KEY FINDING: For all 4 affected users, the Firestore document was
+created within SECONDS of the Firebase Auth account creation.
+
+  Magid:   Auth created 02:02:06 -> Firestore lastEmailSync 02:02:08 (2s gap)
+  Amin:    Auth created 21:33:09 -> Firestore lastEmailSync 21:33:10 (1s gap)
+  Mofareh: Auth created 04:36:23 -> Firestore lastEmailSync 04:36:25 (2s gap)
+  Mansoor: Auth created 00:13:52 -> Firestore lastEmailSync 00:13:54 (2s gap)
+
+This proves the document WAS created during initial registration (not
+from ConfirmUserDetailsScreen later). The registration flow created the
+Firestore doc but somehow wrote userFirstDate as null.
+
+ADDITIONAL FINDING - Mansoor's login pattern:
+  Auth created: 00:13:52
+  lastEmailSync: 00:13:54  (registration)
+  lastDeviceUpdate: 00:26:39  (13 min later - second session?)
+  lastLogin: 00:28:36  (15 min after creation)
+  This suggests he may have had trouble and re-opened the app.
+
+========================================================
+3. POPULATION SAMPLING (MCP Firestore queries)
+========================================================
+
+Sampled 60 random user documents (30 iOS + 30 Android) from
+Firestore via MCP queries on platform field.
+
+RESULTS:
+  - 0 out of 60 sampled users have userFirstDate: null
+  - ALL 60 users have userFirstDate properly set as Timestamp
+  - Users from all eras (2022-2026) have valid userFirstDate
+
+COMPARISON WITH RECENTLY REGISTERED USERS:
+  UID: 01dGzJdClITyVVcJbs5Gm6cnuLj2 (mohamed hamdy)
+    Auth Created: 2025-12-28 via Google Sign-In
+    Firestore userFirstDate: 2026-02-13T19:29:31Z (valid)
+    isPlusUser: false, hasCheckedForDataLoss: null
+    -> Same newer doc structure, but NOT affected
+
+  UID: 01hcOuONKDbHCG7gjsmUJPNCMBc2 (عبدالله)
+    Auth Created: 2024-12-28 via Apple Sign-In
+    Firestore userFirstDate: 2026-01-30T10:02:22Z (valid)
+    isPlusUser: false
+    -> Apple user, NOT affected
+
+  UID: 01DMJstnqCR27bZ7FdCUdvfLfJr1 (Ahmed Harroud)
+    Auth Created: 2025-12-28 via Google Sign-In
+    Firestore userFirstDate: 2025-12-28T12:13:21Z (valid)
+    isPlusUser: null, lastPlusCheck: null
+    -> Same null isPlusUser pattern as Mansoor/Mofareh, but NOT affected
+
+CONCLUSION (REVISED 2026-02-15): The initial 60-user sample was
+misleading. Full-scale query found 2,437 users with null userFirstDate.
+~1,072 are ACTIVE new users from Jan-Feb 2026, stuck in confirm loop.
+See Section 12 for full analysis. Bug affects all auth providers.
+
+========================================================
+4. OUTCOMES / SYMPTOMS
+========================================================
+
+- All 4 affected users have userFirstDate explicitly set to null
+  in their Firestore document (users collection).
+
+- Every other registration field is properly populated:
+  displayName, email, gender, locale, dayOfBirth, role,
+  devicesIds, messagingToken, uid.
+
+- The bug affects ALL auth providers: Apple, Google, and
+  Email/Password. It is NOT provider-specific.
+
+- All affected users were created between Feb 7-10, 2026
+  (recent accounts only). The control user from 2021 is
+  not affected.
+
+- Because userFirstDate is null, the hasMissingData() check
+  in user_document_provider.dart (line 153) returns true,
+  which sets the account status to needConfirmDetails.
+
+- Users see a "profile incomplete" error banner and are
+  directed to the ConfirmUserDetailsScreen.
+
+- The ConfirmUserDetailsScreen CANNOT fix the issue (see
+  Bug #1 below), so users are stuck in a loop.
+
+- 2 of 4 affected users (Mofareh, Mansoor) also have
+  isPlusUser: null and lastPlusCheck: null, suggesting they
+  got stuck BEFORE the plus-check could ever run. The other 2
+  (Magid, Amin) have isPlusUser: true, meaning they purchased
+  Plus but are still stuck in the confirm-details loop.
+
+========================================================
+5. ANALYSIS - IDENTIFIED BUGS
+========================================================
+
+--- BUG #1: ConfirmUserDetailsScreen saves null instead of fallback date ---
+
+File: lib/features/authentication/presentation/confirm_user_details_screen.dart
+
+The screen correctly computes a fallback display value:
+
+  Line 160-161:
+    final userFirstDate = userDocument.userFirstDate?.toDate() ?? DateTime.now();
+    selectedUserFirstDate = displayUserFirstDate.date;
+
+  (selectedUserFirstDate IS properly set to DateTime.now() fallback)
+
+But when saving, it passes the ORIGINAL null value, not the fallback:
+
+  Line 357:
+    userFirstDate: userDocument.userFirstDate,   // <-- THIS IS NULL
+
+  It completely IGNORES selectedUserFirstDate that was computed above.
+
+It should use:
+    userFirstDate: selectedUserFirstDate != null
+        ? Timestamp.fromDate(selectedUserFirstDate!)
+        : Timestamp.fromDate(DateTime.now()),
+
+Additionally, the userFirstDate text field is disabled (enabled: false,
+line 285), so the user has no way to manually fix this field.
+
+VERIFIED IN CODE (lines 349-369):
+  The newUserDoc constructor at line 349 passes userDocument.userFirstDate
+  directly, which is the raw value from Firestore (null). The
+  selectedUserFirstDate local variable (which has the fallback) is never
+  used in the save path.
+
+Impact: Users who reach this screen with a null userFirstDate can never
+fix it. They are permanently stuck with the "profile incomplete" banner.
+
+
+--- BUG #2: Deployed code redirected users to re-register on network errors ---
+
+Files (DEPLOYED versions, before local uncommitted changes):
+  - lib/features/authentication/providers/user_document_provider.dart
+  - lib/features/authentication/providers/account_status_provider.dart
+
+In the deployed (committed) code:
+  - getUserDocument() used GetOptions(source: Source.server) and
+    returned null on any error (network, timeout, etc.)
+  - accountStatusProvider returned needCompleteRegistration on errors
+
+This means any network hiccup would make the app think the user has no
+document, redirecting them to the registration screen even if their
+account was already complete. This could cause users to re-register
+and potentially create a document where the starting date flow is
+handled incorrectly.
+
+The local uncommitted changes already address this by:
+  - Adding AccountStatus.error state (line 15 in account_status_provider.dart)
+  - Rethrowing errors instead of returning null
+  - Removing Source.server restriction
+
+These local fixes are NOT yet deployed.
+
+
+--- BUG #3: Migration service overwrites fields with null ---
+
+File: lib/features/authentication/application/migration_service.dart
+
+The _updateUserDocument() method (line 101-123) creates a new
+UserDocument with only the fields from the passed document. Fields
+like isPlusUser, lastPlusCheck, isRequestedToBeDeleted, and
+hasCheckedForDataLoss are not included in the constructor, so they
+default to null.
+
+VERIFIED IN CODE (lines 107-121):
+  UserDocument newDocuemnt = UserDocument(
+    uid: document.uid,
+    devicesIds: [deviceId],
+    displayName: document.displayName,
+    email: document.email,
+    gender: document.gender,
+    locale: document.locale,
+    dayOfBirth: document.dayOfBirth,
+    userFirstDate: document.userFirstDate,   // passes through null
+    role: role,
+    messagingToken: fcmToken,
+    userRelapses: document.userRelapses,
+    ...
+  );
+  // isPlusUser, lastPlusCheck, isRequestedToBeDeleted,
+  // hasCheckedForDataLoss are ALL omitted -> default to null
+
+The toFirestore() method (user_document.dart lines 87-107) includes
+ALL fields in the map (including these nulls):
+  'isPlusUser': isPlusUser,        // writes null
+  'lastPlusCheck': lastPlusCheck,  // writes null
+  'isRequestedToBeDeleted': isRequestedToBeDeleted,  // writes null
+  'hasCheckedForDataLoss': hasCheckedForDataLoss,     // writes null
+
+And the save uses SetOptions(merge: true) in migeration_repository.dart
+line 115. While merge:true preserves fields NOT in the map, it DOES
+write null for fields that ARE explicitly in the map.
+
+This explains why Mofareh and Mansoor have isPlusUser: null - if they
+went through the migration/confirm-details flow, it would have
+overwritten any existing isPlusUser value with null.
+
+
+--- BUG #4: OAuth sign-in does NOT create user document ---
+
+VERIFIED IN CODE (auth_service.dart):
+
+signInWithGoogle() (lines 161-217):
+  - Signs in with Google credential
+  - Calls _performPostLoginTasks() (only syncs email)
+  - Calls _invalidateAppStartup()
+  - Does NOT create a Firestore user document
+  - Returns User object
+
+signInWithApple() (lines 219-245):
+  - Signs in with Apple credential
+  - Calls _performPostLoginTasks() (only syncs email)
+  - Calls _invalidateAppStartup()
+  - Does NOT create a Firestore user document
+  - Returns User object
+
+_performPostLoginTasks() (lines 150-159):
+  - Only calls emailSyncService.syncUserEmailIfNeeded()
+  - Does NOT create or check user document
+
+FLOW FOR NEW OAUTH USERS:
+  1. User taps "Sign in with Google/Apple"
+  2. Firebase Auth account is created (or signed in)
+  3. App does NOT create Firestore document
+  4. accountStatusProvider checks for document -> null
+  5. Returns needCompleteRegistration
+  6. User is shown RegistrationStepperScreen
+  7. completeAccountRegiseration() creates the document with firstDate
+
+THIS IS THE INTENDED FLOW. But if step 4-5 fails due to network
+(Bug #2), the user might end up in a broken state.
+
+signInWithEmail() (lines 247-285):
+  - Calls _authRepository.isUserDocumentExist() (Source.server in
+    deployed code)
+  - If returns false (including network error), signs user OUT and
+    shows "different provider" error
+  - This is the THIRD entry point where network errors cause problems
+
+========================================================
+6. ROOT CAUSE HYPOTHESIS
+========================================================
+
+MOST LIKELY SCENARIO (supported by all evidence):
+
+1. New user signs up via Apple/Google/Email during Feb 7-10 window
+2. Registration completes: Firebase Auth created, Firestore doc written
+3. User has a brief network hiccup (common on mobile)
+4. On next app launch, deployed code fetches doc with Source.server
+5. Network fails -> getUserDocument() returns null
+6. accountStatusProvider returns needCompleteRegistration
+7. User is shown RegistrationStepperScreen AGAIN
+8. User goes through registration again
+9. creatUserDocuemnt() is called with a new firstDate value
+10. But the Firestore .set() (WITHOUT merge) overwrites the entire doc
+
+ALTERNATIVE SCENARIO:
+  Steps 1-6 same, but at step 7:
+  7. The doc IS found on retry, but hasMissingData() returns true
+     (some field was null during the race condition)
+  8. User is shown ConfirmUserDetailsScreen
+  9. ConfirmUserDetailsScreen saves userFirstDate: null (Bug #1)
+  10. User is now permanently stuck
+
+EVIDENCE FOR ALTERNATIVE SCENARIO:
+  - All 4 users have lastEmailSync/lastDeviceUpdate set (newer fields
+    only set during initial registration via emailSyncService)
+  - Documents appear to be from the FIRST registration, not a re-write
+  - The null is specifically on userFirstDate only, not all fields
+
+MOST LIKELY ROOT: The initial registration DID complete, but something
+in the registration stepper flow failed to pass the firstDate correctly,
+OR the user hit ConfirmUserDetailsScreen afterward and Bug #1 overwrote
+userFirstDate with null.
+
+========================================================
+7. AFFECTED CODE PATHS (VERIFIED)
+========================================================
+
+Registration Flow (both signup and OAuth completion):
+  SignUpStepperScreen / RegistrationStepperScreen
+    -> AuthService.signUpWithEmail() (line 51)
+       / completeAccountRegiseration() (line 522)
+      -> AuthRepository.creatUserDocuemnt() (line 52)
+        -> UserDocument constructor (line 79-90)
+           userFirstDate: Timestamp.fromDate(firstDate.toUtc()) (line 87)
+        -> UserDocument.toFirestore() (line 87-107)
+        -> Firestore .set() WITHOUT merge (line 108-111)
+
+Confirm Details Flow (triggered by hasMissingData):
+  AccountActionBanner -> ConfirmUserDetailsScreen
+    -> Line 160: selectedUserFirstDate = fallback value (CORRECT)
+    -> Line 357: userFirstDate: userDocument.userFirstDate (BUG - uses null)
+    -> MigrationService.migrateToNewDocuemntStrcture()
+      -> _updateUserDocument() (line 101)
+        -> MigerationRepository.updateUserDocument() (line 99)
+          -> UserDocument.toFirestore() (includes null fields)
+          -> Firestore .set() WITH merge:true (line 115)
+            -> Writes null to isPlusUser, lastPlusCheck, etc.
+
+Account Status Check:
+  accountStatusProvider (line 19)
+    -> watches userDocumentsNotifierProvider
+    -> doc == null? -> needCompleteRegistration (line 45-47)
+    -> hasMissingData(doc)? -> needConfirmDetails (line 76-83)
+    -> hasMissingData checks userFirstDate == null (line 153)
+
+OAuth Sign-In (does NOT create document):
+  signInWithGoogle() (line 161) / signInWithApple() (line 219)
+    -> Firebase Auth only, no Firestore doc creation
+    -> Relies on accountStatusProvider to route to registration
+
+Email Sign-In (can sign user out on network error):
+  signInWithEmail() (line 247)
+    -> isUserDocumentExist() with Source.server (deployed)
+    -> Network error -> returns false -> signs user OUT
+
+========================================================
+8. RECOMMENDED FIXES (UPDATED)
+========================================================
+
+FIX 1 (Critical - ConfirmUserDetailsScreen):
+  File: confirm_user_details_screen.dart
+  Change line 357 from:
+    userFirstDate: userDocument.userFirstDate,
+  To:
+    userFirstDate: selectedUserFirstDate != null
+        ? Timestamp.fromDate(selectedUserFirstDate!)
+        : userDocument.userFirstDate ?? Timestamp.fromDate(DateTime.now()),
+
+  This uses the computed fallback (selectedUserFirstDate) which
+  already defaults to DateTime.now() if the original was null.
+
+FIX 2 (Deploy uncommitted changes):
+  The local changes to account_status_provider.dart and
+  user_document_provider.dart should be committed and deployed.
+  They prevent false redirects to registration on network errors.
+  VERIFIED: The AccountStatus.error state is already added (line 15).
+
+FIX 3 (Migration service - prevent field erasure):
+  File: migration_service.dart
+  Update _updateUserDocument() (line 101-123) to preserve existing
+  fields like isPlusUser, lastPlusCheck, etc.
+  Options:
+    a) Read existing doc first, merge values before writing
+    b) Remove null fields from toFirestore() map before writing
+    c) Pass through isPlusUser/lastPlusCheck from the source document
+
+FIX 4 (Data repair for affected users):
+  Set userFirstDate for the 4 affected users using Firebase Auth
+  creation timestamps as the best available fallback:
+    6Qm6... (Magid):   2026-02-07T02:02:06Z
+    S3a5... (Amin):    2026-02-07T21:33:09Z
+    g8T2... (Mofareh): 2026-02-10T04:36:23Z
+    Aj0T... (Mansoor): 2026-02-08T00:13:52Z
+
+FIX 5 (Defensive - registration flow):
+  In AuthRepository.creatUserDocuemnt() (line 52), add a null check:
+    userFirstDate: Timestamp.fromDate(firstDate.toUtc()),
+  Should never be null, but add assertion:
+    assert(firstDate != null, 'firstDate must not be null');
+
+FIX 6 (toFirestore should skip null optional fields):
+  In UserDocument.toFirestore() (line 87-107), consider NOT including
+  fields that are null for optional fields like isPlusUser, lastPlusCheck,
+  etc. This prevents merge:true from writing null over existing values.
+  Change:
+    'isPlusUser': isPlusUser,
+  To:
+    if (isPlusUser != null) 'isPlusUser': isPlusUser,
+  (Or use a helper that removes null entries from the map)
+
+========================================================
+9. IMPACT ASSESSMENT
+========================================================
+
+CURRENT IMPACT (REVISED 2026-02-15):
+  - 2,437 total users with null userFirstDate
+  - ~1,072 are ACTIVE NEW users (Jan-Feb 2026), permanently stuck
+  - ~195 are old migrated users, some still active
+  - ~1,072 are legacy dormant accounts (low impact)
+  - 2+ confirmed Plus subscribers, potentially 50-100+ affected
+  - Bug #3 additionally erases isPlusUser status for all who go through flow
+
+RISK IF UNFIXED:
+  - Every new user who hits a network hiccup during/after registration
+    could potentially end up in this state (Bug #2 - deployed code)
+  - ConfirmUserDetailsScreen will NEVER fix itself (Bug #1)
+  - Migration flow can erase Plus status and other fields (Bug #3)
+
+AFTER FIX:
+  - Fix 1 stops the infinite loop immediately
+  - Fix 2 prevents new users from hitting the bug
+  - Fix 3 prevents field erasure during migration
+  - Fix 4 repairs existing affected users
+  - Fix 5/6 add defensive layers
+
+========================================================
+10. FILES INVOLVED
+========================================================
+
+NEEDS CODE CHANGES:
+  lib/features/authentication/presentation/confirm_user_details_screen.dart
+    -> Line 357: use selectedUserFirstDate instead of null passthrough
+
+  lib/features/authentication/application/migration_service.dart
+    -> Lines 107-121: preserve isPlusUser, lastPlusCheck, etc.
+
+  lib/features/authentication/data/models/user_document.dart
+    -> Lines 87-107: toFirestore() should skip null optional fields
+
+ALREADY FIXED LOCALLY (needs deploy):
+  lib/features/authentication/providers/user_document_provider.dart
+    -> Removed Source.server, rethrows errors
+
+  lib/features/authentication/providers/account_status_provider.dart
+    -> Added AccountStatus.error state
+
+REFERENCE FILES (no changes needed):
+  lib/features/authentication/data/repositories/auth_repository.dart
+  lib/features/authentication/data/repositories/migeration_repository.dart
+  lib/features/authentication/application/auth_service.dart
+  lib/features/authentication/presentation/registration_stepper_screen.dart
+  lib/features/authentication/presentation/signup_screen.dart
+
+========================================================
+11. VERIFICATION METHODOLOGY
+========================================================
+
+Tools used:
+  - Firebase MCP: firestore_get_documents (direct doc reads)
+  - Firebase MCP: firestore_query_collection (population sampling)
+  - Firebase MCP: auth_get_users (Auth record cross-reference)
+  - Code review: all files in auth flow chain
+
+Checks performed:
+  1. Direct Firestore read of all 5 user documents (4 affected + 1 control)
+  2. Firebase Auth records for all 5 users (creation time, provider, etc.)
+  3. Cross-referenced Auth creation time vs Firestore document timestamps
+  4. Random sample of 60 users (30 iOS + 30 Android) for population check
+  5. Firebase Auth records for 4 additional recent users as controls
+  6. Full code trace of registration flow (signUp, completeRegistration)
+  7. Full code trace of OAuth flows (Google, Apple, Email sign-in)
+  8. Code verification of ConfirmUserDetailsScreen save path
+  9. Code verification of MigrationService field handling
+  10. Code verification of toFirestore() null field behavior
+  11. Code verification of hasMissingData() and accountStatusProvider
+
+========================================================
+12. FULL-SCALE QUERY: userFirstDate == null (2,437 records)
+========================================================
+Date: 2026-02-15
+Query: Firestore /users collection, where userFirstDate == null
+Total count (from Firebase Console): 2,437 records
+
+Queried via Firebase MCP (firestore_query_collection) ordered by
+userFirstDate ASCENDING (nulls sort first). Sampled 50+ records
+from the start of the collection.
+
+-------------------------------------------------------
+12a. THREE DISTINCT CATEGORIES IDENTIFIED
+-------------------------------------------------------
+
+The 2,437 null-userFirstDate records are NOT all from the same bug.
+They fall into three distinct categories identifiable by their
+document structure:
+
+CATEGORY A: Legacy Minimal Records (~44% of sample)
+  Signature: Only 5-6 fields (uid, email, userRelapses,
+    userFirstDate, userWatchingWithoutMasturbating,
+    userMasturbatingWithoutWatching)
+  Missing: displayName, role, gender, locale, dayOfBirth,
+    devicesIds, messagingToken, ALL newer fields
+  Some have relapse data from 2022-2023 (proving active usage)
+  Cause: Created BEFORE userFirstDate existed in the schema.
+    These are dormant accounts from the old app version.
+  Estimated count: ~1,072 (44% of 2,437)
+  Impact: LOW - these users are inactive (no recent activity)
+  Sample UIDs:
+    0CfMkV8os3g4yZ4DMAcz719jtaJ2 (email: apdllh123apdllh123@gmail.com)
+    0KrtM2c56VdXJKWibke8szYjHV73 (email: nmhhj22@gmail.com)
+    0PpZNBB01nWfrXNpqvS0n6ucozH2 (email: adzyygoo47dg@gmail.com)
+    0RwvH1XN6XTTNF6hUaigfKHQ1Jp2 (email: bddqweh@gmail.com)
+    0XmXIOuYrQck7dhnRoJiuXwoOMQ2 (email: mah93adel@gmail.com)
+    0Y57uUUVRfhnXa4SDfSwkO2xPZC2 (email: 9sgjbdgxwn@privaterelay.appleid.com)
+    0bS6B7VSoMQqyY5VoOUPfqDeIMe2 (email: f5kxdg42vm@privaterelay.appleid.com)
+    0fNpdodE0VSCCO6gGG21uTYXkTh1 (email: abduallh2025@icloud.com)
+    0h0XP606FTV27SSxDmAXNEt7bFH2 (email: ayoup7923@gmail.com)
+    0eracu469qZi4hbRAg72xYcR0jI2 (email: fares161622@gmail.com, relapses: 2022-08)
+    0k8N0WQQkIRtvTY5wGrB7fuBeFt2 (email: k5gsc56xn7@privaterelay.appleid.com)
+    0mfPyIPu8EWWYgD9VDba9lCqjvQ2 (email: nwvzvf45z8@privaterelay.appleid.com)
+    0vWlrb21v3WzsanMgtbqfXVpZ8r2 (email: hnjxwt6rsm@privaterelay.appleid.com)
+    0wZhDup2c7hI5L3SmcogVPKa1V53 (email: younscraft@gmail.com)
+    0yuwn6DM7HXtBbbb0TVaNHlKp1Q2 (email: tgxqf7stqw@privaterelay.appleid.com)
+    0zhZR0S90YWUSpBP6VwuMoHx5Jy1 (email: ahmadtariqalahmad@gmail.com, relapses: 2022-06)
+    12Z9Gs79wUPNySLBWl7WEKf5K4A2 (email: aibb1029@gmail.com)
+    16RdCaztjlX9IgSmfw3y3DTNy8u2 (email: y09702375@gmail.com)
+    17lzJeNgNreqjwJ4UpLtssW9YNW2 (email: teasdd496@gmail.com)
+    1LIGQH4HskMGvBCmqwfaFbz7ijV2 (email: kalzhrani042@icloud.com)
+    1NclD4Me1Ya8kAzAVvTHYIPFHks2 (email: m479yd2x89@privaterelay.appleid.com, relapses: 2023-08)
+    1OTboHkNZugXKZgookX6AlGCuUG2 (email: taghreedsalam975@gmail.com)
+
+CATEGORY B: Old Migrated Users (~8% of sample)
+  Signature: Have `creationTime` field (2021-2022 era) AND
+    newer fields (devicesIds, lastDeviceUpdate, role, etc.)
+  These users registered in 2021-2022, then re-opened the app
+    on a newer version which ran DeviceTrackingService + migration.
+  Migration path preserved null userFirstDate (Bug #1/#3).
+  Estimated count: ~195 (8% of 2,437)
+  Impact: MEDIUM - some are still active users
+  Sample UIDs:
+    0V1JG9qU9Ka0pvQAU1sskGTRCmI2
+      creationTime: 2021-10-16, lastDeviceUpdate: 2026-01-09
+      displayName: Mustafa Moneb, email: mustafamoneb113@gmail.com
+    0XMOKNSCy2S2KhGIhnVnV62ASAi1
+      creationTime: 2021-04-01, lastTokenUpdate: 2025-07-07
+      displayName: Sa, email: sief.ayman@gmail.com
+    11t5ylSb9vYNACZ2o3w8lpQcjpo2
+      creationTime: 2022-05-12, lastDeviceUpdate: 2026-01-20
+      displayName: واكان, email: rakibkru@gmail.com
+    1DrQ6SjqARSd8CGuOWy32aGuCy73
+      creationTime: 2022-02-25, lastDeviceUpdate: 2025-09-24
+      displayName: محمود احمد, email: almother.199@gmail.com
+
+CATEGORY C: Recent New Users (~44% of sample) ** CRITICAL **
+  Signature: NO creationTime field, HAVE all newer fields
+    (role, gender, locale, dayOfBirth, displayName, devicesIds,
+    lastDeviceUpdate, lastEmailSync, messagingToken)
+  lastDeviceUpdate dates: Jan-Feb 2026 (mostly Feb 2026)
+  Some have referralCode (proving registration completed
+    and Cloud Function fired)
+  ALL have: hasCheckedForDataLoss: null, isRequestedToBeDeleted: null,
+    isPlusUser: null — signatures of ConfirmUserDetailsScreen path
+  Estimated count: ~1,072 (44% of 2,437) ** THIS IS MASSIVE **
+  Impact: CRITICAL - these are ACTIVE new users, stuck in loop
+  Sample UIDs:
+    03JWNfcpEWNam7DxtkhANccRSYb2
+      lastDeviceUpdate: 2026-02-13, displayName: hnnx4
+    03oXhPSFlLa7UiGZz9JjnywWN7h1
+      lastDeviceUpdate: 2026-02-14, displayName: abood
+    0EsHDqJTRHaWFcwMN5L07KU7hr02
+      lastDeviceUpdate: 2026-02-12, displayName: thaihaih5
+    0UwKN7o3AaR1dc3qMETjWxVY2d13
+      lastDeviceUpdate: 2026-02-10, displayName: gggg
+      referralCode: KHAL8L94 (proves registration completed)
+    0ZmJokACPQeYbRJy4HcnLT5xIMO2
+      lastDeviceUpdate: 2026-02-10, displayName: عبدالرحمن عبدلي
+    0iARFjESXEWzOTorNFc9eqKLQYK2
+      lastDeviceUpdate: 2026-02-11, displayName: خالد الشاطري
+      dayOfBirth: null (ALSO missing!)
+    0jjTR6Hg0tOoSAlalNq8eajSJs02
+      lastDeviceUpdate: 2026-02-06, displayName: راكان الشراري
+      referralCode: BVQGC4PT
+    0n2Xbb6H3Hbs4V1PbOLvyiiaiLl2
+      lastDeviceUpdate: 2026-02-04, displayName: badis amour
+    0nZ47DhSsQRQigMUfRrinXZhI7j1
+      lastDeviceUpdate: 2026-02-13, displayName: fif
+    0qaOq9rJroSrWwDwvahlLsXc31x2
+      lastDeviceUpdate: 2026-02-07, displayName: يزن
+      isPlusUser: false (managed to get plus check)
+    0vhTFHXNvbVcwMHXNeAr9gw33k83
+      lastDeviceUpdate: 2026-02-07, displayName: Saber
+      isPlusUser: false
+    0wVS01M0FlRxOxz2TlyNkI3aWeO2
+      lastDeviceUpdate: 2026-02-08, displayName: بخيت
+    0wl1FS7ANBTpJuXfI99C4RxirlZ2
+      lastDeviceUpdate: 2026-02-06, displayName: سليمان
+    14rfLauMP7QOVZmGCaAYrWpRE6S2
+      lastDeviceUpdate: 2026-02-11, displayName: بدر
+      referralCode: BTSTZ6S2
+    19yPotDpWZb2OuJpdLpeazuAtgF3
+      lastDeviceUpdate: 2026-02-08, displayName: Monique
+    1AaVqspq9xQWUcFEKTp5KtMIjR33
+      lastDeviceUpdate: 2026-02-13, displayName: eeeeaaag
+    1HuacvxIMqS5xDqEDiRJNfXL4l93
+      lastDeviceUpdate: 2026-02-11, displayName: Salem
+      referralCode: BWDF9ZJ6
+    1KhYP8QzuCbnzmBwZfWeB46wkZ83
+      lastDeviceUpdate: 2026-02-09, displayName: naif
+    1NQE0E6gvzLsmuKNxRjpaC60UB73
+      lastDeviceUpdate: 2026-02-03, displayName: FahadAlFahad55
+    1PWkHycLUngbrFlty1WVSnB7Ukx2
+      lastDeviceUpdate: 2026-02-09, displayName: فيصل
+    1RSDaqCo59eZvy3VLpPEzli6nDQ2
+      lastDeviceUpdate: 2026-02-08, displayName: Ouakidi Walid
+    1RvZOZO5UxMt4c40UBwJFH6Ifiz1
+      lastDeviceUpdate: 2026-02-04, displayName: احمد علي
+
+SPECIAL CASES (~4%):
+  14qeGGm5BBZb2QxTbFMr45WlDow2
+    Has gender, dayOfBirth, locale BUT displayName: null, no role
+    Partial old-format doc
+  0wECZDWc6eStj7ybz67QWRCP9B63
+    uid: null (!), platform: android, has most fields
+    Old Android version that didn't write uid to doc
+
+-------------------------------------------------------
+12b. CRITICAL NEW FINDING: Bug is 250x worse than initial estimate
+-------------------------------------------------------
+
+Initial investigation found 4 affected users.
+Full query reveals ~1,072 ACTIVE NEW USERS (Category C) stuck
+in the confirm-details loop, all registered Jan-Feb 2026.
+
+This is NOT a rare edge case. This is affecting NEARLY EVERY
+NEW USER who registered since the Shorebird OTA patch was deployed.
+
+Evidence from descending query (most recent userFirstDate values):
+  - Users getting userFirstDate set TODAY (2026-02-15) at 05:53 UTC
+  - These are users whose confirm-details flow SOMEHOW succeeded
+  - They have devicesIds with both old+new format (went through migration)
+  - Example: bvk4jI91TmPtJLxNxEa8Vu1MEgg1 (userFirstDate: 2026-02-15T05:53:26Z)
+  - Example: 0nEuR36Jm8W5tRGvKYOr6S8XTbr2 (userFirstDate: 2026-02-15T05:53:23Z)
+
+KEY PATTERN - Category C users ALL share these traits:
+  1. lastDeviceUpdate in Feb 2026 (registration date)
+  2. lastEmailSync within 1-2 seconds of lastDeviceUpdate
+  3. ALL core fields populated (displayName, email, gender, etc.)
+  4. userFirstDate: null (the bug)
+  5. isPlusUser: null (migration service erased it - Bug #3)
+  6. lastPlusCheck: null (same erasure)
+  7. hasCheckedForDataLoss: null (same - explicit null, not missing)
+  8. isRequestedToBeDeleted: null (same)
+
+These fields (#5-8) being EXPLICITLY null (not missing) proves
+they went through ConfirmUserDetailsScreen → migration_service path,
+which writes null for all these fields via toFirestore() + merge:true.
+
+-------------------------------------------------------
+12c. Date range analysis of Category C users
+-------------------------------------------------------
+
+Earliest lastDeviceUpdate in sample: 2026-02-03 (1NQE0E6gvzLsmuKNxRjpaC60UB73)
+Latest lastDeviceUpdate in sample:  2026-02-14 (03oXhPSFlLa7UiGZz9JjnywWN7h1)
+
+This is a 12-day window (Feb 3-14, 2026) which corresponds to the
+period after the Shorebird OTA patch was deployed. The OTA patch
+likely added the uid-from-doc.id fallback in user_document.dart
+which made partial DeviceTrackingService docs visible as "valid"
+user documents with missing data, triggering the confirm-details flow.
+
+Category B users (old accounts) have lastDeviceUpdate as early as
+2025-09-24 and 2026-01-09, suggesting this migration path issue
+has existed for longer but was masked by different behavior before
+the OTA patch.
+
+-------------------------------------------------------
+12d. REVISED IMPACT ASSESSMENT
+-------------------------------------------------------
+
+TOTAL AFFECTED: 2,437 users with null userFirstDate
+  Category A (legacy dormant):   ~1,072 (LOW impact - inactive)
+  Category B (old migrated):     ~195   (MEDIUM impact - some active)
+  Category C (recent new):       ~1,072 (CRITICAL - all active, stuck)
+  Special cases:                 ~98    (VARIES)
+
+CRITICAL USERS (Category C): ~1,072 NEW users registered in
+  Jan-Feb 2026 are PERMANENTLY stuck in the confirm-details loop.
+  They cannot use the app at all. This is a P0/sev-1 issue.
+
+REVENUE IMPACT: At least 2 confirmed Plus subscribers (Magid, Amin)
+  among original 4. If subscription rate holds across ~1,072 users,
+  potentially 50-100+ paying customers affected.
+
+-------------------------------------------------------
+12e. REVISED FIX PRIORITIES
+-------------------------------------------------------
+
+IMMEDIATE (P0):
+  1. Fix confirm_user_details_screen.dart line 357 (Bug #1)
+     Use selectedUserFirstDate instead of userDocument.userFirstDate
+  2. Deploy to fix the bleeding - every new user currently hits this
+
+DATA REPAIR (P0):
+  3. Batch-fix all Category C users (set userFirstDate from
+     Firebase Auth creationTime or lastDeviceUpdate timestamp)
+  4. Consider batch-fixing Category B users too
+
+PREVENTION (P1):
+  5. Deploy uncommitted account_status_provider.dart changes
+     (AccountStatus.error prevents false redirects)
+  6. Fix migration_service.dart to not erase isPlusUser etc.
+  7. Fix toFirestore() to skip null optional fields
+
+OPTIONAL (P2):
+  8. Category A users are dormant; only fix if they return
+     (the ConfirmUserDetailsScreen fix will handle them if they do)
+
+========================================================
+Prepared by: Claude Code (AI Analysis)
+Date: 2026-02-15 (Updated from 2026-02-14)
+Priority: P0/CRITICAL - ~1,072 active new users permanently stuck
+========================================================

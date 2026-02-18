@@ -4,20 +4,15 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:force_update_helper/force_update_helper.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/routing/app_routes.dart';
 import 'package:reboot_app_3/core/routing/app_startup.dart';
-import 'package:reboot_app_3/core/routing/navigator_keys.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/core/theming/theme_provider.dart';
 import 'package:reboot_app_3/core/theming/color_theme_provider.dart';
-import 'package:reboot_app_3/core/utils/firebase_remote_config_provider.dart';
-import 'package:reboot_app_3/core/utils/url_launcher_provider.dart';
 import 'package:reboot_app_3/features/account/presentation/banned_screen.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:reboot_app_3/core/messaging/services/fcm_service.dart';
 
 class MyApp extends ConsumerWidget {
@@ -116,38 +111,7 @@ class MyApp extends ConsumerWidget {
                 MessagingService.instance.processQueuedMessage();
               });
 
-              // Wrap the content with ForceUpdateWidget as before.
-              return ForceUpdateWidget(
-                navigatorKey: rootNavigatorKey,
-                allowCancel: false,
-                showForceUpdateAlert: (context, allowCancel) => showAlertDialog(
-                  context: context,
-                  title:
-                      AppLocalizations.of(context).translate("required-update"),
-                  content: AppLocalizations.of(context)
-                      .translate("required-update-p"),
-                  cancelActionText: allowCancel
-                      ? AppLocalizations.of(context).translate("later")
-                      : null,
-                  defaultActionText:
-                      AppLocalizations.of(context).translate("update-now"),
-                ),
-                showStoreListing: (uri) async {
-                  ref.read(urlLauncherProvider).launch(
-                        uri,
-                        mode: LaunchMode.externalApplication,
-                      );
-                },
-                forceUpdateClient: ForceUpdateClient(
-                  fetchRequiredVersion: () async {
-                    final remoteConfig =
-                        await ref.read(firebaseRemoteConfigProvider.future);
-                    return remoteConfig.getString('required_version');
-                  },
-                  iosAppStoreId: "1531562469",
-                ),
-                child: child!,
-              );
+              return child!;
             },
           );
         },

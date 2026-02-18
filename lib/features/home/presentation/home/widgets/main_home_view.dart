@@ -8,13 +8,13 @@ import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/home/presentation/home/widgets/quick_actions_widget.dart';
-import 'package:reboot_app_3/features/plus/presentation/widgets/subscription_card.dart';
+
 import 'package:reboot_app_3/features/vault/presentation/widgets/streaks/streaks_view_widget.dart';
+import 'package:reboot_app_3/features/vault/presentation/widgets/calendar/calendar_section.dart';
 import 'package:reboot_app_3/features/home/presentation/home/widgets/notification_promoter_widget.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/features/vault/presentation/vault_settings/activities_notifications_settings_screen.dart';
-import 'package:reboot_app_3/features/home/presentation/home/widgets/challenges_coming_soon_card.dart';
-import 'package:reboot_app_3/features/home/presentation/home/widgets/groups_coming_soon_card.dart';
+import 'package:reboot_app_3/core/shared_widgets/warning_notification_banner.dart';
 
 class MainHomeView extends ConsumerWidget {
   const MainHomeView({super.key});
@@ -29,14 +29,6 @@ class MainHomeView extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Subscription Card
-
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-            child: const SubscriptionCard(),
-          ),
-
-          verticalSpace(Spacing.points24),
           // Notification Promoter - show if notifications are disabled
           notificationsEnabledAsync.when(
             data: (enabled) => enabled
@@ -46,6 +38,9 @@ class MainHomeView extends ConsumerWidget {
             error: (_, __) => const SizedBox.shrink(),
           ),
 
+          // Warning Banner - show if user has warnings
+          const WarningNotificationBanner(),
+
           // Quick Actions
           const QuickActionsWidget(),
           verticalSpace(Spacing.points24),
@@ -54,27 +49,15 @@ class MainHomeView extends ConsumerWidget {
           const StreaksViewWidget(),
           verticalSpace(Spacing.points24),
 
-          // Community Activity Section
-          const _CommunityActivitySection(),
-          verticalSpace(Spacing.points24),
-
-          // Coming Soon Cards Row
+          // Calendar Section
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              children: [
-                // Challenges Coming Soon Card
-                Expanded(
-                  child: ChallengesComingSoonCard(),
-                ),
-                const SizedBox(width: 12),
-                // Groups Coming Soon Card
-                Expanded(
-                  child: GroupsComingSoonCard(),
-                ),
-              ],
-            ),
+            child: const CalendarSection(),
           ),
+          verticalSpace(Spacing.points24),
+
+          // Community Activity Section
+          const _CommunityActivitySection(),
           verticalSpace(Spacing.points24),
 
           // Active Goals/Challenges Section

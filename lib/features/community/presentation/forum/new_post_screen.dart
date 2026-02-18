@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -22,6 +23,14 @@ import 'package:reboot_app_3/features/community/presentation/forum/validation_in
 import 'package:reboot_app_3/features/community/presentation/forum/validation_info_modal_preferences.dart';
 import 'package:reboot_app_3/features/account/presentation/widgets/feature_access_guard.dart';
 import 'package:reboot_app_3/features/account/data/app_features_config.dart';
+import 'package:reboot_app_3/features/community/data/models/post_attachment_data.dart';
+import 'package:reboot_app_3/features/plus/data/notifiers/subscription_notifier.dart';
+import 'package:reboot_app_3/features/plus/presentation/taaafi_plus_features_list_screen.dart';
+import 'package:reboot_app_3/features/community/application/attachment_image_service.dart';
+import 'package:reboot_app_3/core/shared_widgets/container.dart' as shared;
+import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
+import 'package:reboot_app_3/core/shared_widgets/custom_textarea.dart';
+import 'package:reboot_app_3/core/shared_widgets/platform_switch.dart';
 
 /// Screen for creating a new forum post
 ///
@@ -70,6 +79,13 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
       if (widget.initialCategoryId != null) {
         _setInitialCategory();
       }
+
+      // Initialize anonymity state based on user's profile setting
+      ref.read(currentCommunityProfileProvider).whenData((profile) {
+        if (profile != null) {
+          ref.read(anonymousPostProvider.notifier).state = profile.isAnonymous;
+        }
+      });
 
       // Show validation info modal on first visit
       _showValidationInfoModalIfNeeded();
@@ -292,33 +308,22 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
             ),
           ),
 
-          // Right side actions
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Info icon for validation guidelines
-              Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  color: theme.grey[100],
-                  borderRadius: BorderRadius.circular(18),
-                ),
-                child: IconButton(
-                  onPressed: () => _showValidationInfoModal(),
-                  icon: Icon(Icons.info_outline, size: 20),
-                  style: IconButton.styleFrom(
-                    foregroundColor: theme.grey[600],
-                    padding: EdgeInsets.zero,
-                  ),
-                ),
+          // Info icon for validation guidelines
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: theme.grey[100],
+              borderRadius: BorderRadius.circular(18),
+            ),
+            child: IconButton(
+              onPressed: () => _showValidationInfoModal(),
+              icon: Icon(Icons.info_outline, size: 20),
+              style: IconButton.styleFrom(
+                foregroundColor: theme.grey[600],
+                padding: EdgeInsets.zero,
               ),
-
-              const SizedBox(width: 12),
-
-              // Post button
-              _buildPostButton(theme, localizations),
-            ],
+            ),
           ),
         ],
       ),
@@ -567,6 +572,8 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
     AppLocalizations localizations,
     PostCategory? selectedCategory,
   ) {
+    final attachmentState = ref.watch(postAttachmentsProvider);
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -582,6 +589,15 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
 
           // Content input field
           _buildContentInput(theme, localizations),
+
+          // Attachment previews (displayed below content input as requested)
+          if (attachmentState.attachmentData != null) ...[
+            verticalSpace(Spacing.points16),
+            _buildDetailedAttachmentPreview(
+                theme, localizations, attachmentState),
+          ],
+
+          verticalSpace(Spacing.points4),
         ],
       ),
     );
@@ -590,6 +606,11 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
   /// Builds the title input field
   Widget _buildTitleInput(
       CustomThemeData theme, AppLocalizations localizations) {
+    final currentLength = _titleController.text.length;
+    final maxLength = PostFormValidationConstants.maxTitleLength;
+    final isNearLimit = currentLength > maxLength * 0.8;
+    final isOverLimit = currentLength > maxLength;
+
     return TextField(
       controller: _titleController,
       focusNode: _titleFocusNode,
@@ -606,7 +627,14 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
           fontWeight: FontWeight.w600,
         ),
         border: InputBorder.none,
-        counterText: '',
+        counterText: '$currentLength/$maxLength',
+        counterStyle: TextStyles.caption.copyWith(
+          color: isOverLimit
+              ? theme.error[500]
+              : isNearLimit
+                  ? theme.warn[500]
+                  : theme.grey[500],
+        ),
       ),
       onChanged: (value) => setState(() {}),
     );
@@ -677,6 +705,11 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
   /// Builds the content input field
   Widget _buildContentInput(
       CustomThemeData theme, AppLocalizations localizations) {
+    final currentLength = _contentController.text.length;
+    final maxLength = PostFormValidationConstants.maxContentLength;
+    final isNearLimit = currentLength > maxLength * 0.8;
+    final isOverLimit = currentLength > maxLength;
+
     return TextField(
       controller: _contentController,
       focusNode: _contentFocusNode,
@@ -695,15 +728,24 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
           fontSize: 16,
         ),
         border: InputBorder.none,
-        counterText: '',
+        counterText: '$currentLength/$maxLength',
+        counterStyle: TextStyles.caption.copyWith(
+          color: isOverLimit
+              ? theme.error[500]
+              : isNearLimit
+                  ? theme.warn[500]
+                  : theme.grey[500],
+        ),
       ),
       onChanged: (value) => setState(() {}),
     );
   }
 
-  /// Builds the bottom section with character counts
+  /// Builds the bottom section with attachment icons
   Widget _buildBottomSection(
       CustomThemeData theme, AppLocalizations localizations) {
+    final attachmentState = ref.watch(postAttachmentsProvider);
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -713,51 +755,642 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
         ),
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          GestureDetector(
-            onTap: () => _showValidationInfoModal(),
-            child: Icon(
-              LucideIcons.badgeInfo,
-              size: 20,
-              color: theme.primary[600],
-            ),
+          // Attachment action icons (left side)
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildAttachmentIcon(
+                theme,
+                LucideIcons.image,
+                () => _handleAttachmentTap(AttachmentType.image),
+                isSelected:
+                    attachmentState.selectedType == AttachmentType.image,
+              ),
+              horizontalSpace(Spacing.points12),
+              _buildAttachmentIcon(
+                theme,
+                LucideIcons.barChart3,
+                () => _handleAttachmentTap(AttachmentType.poll),
+                isSelected: attachmentState.selectedType == AttachmentType.poll,
+              ),
+            ],
           ),
-          horizontalSpace(Spacing.points8),
-          _buildCharacterCount(
-            '${localizations.translate('title')}: ${_titleController.text.length}/${PostFormValidationConstants.maxTitleLength}',
-            _titleController.text.length,
-            PostFormValidationConstants.maxTitleLength,
-            theme,
-          ),
-          Spacer(),
-          _buildCharacterCount(
-            '${localizations.translate('content')}: ${_contentController.text.length}/${PostFormValidationConstants.maxContentLength}',
-            _contentController.text.length,
-            PostFormValidationConstants.maxContentLength,
-            theme,
-          ),
+
+          // Post button (right side)
+          _buildPostButton(theme, localizations),
         ],
       ),
     );
   }
 
-  /// Builds character count display with color coding
-  Widget _buildCharacterCount(
-      String text, int current, int max, CustomThemeData theme) {
-    final isNearLimit = current > max * 0.8;
-    final isOverLimit = current > max;
-
-    return Text(
-      text,
-      style: TextStyles.caption.copyWith(
-        color: isOverLimit
-            ? theme.error[500]
-            : isNearLimit
-                ? theme.warn[500]
-                : theme.grey[500],
+  /// Builds an attachment icon button
+  Widget _buildAttachmentIcon(
+      CustomThemeData theme, IconData icon, VoidCallback onTap,
+      {bool isSelected = false}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: isSelected ? theme.primary[100] : Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
+          border: isSelected ? Border.all(color: theme.primary[300]!) : null,
+        ),
+        child: Icon(
+          icon,
+          size: 20,
+          color: isSelected ? theme.primary[600] : theme.grey[600],
+        ),
       ),
     );
+  }
+
+  /// Builds detailed attachment preview
+  Widget _buildDetailedAttachmentPreview(
+    CustomThemeData theme,
+    AppLocalizations localizations,
+    PostAttachmentsState attachmentState,
+  ) {
+    switch (attachmentState.selectedType) {
+      case AttachmentType.image:
+        return _buildImagePreview(theme, localizations, attachmentState);
+      case AttachmentType.poll:
+        return _buildPollPreview(theme, localizations, attachmentState);
+      default:
+        return const SizedBox.shrink();
+    }
+  }
+
+  /// Builds image attachment preview with thumbnails
+  Widget _buildImagePreview(
+    CustomThemeData theme,
+    AppLocalizations localizations,
+    PostAttachmentsState attachmentState,
+  ) {
+    final imageData = attachmentState.attachmentData as ImageAttachmentData?;
+    if (imageData == null || imageData.images.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Container(
+      height: 100,
+      // margin: const EdgeInsets.symmetric(horizontal: 16),
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: imageData.images.length,
+        itemBuilder: (context, index) {
+          final image = imageData.images[index];
+
+          return Container(
+            margin: EdgeInsets.only(
+              right: index == imageData.images.length - 1 ? 0 : 12,
+            ),
+            child: Stack(
+              children: [
+                // Image thumbnail
+                GestureDetector(
+                  onTap: () => _showImagePreview(image, imageData.images),
+                  child: Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      color: theme.grey[200],
+                      image: image.localPath != null
+                          ? DecorationImage(
+                              image: FileImage(File(image.localPath)),
+                              fit: BoxFit.cover,
+                            )
+                          : null,
+                    ),
+                    child: image.localPath == null
+                        ? Icon(
+                            LucideIcons.image,
+                            size: 40,
+                            color: theme.grey[500],
+                          )
+                        : null,
+                  ),
+                ),
+                // Delete button
+                Positioned(
+                  top: 6,
+                  right: 6,
+                  child: GestureDetector(
+                    onTap: () => _removeImage(image.id),
+                    child: Container(
+                      width: 28,
+                      height: 28,
+                      decoration: BoxDecoration(
+                        color: theme.error[500]!.withValues(alpha: 0.9),
+                        borderRadius: BorderRadius.circular(14),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.2),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Icon(
+                        LucideIcons.x,
+                        size: 16,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  /// Builds poll attachment preview
+  Widget _buildPollPreview(
+    CustomThemeData theme,
+    AppLocalizations localizations,
+    PostAttachmentsState attachmentState,
+  ) {
+    final pollData = attachmentState.attachmentData as PollAttachmentData?;
+    if (pollData == null) {
+      return const SizedBox.shrink();
+    }
+
+    return GestureDetector(
+      onTap: () => _editPoll(pollData),
+      child: WidgetsContainer(
+        width: double.infinity, // Full width
+        padding: const EdgeInsets.all(14),
+        backgroundColor: theme.primary[50],
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: theme.primary[200]!, width: 1),
+        cornerSmoothing: 0.8,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header with poll icon and actions
+            Row(
+              children: [
+                WidgetsContainer(
+                  padding: const EdgeInsets.all(6),
+                  backgroundColor: theme.primary[100],
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide.none,
+                  cornerSmoothing: 0.6,
+                  child: Icon(
+                    LucideIcons.barChart3,
+                    size: 18,
+                    color: theme.primary[600],
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        localizations.translate('poll'),
+                        style: TextStyles.footnoteSelected.copyWith(
+                          color: theme.primary[700],
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(
+                          height:
+                              2), // Proper spacing between heading and description
+                      Text(
+                        '${pollData.options.length} ${localizations.translate(pollData.options.length > 1 ? 'poll-options' : 'poll-option')}${pollData.isMultiSelect ? ' • ${localizations.translate('poll-multi-select')}' : ''}',
+                        style: TextStyles.caption.copyWith(
+                          color: theme.primary[600],
+                        ),
+                        maxLines: null, // Allow text to wrap
+                      ),
+                    ],
+                  ),
+                ),
+                // Edit button
+                GestureDetector(
+                  onTap: () => _editPoll(pollData),
+                  child: WidgetsContainer(
+                    padding: const EdgeInsets.all(4),
+                    backgroundColor: theme.grey[100],
+                    borderRadius: BorderRadius.circular(6),
+                    borderSide: BorderSide.none,
+                    cornerSmoothing: 0.6,
+                    child: Icon(
+                      LucideIcons.pencil,
+                      size: 14,
+                      color: theme.grey[600],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 6),
+                // Clear button
+                GestureDetector(
+                  onTap: _clearAttachments,
+                  child: WidgetsContainer(
+                    padding: const EdgeInsets.all(4),
+                    backgroundColor: theme.error[100],
+                    borderRadius: BorderRadius.circular(6),
+                    borderSide: BorderSide.none,
+                    cornerSmoothing: 0.6,
+                    child: Icon(
+                      LucideIcons.x,
+                      size: 14,
+                      color: theme.error[600],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 12),
+
+            // Poll question section - more compact
+            WidgetsContainer(
+              width: double.infinity,
+              padding: const EdgeInsets.all(10),
+              backgroundColor: theme.backgroundColor,
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(color: theme.grey[200]!, width: 1),
+              cornerSmoothing: 0.6,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    localizations.translate('poll-question'),
+                    style: TextStyles.caption.copyWith(
+                      color: theme.grey[500],
+                      fontWeight: FontWeight.w500,
+                      fontSize: 11,
+                    ),
+                  ),
+                  const SizedBox(height: 3), // Proper spacing
+                  Text(
+                    pollData.question.isNotEmpty
+                        ? pollData.question
+                        : localizations.translate('poll-question-placeholder'),
+                    style: TextStyles.footnote.copyWith(
+                      color: theme.grey[900],
+                      fontWeight: FontWeight.w500,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 10),
+
+            // Options preview section - more compact
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  localizations.translate('poll-options-preview'),
+                  style: TextStyles.caption.copyWith(
+                    color: theme.grey[500],
+                    fontWeight: FontWeight.w500,
+                    fontSize: 11,
+                  ),
+                ),
+                const SizedBox(height: 6), // Proper spacing
+                ...pollData.options.take(3).map((option) => Padding(
+                      padding: const EdgeInsets.only(bottom: 4),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 14,
+                            height: 14,
+                            decoration: BoxDecoration(
+                              color: theme.primary[100],
+                              shape: pollData.isMultiSelect
+                                  ? BoxShape.rectangle
+                                  : BoxShape.circle,
+                              borderRadius: pollData.isMultiSelect
+                                  ? BorderRadius.circular(3)
+                                  : null,
+                              border: Border.all(
+                                color: theme.primary[300]!,
+                                width: 1,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              option.text,
+                              style: TextStyles.caption.copyWith(
+                                color: theme.grey[700],
+                                fontSize: 13,
+                              ),
+                              maxLines: null, // Allow text to wrap
+                            ),
+                          ),
+                        ],
+                      ),
+                    )),
+                if (pollData.options.length > 3)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 2),
+                    child: Text(
+                      '+${pollData.options.length - 3} ${localizations.translate('more-options')}',
+                      style: TextStyles.caption.copyWith(
+                        color: theme.primary[600],
+                        fontStyle: FontStyle.italic,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+
+            // Tap to edit hint - more compact
+            const SizedBox(height: 10),
+            WidgetsContainer(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+              backgroundColor: theme.primary[50],
+              borderRadius: BorderRadius.circular(6),
+              borderSide: BorderSide.none,
+              cornerSmoothing: 0.6,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    LucideIcons.edit3,
+                    size: 12,
+                    color: theme.primary[600],
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    localizations.translate('tap-to-edit-poll'),
+                    style: TextStyles.caption.copyWith(
+                      color: theme.primary[600],
+                      fontWeight: FontWeight.w500,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Helper methods for attachment management
+  void _clearAttachments() {
+    ref.read(postAttachmentsProvider.notifier).clearAttachments();
+  }
+
+  /// Handle attachment icon tap with Plus eligibility check
+  void _handleAttachmentTap(AttachmentType attachmentType) {
+    final hasActiveSubscription = ref.read(hasActiveSubscriptionProvider);
+
+    if (!hasActiveSubscription) {
+      // Show Plus subscription modal
+      _showPlusSubscriptionModal();
+      return;
+    }
+
+    // User has Plus access - proceed with attachment functionality
+    switch (attachmentType) {
+      case AttachmentType.image:
+        _handleImageAttachment();
+        break;
+      case AttachmentType.poll:
+        _handlePollAttachment();
+        break;
+      case AttachmentType.groupInvite:
+        // Group invite functionality has been removed
+        break;
+    }
+  }
+
+  /// Show Plus subscription modal
+  void _showPlusSubscriptionModal() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      useSafeArea: true,
+      builder: (context) => const TaaafiPlusSubscriptionScreen(),
+    );
+  }
+
+  /// Attachment action handlers (for Plus users)
+  void _handleImageAttachment() async {
+    // Show loading modal first
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      isDismissible: false,
+      enableDrag: false,
+      useSafeArea: true,
+      builder: (BuildContext modalContext) {
+        return DraggableScrollableSheet(
+          initialChildSize: 0.25,
+          minChildSize: 0.2,
+          maxChildSize: 0.3,
+          builder: (context, scrollController) {
+            return Container(
+              decoration: BoxDecoration(
+                color: AppTheme.of(context).backgroundColor,
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Handle bar
+                      Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: AppTheme.of(context).grey[300],
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                      const SizedBox(height: 40),
+                      // Loading spinner
+                      Spinner(
+                        strokeWidth: 3,
+                        valueColor: AppTheme.of(context).primary[600],
+                      ),
+                      const SizedBox(height: 40),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+
+    // Check feature access
+    final canAccess =
+        await checkFeatureAccess(ref, AppFeaturesConfig.shareMedia);
+
+    if (!context.mounted) return;
+
+    // Close loading modal
+    Navigator.of(context).pop();
+
+    if (!canAccess) {
+      // Show ban message
+      await checkFeatureAccessAndShowBanSnackbar(
+        context,
+        ref,
+        AppFeaturesConfig.shareMedia,
+        customMessage:
+            AppLocalizations.of(context).translate('media-sharing-restricted'),
+      );
+    } else {
+      // Execute the image attachment logic
+      try {
+        final imageService = ref.read(attachmentImageServiceProvider);
+        final images = await imageService.pickImages(maxImages: 4);
+
+        if (images.isNotEmpty) {
+          ref.read(postAttachmentsProvider.notifier).updateImages(images);
+        }
+      } catch (e) {
+        getErrorSnackBar(context, 'Failed to select images');
+      }
+    }
+  }
+
+  /// Remove a single image by ID
+  void _removeImage(String imageId) {
+    print('Removing image: $imageId'); // Debug log
+    ref.read(postAttachmentsProvider.notifier).removeImage(imageId);
+  }
+
+  /// Show fullscreen image preview
+  void _showImagePreview(dynamic image, List<dynamic> allImages) {
+    print('Opening image preview for image: ${image.id}'); // Debug log
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      useSafeArea: true,
+      builder: (context) => _ImagePreviewModal(
+        image: image,
+        allImages: allImages,
+      ),
+    );
+  }
+
+  void _handlePollAttachment() async {
+    // Show loading modal first
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      isDismissible: false,
+      enableDrag: false,
+      useSafeArea: true,
+      builder: (BuildContext modalContext) {
+        return DraggableScrollableSheet(
+          initialChildSize: 0.25,
+          minChildSize: 0.2,
+          maxChildSize: 0.3,
+          builder: (context, scrollController) {
+            return Container(
+              decoration: BoxDecoration(
+                color: AppTheme.of(context).backgroundColor,
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Handle bar
+                      Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: AppTheme.of(context).grey[300],
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                      const SizedBox(height: 40),
+                      // Loading spinner
+                      Spinner(
+                        strokeWidth: 3,
+                        valueColor: AppTheme.of(context).primary[600],
+                      ),
+                      const SizedBox(height: 40),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+
+    // Check feature access
+    final canAccess =
+        await checkFeatureAccess(ref, AppFeaturesConfig.createPoll);
+
+    if (!context.mounted) return;
+
+    // Close loading modal
+    Navigator.of(context).pop();
+
+    if (!canAccess) {
+      // Show ban message
+      await checkFeatureAccessAndShowBanSnackbar(
+        context,
+        ref,
+        AppFeaturesConfig.createPoll,
+        customMessage:
+            AppLocalizations.of(context).translate('poll-creation-restricted'),
+      );
+    } else {
+      // Show the poll creation modal
+      _showPollCreationModal();
+    }
+  }
+
+  /// Shows poll creation modal
+  void _showPollCreationModal({PollAttachmentData? existingPoll}) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      useSafeArea: true,
+      builder: (context) => _PollCreationModal(
+        existingPoll: existingPoll,
+        onPollCreated: (pollData) {
+          ref.read(postAttachmentsProvider.notifier).updatePoll(pollData);
+          Navigator.of(context).pop();
+        },
+      ),
+    );
+  }
+
+  /// Edit existing poll
+  void _editPoll(PollAttachmentData pollData) {
+    _showPollCreationModal(existingPoll: pollData);
   }
 
   /// Shows the category selector modal
@@ -896,7 +1529,8 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
       backgroundColor: Colors.transparent,
       builder: (context) => AnonymityToggleModal(
         profile: profile,
-        currentAnonymousState: currentAnonymousState,
+        currentAnonymousState:
+            ref.read(anonymousPostProvider), // Always use actual provider state
         onToggleComplete: (newAnonymityState) {
           ref.read(anonymousPostProvider.notifier).state = newAnonymityState;
           ref.refresh(currentCommunityProfileProvider);
@@ -1082,11 +1716,22 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
           '   - Content: "${postData.content.substring(0, postData.content.length > 50 ? 50 : postData.content.length)}${postData.content.length > 50 ? '...' : ''}" (${postData.content.length} chars)');
       print('   - Category ID: ${postData.categoryId}');
 
+      // Get attachment data if any
+      final attachmentState = ref.read(postAttachmentsProvider);
+
+      print(
+          '📎 [NewPostScreen] Attachment state: ${attachmentState.selectedType}');
+      if (attachmentState.attachmentData != null) {
+        print(
+            '   - Has attachment data: ${attachmentState.attachmentData.runtimeType}');
+      }
+
       // Submit through the provider
       print('🔄 [NewPostScreen] Calling postCreationProvider.createPost...');
       await ref.read(postCreationProvider.notifier).createPost(
             postData,
             AppLocalizations.of(context),
+            attachmentData: attachmentState,
           );
       print(
           '✅ [NewPostScreen] postCreationProvider.createPost completed successfully');
@@ -1212,9 +1857,20 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
     _contentController.clear();
     // Reset to null and let the category loading logic set the default general category
     ref.read(selectedCategoryProvider.notifier).state = null;
-    ref.read(anonymousPostProvider.notifier).state = false;
+
+    // Reset anonymity state to user's profile setting
+    ref.read(currentCommunityProfileProvider).whenData((profile) {
+      if (profile != null) {
+        ref.read(anonymousPostProvider.notifier).state = profile.isAnonymous;
+      } else {
+        ref.read(anonymousPostProvider.notifier).state = false;
+      }
+    });
+
     ref.read(postContentProvider.notifier).state = '';
     ref.read(postCreationProvider.notifier).reset();
+    // Clear attachments
+    ref.read(postAttachmentsProvider.notifier).clearAttachments();
   }
 
   /// Selects a category
@@ -1227,5 +1883,465 @@ class _NewPostScreenState extends ConsumerState<NewPostScreen> {
   void _toggleAnonymity() {
     final current = ref.read(anonymousPostProvider);
     ref.read(anonymousPostProvider.notifier).state = !current;
+  }
+}
+
+/// Poll Creation Modal Widget
+class _PollCreationModal extends ConsumerStatefulWidget {
+  final Function(PollAttachmentData) onPollCreated;
+  final PollAttachmentData? existingPoll;
+
+  const _PollCreationModal({
+    required this.onPollCreated,
+    this.existingPoll,
+  });
+
+  @override
+  ConsumerState<_PollCreationModal> createState() => _PollCreationModalState();
+}
+
+class _PollCreationModalState extends ConsumerState<_PollCreationModal> {
+  late final TextEditingController _questionController;
+  late final List<TextEditingController> _optionControllers;
+  late bool _isMultiSelect;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize with existing poll data if available
+    if (widget.existingPoll != null) {
+      _questionController =
+          TextEditingController(text: widget.existingPoll!.question);
+      _optionControllers = widget.existingPoll!.options
+          .map((option) => TextEditingController(text: option.text))
+          .toList();
+      _isMultiSelect = widget.existingPoll!.isMultiSelect;
+    } else {
+      _questionController = TextEditingController();
+      _optionControllers = [
+        TextEditingController(),
+        TextEditingController(),
+      ];
+      _isMultiSelect = false;
+    }
+
+    // Add listeners to trigger validation
+    _questionController.addListener(_checkFormValidity);
+    for (var controller in _optionControllers) {
+      controller.addListener(_checkFormValidity);
+    }
+
+    // Check initial validity
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkFormValidity();
+    });
+  }
+
+  @override
+  void dispose() {
+    _questionController.removeListener(_checkFormValidity);
+    _questionController.dispose();
+    for (var controller in _optionControllers) {
+      controller.removeListener(_checkFormValidity);
+      controller.dispose();
+    }
+    super.dispose();
+  }
+
+  bool _isFormValid = false;
+
+  void _checkFormValidity() {
+    final isValid = _questionController.text.trim().isNotEmpty &&
+        _optionControllers
+                .where((controller) => controller.text.trim().isNotEmpty)
+                .length >=
+            2;
+    if (_isFormValid != isValid) {
+      setState(() {
+        _isFormValid = isValid;
+      });
+    }
+  }
+
+  bool get _isValid => _isFormValid;
+
+  void _addOption() {
+    if (_optionControllers.length < 4) {
+      setState(() {
+        final newController = TextEditingController();
+        newController.addListener(_checkFormValidity);
+        _optionControllers.add(newController);
+      });
+      _checkFormValidity();
+    }
+  }
+
+  void _removeOption(int index) {
+    if (_optionControllers.length > 2) {
+      setState(() {
+        _optionControllers[index].removeListener(_checkFormValidity);
+        _optionControllers[index].dispose();
+        _optionControllers.removeAt(index);
+      });
+      _checkFormValidity();
+    }
+  }
+
+  void _createPoll() {
+    if (!_isValid) return;
+
+    final options = _optionControllers
+        .where((controller) => controller.text.trim().isNotEmpty)
+        .map((controller) => PollOptionData(
+              id: DateTime.now().millisecondsSinceEpoch.toString() +
+                  _optionControllers.indexOf(controller).toString(),
+              text: controller.text.trim(),
+            ))
+        .toList();
+
+    final pollData = PollAttachmentData(
+      question: _questionController.text.trim(),
+      options: options,
+      isMultiSelect: _isMultiSelect,
+      closesAt: null,
+    );
+
+    widget.onPollCreated(pollData);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = AppTheme.of(context);
+    final localizations = AppLocalizations.of(context);
+
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.85,
+      decoration: BoxDecoration(
+        color: theme.backgroundColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      child: Column(
+        children: [
+          // Handle bar
+          Container(
+            width: 40,
+            height: 4,
+            margin: const EdgeInsets.only(top: 12),
+            decoration: BoxDecoration(
+              color: theme.grey[300],
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+
+          // Header
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                IconButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  icon: Icon(LucideIcons.x),
+                ),
+                Expanded(
+                  child: Text(
+                    localizations.translate(widget.existingPoll != null
+                        ? 'poll-edit'
+                        : 'poll-create'),
+                    style: TextStyles.h6.copyWith(
+                      color: theme.grey[900],
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                // Create button using shared WidgetsContainer
+                shared.WidgetsContainer(
+                  backgroundColor:
+                      _isValid ? theme.primary[600] : theme.grey[400],
+                  borderSide: BorderSide.none,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: GestureDetector(
+                    onTap: _isValid ? _createPoll : null,
+                    child: Text(
+                      localizations.translate(
+                          widget.existingPoll != null ? 'update' : 'create'),
+                      style: TextStyles.footnoteSelected.copyWith(
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Question input using CustomTextArea
+                  CustomTextArea(
+                    controller: _questionController,
+                    hint: localizations.translate('poll-question-hint'),
+                    prefixIcon: LucideIcons.helpCircle,
+                    maxLength: 100,
+                    maxLines: 2,
+                    height: 80,
+                    validator: (value) {
+                      if (value?.trim().isEmpty ?? true) {
+                        return 'Required';
+                      }
+                      return null;
+                    },
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  // Options
+                  Text(
+                    localizations.translate('poll-options'),
+                    style: TextStyles.footnoteSelected.copyWith(
+                      color: theme.grey[800],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+
+                  // Options using CustomTextField
+                  ..._optionControllers.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final controller = entry.value;
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: CustomTextField(
+                              controller: controller,
+                              hint:
+                                  '${localizations.translate('poll-option')} ${index + 1}',
+                              prefixIcon: LucideIcons.circle,
+                              inputType: TextInputType.text,
+                              validator: (value) =>
+                                  null, // No validation for options
+                            ),
+                          ),
+                          if (_optionControllers.length > 2)
+                            IconButton(
+                              icon: Icon(LucideIcons.x,
+                                  size: 16, color: theme.error[600]),
+                              onPressed: () => _removeOption(index),
+                            ),
+                        ],
+                      ),
+                    );
+                  }),
+
+                  // Add option button using WidgetsContainer
+                  if (_optionControllers.length < 4)
+                    GestureDetector(
+                      onTap: _addOption,
+                      child: shared.WidgetsContainer(
+                        width: double.infinity,
+                        backgroundColor: theme.grey[50],
+                        borderSide: BorderSide(
+                          color: theme.primary[300]!,
+                          style: BorderStyle.solid,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(LucideIcons.plus,
+                                size: 16, color: theme.primary[600]),
+                            const SizedBox(width: 8),
+                            Text(
+                              localizations.translate('poll-add-option'),
+                              style: TextStyles.footnoteSelected.copyWith(
+                                color: theme.primary[600],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                  const SizedBox(height: 24),
+
+                  // Multi-select switch using PlatformSwitch
+                  PlatformSwitch(
+                    value: _isMultiSelect,
+                    onChanged: (value) =>
+                        setState(() => _isMultiSelect = value),
+                    label: localizations.translate('poll-multi-select'),
+                  ),
+
+                  const SizedBox(height: 16),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Image Preview Modal Widget
+class _ImagePreviewModal extends StatefulWidget {
+  final dynamic image;
+  final List<dynamic> allImages;
+
+  const _ImagePreviewModal({
+    required this.image,
+    required this.allImages,
+  });
+
+  @override
+  State<_ImagePreviewModal> createState() => _ImagePreviewModalState();
+}
+
+class _ImagePreviewModalState extends State<_ImagePreviewModal> {
+  late PageController _pageController;
+  late int _currentIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.allImages.indexOf(widget.image);
+    _pageController = PageController(initialPage: _currentIndex);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = AppTheme.of(context);
+
+    return Container(
+      color: Colors.black,
+      child: Column(
+        children: [
+          // Header with close button and counter
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(12),
+                    onTap: () {
+                      print('Close button tapped'); // Debug log
+                      Navigator.of(context).pop();
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.5),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        LucideIcons.x,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                    ),
+                  ),
+                ),
+                const Spacer(),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.5),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Text(
+                    '${_currentIndex + 1} / ${widget.allImages.length}',
+                    style: TextStyles.footnote.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Image viewer
+          Expanded(
+            child: PageView.builder(
+              controller: _pageController,
+              itemCount: widget.allImages.length,
+              onPageChanged: (index) {
+                setState(() {
+                  _currentIndex = index;
+                });
+              },
+              itemBuilder: (context, index) {
+                final image = widget.allImages[index];
+                return Center(
+                  child: InteractiveViewer(
+                    child: Container(
+                      constraints: BoxConstraints(
+                        maxHeight: MediaQuery.of(context).size.height * 0.7,
+                        maxWidth: MediaQuery.of(context).size.width,
+                      ),
+                      child: image.localPath != null
+                          ? Image.file(
+                              File(image.localPath),
+                              fit: BoxFit.contain,
+                            )
+                          : Container(
+                              width: 200,
+                              height: 200,
+                              decoration: BoxDecoration(
+                                color: theme.grey[200],
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Icon(
+                                LucideIcons.image,
+                                size: 64,
+                                color: theme.grey[500],
+                              ),
+                            ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+
+          // Page indicator dots (only show if more than 1 image)
+          if (widget.allImages.length > 1) ...[
+            Container(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(
+                  widget.allImages.length,
+                  (index) => Container(
+                    width: 8,
+                    height: 8,
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: index == _currentIndex
+                          ? Colors.white
+                          : Colors.white.withValues(alpha: 0.4),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
   }
 }

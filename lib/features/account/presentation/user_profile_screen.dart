@@ -808,7 +808,9 @@ class UserProfileScreen extends ConsumerWidget {
             theme.primary[600]!,
             onRefresh: () {
               HapticFeedback.lightImpact();
-              ref.invalidate(subscriptionNotifierProvider);
+              ref
+                  .read(subscriptionNotifierProvider.notifier)
+                  .forceRefreshWithCacheClear();
             },
             isRefreshing: isRefreshing,
           ),
@@ -833,7 +835,9 @@ class UserProfileScreen extends ConsumerWidget {
             theme.primary[600]!,
             onRefresh: () {
               HapticFeedback.lightImpact();
-              ref.invalidate(subscriptionNotifierProvider);
+              ref
+                  .read(subscriptionNotifierProvider.notifier)
+                  .forceRefreshWithCacheClear();
             },
             isRefreshing: isRefreshing,
           ),
@@ -870,7 +874,10 @@ class UserProfileScreen extends ConsumerWidget {
               hasActiveSubscription ? theme.primary[600]! : theme.grey[600]!,
               onRefresh: () {
                 HapticFeedback.lightImpact();
-                ref.invalidate(subscriptionNotifierProvider);
+                // Force refresh with cache clear to get fresh data from RevenueCat
+                ref
+                    .read(subscriptionNotifierProvider.notifier)
+                    .forceRefreshWithCacheClear();
               },
               isRefreshing: isRefreshing,
             ),

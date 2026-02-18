@@ -136,6 +136,24 @@ class SubscriptionRepository {
         'Subscription Repository: All caches cleared and user validation forced');
   }
 
+  /// Check if current platform has configuration issues (for cross-platform scenarios)
+  /// Returns true if offerings can't be fetched due to platform configuration
+  Future<bool> hasPlatformConfigurationIssues() async {
+    try {
+      final offerings = await _revenueCatService.getOfferings();
+      return offerings.current?.availablePackages.isEmpty ?? true;
+    } catch (e) {
+      final errorMessage = e.toString();
+      if (errorMessage.contains('CONFIGURATION_ERROR') ||
+          errorMessage.contains('could be fetched from App Store Connect')) {
+        print(
+            'Subscription Repository: Platform configuration issues detected - $e');
+        return true;
+      }
+      return false;
+    }
+  }
+
   /// COMPREHENSIVE DEBUG METHOD - Traces every step of entitlement fetching
   Future<void> debugEntitlementFetching() async {
     print('\n🔍 === COMPREHENSIVE ENTITLEMENT DEBUG ===');
@@ -217,25 +235,47 @@ class SubscriptionRepository {
         });
       }
 
-      // Step 7: Test our subscription info creation
-      print('Step 7 - Testing SubscriptionInfo creation:');
-      final packages = await _revenueCatService.getOfferings();
-      final subscriptionInfo = SubscriptionInfo.fromRevenueCat(
-          customerInfo, packages.current?.availablePackages ?? []);
+      // Step 7: Test cross-platform offerings support
+      print('Step 7 - Cross-platform offerings check:');
+      Offerings? offerings;
+      List<Package>? packages;
+
+      try {
+        offerings = await _revenueCatService.getOfferings();
+        packages = offerings.current?.availablePackages;
+        print('  ✅ Offerings fetched successfully');
+        print('  - Available packages count: ${packages?.length ?? 0}');
+      } catch (e) {
+        print('  ⚠️  Offerings failed (cross-platform scenario) - $e');
+        final isConfigError = e.toString().contains('CONFIGURATION_ERROR') ||
+            e.toString().contains('could be fetched from App Store Connect');
+        if (isConfigError) {
+          print(
+              '  🔧 This is a platform configuration issue - subscription status should still work');
+        }
+      }
+
+      // Step 8: Test our subscription info creation with cross-platform handling
+      print(
+          'Step 8 - Testing SubscriptionInfo creation with cross-platform support:');
+      final subscriptionInfo =
+          SubscriptionInfo.fromRevenueCat(customerInfo, packages);
 
       print('  - Generated Status: ${subscriptionInfo.status}');
       print('  - Generated IsActive: ${subscriptionInfo.isActive}');
       print('  - Generated Product ID: ${subscriptionInfo.productId}');
       print('  - Generated Expiration: ${subscriptionInfo.expirationDate}');
+      print(
+          '  - Available Packages: ${packages?.length ?? 0} (null = platform config issues)');
 
-      // Step 8: Test hasEntitlement method
-      print('Step 8 - Testing hasEntitlement method:');
+      // Step 9: Test hasEntitlement method
+      print('Step 9 - Testing hasEntitlement method:');
       final hasEntitlementResult =
           subscriptionInfo.hasEntitlement('taaafi_plus');
       print('  - hasEntitlement("taaafi_plus"): $hasEntitlementResult');
 
-      // Step 9: Test raw entitlement check
-      print('Step 9 - Raw entitlement checks:');
+      // Step 10: Test raw entitlement check
+      print('Step 10 - Raw entitlement checks:');
       final rawActiveCheck =
           customerInfo.entitlements.active['taaafi_plus']?.isActive ?? false;
       final rawAllCheck =
@@ -243,8 +283,17 @@ class SubscriptionRepository {
       print('  - Raw active["taaafi_plus"]?.isActive: $rawActiveCheck');
       print('  - Raw all["taaafi_plus"]?.isActive: $rawAllCheck');
 
-      // Step 10: Check what our hasActiveSubscription would return
-      print('Step 10 - Final hasActiveSubscription logic:');
+      // Step 11: Cross-platform scenario analysis
+      print('Step 11 - Cross-platform scenario analysis:');
+      final hasPlatformIssues = await hasPlatformConfigurationIssues();
+      print('  - Platform has configuration issues: $hasPlatformIssues');
+      if (hasPlatformIssues && (rawActiveCheck || rawAllCheck)) {
+        print(
+            '  ✅ SUCCESS: User has valid cross-platform subscription despite platform config issues');
+      }
+
+      // Step 12: Check what our hasActiveSubscription would return
+      print('Step 12 - Final hasActiveSubscription logic:');
       final hasEntitlement = subscriptionInfo.hasEntitlement('taaafi_plus');
       final hasLegacyStatus =
           (subscriptionInfo.status == SubscriptionStatus.plus &&
@@ -288,10 +337,12 @@ class SubscriptionRepository {
       // Optimized user sync check
       await _ensureUserSynced();
 
-      // Try to get fresh data from RevenueCat
+      // Try to get customer info first (this contains subscription status)
       final customerInfo = await _revenueCatService.getCustomerInfo();
-      final offerings = await _revenueCatService.getOfferings();
-      final packages = offerings.current?.availablePackages;
+
+      // Try to get offerings, but don't fail if not available (cross-platform support)
+      final offerings = await _revenueCatService.getOfferingsOrNull();
+      final packages = offerings?.current?.availablePackages;
 
       final subscription =
           SubscriptionInfo.fromRevenueCat(customerInfo, packages);
@@ -299,11 +350,16 @@ class SubscriptionRepository {
       // Cache the fresh data locally for offline access
       await _cacheSubscriptionStatus(subscription);
 
+      print(
+          'Subscription Repository: Successfully got subscription status from RevenueCat');
       return subscription;
     } catch (e) {
       print('Failed to get subscription status from RevenueCat: $e');
       // Fallback to cached data if RevenueCat fails
-      return await _getCachedSubscriptionStatus();
+      final cachedInfo = await _getCachedSubscriptionStatus();
+      print(
+          'Subscription Repository: Using cached subscription status - isActive: ${cachedInfo.isActive}, status: ${cachedInfo.status}');
+      return cachedInfo;
     }
   }
 
@@ -450,6 +506,15 @@ class SubscriptionRepository {
       }
       return false;
     } catch (e) {
+      // Check if this is a cross-platform configuration issue
+      final errorMessage = e.toString();
+      if (errorMessage.contains('CONFIGURATION_ERROR') ||
+          errorMessage.contains('could be fetched from App Store Connect')) {
+        throw Exception(
+            'Purchase not available on this platform due to configuration issues. '
+            'Your existing subscription from other platforms is still valid. '
+            'Error: $e');
+      }
       throw Exception('Purchase failed: $e');
     }
   }
@@ -483,10 +548,17 @@ class SubscriptionRepository {
       await _ensureUserSynced();
 
       final customerInfo = await _revenueCatService.restorePurchases();
-      final offerings = await _revenueCatService.getOfferings();
-      final packages = offerings.current?.availablePackages;
 
-      return SubscriptionInfo.fromRevenueCat(customerInfo, packages);
+      // Try to get offerings, but don't fail if not available (cross-platform support)
+      final offerings = await _revenueCatService.getOfferingsOrNull();
+      final packages = offerings?.current?.availablePackages;
+
+      final subscription =
+          SubscriptionInfo.fromRevenueCat(customerInfo, packages);
+      print(
+          'Subscription Repository: Restore purchases completed, subscription active: ${subscription.isActive}');
+
+      return subscription;
     } catch (e) {
       throw Exception('Restore failed: $e');
     }

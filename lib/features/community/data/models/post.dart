@@ -16,6 +16,12 @@ class Post {
   final DateTime createdAt;
   final DateTime? updatedAt;
 
+  // Attachment fields
+  final List<Map<String, dynamic>> attachmentsSummary;
+  final List<String> attachmentTypes;
+  final bool pendingAttachments;
+  final DateTime? attachmentsFinalizedAt;
+
   const Post({
     required this.id,
     required this.authorCPId,
@@ -31,6 +37,10 @@ class Post {
     required this.dislikeCount,
     required this.createdAt,
     this.updatedAt,
+    this.attachmentsSummary = const [],
+    this.attachmentTypes = const [],
+    this.pendingAttachments = false,
+    this.attachmentsFinalizedAt,
   });
 
   factory Post.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) =>
@@ -49,6 +59,13 @@ class Post {
         dislikeCount: doc.data()!["dislikeCount"] ?? 0,
         createdAt: (doc.data()!["createdAt"] as Timestamp).toDate(),
         updatedAt: (doc.data()!["updatedAt"] as Timestamp?)?.toDate(),
+        attachmentsSummary: _extractAttachmentsSummary(doc.data()!),
+        attachmentTypes: List<String>.from(
+          doc.data()!["attachmentTypes"] ?? [],
+        ),
+        pendingAttachments: doc.data()!["pendingAttachments"] ?? false,
+        attachmentsFinalizedAt:
+            (doc.data()!["attachmentsFinalizedAt"] as Timestamp?)?.toDate(),
       );
 
   Map<String, dynamic> toJson() => {
@@ -66,6 +83,10 @@ class Post {
         'dislikeCount': dislikeCount,
         'createdAt': createdAt.toIso8601String(),
         'updatedAt': updatedAt?.toIso8601String(),
+        'attachmentsSummary': attachmentsSummary,
+        'attachmentTypes': attachmentTypes,
+        'pendingAttachments': pendingAttachments,
+        'attachmentsFinalizedAt': attachmentsFinalizedAt?.toIso8601String(),
       };
 
   /// Converts Post to Firestore document data
@@ -84,6 +105,12 @@ class Post {
         'dislikeCount': dislikeCount,
         'createdAt': Timestamp.fromDate(createdAt),
         'updatedAt': updatedAt != null ? Timestamp.fromDate(updatedAt!) : null,
+        'attachmentsSummary': attachmentsSummary,
+        'attachmentTypes': attachmentTypes,
+        'pendingAttachments': pendingAttachments,
+        'attachmentsFinalizedAt': attachmentsFinalizedAt != null
+            ? Timestamp.fromDate(attachmentsFinalizedAt!)
+            : null,
       };
 
   /// Creates a copy of this post with updated values
@@ -102,6 +129,10 @@ class Post {
     int? dislikeCount,
     DateTime? createdAt,
     DateTime? updatedAt,
+    List<Map<String, dynamic>>? attachmentsSummary,
+    List<String>? attachmentTypes,
+    bool? pendingAttachments,
+    DateTime? attachmentsFinalizedAt,
   }) {
     return Post(
       id: id ?? this.id,
@@ -118,6 +149,11 @@ class Post {
       dislikeCount: dislikeCount ?? this.dislikeCount,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      attachmentsSummary: attachmentsSummary ?? this.attachmentsSummary,
+      attachmentTypes: attachmentTypes ?? this.attachmentTypes,
+      pendingAttachments: pendingAttachments ?? this.pendingAttachments,
+      attachmentsFinalizedAt:
+          attachmentsFinalizedAt ?? this.attachmentsFinalizedAt,
     );
   }
 
@@ -138,7 +174,11 @@ class Post {
         other.likeCount == likeCount &&
         other.dislikeCount == dislikeCount &&
         other.createdAt == createdAt &&
-        other.updatedAt == updatedAt;
+        other.updatedAt == updatedAt &&
+        other.attachmentsSummary == attachmentsSummary &&
+        other.attachmentTypes == attachmentTypes &&
+        other.pendingAttachments == pendingAttachments &&
+        other.attachmentsFinalizedAt == attachmentsFinalizedAt;
   }
 
   @override
@@ -158,11 +198,37 @@ class Post {
       dislikeCount,
       createdAt,
       updatedAt,
+      attachmentsSummary,
+      attachmentTypes,
+      pendingAttachments,
+      attachmentsFinalizedAt,
     );
   }
 
   @override
   String toString() {
-    return 'Post(id: $id, authorCPId: $authorCPId, title: $title, body: $body, category: $category, isPinned: $isPinned, isDeleted: $isDeleted, isCommentingAllowed: $isCommentingAllowed, isHidden: $isHidden, score: $score, likeCount: $likeCount, dislikeCount: $dislikeCount, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'Post(id: $id, authorCPId: $authorCPId, title: $title, body: $body, category: $category, isPinned: $isPinned, isDeleted: $isDeleted, isCommentingAllowed: $isCommentingAllowed, isHidden: $isHidden, score: $score, likeCount: $likeCount, dislikeCount: $dislikeCount, createdAt: $createdAt, updatedAt: $updatedAt, attachmentsSummary: $attachmentsSummary, attachmentTypes: $attachmentTypes, pendingAttachments: $pendingAttachments, attachmentsFinalizedAt: $attachmentsFinalizedAt)';
+  }
+
+  /// Extract attachments summary from new or old data structure
+  static List<Map<String, dynamic>> _extractAttachmentsSummary(
+      Map<String, dynamic> data) {
+    // Try new structure first (attachmentsSummaryById + attachmentsOrder)
+    final summaryById = data["attachmentsSummaryById"] as Map<String, dynamic>?;
+    final order = data["attachmentsOrder"] as List?;
+
+    if (summaryById != null && order != null && order.isNotEmpty) {
+      // Convert map-based summary to list using order
+      final result = order.map((id) {
+        final summary = Map<String, dynamic>.from(summaryById[id] ?? {});
+        summary['id'] = id; // Ensure id is included
+        return summary;
+      }).toList();
+
+      return result;
+    }
+
+    // Fallback to old structure
+    return List<Map<String, dynamic>>.from(data["attachmentsSummary"] ?? []);
   }
 }

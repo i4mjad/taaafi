@@ -28,6 +28,7 @@ import 'package:reboot_app_3/core/utils/url_launcher_provider.dart';
 import 'package:reboot_app_3/features/authentication/application/auth_service.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_document_provider.dart';
 import 'package:reboot_app_3/features/authentication/providers/user_provider.dart';
+import 'package:reboot_app_3/features/referral/presentation/widgets/referral_code_input_widget.dart';
 
 class RegistrationStepperScreen extends ConsumerStatefulWidget {
   const RegistrationStepperScreen({super.key});
@@ -146,6 +147,9 @@ class _RegistrationStepperScreenState
         final user = FirebaseAuth.instance.currentUser;
         return _emailVerified || (user?.emailVerified == true);
 
+      case 4: // Referral Code (Optional - always valid)
+        return true;
+
       default:
         return true;
     }
@@ -154,7 +158,7 @@ class _RegistrationStepperScreenState
   Future<void> _nextStep() async {
     if (!_validateCurrentStep()) return;
 
-    if (_currentStep < 4) {
+    if (_currentStep < 5) {
       if (mounted) setState(() => _currentStep++);
       if (_currentStep == 3 && mounted) {
         // Check if email is already verified (OAuth users)
@@ -166,10 +170,9 @@ class _RegistrationStepperScreenState
         }
       }
     } else {
-      // Final step - complete registration and show subscription promotion
+      // Final step - complete registration and navigate to subscription
       await _completeRegistration();
       if (mounted) {
-        // Promote subscription to new users for better monetization
         context.goNamed(RouteNames.ta3afiPlus.name);
       }
     }
@@ -291,8 +294,27 @@ class _RegistrationStepperScreenState
     );
   }
 
+  String _getStepLabel(int index) {
+    switch (index) {
+      case 0:
+        return AppLocalizations.of(context).translate('personal-info');
+      case 1:
+        return AppLocalizations.of(context).translate('preferences');
+      case 2:
+        return AppLocalizations.of(context).translate('recovery');
+      case 3:
+        return AppLocalizations.of(context).translate('verification');
+      case 4:
+        return AppLocalizations.of(context).translate('referral');
+      case 5:
+        return AppLocalizations.of(context).translate('complete');
+      default:
+        return '';
+    }
+  }
+
   Widget _buildHorizontalStepIndicator(dynamic theme) {
-    const int totalSteps = 5;
+    const int totalSteps = 6;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
@@ -376,7 +398,7 @@ class _RegistrationStepperScreenState
                         ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 6),
                   // Step label
                   Text(
                     _getStepLabel(index),
@@ -388,9 +410,10 @@ class _RegistrationStepperScreenState
                               : theme.grey[500],
                       fontWeight:
                           isActive ? FontWeight.w600 : FontWeight.normal,
+                      fontSize: 10,
                     ),
                     textAlign: TextAlign.center,
-                    maxLines: 2,
+                    maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
@@ -400,23 +423,6 @@ class _RegistrationStepperScreenState
         }),
       ),
     );
-  }
-
-  String _getStepLabel(int index) {
-    switch (index) {
-      case 0:
-        return AppLocalizations.of(context).translate('personal-info');
-      case 1:
-        return AppLocalizations.of(context).translate('preferences');
-      case 2:
-        return AppLocalizations.of(context).translate('recovery');
-      case 3:
-        return AppLocalizations.of(context).translate('verification');
-      case 4:
-        return AppLocalizations.of(context).translate('complete');
-      default:
-        return '';
-    }
   }
 
   Widget _buildCurrentStepContent() {
@@ -430,6 +436,8 @@ class _RegistrationStepperScreenState
       case 3:
         return _buildEmailVerificationContent();
       case 4:
+        return _buildReferralCodeContent();
+      case 5:
         return _buildCompletionContent();
       default:
         return Container();
@@ -492,8 +500,12 @@ class _RegistrationStepperScreenState
                     )
                   : Text(
                       _currentStep == 4
-                          ? AppLocalizations.of(context).translate('finish')
-                          : AppLocalizations.of(context).translate('continue'),
+                          ? AppLocalizations.of(context)
+                              .translate('referral.input.skip')
+                          : _currentStep == 5
+                              ? AppLocalizations.of(context).translate('finish')
+                              : AppLocalizations.of(context)
+                                  .translate('continue'),
                       style:
                           TextStyles.footnote.copyWith(color: theme.grey[50]),
                     ),
@@ -846,6 +858,64 @@ class _RegistrationStepperScreenState
               ),
             ),
           ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildReferralCodeContent() {
+    final theme = AppTheme.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Icon
+        Center(
+          child: Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              color: theme.primary[50],
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.card_giftcard_rounded,
+              size: 40,
+              color: theme.primary[600],
+            ),
+          ),
+        ),
+        verticalSpace(Spacing.points24),
+
+        // Title
+        Text(
+          AppLocalizations.of(context).translate('referral.input.title'),
+          style: TextStyles.h6.copyWith(
+            color: theme.grey[900],
+            fontWeight: FontWeight.w600,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        verticalSpace(Spacing.points12),
+
+        // Subtitle
+        Text(
+          AppLocalizations.of(context).translate('referral.input.subtitle'),
+          style: TextStyles.footnote.copyWith(
+            color: theme.grey[600],
+            height: 1.5,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        verticalSpace(Spacing.points32),
+
+        // Referral code input widget
+        ReferralCodeInputWidget(
+          onSuccess: () {
+            // Move to next step on success
+            if (mounted) setState(() => _currentStep++);
+          },
+          onSkip: null, // No skip button - use the main "Skip" button instead
         ),
       ],
     );

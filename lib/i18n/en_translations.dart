@@ -2,6 +2,7 @@
 // This file is maintained manually. Keep keys in sync with other language maps.
 
 const Map<String, String> kEn = {
+  "add": "Add",
   "founder": "Founder",
   "daily": "Daily",
   "weekly": "Weekly",
@@ -40,6 +41,26 @@ const Map<String, String> kEn = {
   "update-complete-message":
       "The update has been downloaded successfully. Please restart the app to apply the changes.",
   "restart-app": "Restart App",
+
+  // Full-screen Shorebird update blocking messages
+  "update-required": "Update Required",
+  "updating-app": "Updating App",
+  "update-failed": "Update Failed",
+  "critical-update-message":
+      "A critical update is required to continue using the app. Please download and install the update.",
+  "please-wait-updating": "Please Wait",
+  "restart-required-message":
+      "The update has been installed successfully. The app needs to restart to apply the changes.",
+  "update-error-message": "An error occurred while updating the app.",
+  "blocking-update-message":
+      "This update is required to continue using the app. The update will be downloaded and installed automatically.",
+  "download-update": "Download Update",
+  "download-in-progress-message":
+      "Please do not close the app while the update is being downloaded and installed.",
+  "update-success-restart-message":
+      "Update completed successfully! The app will restart to apply the changes.",
+  "restart-now": "Restart Now",
+  "update-error-generic": "Failed to download the update. Please try again.",
   "welcome": "Welcome!",
   "welcome-back": "Welcome Back",
   "dashboard-subtitle": "Your recovery journey at a glance",
@@ -151,6 +172,7 @@ const Map<String, String> kEn = {
   "title": "Title",
   "body": "Body",
   "delete": "Delete",
+  "create": "Create",
   "save": "Save",
   "changes-has-been-saved": "Changes has been saved",
   "disable_commenting": "Disable Comments",
@@ -172,6 +194,26 @@ const Map<String, String> kEn = {
   "remove-activity": "Remove Activity",
   "taaafi-groups": "Ta'aafi Groups",
   "group": "Group",
+  "group-updates": "Group Updates",
+  "group-details": "Group Details",
+  "description": "Description",
+  "members": "members",
+  "visibility": "Visibility",
+  "join-method": "Join Method",
+  "preferred-language": "Preferred Language",
+  "gender-restriction": "Gender Restriction",
+  "male-only": "Male Only",
+  "female-only": "Female Only",
+  "mixed-gender": "Mixed Gender",
+  "public": "Public",
+  "private": "Private",
+  "anyone-can-join": "Anyone Can Join",
+  "admin-approval-required": "Admin Approval Required",
+  "join-code-required": "Join Code Required",
+  "created": "Created",
+  "group-join-disclaimer":
+      "By joining, you agree to follow group guidelines and community standards.",
+  "join-group": "Join Group",
   "not-alone": "You Are Not Alone",
   "not-alone-description":
       "Learn about different experiences and share your own with a group of recovering individuals to exchange knowledge and discover challenges in the recovery journey.",
@@ -208,6 +250,7 @@ const Map<String, String> kEn = {
   "view-progress": "View Progress",
   "view-all": "View All",
   "view-journey": "View Journey",
+  "open": "Open",
   "relapse-free": "Relapse Free",
   "porn-free": "Porn Free",
   "clean-days": "Clean Days",
@@ -279,6 +322,74 @@ const Map<String, String> kEn = {
   "group-detail": "Group Detail",
   "group-chat": "Group Chat",
   "group-challenge": "Group Challenge",
+
+  // Direct Messaging (DMs)
+  "community-chats": "Chats",
+  "start-conversation": "Message",
+  "open-conversation": "Open chat",
+  "conversation-muted": "Muted",
+  "you-blocked-this-user": "You blocked this user",
+  "user-has-blocked-you": "This user has blocked you",
+  "cannot-message-user-blocked": "You can't send messages to this user",
+  "direct-messaging-restricted": "Direct messaging is restricted",
+  "message-sent": "Message sent",
+  "new-message": "New message",
+  "no-conversations": "No conversations yet",
+  "no-conversations-description":
+      "Start a conversation by messaging someone from the community",
+  "block-user": "Block User",
+  "unblock-user": "Unblock User",
+  "block-user-confirmation": "Are you sure you want to block this user?",
+  "unblock-user-confirmation": "Are you sure you want to unblock this user?",
+  "user-blocked-successfully": "User blocked successfully",
+  "user-unblocked-successfully": "User unblocked successfully",
+  "error-blocking-user": "Error blocking user",
+  "error-unblocking-user": "Error unblocking user",
+  "error-checking-block-status": "Error checking block status",
+  "user-not-accepting-messages": "This user is not accepting messages",
+  "error-checking-messaging-preferences":
+      "Error checking messaging preferences",
+  "privacy-settings": "Privacy Settings",
+  "allow-direct-messages": "Allow direct messages",
+  "allow-direct-messages-description":
+      "Allow other users to send you private messages",
+  "report": "Report",
+  "submit-report": "Submit Report",
+  "report-user": "Report User",
+  "report-user-confirmation": "Do you want to report this user to moderators?",
+  "user-reported-successfully": "User reported successfully",
+  "error-reporting-user": "Error reporting user",
+  "report-message": "Report Message",
+  "report-message-confirmation":
+      "Do you want to report this message to moderators?",
+  "report-inappropriate-message": "Report inappropriate message",
+  "message-reported-successfully": "Message reported successfully",
+  "error-reporting-message": "Error reporting message",
+  "delete-conversation": "Delete Conversation",
+  "delete-conversation-confirmation":
+      "Are you sure you want to delete this conversation?",
+  "conversation-deleted": "Conversation deleted",
+  "error-deleting-conversation": "Error deleting conversation",
+  "direct-messaging-completely-restricted":
+      "You are restricted from using direct messaging",
+  "start-conversation-restricted":
+      "You are restricted from starting new conversations",
+  "send-message-restricted": "You are restricted from sending messages",
+  "feature-restricted": "This feature is currently restricted for your account",
+  "error-checking-permissions": "Error checking permissions",
+  "reason": "Reason",
+  "message-under-review":
+      "This message is under review due to a suspicious rule violation",
+  "message-under-review-short": "Under review",
+  "update-under-review":
+      "This update is under review and will be visible once approved",
+  "mute-conversation": "Mute",
+  "unmute-conversation": "Unmute",
+  "conversation-muted-success": "Conversation muted",
+  "conversation-unmuted-success": "Conversation unmuted",
+  "send-message": "Send message",
+  "type-message": "Type a message...",
+
   "community-profile": "Community Profile",
   "search-groups": "Search groups",
   "community-recent": "Recent",
@@ -287,7 +398,7 @@ const Map<String, String> kEn = {
   "community-general": "General",
   "community-questions": "Questions",
   "community-tips": "Tips",
-  "community-support": "Support",
+  "community-support": "Community Support",
   "community-discussions": "Discussions",
   "community-all": "All",
   "community-likes": "likes",
@@ -433,8 +544,11 @@ const Map<String, String> kEn = {
   "report_justification_too_long":
       "Report reason is too long (max 500 characters)",
   "submit_report": "Submit Report",
-  "post": "post",
+  "post": "Post",
+  "loading-group-members": "Loading group members...",
   "comment": "comment",
+  "poll-voted": "Voted",
+  "of": "of",
   "report_content_type": "Content Type",
   "report_content_id": "Content ID",
   "report_content_preview": "Content Preview",
@@ -442,6 +556,12 @@ const Map<String, String> kEn = {
   "character_count": "{current}/{max} characters",
   "report_post_submitted": "Post report submitted successfully",
   "report_comment_submitted": "Comment report submitted successfully",
+  "group_update": "Group Update",
+  "report-update": "Report Update",
+  "report_group_update_submitted": "Group update report submitted successfully",
+  "task-completed-in-challenge":
+      "Just completed \"{taskName}\" in {challengeName}! 🎯",
+  "points-earned": "+{points} points",
   "send": "Send",
   "community-anonymous": "Anonymous",
   "community-deleted-user": "Deleted",
@@ -466,6 +586,11 @@ const Map<String, String> kEn = {
   "community-profile-update-failed": "Failed to update profile",
   "community-profile-not-found": "Community profile not found",
   "community-profile-error": "Error loading profile",
+  "group-activity": "Group Activity",
+  "current-group-member": "Current group member",
+  "no-longer-group-member": "No longer a group member",
+  "messages-in-group": "Messages in this group",
+  "error-loading-group-info": "Error loading group information",
   "community-no-posts": "No posts yet",
   "community-no-comments": "No comments yet",
   "community-no-likes": "No likes yet",
@@ -575,9 +700,74 @@ const Map<String, String> kEn = {
   "community-profile-visible-message": "Others can see your name and profile",
   "anyone_can_reply": "Anyone can reply",
   "post_created": "Post created successfully!",
-  "photo_coming_soon": "Photo attachment coming soon",
-  "video_coming_soon": "Video attachment coming soon",
-  "poll_coming_soon": "Poll creation coming soon",
+
+  // Attachments - Composer and errors
+  "new-attachment": "New Attachment",
+  "attachments-plus-only": "Attachments are available for Plus users only",
+  "attachments-type-already-selected":
+      "One attachment type is already selected",
+  "attachments-limit-reached": "Attachment limit reached",
+  "image-format-not-allowed":
+      "Image format not supported. Please use JPEG or PNG",
+  "image-too-large": "Image is too large. Maximum size is 5MB",
+  "image-processing-failed": "Failed to process image",
+  "attachment-creation-failed": "Failed to create attachment",
+
+  // Poll
+  "poll-create": "Create Poll",
+  "poll-question": "Poll Question",
+  "poll-question-hint": "Ask your question...",
+  "poll-option": "Option",
+  "poll-add-option": "Add Option",
+  "poll-options": "Poll Options",
+  "poll-single-select": "Single Choice",
+  "poll-multi-select": "Allow multiple selections",
+  "poll-close-at": "Close Poll At",
+  "poll-closed": "Poll Closed",
+  "poll-vote": "Vote",
+  "poll-change-vote": "Change Vote",
+  "poll-results-hidden-until-vote": "Vote to see results",
+  "poll-results-hidden-until-close": "Results will be shown when poll closes",
+
+  // Group invite
+  "group-invite": "Group Invite",
+  "group-invite-select": "Select Group to Invite",
+  "group-invite-expired": "Invite has expired",
+  "group-invite-revoked": "Invite has been revoked",
+  "group-invite-join": "Join Group",
+  "group-invite-plus-only": "This is a Plus-only group",
+  "group-invite-member-left": "Inviter is no longer a member",
+  "poll-edit": "Edit Poll",
+  "poll-options-preview": "Options",
+  "tap-to-edit-poll": "Tap to edit",
+  "more-options": "more options",
+  "images": "Images",
+  "images-selected": "images selected",
+  "image-selected": "image selected",
+  "image-preview": "Preview",
+  "tap-to-change-images": "Tap to change",
+  "invite-to-join-group": "Invite members to join this group",
+  "instant-join": "Instant join",
+  "requires-approval": "Requires approval",
+  "tap-to-change-group": "Tap to change",
+
+  // Join rejections
+  "join-blocked-gender": "This group is for a different gender",
+  "join-blocked-capacity": "This group is at full capacity",
+  "join-blocked-cooldown": "You must wait before joining another group",
+  "join-blocked-plus-only": "This group requires a Plus subscription",
+
+  // Moderation placeholder
+  "attachment-removed": "Attachment removed by moderator",
+
+  // Upsell
+  "plus-features-attachments":
+      "Add images, polls, and group invites to your posts",
+
+  // Generic
+  "finalizing-attachments": "Finalizing attachments...",
+  "attachments-failed-retry": "Failed to attach. Tap to retry",
+
   "link_coming_soon": "Link attachment coming soon",
   "post_title": "Title",
   "select_category": "Select Category",
@@ -648,8 +838,6 @@ const Map<String, String> kEn = {
   "logout-error": "Failed to logout. Please try again.",
   "warning-details": "Warning Details",
   "ban-details": "Ban Details",
-  "reason": "Reason",
-  "description": "Description",
   "warning-information": "Warning Information",
   "ban-information": "Ban Information",
   "warning-type": "Warning Type",
@@ -824,7 +1012,7 @@ const Map<String, String> kEn = {
   "about-app": "About App",
   "about-ta3afi":
       "An app to raise awareness about the dangers of pornography and addiction to it by providing content and tools to help solve the problem.",
-  "version-number": "Version 5.3.1 (1)",
+  "version-number": "Version 5.5.0",
   "what-is-all-of-those": "What's the difference between these numbers?",
   "app-loading": "Initializing...",
   "processing": "Processing...",
@@ -909,6 +1097,7 @@ const Map<String, String> kEn = {
   "personal-info": "Personal Info",
   "recovery": "Recovery",
   "verification": "Verification",
+  "referral": "Referral",
   "complete": "Complete",
 
   // Account creation
@@ -1072,7 +1261,7 @@ const Map<String, String> kEn = {
   "female": "Female",
   "date-of-birth": "Date of Birth",
   "gender": "Gender",
-  "preferred-language": "Preferred Language",
+
   "activate": "Activate",
   "data-are-secured": "We keep your information secure and private.",
   "no-follow-ups": "No Follow Up for this day",
@@ -1160,7 +1349,6 @@ const Map<String, String> kEn = {
   "delete-follow-up": "Delete Follow up",
   "edit-emotion": "Edit Emotion",
   "no-tasks-for-date": "No tasks for this date",
-  "no-tasks-today": "No tasks for today",
   "no-ongoing-activities": "No ongoing activities",
   "activities-notifications-settings": "Activity Reminders",
   "allow-notifications": "Allow Notifications",
@@ -1259,6 +1447,7 @@ const Map<String, String> kEn = {
   "scheduled-for": "Scheduled for",
   "mark-as-complete": "Mark as Complete",
   "task-completed": "Task Completed",
+  "error-completing-task": "Failed to complete task",
   "mark-as-incomplete": "Mark as Incomplete",
   "community-coming-soon": "Ta'aafi Community Coming Soon!",
   "community-coming-soon-description":
@@ -1404,7 +1593,6 @@ const Map<String, String> kEn = {
   "report-data-error": "Report data error",
   "report-data-error-description":
       "After the update some of the data might be lost, if you feel that is the case with your numbers, create a report and we will review it.",
-  "submit-report": "Submit Report",
   "check-your-inquiry": "Check Your Inquiry",
   "user-justification": "User Justification",
   "user-justification-placeholder":
@@ -1433,9 +1621,7 @@ const Map<String, String> kEn = {
   "view-report": "View Report",
   "add-message": "Add Message",
   "type-your-message": "Type your message here...",
-  "send-message": "Send Message",
   "cannot-send-message": "Cannot send new messages to this report",
-  "message-sent": "Message sent",
   "admin": "Admin",
   "you": "You",
   "report-conversation": "Report Conversation",
@@ -1479,6 +1665,9 @@ const Map<String, String> kEn = {
   "recovery-follow-up-question":
       "When do you want to start tracking your recovery? We will start counting from the date you choose",
   "notifications": "Notifications",
+  "chat": "Chat",
+  "privacy": "Privacy",
+  "leave": "Leave",
   "clear-all": "Clear All",
   "no-notifications": "No Notifications",
   "no-notifications-description": "You'll see updates about your reports here",
@@ -1515,6 +1704,8 @@ const Map<String, String> kEn = {
   "no-profile-data": "No profile data available",
   "profile-details": "Profile Details",
   "warnings": "Warnings",
+  "you-have-warning": "You have 1 active warning",
+  "you-have-warnings": "You have {count} active warnings",
   "bans": "Bans",
   "age": "Age",
   "member-since": "Member Since",
@@ -1617,6 +1808,209 @@ const Map<String, String> kEn = {
   "community-profile-settings": "Community Profile",
   "groups-feature-4": "Track group achievements and milestones",
   "groups-feature-5": "Private and secure group interactions",
+
+  // Groups screen translations
+  "groups-feature-title": "Groups Feature",
+  "groups-feature-description":
+      "Connect with a supportive community of people on a shared recovery journey. Share experiences and get support in a safe and respectful environment.",
+  "shared-updates": "Updates",
+  "shared-challenges": "Challenges",
+  "error-no-group-membership": "Error: No group membership found",
+  "error": "Error",
+  "connection-error": "Unable to verify account status",
+  "connection-error-subtitle": "Please check your connection and try again.",
+
+  // Coming soon section
+  "join-exciting-challenges":
+      "Join exciting challenges with community support.",
+  "share-updates-with-members": "Share your updates with other group members.",
+  "whats-coming": "What's Coming:",
+  "daily-goals": "Daily Goals",
+  "achievements-rewards": "Achievements & Rewards",
+  "progress-sharing": "Progress Sharing",
+  "milestone-updates": "Milestone Updates",
+  "encouragement-posts": "Encouragement Posts",
+
+  // Groups main screen
+  "groups-main-title": "Ta'aafi Groups",
+  "groups-main-feature-1-title": "You're not alone",
+  "groups-main-feature-1-desc":
+      "Get to know different experiences and share your experience with a group of recovering people to exchange experiences and discover challenges in the recovery journey",
+  "groups-main-feature-2-title": "Privacy first!",
+  "groups-main-feature-2-desc":
+      "You can share your recovery journey and the challenges you face in complete secrecy without showing your identity",
+  "groups-main-feature-3-title": "Challenge your colleagues",
+  "groups-main-feature-3-desc":
+      "Challenge your colleagues in the recovery journey to achieve advanced stages in the recovery journey",
+  "groups-main-feature-4-title": "Follow your colleagues' updates",
+  "groups-main-feature-4-desc":
+      "Follow updates from your colleagues in the group and help them and benefit from their experiences in recovery",
+  "groups-main-join-button": "Join a Group",
+  "groups-main-create-button": "Create Group",
+  "groups-need-profile-message":
+      "You need to set up your community profile first to join or create groups",
+  "groups-already-in-group-button": "Already in Group",
+  "groups-already-in-group-message":
+      "You are already a member of a group. You can only be in one group at a time",
+
+  // Join Group Modal
+  "join-group-title": "Join Group",
+  "hide-identity-description":
+      "Enable this option to hide your basic information (name and gender) from members in the group, then display your number for members of the group only",
+  "join-specific-group": "Join Specific Group",
+  "enter-group-code": "Enter group code",
+  "group-code-required": "Group code is required",
+  "join-button": "Join",
+  "join-randomly": "Join Randomly",
+  "join-randomly-description":
+      "This private feature allows you to search for a group that contains complex feelings. The search will be for feelings that match yours",
+  "find-group-button": "Find Group",
+
+  // Create Group Modal
+  "create-group-title": "Create Group",
+  "group-name": "Group Name",
+  "enter-group-name": "Enter group name",
+  "group-name-required": "Group name is required",
+  "member-count": "Member Count",
+  "enter-member-count": "Enter member count",
+  "member-count-required": "Member count is required",
+  "member-count-invalid": "Member count must be between 2 and 50",
+  "group-type": "Group Type",
+  "group-type-public": "Public",
+  "group-type-private": "Private",
+  "group-type-public-description":
+      "In a public group, it is possible for members to find and join this group randomly. You can also invite members to join through the group code",
+  "group-type-private-description":
+      "In a private group, only those invited can join this group through invitation",
+  "group-joining-methods": "Group Joining Methods",
+  "select-joining-method": "Select joining method",
+  "joining-method-any": "Any",
+  "joining-method-any-description":
+      "People can join randomly, by admin invitation, or by group code",
+  "joining-method-admin-only": "Admin Invitation Only",
+  "joining-method-admin-only-description":
+      "Only people invited by the admin can join this group",
+  "joining-method-code-only": "Group Code Only",
+  "joining-method-code-only-description":
+      "Only people with the group code can join this group",
+  "confirm-selection": "Confirm Selection",
+  "create-group-button": "Create Group",
+
+  // Group Invitations
+  "group-invitations-title": "Group Invitations",
+  "invitations-count": "You have {count} pending invitations",
+  "you-have-invitations":
+      "You have {count} group invitation(s) waiting for your response",
+  "invited-by": "Invited by {inviter}",
+  "member-count-text": "{count} members",
+  "accept-invitation": "Accept",
+  "decline-invitation": "Decline",
+  "view-invitations": "View Invitations",
+  "join-other-group": "Join Other Group",
+  "group-joined-successfully": "Successfully joined the group!",
+  "group-members-count": "{count} connected now",
+  "group-recent-updates": "Recent Updates",
+  "group-challenges": "Challenges",
+  "group-leaderboard": "Leaderboard",
+  "group-settings": "Group Settings",
+  "notification-settings": "Notification Settings",
+  "member-settings": "Member Settings",
+
+  // Group Capacity Settings
+  "admin-settings": "Admin Settings",
+  "group-capacity": "Group Capacity",
+  "current-capacity": "Current Capacity",
+  "current-members": "Current Members",
+  "members-remaining": "Members Remaining",
+  "update-capacity": "Update Capacity",
+  "capacity-updated-successfully": "Group capacity updated successfully",
+  "error-capacity-below-member-count":
+      "Cannot set capacity below current member count",
+  "error-invalid-capacity-range": "Capacity must be between 2 and 50",
+  "error-plus-required-for-capacity":
+      "Plus membership required for groups with more than 6 members",
+  "upgrade-to-plus-for-capacity":
+      "Upgrade to Plus to increase capacity beyond 6 members",
+  "plus-feature-active": "Plus feature active - capacity up to 50 members",
+  "subscription-cancelled-capacity-locked":
+      "Your Plus subscription has been cancelled. You can maintain or decrease capacity, but cannot increase it beyond the current limit.",
+  "manage-group-settings": "Manage group name, description, and capacity",
+  "new-capacity": "New Capacity",
+  "capacity-warning":
+      "You cannot reduce capacity below the current number of members ({count})",
+  "confirm-capacity-change":
+      "Are you sure you want to change the capacity to {capacity}?",
+
+  // Edit Group Details
+  "edit-group-details": "Edit Group Details",
+  "group-name-label": "Group Name",
+  "group-description-label": "Group Description",
+  "name-and-description": "Name and Description",
+  "name-too-long": "Group name must be 60 characters or less",
+  "description-too-long": "Description must be 500 characters or less",
+  "no-changes-made": "No changes were made",
+  "details-updated-successfully": "Group details updated successfully",
+  "characters-remaining": "{count} characters remaining",
+  "save-changes": "Save Changes",
+  "confirm-save-changes": "Are you sure you want to save these changes?",
+  "discard-changes": "Discard Changes",
+  "unsaved-changes-warning":
+      "You have unsaved changes. Are you sure you want to leave?",
+  "error-no-changes-provided": "No changes provided",
+  "error-admin-permission-required": "Admin permission required",
+  "error-group-name-required": "Group name is required",
+  "error-invalid-group-name": "Invalid group name",
+  "error-invalid-description-length": "Description is too long",
+  "error-loading-data": "Error loading data",
+  "chat-settings": "Chat Settings",
+  "leave-group": "Leave Group",
+  "leave-group-confirm-title": "Leave Group",
+  "leave-group-confirm-message":
+      "Are you sure you want to leave this group? You won't be able to access the chats and updates after leaving.",
+
+  // Notification Settings
+  "enable-notifications": "Enable Notifications",
+  "message-notifications": "Message Notifications",
+  "update-notifications": "Update Notifications",
+  "challenge-reminders": "Challenge Reminders",
+
+  // Member Settings
+  "supervisor": "Supervisor",
+  "member": "Member",
+  "join-date": "Join Date",
+  "change-to-member": "Change to Member",
+  "change-to-supervisor": "Change to Supervisor",
+  "remove-from-group": "Remove from Group",
+  "remove-member-confirm-title": "Remove Member",
+  "remove-member-confirm-message":
+      "Are you sure you want to remove {name} from the group?",
+  "remove": "Remove",
+
+  // Privacy Settings
+  "show-identity-description":
+      "Enable this option to make your basic information (name and gender) visible to group members, and disable the option to stay anonymous",
+  "make-messages-public": "Make Messages Public/Private",
+  "make-messages-public-description":
+      "When you make the message public, anyone can join our address",
+
+  // Chat Settings
+  "chat-settings-coming-soon-desc": "Chat settings will be available soon",
+
+  // Leave Group Modal
+  "leave-group-warning-messages":
+      "Messages you've shared will be deleted from the group chat when you leave.",
+  "leave-group-warning-challenges":
+      "You will be removed from all challenges you participated in the group",
+  "leave-group-warning-updates":
+      "All updates you shared in the group will be removed",
+  "leave-group-warning-privacy":
+      "Privacy settings will be reset. If you join another group, you'll need to update your privacy settings",
+  "leave-group-24hour-restriction":
+      "You won't be able to join any group for 24 hours after leaving",
+
+  "points": "points",
+  "coming-soon": "Coming soon",
+
   "default-image": "Default Image",
   "use-account-profile-image": "Use your account profile image",
   "use-anonymous-avatar": "Use anonymous avatar instead",
@@ -1643,6 +2037,12 @@ const Map<String, String> kEn = {
   "unsaved_changes_message":
       "You have unsaved changes. Are you sure you want to leave?",
   "discard": "Discard",
+  "stay": "Stay",
+  "unsaved-message": "Unsaved Message",
+  "unsaved-message-warning":
+      "You have an unsaved message. Are you sure you want to leave?",
+  "word": "word",
+  "words": "words",
   "error_loading_categories": "Error loading categories",
 
   // Post validation translations
@@ -1707,6 +2107,34 @@ const Map<String, String> kEn = {
   'thumbs_up': 'Thumbs Up',
   'thumbs_down': 'Thumbs Down',
   'interaction_failed': 'Interaction failed',
+
+  // Guard/Focus feature
+  'guard': 'Guard',
+  'focus_score': 'Focus Score',
+  'screen_time_today': 'Screen Time Today',
+  'total_screen_time': 'Total screen time',
+  'focus_breaks': 'Focus breaks',
+  'pickups': 'Pickups',
+  'top_apps': 'Top Apps',
+  'most_used': 'Most Used',
+  'time_offline': 'Time Offline',
+  'of_your_day': 'of your day',
+  'block_now': 'Block Now',
+  'live': 'LIVE',
+  'refresh_now': 'Refresh now',
+  'no_app_usage_data': 'No app usage data yet',
+  'start_monitoring_to_see_results': 'Start monitoring to see results',
+  'select_apps_and_sites': 'Select apps & sites',
+  'start_monitoring': 'Start monitoring',
+  'hourly_monitoring_started': 'Hourly monitoring started',
+  'usage_access_required': 'Usage Access is required to compute Focus Score',
+  'focus_controls': 'Focus Controls',
+  'choose_apps_to_monitor': 'Choose apps to monitor',
+  'begin_usage_tracking': 'Begin usage tracking',
+
+  'last_7_days': 'Last 7 Days',
+
+  'error_loading_data': 'Error loading data',
   'invalid_interaction_value': 'Invalid interaction value',
 
   'community_posts': 'Posts',
@@ -1774,8 +2202,20 @@ const Map<String, String> kEn = {
       "Your ability to create posts has been restricted",
   "comment-creation-restricted":
       "Your ability to add comments has been restricted",
+  "group-joining-restricted":
+      "Your ability to join or create groups has been restricted",
   "community-interaction-restricted":
       "Your ability to interact with content has been restricted",
+
+  // Feature names for restricted features display
+  "share_a_media": "Share Media",
+  "create_a_poll": "Create Polls",
+  "create_or_join_a_group": "Create or Join Groups",
+
+  // Feature restriction messages for snackbar
+  "media-sharing-restricted": "Your ability to share media has been restricted",
+  "poll-creation-restricted":
+      "Your ability to create polls has been restricted",
   "post_creation_banned": "You are {type} banned from creating posts",
   "comment_creation_banned": "You are {type} banned from adding comments",
   "interaction_banned": "You are {type} banned from interacting with content",
@@ -1796,7 +2236,6 @@ const Map<String, String> kEn = {
   "subscription-support": "Support",
   "subscription-community": "Community",
   "subscription-analytics": "Analytics",
-  "member": "Member",
   "no_search_results": "No results found",
   "subscription-status": "Subscription Status",
 
@@ -1889,6 +2328,18 @@ const Map<String, String> kEn = {
   "expires": "Expires",
   "features-active": "features active",
 
+  // Leaderboard
+  "leaderboard": "Leaderboard",
+  "show-left-users": "Show users who left",
+  "hide-left-users": "Hide users who left",
+  "left": "Left",
+  "no-active-participants": "No active participants yet",
+  "my_tasks": "My Tasks",
+  "your-tasks-today": "🔥 Your Tasks for today",
+  "hours-left": "hours left",
+  "minutes-left": "minutes left",
+  "task-expired": "Task expired",
+  "no-tasks-today": "No tasks for today! Take a break or check back tomorrow.",
   // Smart Alerts Plus Feature
   "smart-alerts-plus-required-title": "Ta'aafi Plus Required",
   "smart-alerts-plus-required-description":
@@ -1900,7 +2351,7 @@ const Map<String, String> kEn = {
       "Smart Alerts is currently in beta. We're actively improving this feature based on user feedback.",
   "notifications-disabled-banner":
       "Enable notifications to receive relapse-prevention tips",
-  "enable-notifications": "Enable Notifications",
+
   "high-risk-hour-description":
       "Get notified 30 minutes before your statistically highest risk hour for relapse",
   "vulnerability-alert-description":
@@ -2050,7 +2501,6 @@ const Map<String, String> kEn = {
   "terms-and-conditions-applied": "Terms and Conditions Applied",
   "start-logging-to-see-data":
       "Start logging your daily follow-ups to see data here",
-  "error-loading-data": "Error loading data",
 
   // Messaging groups
   "notifications-groups": "Notifications Groups",
@@ -2665,6 +3115,35 @@ const Map<String, String> kEn = {
   "no-groups-available": "No groups available",
   "no-groups-description": "Check back later for new notification topics",
   "error-loading-groups": "Failed to load notification groups",
+  "error-loading-group": "Failed to load group",
+  "no-group-found": "No group found",
+  "group-gender": "Group Gender",
+  "total-points": "Total Points",
+  "joined": "Joined",
+  "group-admin": "Admin",
+  "group-member": "Member",
+
+  "error-loading-member": "Failed to load member",
+  "report-inappropriate-behavior": "Report inappropriate behavior",
+  "promote-to-admin": "Promote to Admin",
+  "grant-admin-privileges": "Grant admin privileges",
+  "demote-to-member": "Demote to Member",
+  "remove-admin-privileges": "Remove admin privileges",
+
+  "permanently-remove-member": "Permanently remove this member",
+  "group-members": "Group Members",
+  "no-members-found": "No members found",
+  "error-loading-members": "Failed to load group members",
+  "not-in-group": "You are not in a group",
+  "cannot-demote-group-creator": "Cannot demote the group creator",
+  "cannot-remove-group-creator": "Cannot remove the group creator",
+  "member-promoted-successfully": "Member promoted to admin successfully",
+  "failed-to-promote-member": "Failed to promote member to admin",
+  "member-demoted-successfully": "Member demoted to member successfully",
+  "failed-to-demote-member": "Failed to demote member",
+  "member-removed-successfully": "Member removed from group successfully",
+  "failed-to-remove-member": "Failed to remove member from group",
+  "inappropriate-behavior-in-group": "Inappropriate behavior in group",
   "refresh-groups": "Refresh",
   "subscription-successful": "Successfully subscribed to group",
   "subscription-failed": "Failed to subscribe to group",
@@ -2672,7 +3151,6 @@ const Map<String, String> kEn = {
   "unsubscription-failed": "Failed to unsubscribe from group",
   "cannot-unsubscribe-all-users": "Cannot unsubscribe from default user group",
   "plus-feature-badge": "Plus Feature",
-  "member-count": "member",
   "members-count": "members",
   "default-group": "Default Group",
   "subscribed-to-group": "Subscribed",
@@ -2749,11 +3227,10 @@ const Map<String, String> kEn = {
   "total-comments": "Total Comments",
   "total-interactions": "Total Interactions",
   "interactions-received": "Interactions Received",
-  "report-user": "Report User",
+
   "report-user-subtitle": "Report inappropriate behavior",
   "report-user-placeholder": "Describe the issue you'd like to report...",
   "user-reported": "User reported successfully",
-  "error-reporting-user": "Error reporting user",
   "profile-actions": "Profile Actions",
   "error_loading_stats": "Error loading statistics",
   "cannot-restore-multiple-profiles":
@@ -2790,6 +3267,22 @@ const Map<String, String> kEn = {
   "subscription-active-title": "Active Subscription",
   "subscription-active-message":
       "You have an active Ta3afi+ subscription. Please cancel your subscription first before deleting your account. You can cancel your subscription in the App Store.",
+  "subscription-active-warning": "Active Subscription Detected",
+  "subscription-active-warning-desc":
+      "You have an active Ta3afi+ subscription. Please cancel your subscription in the App Store before deleting your account.",
+
+  // Retention offer (delete account screen)
+  "retention-offer-badge": "Special Offer",
+  "retention-offer-title": "Wait! Here's 1 Month Free",
+  "retention-offer-description":
+      "Before you go, we'd love for you to experience Ta3afi+ for free. Get a full month of premium features on us - no strings attached.",
+  "retention-offer-claim-button": "Claim My Free Month",
+  "retention-offer-skip":
+      "I don't want a free month, proceed to delete my account",
+  "retention-offer-reconsider": "Changed your mind? Claim your free month",
+  "retention-reward-claimed": "Your free month has been activated!",
+  "retention-reward-already-claimed": "You've already claimed this offer",
+  "retention-reward-failed": "Failed to claim reward. Please try again.",
 
   // Profile image
   "select-image-source": "Select Image Source",
@@ -2800,4 +3293,890 @@ const Map<String, String> kEn = {
   "profile-image-removed-successfully": "Profile image removed successfully",
   "change-profile-picture": "Change Profile Picture",
   "remove-profile-picture": "Remove Profile Picture",
+
+  // Group Members
+
+  "online": "Online",
+  "offline": "Offline",
+  "last-seen": "Last seen",
+
+  "minutes-ago-plural": "{count} minutes ago",
+  "hours-ago-plural": "{count} hours ago",
+  "days-ago-plural": "{count} days ago",
+  "weeks-ago-plural": "{count} weeks ago",
+  "member-count-plural": "{count} members",
+
+  //Guard
+
+  // Report Message
+  "report-reason": "Why are you reporting this message?",
+  "report-inappropriate-content": "Inappropriate Content",
+  "report-harassment": "Harassment or Bullying",
+  "report-spam": "Spam or Unwanted Content",
+  "report-hate-speech": "Hate Speech",
+  "report-other-reason": "Other Reason",
+  "report-reason-message":
+      "Reporting message for: {reason}\n\nMessage preview: \"{messagePreview}\"",
+  "selected-reason": "Selected Reason",
+  "additional-details": "Additional Details",
+  "reported-message": "Reported Message",
+  "message-report-description":
+      "Please provide additional details about why you're reporting this message. This information helps our moderation team review the content more effectively.",
+  "message-report-placeholder":
+      "Describe why you believe this message violates our community guidelines...",
+  "message-report-note": "Your report will be reviewed by our moderation team",
+  "message-report-submitted": "Message report submitted successfully",
+  "submitting": "Submitting...",
+  "report-submitted": "Report submitted successfully",
+  "confirm-report": "Confirm Report",
+  "confirm-report-message":
+      "Are you sure you want to report this message? This action cannot be undone.",
+  "confirm-submit-report": "Submit Report",
+  "replying-to": "Replying to",
+  "original-message": "Original Message",
+  "deleted-message": "Deleted message",
+
+  // Groups Exploration
+  "already-in-group": "You're already in a group",
+  "leave-current-group-to-explore":
+      "Leave your current group to explore other groups",
+  "search-groups-placeholder": "Search groups by name or tags...",
+  "all-groups": "All Groups",
+  "male-groups": "Male Groups",
+  "female-groups": "Female Groups",
+  "open-join": "Open Join",
+  "code-required": "Code Required",
+  "groups-found": "{count} groups found",
+  "no-groups-found": "No groups found",
+  "try-different-filters": "Try adjusting your search or filters",
+  "sort-groups": "Sort Groups",
+  "newest-first": "Newest First",
+  "oldest-first": "Oldest First",
+  "most-members": "Most Members",
+  "least-members": "Least Members",
+  "most-active": "Most Active",
+  "explore-groups": "Explore Groups",
+  "explore-groups-description":
+      "Browse and discover support groups that match your interests",
+  "explore-groups-button": "Explore Groups",
+  "explore-groups-navigation": "Opening groups exploration...",
+
+//Groups
+  'group-description': 'Group Description',
+  'enter-group-description': 'Enter group description',
+  'joining-method-required': 'Please select a joining method',
+  'group-created-successfully': 'Group created successfully!',
+  'group-creation-failed': 'Failed to create group',
+  'profile-required': 'Community profile required',
+  'already-in-group-error': 'You must leave your current group first',
+  'cooldown-active-error': 'You must wait before joining another group',
+  'cooldown-active-create-error':
+      'You must wait before joining or creating another group',
+  'group-full-error': 'This group is full',
+  'invalid-join-code-error': 'Invalid or expired join code',
+  'gender-mismatch-error': 'Gender requirements not met',
+  'gender-requirements-not-met': 'Gender requirements not met',
+  'group-name-invalid': 'Group name is invalid',
+  'member-count-requires-plus': 'Large group capacity requires Plus membership',
+  'group-not-found-error': 'Group not found',
+  'group-inactive-error': 'This group is no longer active',
+  'user-banned-error': 'You are banned from joining groups',
+  'join-group-failed': 'Failed to join group',
+  'leaving-group': 'Leaving group...',
+  'left-group-successfully': 'Successfully left the group',
+  'leave-group-failed': 'Failed to leave group',
+
+  // Group Card
+  "group-member-count": "members",
+  "group-challenge-count": "challenges",
+  "group-active": "Active",
+  "group-inactive": "Inactive",
+  "mixed": "Mixed",
+  "group-full": "Group Full",
+  "join-with-code": "Join with Code",
+  "just-created": "Just created",
+  "group-months-ago": "{months} months ago",
+  "group-days-ago": "{days} days ago",
+  "group-hours-ago": "{hours} hours ago",
+  "joined-group-successfully": "Successfully joined {groupName}!",
+
+  // Group Join Code Card translations
+  "group-sharing": "Group Sharing",
+  "join-code": "Join Code",
+  "group-id": "Group ID",
+  "anonymous_user": "Anonymous",
+  "enter-join-code": "Enter Join Code",
+  "code-only-admin-desc":
+      "Share this code with others to let them join your group.",
+  "code-only-member-desc":
+      "This group uses join codes. Ask the admin for the code to invite others.",
+  "share-group": "Share Group",
+  "share-as-post": "Share as Community Post",
+  "share-as-post-subtitle": "Share this group with the community",
+  "share-to-social": "Share to Social Media",
+  "share-to-social-subtitle": "Share group invitation with friends",
+  "group-share-message":
+      "Join our support group on Ta'aafi! Use code: {code} to join and start your recovery journey with us.\n\nDownload the app: https://ta3afi.app\nFollow us: @ta3afi",
+  "any-join-desc": "Anyone can join this group using the group ID below.",
+  "admin-only-admin-desc":
+      "This group is invitation-only. You can send invites to let people join.",
+  "admin-only-member-desc":
+      "This group is invitation-only. Only admins can invite new members.",
+  "copied-to-clipboard": "Copied to clipboard!",
+
+  "invitation-feature-coming-soon":
+      "Invitation management features are coming soon.",
+
+  // Group creation success modal
+  "group-created-successfully-title": "Group Created Successfully!",
+  "your-join-code": "Your Join Code",
+  "copy-code": "Copy Code",
+  "join-code-copied": "Join code copied to clipboard!",
+
+  // Group Privacy Settings
+  "user-privacy-settings": "Personal Privacy Settings",
+  "user-privacy-description":
+      "Control how your identity appears to group members",
+  "admin-group-settings": "Group Privacy Settings (Admin)",
+  "admin-group-settings-description":
+      "Manage group visibility and joining methods",
+  "make-group-public": "Make Group Public",
+  "make-group-public-description":
+      "Allow the group to be discoverable by others",
+  "group-join-method": "Group Joining Method",
+  "group-join-method-description": "Choose how people can join this group",
+  "join-method-any": "Anyone Can Join",
+  "join-method-any-description": "Group members and visitors can join directly",
+  "join-method-admin-only": "Admin Invitation Only",
+  "join-method-admin-only-description":
+      "Only admin can send invitations to join",
+  "join-method-code-only": "Join Code Required",
+  "join-method-code-only-description": "Members need a code to join the group",
+  "join-method-any-requires-public":
+      "This option requires the group to be public",
+  "current-join-code": "Current Join Code",
+  "open-join-info":
+      "This group allows open joining. Users can find and join directly from the group exploration screen.",
+  "join-group-with-code": "Join Group with Code",
+  "join-code-placeholder": "Enter 5-character code",
+  "group-weeks-ago": "{weeks} weeks ago",
+
+  // Group Privacy Error Messages
+  "error-group-not-found": "Group not found",
+  "error-group-membership-not-found": "Group membership not found",
+  "error-only-admin-can-update": "Only group admin can update privacy settings",
+  "error-groups-any-must-public":
+      "Groups with \"any\" join method must be public",
+  "error-private-groups-no-any":
+      "Private groups cannot have \"any\" join method",
+  "error-failed-update-privacy": "Failed to update group privacy settings",
+
+  // Join cooldown timer
+  "join-cooldown-active": "Join Cooldown Active",
+  "join-cooldown-description":
+      "You must wait before joining another group after leaving your previous one.",
+  "time-remaining": "Time Remaining",
+  "join-cooldown-info":
+      "You can explore groups and join once the cooldown expires.",
+  "countdown-days-hours-minutes": "{days}d {hours}h {minutes}m",
+  "countdown-day-hours-minutes": "{hours}h {minutes}m",
+  "countdown-hours-minutes-seconds": "{hours}:{minutes}:{seconds}",
+  "countdown-minutes-seconds": "{minutes}:{seconds}",
+  "wait-to-join": "Wait to Join",
+  "unavailable": "Unavailable",
+
+  // Groups cooldown screen
+  "groups-cooldown-title": "Join Cooldown Active",
+  "groups-cooldown-message":
+      "You recently left a group and must wait before joining another one. This helps maintain group stability and prevents abuse.",
+  "what-can-you-do": "What can you do while you wait?",
+  "cooldown-activities":
+      "• Explore available groups\n• Focus on your current journey\n• Use other app features\n• Plan which group to join next",
+
+  // Chat text size settings
+  "chat-text-size": "Message Text Size",
+  "chat-text-size-description":
+      "Choose a comfortable text size for reading messages",
+  "text-size-small": "Small",
+  "text-size-large": "Large",
+  "message-preview": "Message Preview",
+  "sample-message": "This is a sample message to show the selected text size",
+  "sample-sender-name": "Sample Sender",
+
+  // Hidden messages
+  "message-hidden-by-admin": "This message was hidden by a group admin",
+  "message-actions": "Message Actions",
+  "reply-to-message": "Reply to this message",
+  "delete-message": "Delete this message",
+  "unhide-message": "Unhide Message",
+  "unhide-message-description": "Show this message to all group members",
+  "hiding-message": "Hiding message...",
+  "message-hidden-successfully": "Message hidden successfully",
+  "unhiding-message": "Unhiding message...",
+  "message-unhidden-successfully": "Message unhidden successfully",
+  "failed-to-hide-message": "Failed to hide message",
+  "failed-to-unhide-message": "Failed to unhide message",
+
+  // Activity insights (Sprint 2 - Feature 2.1)
+  "activity": "Activity",
+  "activity-insights": "Activity Insights",
+  "member-activity": "Member Activity",
+  "active-members": "Active Members",
+  "inactive-members": "Inactive Members",
+  "last-active": "Last Active",
+  "message-count": "Messages",
+  "engagement-score": "Engagement",
+  "active-now": "Active now",
+  "active-member": "Active member",
+  "active-minutes-ago": "Active {minutes}m ago",
+  "active-hours-ago": "Active {hours}h ago",
+  "active-days-ago": "Active {days}d ago",
+  "active-weeks-ago": "Active {weeks}w ago",
+  "never-active": "Never active",
+  "high-engagement": "High Engagement",
+  "medium-engagement": "Medium Engagement",
+  "low-engagement": "Low Engagement",
+  "most-active-member": "Most Active Member",
+  "average-engagement": "Average Engagement",
+  "inactive-warning": "{count} members haven't been active in 7+ days",
+  "sort-by-activity": "Sort by Activity",
+  "sort-by-engagement": "Sort by Engagement",
+  "show-inactive-only": "Show Inactive Only",
+  "activity-overview": "Activity Overview",
+  "engagement-level": "Engagement Level",
+  "total-messages": "Total Messages",
+
+  // Activity Backfill (Sprint 2 - Backward Compatibility)
+  "new-activity-tracking": "📊 New: Activity Tracking!",
+  "activity-tracking-description":
+      "We've added activity tracking! Load your historical stats and achievements by clicking below.",
+  "load-my-activity": "Load My Activity",
+  "activity-backfill-success":
+      "Activity data loaded successfully! Your stats and achievements are now up to date.",
+  "refresh-activity-data": "Refresh Activity Data",
+  "backfill-historical-activity":
+      "Load your historical messages and achievements",
+  "error-backfill-internal": "Failed to load activity data. Please try again.",
+  "error-not-group-member": "You are not a member of this group.",
+  "error-unauthenticated": "You must be signed in to load activity data.",
+  "error-invalid-request": "Invalid request. Please try again.",
+
+  // Bulk operations (Sprint 2 - Feature 2.2)
+  "bulk-actions": "Bulk Actions",
+  "select-members": "Select Members",
+  "selected-count": "{count} selected",
+  "select-all": "Select All",
+  "deselect-all": "Deselect All",
+  "bulk-promote": "Promote Selected to Admin",
+  "bulk-remove": "Remove Selected Members",
+  "export-selected": "Export Selected",
+  "export-all-members": "Export All Members",
+  "include-inactive-members": "Include Inactive Members",
+  "confirm-bulk-promote": "Promote {count} members to admin?",
+  "confirm-bulk-remove": "Remove {count} members from the group?",
+  "bulk-operation-in-progress": "Processing {current} of {total}...",
+  "bulk-operation-complete": "Operation Complete",
+  "bulk-success-summary": "{successCount} succeeded, {failureCount} failed",
+  "bulk-failures-title": "Failed Operations",
+  "export-members": "Export Members",
+  "export-format": "Export Format",
+  "export-generating": "Generating export...",
+  "export-ready": "Export ready to share",
+  "cannot-bulk-operate-creator":
+      "Cannot perform bulk operations on group creator",
+  "max-bulk-selection": "Maximum 20 members can be selected",
+  "error-loading-activity-data": "Error loading activity data",
+
+  // Pin Messages (Sprint 3 - Feature 3.1)
+  "pinned-messages": "Pinned Messages",
+  "pin-message": "Pin Message",
+  "unpin-message": "Unpin Message",
+  "message-pinned": "Message pinned",
+  "message-unpinned": "Message unpinned",
+  "max-pinned-messages": "Maximum 3 messages can be pinned",
+  "only-admins-can-pin": "Only admins can pin messages",
+  "pinned-by": "Pinned by {name}",
+  "tap-to-view-pinned-message": "Tap to view pinned message",
+  "no-pinned-messages": "No pinned messages",
+  "confirm-unpin-message": "Are you sure you want to unpin this message?",
+  "unpin": "Unpin",
+  "error-pinning-message": "Error pinning message",
+  "error-unpinning-message": "Error unpinning message",
+
+  // Message Reactions
+  "react-to-message": "React to message",
+  "add-reaction": "Add reaction",
+  "error-toggling-reaction": "Failed to react. Please try again.",
+  "reactions": "Reactions",
+  "reacted-with": "reacted with",
+  "and-others": "and {count} others",
+
+  // Search Messages
+  "search-messages": "Search Messages",
+  "search-placeholder": "Search in conversation...",
+  "search-results": "Search Results",
+  "no-results-found": "No messages found",
+  "search-in-progress": "Searching...",
+  "clear-search": "Clear Search",
+  "found-messages": "Found {count} messages",
+
+  // Member Profiles (Sprint 4 - Feature 4.1)
+  "member-profile": "Member Profile",
+  "my-group-profile": "My Group Profile",
+  "profile-completed": "Profile completed",
+  "joined-recently": "Just joined",
+  "no-activity-yet": "No activity yet",
+  "joined-today": "Joined today",
+  "joined-yesterday": "Joined yesterday",
+  "joined-days-ago": "Joined {days} days ago",
+  "joined-months-ago": "Joined {months} months ago",
+  "joined-on-date": "Joined {date}",
+  "edit-group-profile": "Edit Profile",
+  "group-bio": "Group Bio",
+  "interests": "Interests",
+  "achievements": "Achievements",
+  "member-stats": "Member Stats",
+  "member-stats-explained": "Member Stats",
+  "joined-date": "Joined Date",
+  "joined-date-explanation": "When this member joined the group",
+  "messages-sent-explanation":
+      "Total number of messages sent in this group (excluding deleted messages)",
+  "days-active-explanation": "Number of days since joining the group",
+  "engagement-score-explanation":
+      "Activity score based on messages sent and recent activity. Higher score means more active member.",
+  "days-active": "Days Active",
+  "messages-sent": "Messages Sent",
+  "add-bio": "Add a bio to tell others about yourself",
+  "bio-placeholder": "Tell the group about yourself...",
+  "select-interests": "Select your interests",
+  "no-achievements-yet": "No achievements earned yet",
+  "achievement-earned": "Achievement Earned!",
+  "message-member": "Message {name}",
+  "view-full-profile": "View Full Profile",
+  "group-profile-updated": "Profile updated successfully",
+  "joined-group": "Joined {date}",
+  "member-engagement-score": "Engagement Score",
+  "save-profile": "Save Profile",
+  "bio-max-length": "Maximum 200 characters",
+  "bio-char-count": "{count}/200",
+
+  // Achievement Types (matches AchievementType constants with underscores)
+  "not-earned-yet": "Not earned yet",
+  "earned-on": "Earned on {date}",
+  "error-loading-achievements": "Failed to load achievements",
+  "first_message-achievement": "First Message",
+  "first_message-desc": "Sent your first message to the group",
+  "welcome-achievement": "Welcome",
+  "welcome-desc": "Joined the group",
+  "week_warrior-achievement": "Week Warrior",
+  "week_warrior-desc": "Active for 7 days straight",
+  "month_master-achievement": "Month Master",
+  "month_master-desc": "Active for 30 days straight",
+  "helpful-achievement": "Helpful",
+  "helpful-desc": "Received 10+ supportive reactions",
+  "top_contributor-achievement": "Top Contributor",
+  "top_contributor-desc": "Most active member this month",
+
+  // Interest Tags
+  "interest-fitness": "Fitness",
+  "interest-wellness": "Wellness",
+  "interest-faith": "Faith",
+  "interest-study": "Study",
+  "interest-support": "Support",
+  "interest-goals": "Goals",
+  "interest-habits": "Habits",
+  "interest-mindfulness": "Mindfulness",
+  "interest-recovery": "Recovery",
+  "interest-motivation": "Motivation",
+
+  // Mobile UX (Sprint 4 - Feature 4.2)
+  "swipe-to-reply": "Swipe to reply",
+  "swipe-for-actions": "Swipe for actions",
+  "pull-to-refresh": "Pull to refresh",
+  "refreshing": "Refreshing...",
+  "reply-sent": "Reply sent",
+  "quick-reply": "Quick Reply",
+
+  // Challenges (Sprint 5)
+  "challenge": "Challenge",
+  "create-challenge": "Create Challenge",
+  "add-challenge": "Add Challenge",
+  "edit-challenge": "Edit Challenge",
+  "challenge-updated-successfully": "Challenge updated successfully!",
+  "error-updating-challenge": "Failed to update challenge",
+  "challenge-name": "Challenge Name",
+  "challenge-name-hint": "Example: Daily Diary Challenge",
+  "challenge-description-hint": "Optional: Describe the challenge goals",
+  "challenge-end-date": "Challenge End Date",
+  "color": "Color",
+  "task": "Task",
+  "add-task": "Add Task",
+  "task-name-hint": "Example: Write your daily diary",
+  "points-count": "Points Count",
+  "one-time": "One Time",
+  "add-exercise": "Add Exercise",
+  "challenge-created-successfully": "Challenge created successfully!",
+  "error-creating-challenge": "Failed to create challenge",
+  "task-history": "Task History",
+  "view-task-history": "View All",
+  "no-task-history": "No task history yet",
+  "task-missed": "Missed",
+  "task-pending": "Pending",
+  "allow-late-completion": "Allow Late Completion",
+  "allow-late-completion-desc":
+      "Users can complete this task after its deadline",
+  "can-still-complete": "Can Still Complete",
+  "flexible": "Flexible",
+  "strict": "Strict",
+
+  // Challenge List
+  "upcoming": "Upcoming",
+  "completed": "Completed",
+  "no-active-challenges": "No active challenges yet",
+  "no-upcoming-challenges": "No upcoming challenges",
+  "no-completed-challenges": "No completed challenges yet",
+  "error-loading-challenges": "Failed to load challenges",
+  "participant": "Participant",
+  "ending-soon": "Ending Soon",
+  "challenge-not-found": "Challenge not found",
+
+  // Challenge Detail
+  "challenge-stats": "Challenge Statistics",
+  "avg-progress": "Avg Progress",
+  "your-progress": "Your Progress",
+  "no-participants-yet": "No participants yet",
+  "all-participants": "All Participants",
+  "view-tasks-history": "View Tasks History",
+  "pick-color": "Pick a Color",
+  "select-color": "Select color",
+  "select-shade": "Select shade",
+  "tap-to-change-color": "Tap to change color",
+
+  // Challenge Actions
+  "join-challenge": "Join Challenge",
+  "leave-challenge": "Leave Challenge",
+  "update-progress": "Update Progress",
+  "confirm-leave-challenge":
+      "Are you sure you want to leave this challenge? Your progress will be saved.",
+  "challenge-joined": "You've joined the challenge!",
+  "challenge-left": "You've left the challenge",
+  "progress-updated": "Progress updated successfully",
+  "new-value": "New Value",
+  "enter-new-value": "Enter new progress value",
+
+  // Challenge Results/Errors
+  "challenge-full": "This challenge is full",
+  "already-joined": "You've already joined this challenge",
+  "late-join-not-allowed": "Late joining is not allowed for this challenge",
+  "challenge-not-active": "This challenge is not active",
+  "error-loading-leaderboard": "Failed to load leaderboard",
+  "only-admins-create-challenges": "Only group admins can create challenges",
+
+  // Challenge Status
+  "cancelled": "Cancelled",
+  "failed": "Failed",
+
+  // Challenge Validation Messages
+  "title-required": "Title is required",
+  "title-too-long": "Title must be 60 characters or less",
+  "challenge-description-too-long":
+      "Description must be 500 characters or less",
+  "start-date-required": "Start date is required",
+  "end-date-required": "End date is required",
+  "end-date-before-start": "End date must be after start date",
+  "goal-type-required": "Goal type is required",
+  "goal-target-required": "Goal target is required",
+  "goal-target-must-be-positive": "Goal target must be greater than 0",
+
+  // ==================== SPRINT 6: UPDATES FEED ====================
+  'updates': 'Updates',
+  'latest-updates': 'Latest Updates',
+  'updates-feed': 'Updates Feed',
+  'post-update': 'Post Update',
+  'share-update': 'Share Update',
+  'update-types': 'Update Types',
+  'update-type': 'Update Type',
+  'update-type-progress': 'Progress',
+  'update-type-milestone': 'Milestone',
+  'update-type-checkin': 'Check-in',
+  'update-type-general': 'General',
+  'update-type-encouragement': 'Encouragement',
+  'update-type-need_help': 'Need Help',
+  'update-type-need_support': 'Need Support',
+  'update-type-celebration': 'Celebration',
+  'update-type-struggle': 'Struggle',
+  'update-title': 'Title (optional)',
+  'update-content': 'What\'s your update?',
+  'whats-your-update': 'Share what\'s on your mind...',
+  'post-anonymously': 'Post Anonymously',
+  'anonymous-member': 'Anonymous Member',
+  'post-update-button': 'Post Update',
+  'update-posted': 'Update posted!',
+  'no-updates-yet': 'No updates yet',
+  'be-first-to-share': 'Be the first to share your progress!',
+  'error-loading-updates': 'Error loading updates',
+  'use-preset': 'Use Quick Message',
+  'choose-preset': 'Choose a preset',
+  'preset-need-help-title': 'I Need Help',
+  'preset-need-help-content':
+      'I\'m struggling right now and could use some support from the group. Please keep me in your prayers.',
+  'preset-need-support-title': 'Need Support',
+  'preset-need-support-content':
+      'Going through a difficult time and would appreciate your support and encouragement.',
+  'preset-feeling-weak-title': 'Feeling Weak',
+  'preset-feeling-weak-content':
+      'Not feeling my strongest today. Any advice or words of encouragement would help.',
+  'preset-urges-title': 'Fighting Urges',
+  'preset-urges-content':
+      'Dealing with strong urges right now. Please make dua for me.',
+  'preset-doing-well-title': 'Doing Well',
+  'preset-doing-well-content':
+      'Alhamdulillah, things are going well. Staying strong and focused on my goals.',
+  'preset-milestone-title': 'Milestone Reached',
+  'preset-milestone-content':
+      'Alhamdulillah, I reached an important milestone in my journey! Thank you all for your support.',
+  'preset-clean-streak-title': 'Clean Streak',
+  'preset-clean-streak-content':
+      'Alhamdulillah, maintaining my clean streak. One day at a time.',
+  'preset-daily-checkin-title': 'Daily Check-in',
+  'preset-daily-checkin-content':
+      'Checking in for today. Still committed to the journey.',
+  'preset-weekly-checkin-title': 'Weekly Check-in',
+  'preset-weekly-checkin-content':
+      'This week has been... [Share your experience]',
+  'preset-encourage-title': 'Words of Encouragement',
+  'preset-encourage-content-male':
+      'Remember brothers, every day is a new opportunity. Keep going!',
+  'preset-encourage-content-female':
+      'Remember sisters, every day is a new opportunity. Keep going!',
+  'preset-share-tip-title': 'Helpful Tip',
+  'preset-share-tip-content':
+      'Here\'s something that helped me: [Share your tip]',
+  'preset-grateful-title': 'Feeling Grateful',
+  'preset-grateful-content':
+      'Alhamdulillah for this group and all the support. Grateful for each of you.',
+  'preset-victory-title': 'Small Victory',
+  'preset-victory-content':
+      'Celebrated a small victory today! Every step counts.',
+  'update-from-followup': 'Update from Follow-up',
+  'relapse-update-content-male':
+      'I experienced a setback. Please support your brother as I work to move forward.',
+  'relapse-update-content-female':
+      'I experienced a setback. Please support your sister as I work to move forward.',
+  'porn-only-update-content':
+      'I slipped with viewing. Working on getting back on track. Please keep me in your duas.',
+  'mast-only-update-content':
+      'I had a moment of weakness. Recommitting to my goals. Your support means a lot.',
+  'slip-up-update-content':
+      'Had a minor slip-up. Not giving up - just refocusing and moving forward.',
+  'general-update-content': 'Sharing an update with the group.',
+  'invalid-gender-error':
+      'Unable to share update: valid gender required in profile.',
+  'view-all-comments': 'View all {count} comments',
+  'add-comment': 'Add a comment...',
+  'send-comment': 'Send',
+  'comment-added': 'Comment added',
+  'delete-comment-update': 'Delete Comment',
+  'linked-to-challenge': 'Linked to challenge',
+  'just-now-time': 'just now',
+  'minutes-short-time': 'm',
+  'hours-short-time': 'h',
+  'days-short-time': 'd',
+  'view-all-updates': 'View All',
+
+  // Sprint 6: Followup Integration
+  'share-to-group': 'Share to group',
+  'sharing-to': 'Sharing to',
+  'select-group': 'Select Group',
+  'share-anonymously': 'Share anonymously',
+  'create-community-profile-to-share':
+      'Create a community profile to share with groups',
+  'join-group-to-share': 'Join a group to share your updates',
+  'update-preview': 'Preview',
+  'update-preview-will-appear-below': 'Preview will appear below',
+
+  // Update posting messages
+  'please-add-content': 'Please add content or select a preset',
+  'update-posted-successfully': 'Update posted successfully!',
+  'failed-to-post-update': 'Failed to post update',
+  'error-posting-update': 'Error posting update',
+
+  // Update deletion messages
+  'delete-update': 'Delete Update',
+  'delete-update-confirmation':
+      'Are you sure you want to delete this update? This action cannot be undone.',
+  'update-deleted-successfully': 'Update deleted successfully',
+  'error-deleting-update': 'Error deleting update',
+
+  // Challenge Overview Screen
+  'your-current-tasks': 'Your Current Tasks',
+  'remaining': 'Remaining',
+  'and': 'and',
+
+  // Referral Program (Sprint 03)
+  'referral.input.title': 'Do you have a referral code?',
+  'referral.input.subtitle': 'Enter your friend\'s code to unlock rewards',
+  'referral.input.placeholder': 'Enter code',
+  'referral.input.verify': 'Verify Code',
+  'referral.input.skip': 'Skip',
+  'referral.input.invalid': 'Invalid code. Please check and try again.',
+  'referral.input.already_used': 'You\'ve already used a referral code.',
+  'referral.input.own_code': 'You cannot use your own referral code.',
+  'referral.input.success': 'Code verified! Welcome from {referrerName}!',
+  'verifying': 'Verifying...',
+
+  // Referral Dashboard
+  'referral-program': 'Referral Program',
+  'referral.dashboard.title': 'Referral Program',
+  'referral.dashboard.your_code': 'Your Referral Code',
+  'referral.dashboard.code_copied': 'Code copied to clipboard!',
+  'referral.dashboard.share_code': 'Share Code',
+  'referral.dashboard.share_subject': 'Join me on Ta3afi',
+  'referral.dashboard.share_message':
+      'Join me on Ta3afi for recovery support!\n\nUse my code: {code}\nGet 1 month Premium free when you verify your account.\n\nDownload now!',
+
+  // Share Feature
+  'referral.share.sheet_title': 'Share Your Referral Code',
+  'referral.share.sheet_subtitle': 'Choose how you want to share',
+  'referral.share.your_code': 'Your Code:',
+  'referral.share.whatsapp': 'Share via WhatsApp',
+  'referral.share.sms': 'Share via SMS',
+  'referral.share.email': 'Share via Email',
+  'referral.share.copy_link': 'Copy Message',
+  'referral.share.more_options': 'More Options',
+  'referral.share.subject': 'Join me on Ta3afi - Recovery Support',
+  'referral.share.default_user': 'a friend',
+
+  // Share Templates
+  'referral.share.generic_message':
+      '🌟 Join me on Ta3afi!\n\nI\'m using Ta3afi for recovery support and it\'s been amazing. Join me and get 1 month of Premium features free!\n\nUse my code: {code}\n\nLet\'s support each other on this journey! 💪',
+  'referral.share.whatsapp_message':
+      '🌟 Join me on Ta3afi!\n\nI\'m on a recovery journey with Ta3afi and would love your support. Use my code *{code}* to join and get 1 month Premium free! 💪',
+  'referral.share.sms_message':
+      'Join me on Ta3afi for recovery support! Use code: {code} to get 1 month Premium free.',
+  'referral.share.email_subject': 'Join me on Ta3afi - Recovery Support',
+  'referral.share.email_message':
+      'Hi,\n\nI wanted to share something important with you. I\'ve been using Ta3afi for recovery support and it\'s been making a real difference in my life.\n\nI thought you might find it helpful too. When you sign up with my referral code ({code}), you\'ll get 1 month of Premium features completely free.\n\nTa3afi offers:\n• Daily motivation and support\n• Recovery tracking tools\n• A supportive community\n• Helpful resources and guides\n\nUse my code: {code}\n\nLet\'s support each other on this journey!\n\nBest regards',
+  'referral.share.copy_link_message':
+      'Join me on Ta3afi! Use code {code} for 1 month Premium free.',
+
+  // Share Success Messages
+  'referral.share.copied_success': 'Message copied to clipboard!',
+  'referral.share.share_success': 'Shared successfully!',
+  'referral.share.share_failed': 'Failed to share. Please try again.',
+
+  // Stats
+  'referral.dashboard.stats_title': 'Referral Stats',
+  'referral.dashboard.total_referrals': 'Total',
+  'referral.dashboard.verified': 'Verified',
+  'referral.dashboard.paid_conversions': 'Premium',
+  'referral.dashboard.pending': 'Pending',
+
+  // Rewards
+  'referral.dashboard.rewards_title': 'Your Rewards (As Referrer)',
+  'referral.dashboard.months_earned': 'Months Premium (You)',
+  'referral.dashboard.weeks_earned': 'Weeks Premium (You)',
+  'referral.dashboard.no_rewards_yet':
+      'Share your code to earn Premium rewards for yourself!',
+  'referral.dashboard.next_reward': 'Your Next Reward',
+  'referral.dashboard.users_to_next_milestone':
+      '{count} more verified users → YOU get 1 month Premium',
+  'referral.dashboard.users_to_next_milestone_singular':
+      '1 more verified user → YOU get 1 month Premium',
+  'referral.dashboard.redeem_rewards': 'Redeem My Rewards',
+  'referral.dashboard.redeem_title': 'Redeem Coming Soon',
+  'referral.dashboard.redeem_message':
+      'Reward redemption will be available in the next update. Your rewards are safe!',
+
+  // Referral List
+  'referral.dashboard.your_referrals': 'Your Referrals',
+  'referral.dashboard.no_referrals_title': 'No referrals yet',
+  'referral.dashboard.no_referrals_message':
+      'Share your code to start earning rewards!',
+  'referral.dashboard.status_verified': 'Verified',
+  'referral.dashboard.status_pending': 'Pending',
+  'referral.dashboard.status_premium': 'Premium',
+  'referral.dashboard.status_blocked': 'Blocked',
+
+  // How It Works
+  'referral.dashboard.how_it_works': 'How It Works',
+  'referral.how_it_works.title': 'How Referral Program Works',
+  'referral.how_it_works.step1_title': 'Share Your Code',
+  'referral.how_it_works.step1_description':
+      'Share your unique code with friends',
+  'referral.how_it_works.step2_title': 'They Join & Verify',
+  'referral.how_it_works.step2_description':
+      'New users complete simple activities:',
+  'referral.how_it_works.checklist_active_7_days': 'Be active for 7 days',
+  'referral.how_it_works.checklist_forum_posts': 'Post 3 forum posts',
+  'referral.how_it_works.checklist_interactions': 'Interact 5 times',
+  'referral.how_it_works.checklist_group_join':
+      'Join a group & send 3 messages',
+  'referral.how_it_works.checklist_activity': 'Start 1 recovery activity',
+  'referral.how_it_works.step3_title': 'You Earn Rewards',
+  'referral.how_it_works.step3_description': 'Get Premium access for free!',
+  'referral.how_it_works.reward_verified':
+      'Every 2 verified users = 1 month Premium',
+  'referral.how_it_works.reward_paid': 'When they subscribe = +2 weeks bonus',
+  'referral.how_it_works.got_it': 'Got it',
+
+  // Errors and Empty States
+  'referral.dashboard.error_loading': 'Error loading data. Pull to refresh.',
+  'referral.dashboard.no_code_title': 'No Referral Code',
+  'referral.dashboard.no_code_message':
+      'Your referral code hasn\'t been generated yet. Click the button below to create yours!',
+  'referral.dashboard.no_stats': 'No stats available yet',
+  'referral.dashboard.progress_title': 'Detailed Progress',
+  'referral.dashboard.progress_coming_soon':
+      'Detailed progress tracking coming soon in Sprint 08!',
+
+  // Generate Code
+  'referral.dashboard.generate_code': 'Generate My Code',
+  'referral.dashboard.generating_code': 'Generating your referral code...',
+  'referral.dashboard.code_generated': 'Referral code generated successfully!',
+  'referral.dashboard.generation_failed':
+      'Failed to generate code. Please try again.',
+  'referral.dashboard.code_already_exists': 'You already have a referral code.',
+  'referral.dashboard.generation_limit_reached':
+      'You\'ve reached the maximum number of code generation attempts.',
+
+  // Checklist Progress UI
+  'referral.checklist.title': 'Verification Progress',
+  'referral.checklist.my_progress_title': 'My Verification Progress',
+  'referral.checklist.user_progress': 'User Progress',
+  'referral.checklist.not_referred_title': 'Not Part of Referral Program',
+  'referral.checklist.not_referred_message':
+      'You didn\'t sign up using a referral code, so there\'s no verification progress to track.',
+  'referral.checklist.no_referral_data': 'No Referral Data',
+  'referral.checklist.user_not_referred':
+      'This user was not referred through the referral program.',
+  'referral.checklist.viewing_progress':
+      '👀 You\'re viewing someone else\'s progress (read-only)',
+  'referral.checklist.their_tasks': 'Their Tasks',
+  'referral.checklist.read_only': 'Read Only',
+  'referral.checklist.progress': '{completed} of {total} tasks',
+  'referral.checklist.subtitle': 'Complete tasks to unlock Premium!',
+  'referral.checklist.all_complete_message':
+      'Amazing! You\'ve completed all tasks!',
+  'referral.checklist.almost_there': 'You\'re almost there! Keep going!',
+  'referral.checklist.great_progress': 'Great progress! You\'re doing well!',
+  'referral.checklist.keep_going': 'Keep going! You\'re making progress!',
+  'referral.checklist.keep_going_readonly': 'User is making progress',
+  'referral.checklist.great_progress_readonly': 'Good progress so far',
+  'referral.checklist.almost_there_readonly': 'Almost complete',
+  'referral.checklist.all_complete_message_readonly': 'All tasks completed',
+  'referral.checklist.subtitle_readonly': 'Tasks to be completed',
+  'referral.checklist.completed': 'Completed',
+  'referral.checklist.tasks_title': 'Verification Tasks',
+
+  // Checklist Items
+  'referral.checklist.account_age': 'Account Active 7 Days',
+  'referral.checklist.forum_posts': 'Post 3 Forum Posts',
+  'referral.checklist.interactions': '5 Interactions',
+  'referral.checklist.join_group': 'Join a Group',
+  'referral.checklist.group_messages': 'Send 3 Group Messages',
+  'referral.checklist.start_activity': 'Start 1 Recovery Activity',
+
+  // Progress indicators
+  'referral.checklist.in_progress': 'In Progress',
+  'referral.checklist.not_started': 'Not Started',
+  'referral.checklist.posts': 'posts',
+  'referral.checklist.interactions_count': 'interactions',
+  'referral.checklist.messages': 'messages',
+  'referral.checklist.not_joined': 'Not joined yet',
+  'referral.checklist.no_activity': 'No activity started',
+
+  // Time indicators
+  'referral.checklist.days_remaining': '{days} days remaining',
+  'referral.checklist.day_progress': 'Day {current} of {target}',
+  'referral.checklist.completed_days_ago': 'Completed {days} days ago',
+  'referral.checklist.completed_hours_ago': 'Completed {hours} hours ago',
+  'referral.checklist.completed_recently': 'Completed recently',
+
+  // Action buttons
+  'referral.checklist.go_to_forum': 'Go to Forum',
+  'referral.checklist.go_to_groups': 'Explore Groups',
+  'referral.checklist.go_to_group': 'Go to Group',
+  'referral.checklist.start_an_activity': 'Start Activity',
+
+  // Referrer info
+  'referral.checklist.referred_by': 'Referred by {name}',
+  'referral.checklist.help_referrer':
+      'Complete tasks to help them earn rewards!',
+
+  // Celebration
+  'referral.checklist.celebration_title': 'Congratulations! 🎉',
+  'referral.checklist.celebration_message':
+      'You\'re verified! You\'ve unlocked 1 month of Premium access as your reward.',
+  'referral.checklist.premium_reward': '1 Month Premium (Your Reward)',
+  'referral.checklist.explore_premium': 'Explore Your Premium Features',
+  'referral.checklist.referrer_notified':
+      'The friend who referred you has been notified!',
+  'referral.checklist.claim_my_reward': 'Claim My 1-Month Reward',
+  'referral.checklist.claiming_reward': 'Activating your Premium access...',
+  'referral.checklist.reward_claimed': 'Reward Claimed!',
+  'referral.checklist.days_activated':
+      'You now have {days} days of Premium access!',
+  'referral.checklist.claim_failed':
+      'Failed to claim reward. Please try again.',
+
+  // Rewards List
+  'referral.rewards.my_rewards_title': 'My Rewards',
+  'referral.rewards.claim_now': 'Claim',
+  'referral.rewards.status_active': 'Active',
+  'referral.rewards.status_expired': 'Expired',
+  'referral.rewards.status_ready_to_claim': 'Ready to claim!',
+  'referral.rewards.status_locked': 'Locked',
+  'referral.rewards.active_until': 'Active until {date}',
+  'referral.rewards.expired_on': 'Expired on {date}',
+  'referral.rewards.claim_success':
+      '🎉 Success! You now have {days} days of Premium!',
+
+  // Referee Banner (shown in account screen)
+  'referral.banner.reward_ready': '🎁 Your Reward is Ready!',
+  'referral.banner.claim_3_days': 'Claim your 1 month Premium now',
+  'referral.banner.progress_title': 'Verification: {completed}/{total} tasks',
+  'referral.banner.complete_tasks': 'Complete tasks to unlock 1 month Premium',
+
+  // Late Referral Code Banner
+  'referral.late_code.title': 'Have a Referral Code?',
+  'referral.late_code.subtitle':
+      'Enter it within {days} days to get 1 month Premium!',
+  'referral.late_code.sheet_title': 'Enter Referral Code',
+  'referral.late_code.description':
+      'If a friend referred you, enter their code below to unlock 1 month of Premium access.',
+  'referral.late_code.submit': 'Redeem Code',
+  'referral.late_code.success_title': 'Code Redeemed!',
+  'referral.late_code.success_message':
+      'Great! Complete the verification tasks to unlock your 1-month Premium reward.',
+
+  // States
+  'referral.checklist.under_review': 'Under Review',
+  'referral.checklist.under_review_message':
+      'Your verification is under review. Our team will contact you soon.',
+  'referral.checklist.no_data_title': 'No Verification Data',
+  'referral.checklist.no_data_message':
+      'We couldn\'t find your verification progress.',
+
+  // What Happens Next
+  'referral.checklist.what_happens_next': 'What Happens Next?',
+  'referral.checklist.what_happens_title': 'After Verification',
+  'referral.checklist.step1_title': '✅ You Get 1 Month Premium',
+  'referral.checklist.step1_message':
+      'As the referred user, YOU receive 1 month of Premium access immediately!',
+  'referral.checklist.step2_title': '🎁 Your Friend Gets Progress',
+  'referral.checklist.step2_message':
+      'The friend who referred you moves closer to their rewards (1 month per 2 verified users).',
+  'referral.checklist.step3_title': '🚀 Enjoy Premium Now',
+  'referral.checklist.step3_message':
+      'Your 1-month Premium access is active. Explore all features immediately!',
+  'referral.checklist.step4_title': '💎 Bonus: Subscribe = Gift Friend',
+  'referral.checklist.step4_message':
+      'If you love Premium and subscribe, your friend gets a bonus 2 weeks free!',
+
+  'common.ok': 'OK',
+  'common.error': 'Error',
+  'common.loading': 'Loading...',
+  'common.view': 'View',
+  'common.got_it': 'Got it',
 };

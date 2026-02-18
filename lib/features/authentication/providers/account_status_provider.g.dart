@@ -6,7 +6,7 @@ part of 'account_status_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$accountStatusHash() => r'e9e4bef2635dac04eccc28891b09bb206e88e5cd';
+String _$accountStatusHash() => r'edfd657ad2b85a91e5a37faa4f0c6941cb1940c8';
 
 /// See also [accountStatus].
 @ProviderFor(accountStatus)

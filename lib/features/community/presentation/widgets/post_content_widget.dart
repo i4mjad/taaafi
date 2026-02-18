@@ -4,6 +4,7 @@ import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/community/data/models/post.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/features/community/presentation/widgets/attachment_renderers.dart';
 
 class PostContentWidget extends ConsumerWidget {
   final Post post;
@@ -46,9 +47,10 @@ class PostContentWidget extends ConsumerWidget {
         if (post.title.isNotEmpty) ...[
           Text(
             post.title,
-            style: TextStyles.h6.copyWith(
+            style: TextStyles.bodyLarge.copyWith(
               fontWeight: FontWeight.w600,
               color: theme.grey[900],
+              height: 1.4,
             ),
           ),
           const SizedBox(height: 8),
@@ -66,6 +68,13 @@ class PostContentWidget extends ConsumerWidget {
             overflow: maxLines != null ? TextOverflow.ellipsis : null,
           ),
         ],
+
+        // Attachments (detail view)
+        if (!isPreview)
+          AttachmentRenderer(
+            post: post,
+            isListView: false,
+          ),
       ],
     );
   }

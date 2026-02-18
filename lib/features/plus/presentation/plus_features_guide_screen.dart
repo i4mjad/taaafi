@@ -37,7 +37,12 @@ class PlusFeaturesGuideScreen extends ConsumerWidget {
         backgroundColor: theme.backgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(LucideIcons.arrowLeft, color: theme.grey[700]),
+          icon: Icon(
+            Directionality.of(context) == TextDirection.rtl
+                ? LucideIcons.arrowRight
+                : LucideIcons.arrowLeft,
+            color: theme.grey[700],
+          ),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
@@ -97,7 +102,7 @@ class PlusFeaturesGuideScreen extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
-                Ta3afiPlatformIcons.plus_icon,
+                Ta3afiPlatformIcons.plus,
                 color: const Color(0xFFFEBA01),
                 size: 32,
               ),
@@ -346,23 +351,6 @@ class PlusFeaturesGuideScreen extends ConsumerWidget {
                 ),
               ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showRemindersInfo(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(AppLocalizations.of(context).translate('custom-reminders')),
-        content: Text(
-            AppLocalizations.of(context).translate('reminders-info-dialog')),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(AppLocalizations.of(context).translate('got-it')),
           ),
         ],
       ),
@@ -645,7 +633,7 @@ class _PlusContactUsModalState extends ConsumerState<PlusContactUsModal> {
                         child: Row(
                           children: [
                             Icon(
-                              Ta3afiPlatformIcons.plus_icon,
+                              Ta3afiPlatformIcons.plus,
                               color: const Color(0xFFFEBA01),
                               size: 24,
                             ),
