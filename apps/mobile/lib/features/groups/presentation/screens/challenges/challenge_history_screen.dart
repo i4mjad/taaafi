@@ -1,0 +1,336 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:grouped_list/grouped_list.dart';
+import 'package:lucide_icons/lucide_icons.dart';
+import 'package:reboot_app_3/core/helpers/date_display_formater.dart';
+import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
+import 'package:reboot_app_3/core/shared_widgets/container.dart';
+import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
+import 'package:reboot_app_3/core/theming/app-themes.dart';
+import 'package:reboot_app_3/core/theming/spacing.dart';
+import 'package:reboot_app_3/core/theming/text_styles.dart';
+import 'package:reboot_app_3/features/groups/application/challenges_providers.dart';
+import 'package:reboot_app_3/features/groups/application/updates_providers.dart';
+import 'package:reboot_app_3/features/groups/domain/entities/challenge_task_instance.dart';
+import 'package:reboot_app_3/features/groups/domain/entities/challenge_task_entity.dart';
+import 'package:reboot_app_3/features/groups/providers/challenge_detail_notifier.dart';
+
+class ChallengeHistoryScreen extends ConsumerStatefulWidget {
+  final String groupId;
+  final String challengeId;
+
+  const ChallengeHistoryScreen({
+    super.key,
+    required this.groupId,
+    required this.challengeId,
+  });
+
+  @override
+  ConsumerState<ChallengeHistoryScreen> createState() =>
+      _ChallengeHistoryScreenState();
+}
+
+class _ChallengeHistoryScreenState
+    extends ConsumerState<ChallengeHistoryScreen> {
+  final Set<String> _completingTasks = {};
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = AppTheme.of(context);
+    final l10n = AppLocalizations.of(context);
+    final locale = ref.watch(localeNotifierProvider);
+
+    // Load task instances for this challenge and user
+    final taskInstancesAsync =
+        ref.watch(challengeTaskInstancesProvider(widget.challengeId));
+
+    return Scaffold(
+      backgroundColor: theme.backgroundColor,
+      appBar: appBar(context, ref, "task-history", false, true),
+      body: taskInstancesAsync.when(
+        data: (instances) {
+          if (instances.isEmpty) {
+            return Center(
+              child: Text(
+                l10n.translate('no-task-history'),
+                style: TextStyles.body.copyWith(color: theme.grey[600]),
+              ),
+            );
+          }
+
+          return RefreshIndicator(
+            onRefresh: () async {
+              ref.invalidate(
+                  challengeTaskInstancesProvider(widget.challengeId));
+            },
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+              child: GroupedListView<ChallengeTaskInstance, DateTime>(
+                elements: instances,
+                groupBy: (instance) => DateTime(
+                  instance.scheduledDate.year,
+                  instance.scheduledDate.month,
+                  instance.scheduledDate.day,
+                ),
+                useStickyGroupSeparators: true,
+                groupSeparatorBuilder: (DateTime date) => Container(
+                  color: theme.backgroundColor,
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Text(
+                    getDisplayDate(date, locale!.languageCode),
+                    style: TextStyles.footnoteSelected.copyWith(
+                      color: theme.grey[900],
+                    ),
+                  ),
+                ),
+                itemBuilder: (context, instance) => Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: _buildTaskInstanceWidget(
+                      context, ref, theme, l10n, instance),
+                ),
+                // Sort by date descending (most recent first within each group)
+                order: GroupedListOrder.ASC,
+              ),
+            ),
+          );
+        },
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, stackTrace) => Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                '${l10n.translate('error')}: ${error.toString()}',
+                style: TextStyles.body.copyWith(color: theme.error[600]),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  ref.invalidate(
+                      challengeTaskInstancesProvider(widget.challengeId));
+                },
+                child: Text(l10n.translate('retry')),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTaskInstanceWidget(
+    BuildContext context,
+    WidgetRef ref,
+    theme,
+    AppLocalizations l10n,
+    ChallengeTaskInstance instance,
+  ) {
+    Color backgroundColor;
+    Color borderColor;
+    Color textColor;
+    IconData icon;
+    String statusText;
+
+    switch (instance.status) {
+      case TaskInstanceStatus.completed:
+        backgroundColor = theme.success[50]!;
+        borderColor = theme.success[200]!;
+        textColor = theme.success[700]!;
+        icon = LucideIcons.checkCircle2;
+        statusText = l10n.translate('completed');
+        break;
+      case TaskInstanceStatus.missed:
+        // If retroactive is allowed, show as pending (can still complete)
+        if (instance.task.allowRetroactiveCompletion) {
+          backgroundColor = theme.warn[50]!;
+          borderColor = theme.warn[200]!;
+          textColor = theme.warn[700]!;
+          icon = LucideIcons.alertCircle;
+          statusText = l10n.translate('can-still-complete');
+        } else {
+          backgroundColor = theme.error[50]!;
+          borderColor = theme.error[200]!;
+          textColor = theme.error[700]!;
+          icon = LucideIcons.xCircle;
+          statusText = l10n.translate('task-missed');
+        }
+        break;
+      case TaskInstanceStatus.today:
+        backgroundColor = theme.primary[50]!;
+        borderColor = theme.primary[200]!;
+        textColor = theme.primary[700]!;
+        icon = LucideIcons.clock;
+        statusText = l10n.translate('task-pending');
+        break;
+      case TaskInstanceStatus.upcoming:
+        backgroundColor = theme.grey[50]!;
+        borderColor = theme.grey[200]!;
+        textColor = theme.grey[700]!;
+        icon = LucideIcons.clock;
+        statusText = l10n.translate('upcoming');
+        break;
+    }
+
+    // Determine if task can be completed
+    final canComplete = instance.status == TaskInstanceStatus.today ||
+        (instance.status == TaskInstanceStatus.missed &&
+            instance.task.allowRetroactiveCompletion);
+
+    // Create a unique key for this task instance
+    final taskKey =
+        '${instance.task.id}_${instance.scheduledDate.millisecondsSinceEpoch}';
+    final isCompleting = _completingTasks.contains(taskKey);
+
+    return WidgetsContainer(
+      backgroundColor: backgroundColor,
+      borderRadius: BorderRadius.circular(8),
+      borderSide: BorderSide(color: borderColor, width: 1),
+      padding: const EdgeInsets.all(12),
+      child: Row(
+        children: [
+          // Status Icon, Checkbox, or Loading indicator
+          if (canComplete && isCompleting)
+            SizedBox(
+              width: 28,
+              height: 28,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  theme.primary[600]!,
+                ),
+              ),
+            )
+          else if (canComplete)
+            GestureDetector(
+              onTap: () {
+                _completeTask(context, ref, instance, taskKey);
+              },
+              child: Container(
+                width: 28,
+                height: 28,
+                decoration: BoxDecoration(
+                  color: theme.backgroundColor,
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(
+                    color: theme.primary[600]!,
+                    width: 2,
+                  ),
+                ),
+                child: Icon(
+                  LucideIcons.check,
+                  color: theme.primary[600],
+                  size: 16,
+                ),
+              ),
+            )
+          else
+            Icon(
+              icon,
+              size: 20,
+              color: textColor,
+            ),
+          horizontalSpace(Spacing.points12),
+          // Task Info
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  instance.task.name,
+                  style: TextStyles.body.copyWith(
+                    color: theme.grey[900],
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                verticalSpace(Spacing.points4),
+                Text(
+                  '${_getFrequencyLabel(l10n, instance.task.frequency)} • ${instance.task.points} ${l10n.translate('points')}',
+                  style: TextStyles.caption.copyWith(
+                    color: theme.grey[600],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Status Badge
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: textColor.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Text(
+              statusText,
+              style: TextStyles.caption.copyWith(
+                color: textColor,
+                fontWeight: FontWeight.bold,
+                fontSize: 11,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _completeTask(BuildContext context, WidgetRef ref,
+      ChallengeTaskInstance instance, String taskKey) async {
+    // Add to completing set
+    setState(() {
+      _completingTasks.add(taskKey);
+    });
+
+    try {
+      // Complete the task using the challenge detail notifier
+      // Pass the specific scheduled date for retroactive completion
+      await ref
+          .read(challengeDetailNotifierProvider(widget.challengeId).notifier)
+          .completeTask(
+            instance.task.id,
+            instance.task.points,
+            instance.task.frequency,
+            completionDate: instance.scheduledDate,
+          );
+
+      if (!mounted) return;
+
+      // Show success message
+      getSuccessSnackBar(
+        context,
+        'task-completed',
+      );
+
+      // The stream will automatically update the UI, but we'll invalidate
+      // other related providers that aren't using streams yet
+      ref.invalidate(activeChallengesProvider(widget.groupId));
+      ref.invalidate(groupTodayTasksProvider(widget.groupId));
+      ref.invalidate(latestUpdatesProvider(widget.groupId));
+    } catch (e) {
+      if (!mounted) return;
+
+      // Show error message
+      getErrorSnackBar(
+        context,
+        'error-completing-task',
+      );
+    } finally {
+      if (mounted) {
+        // Remove from completing set
+        setState(() {
+          _completingTasks.remove(taskKey);
+        });
+      }
+    }
+  }
+
+  String _getFrequencyLabel(AppLocalizations l10n, TaskFrequency frequency) {
+    switch (frequency) {
+      case TaskFrequency.daily:
+        return l10n.translate('daily');
+      case TaskFrequency.weekly:
+        return l10n.translate('weekly');
+    }
+  }
+}

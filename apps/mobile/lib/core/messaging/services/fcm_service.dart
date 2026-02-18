@@ -1,0 +1,829 @@
+import 'dart:io';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:go_router/go_router.dart';
+import 'package:reboot_app_3/core/messaging/repositories/fcm_repository.dart';
+import 'package:reboot_app_3/core/routing/route_names.dart';
+import 'package:reboot_app_3/core/routing/navigator_keys.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:reboot_app_3/features/notifications/data/models/app_notification.dart';
+import 'package:reboot_app_3/features/notifications/data/repositories/notifications_repository.dart';
+import 'package:reboot_app_3/features/notifications/data/database/notifications_database.dart';
+import 'package:reboot_app_3/core/theming/app-themes.dart';
+import 'package:reboot_app_3/core/theming/text_styles.dart';
+import 'package:figma_squircle/figma_squircle.dart';
+import 'package:lucide_icons/lucide_icons.dart';
+import 'package:reboot_app_3/core/localization/localization.dart';
+
+part 'fcm_service.g.dart';
+
+class MessagingService with WidgetsBindingObserver {
+  MessagingService._();
+
+  static final MessagingService instance = MessagingService._();
+
+  final FirebaseMessagingRepository _fcmRepository =
+      FirebaseMessagingRepository(
+    FirebaseMessaging.instance,
+    FirebaseAuth.instance,
+    FirebaseFirestore.instance,
+  );
+  final _localNotificationPlugin = FlutterLocalNotificationsPlugin();
+  final _messaging = FirebaseMessaging.instance;
+  final _auth = FirebaseAuth.instance;
+  final _firestore = FirebaseFirestore.instance;
+  bool _isFlutterNotificationPluginInitalized = false;
+
+  // Global provider container for accessing repositories
+  static ProviderContainer? _globalContainer;
+
+  // Method to set the global container reference
+  static void setGlobalContainer(ProviderContainer container) {
+    _globalContainer = container;
+  }
+
+  // Pending message to handle once context is available
+  RemoteMessage? _queuedMessage;
+
+  Future<void> init() async {
+    print('🚀 FCM SERVICE: Starting initialization...');
+    
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+    // Add lifecycle observer to listen for app state changes
+    WidgetsBinding.instance.addObserver(this);
+
+    // 🚀 OPTIMIZATION: Run permission request, message handler setup, and initial message check in parallel
+    // These operations don't depend on each other
+    print('📱 FCM SERVICE: Running parallel initialization...');
+    
+    await Future.wait([
+      // 1. Request permission
+      _requestPermissionSafe(),
+      // 2. Setup message handler
+      _setupMessageHandlerSafe(),
+      // 3. Check for initial message (from cold start notification tap)
+      _checkInitialMessageSafe(),
+    ]);
+
+    // 4. Setup auth state listener (sync - fast)
+    _setupAuthStateListener();
+
+    // 🚀 OPTIMIZATION: Defer FCM token update to background
+    // This writes to Firestore and can happen after app is visible
+    _updateFCMTokenSafe();
+    
+    print('🎉 FCM SERVICE: Initialization complete!');
+  }
+
+  /// Safe permission request that won't throw
+  Future<void> _requestPermissionSafe() async {
+    try {
+      await requestPermission();
+      print('✅ FCM SERVICE: Permissions requested');
+    } catch (e) {
+      print('❌ FCM SERVICE: Permission error: $e');
+    }
+  }
+
+  /// Safe message handler setup that won't throw
+  Future<void> _setupMessageHandlerSafe() async {
+    try {
+      await _setupMessageHandler();
+      print('✅ FCM SERVICE: Message handler set up');
+    } catch (e) {
+      print('❌ FCM SERVICE: Message handler error: $e');
+    }
+  }
+
+  /// Safe initial message check that won't throw
+  Future<void> _checkInitialMessageSafe() async {
+    try {
+      final initialMessage = await _messaging.getInitialMessage();
+      if (initialMessage != null) {
+        print('📥 FCM SERVICE: Found initial message, queuing for later processing');
+        _queuedMessage = initialMessage;
+      }
+    } catch (e) {
+      print('❌ FCM SERVICE: Initial message check error: $e');
+    }
+  }
+
+  /// Safe FCM token update (fire and forget)
+  void _updateFCMTokenSafe() {
+    Future(() async {
+      try {
+        await updateFCMToken();
+        print('✅ FCM SERVICE: FCM token update completed');
+      } catch (e) {
+        print('❌ FCM SERVICE: Update token error: $e');
+      }
+    });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+  }
+
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+  }
+
+  Future<void> requestPermission() async {
+    final settings = await _messaging.requestPermission(
+      alert: true,
+      sound: true,
+      badge: true,
+      provisional: false,
+      carPlay: false,
+      criticalAlert: false,
+      announcement: false,
+    );
+
+    // Retrieve APNs token for iOS
+    if (settings.authorizationStatus == AuthorizationStatus.authorized &&
+        Platform.isIOS) {
+      await _messaging.getAPNSToken();
+    }
+  }
+
+  Future<void> setupFlutterNotification(RemoteMessage message) async {
+    if (_isFlutterNotificationPluginInitalized) {
+      return;
+    }
+
+    //Android Setup
+    final channel = const AndroidNotificationChannel(
+      'high_importance_channel',
+      'High Importance Notifications',
+      importance: Importance.high,
+    );
+
+    await _localNotificationPlugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(channel);
+
+    const initalAndroidSettings =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+
+    //IOS Setup
+
+    const initalIOSSettings = DarwinInitializationSettings();
+
+    final initalSettings = InitializationSettings(
+      android: initalAndroidSettings,
+      iOS: initalIOSSettings,
+    );
+
+    await _localNotificationPlugin.initialize(initalSettings,
+        onDidReceiveNotificationResponse: (response) async {
+      // Handle navigation from local notification tap
+      if (response.payload != null && response.payload!.isNotEmpty) {
+        try {
+          // Parse payload back to Map if it contains navigation data
+          // Note: You might need to encode/decode the payload properly
+        } catch (e) {
+          // Silent error - don't clutter logs
+        }
+      }
+    });
+
+    _isFlutterNotificationPluginInitalized = true;
+  }
+
+  Future<void> updateFCMToken() async {
+    try {
+      return await _fcmRepository.updateUserMessagingToken();
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<String?> getFCMToken() async {
+    try {
+      return await _fcmRepository.getMessagingToken();
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<void> storeNotification(RemoteMessage message) async {
+    try {
+      final data = message.data;
+      final notification = message.notification;
+
+      // Store all notifications (not just report-related ones)
+      if (notification != null) {
+        final appNotification = AppNotification(
+          id: message.messageId ??
+              DateTime.now().millisecondsSinceEpoch.toString(),
+          title: notification.title ?? 'New Notification',
+          message: notification.body ?? 'You have a new notification',
+          timestamp: message.sentTime ?? DateTime.now(),
+          isRead: false,
+          reportId: data['reportId'] ?? '',
+          reportStatus: data['reportStatus'] ?? 'general',
+          additionalData: data,
+        );
+
+        // Try to use repository first for proper state management
+        if (_globalContainer != null) {
+          try {
+            await _globalContainer!
+                .read(notificationsRepositoryProvider.notifier)
+                .addNotification(appNotification);
+          } catch (e) {
+            await NotificationsDatabase.instance.create(appNotification);
+          }
+        } else {
+          // Fallback to direct database access
+          await NotificationsDatabase.instance.create(appNotification);
+        }
+      }
+    } catch (e) {
+      // Silent error - don't clutter logs
+    }
+  }
+
+  Future<void> showNotification(RemoteMessage message) async {
+    RemoteNotification? notification = message.notification;
+
+    if (notification != null) {
+      try {
+        await _localNotificationPlugin.show(
+          notification.hashCode,
+          notification.title,
+          notification.body,
+          NotificationDetails(
+            android: AndroidNotificationDetails(
+              'high_importance_channel',
+              'High Importance Notifications',
+              channelDescription:
+                  'This channel is used for important notifications',
+              icon: '@mipmap/ic_launcher',
+            ),
+            iOS: DarwinNotificationDetails(
+              presentAlert: true,
+              presentBadge: true,
+              presentSound: true,
+            ),
+          ),
+          payload: message.data.toString(),
+        );
+      } catch (e) {
+        // Silent error - don't clutter logs
+      }
+    }
+  }
+
+  Future<void> _setupMessageHandler() async {
+    //Foreground
+    FirebaseMessaging.onMessage.listen((message) async {
+      await storeNotification(message);
+      await setupFlutterNotification(message);
+      await _showNotificationSnackbar(message);
+      await showNotification(message);
+    });
+
+    //Background
+    FirebaseMessaging.onMessageOpenedApp.listen(_handleBackgroundMessage);
+
+    //Opened app (cold start). We just queue the message and let the app
+    //process it once navigation is fully ready.
+    final initialMessage = await _messaging.getInitialMessage();
+    if (initialMessage != null) {
+      _queuedMessage = initialMessage;
+    }
+  }
+
+  Future<void> _handleBackgroundMessage(RemoteMessage message) async {
+    // Store notification in database
+    await storeNotification(message);
+
+    // Handle navigation based on notification data
+    await _handleNotificationNavigation(message);
+
+    await showNotification(message);
+  }
+
+  /// Shows a snackbar with notification content and navigation button
+  Future<void> _showNotificationSnackbar(RemoteMessage message) async {
+    final ctx = rootNavigatorKey.currentContext;
+
+    if (ctx == null) {
+      return;
+    }
+
+    final notification = message.notification;
+    if (notification == null) {
+      return;
+    }
+
+    final localization = AppLocalizations.of(ctx);
+    final title = notification.title ??
+        localization.translate('notification-snackbar-new-title');
+    final body = notification.body ??
+        localization.translate('notification-snackbar-new-body');
+
+    try {
+      // Find the ScaffoldMessenger
+      final scaffoldMessenger = ScaffoldMessenger.of(ctx);
+
+      // Clear any existing snackbars
+      scaffoldMessenger.clearSnackBars();
+
+      // Show the snackbar using app's design system
+      final theme = AppTheme.of(ctx);
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(16, 16, 8, 16),
+          shape: SmoothRectangleBorder(
+            borderRadius: SmoothBorderRadius(
+              cornerRadius: 15,
+              cornerSmoothing: 1,
+            ),
+            side: BorderSide(
+              width: 2,
+              color: theme.primary[300]!,
+            ),
+          ),
+          backgroundColor: theme.primary[50],
+          duration: const Duration(seconds: 5),
+          content: Row(
+            children: [
+              Icon(
+                LucideIcons.bell,
+                color: theme.primary[600]!,
+                size: 24,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyles.caption.copyWith(
+                        color: theme.grey[900],
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      body,
+                      style: TextStyles.caption.copyWith(
+                        color: theme.grey[700],
+                        height: 1.3,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              TextButton(
+                onPressed: () {
+                  scaffoldMessenger.hideCurrentSnackBar();
+                  // Navigate to notifications screen
+                  try {
+                    GoRouter.of(ctx).goNamed(RouteNames.notifications.name);
+                  } catch (e) {
+                    // Silent error - don't clutter logs
+                  }
+                },
+                style: TextButton.styleFrom(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  backgroundColor: theme.primary[600],
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: Text(
+                  localization.translate('notification-snackbar-view'),
+                  style: TextStyles.caption.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    } catch (e) {
+      // Silent error - don't clutter logs
+    }
+  }
+
+  /// Maps screen parameter string to RouteNames enum value
+  RouteNames? _getRouteFromScreenParameter(String screen) {
+    try {
+      // Convert screen string to RouteNames enum
+      return RouteNames.values.firstWhere(
+        (route) => route.name == screen,
+        orElse: () => throw StateError('Route not found'),
+      );
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /// Handles navigation based on notification data
+  Future<void> _handleNotificationNavigation(RemoteMessage message) async {
+    // Try to obtain a BuildContext from the rootNavigatorKey
+    final ctx = rootNavigatorKey.currentContext;
+
+    if (ctx == null) {
+      // Context isn't ready yet – queue the message for later and retry
+      _queuedMessage = message;
+      // Retry after next frame
+      Future.delayed(const Duration(milliseconds: 300), () {
+        if (_queuedMessage != null) {
+          _handleNotificationNavigation(_queuedMessage!);
+        }
+      });
+      return;
+    }
+
+    // We have a context, clear any queued message
+    _queuedMessage = null;
+
+    final data = message.data;
+    final screen = data['screen'];
+    final route = data['route'];
+    final type = data['type'];
+
+    // Add delay to ensure app is ready for navigation
+    await Future.delayed(const Duration(milliseconds: 100));
+
+    try {
+      // Handle route-based navigation (for group messages)
+      if (route != null && route.isNotEmpty) {
+        await _handleRouteNavigation(ctx, route, data);
+        return;
+      }
+
+      // Handle type-based navigation (fallback for notifications without screen)
+      if (screen == null && type != null) {
+        await _handleTypeBasedNavigation(ctx, type, data);
+        return;
+      }
+
+      // If no screen parameter, redirect to notifications
+      if (screen == null || screen.isEmpty) {
+        GoRouter.of(ctx).goNamed(RouteNames.notifications.name);
+        return;
+      }
+
+      // Handle special cases with parameters first
+      await _handleSpecialRouteNavigation(ctx, screen, data);
+    } catch (e) {
+      // Silent error handling
+    }
+  }
+
+  /// Handles special route navigation with parameters and fallbacks
+  Future<void> _handleSpecialRouteNavigation(
+      BuildContext ctx, String screen, Map<String, dynamic> data) async {
+    try {
+      // Handle special cases with parameters
+      if (screen == 'reportConversation' || screen == 'reportDetails') {
+        final reportId = data['reportId'];
+        if (reportId != null) {
+          GoRouter.of(ctx).goNamed(
+            RouteNames.reportConversation.name,
+            pathParameters: {'reportId': reportId},
+          );
+          return;
+        }
+      }
+
+      // Handle community post navigation
+      if (screen == 'postDetail' || screen == 'postDetails') {
+        final postId = data['postId'];
+        if (postId != null) {
+          try {
+            GoRouter.of(ctx).goNamed(
+              RouteNames.postDetail.name,
+              pathParameters: {'postId': postId},
+            );
+            return;
+          } catch (e) {
+            // If post detail route doesn't exist or navigation fails, go to community
+            try {
+              GoRouter.of(ctx).goNamed(RouteNames.community.name);
+              return;
+            } catch (e2) {
+              // Last fallback to notifications
+              GoRouter.of(ctx).goNamed(RouteNames.notifications.name);
+              return;
+            }
+          }
+        }
+      }
+
+      // Handle groups navigation for member management notifications
+      if (screen == 'groups') {
+        final notificationType = data['notificationType'];
+        if (notificationType != null &&
+            (notificationType == 'member_promoted' ||
+                notificationType == 'member_demoted' ||
+                notificationType == 'member_removed')) {
+          try {
+            GoRouter.of(ctx).goNamed(RouteNames.groups.name);
+            return;
+          } catch (e) {
+            GoRouter.of(ctx).goNamed(RouteNames.notifications.name);
+            return;
+          }
+        }
+      }
+
+      // Handle general route navigation - try to map screen parameter to RouteNames
+      final routeName = _getRouteFromScreenParameter(screen);
+      if (routeName != null) {
+        try {
+          GoRouter.of(ctx).goNamed(routeName.name);
+          return;
+        } catch (e) {
+          // Navigation failed, continue to fallback
+        }
+      }
+
+      // Final fallback: try direct navigation with screen parameter
+      try {
+        GoRouter.of(ctx).goNamed(screen);
+        return;
+      } catch (e) {
+        // All navigation attempts failed, go to notifications
+        GoRouter.of(ctx).goNamed(RouteNames.notifications.name);
+      }
+    } catch (e) {
+      // Silent error handling - fallback to notifications
+      try {
+        GoRouter.of(ctx).goNamed(RouteNames.notifications.name);
+      } catch (e2) {
+        // Silent error - don't clutter logs
+      }
+    }
+  }
+
+  /// Sets up listener for authentication state changes
+  /// Subscribes logged-in users to all_users topic
+  void _setupAuthStateListener() {
+    print('👂 FCM SERVICE: Setting up auth state listener...');
+    _auth.authStateChanges().listen((User? user) async {
+      if (user != null) {
+        print('🔐 FCM SERVICE: Auth state changed - User logged in: ${user.uid}');
+        // User is signed in - subscribe to all_users topic and update FCM token
+        print('📢 FCM SERVICE: Subscribing to all_users topic...');
+        await _subscribeToAllUsersGroup();
+        print('💾 FCM SERVICE: Updating FCM token on auth state change...');
+        await updateFCMToken();
+        print('✅ FCM SERVICE: Auth state handling complete');
+      } else {
+        print('🚪 FCM SERVICE: Auth state changed - User logged out');
+      }
+    });
+    
+    // Also listen to token refresh events (when APNS becomes available, etc.)
+    print('👂 FCM SERVICE: Setting up token refresh listener...');
+    _messaging.onTokenRefresh.listen((newToken) async {
+      print('🔄 FCM SERVICE: Token refreshed! New token: ${newToken.substring(0, 20)}...');
+      final user = _auth.currentUser;
+      if (user != null) {
+        print('💾 FCM SERVICE: Updating refreshed token in Firestore...');
+        await updateFCMToken();
+        print('✅ FCM SERVICE: Token refresh update complete');
+      } else {
+        print('ℹ️ FCM SERVICE: Token refreshed but no user logged in, skipping update');
+      }
+    });
+  }
+
+  /// Subscribes the logged-in user to the "all_users" messaging group
+  Future<void> _subscribeToAllUsersGroup() async {
+    final user = _auth.currentUser;
+    if (user == null) return;
+
+    try {
+      // Subscribe to FCM topic first (critical)
+      await _messaging.subscribeToTopic('all_users');
+
+      // Track subscription in Firestore (optional, non-blocking)
+      _trackAllUsersSubscription(user.uid).catchError((e) {
+        // Don't rethrow - this is optional
+      });
+    } catch (e) {
+      // Silent error - don't clutter logs
+    }
+  }
+
+  /// Tracks that the user is subscribed to the all_users group
+  Future<void> _trackAllUsersSubscription(String userId) async {
+    try {
+      final userMembershipsRef =
+          _firestore.collection('userGroupMemberships').doc(userId);
+
+      final doc = await userMembershipsRef.get();
+      List<Map<String, dynamic>> currentGroups = [];
+
+      if (doc.exists) {
+        final data = doc.data();
+        if (data != null && data['groups'] != null) {
+          currentGroups = List<Map<String, dynamic>>.from(data['groups']);
+        }
+      }
+
+      // Check if already subscribed to all_users
+      bool alreadySubscribed = currentGroups.any(
+        (group) => group['topicId'] == 'all_users',
+      );
+
+      if (!alreadySubscribed) {
+        final now = Timestamp.now();
+        // Add all_users subscription
+        currentGroups.add({
+          'groupName': 'All Users',
+          'groupNameAr': 'جميع المستخدمين',
+          'topicId': 'all_users',
+          'subscribedAt': now,
+        });
+
+        // Update user's memberships
+        await userMembershipsRef.set({
+          'userId': userId,
+          'groups': currentGroups,
+          'updatedAt': now,
+        }, SetOptions(merge: true));
+      }
+    } catch (e) {
+      // Silent error - don't clutter logs
+    }
+  }
+
+  /// Handle route-based navigation (e.g., /groups/{groupId}/chat)
+  Future<void> _handleRouteNavigation(
+      BuildContext ctx, String route, Map<String, dynamic> data) async {
+    try {
+      // Parse route for group chat navigation
+      if (route.startsWith('/groups/') && route.endsWith('/chat')) {
+        // Extract groupId from route like '/groups/{groupId}/chat'
+        final routeParts = route.split('/');
+        if (routeParts.length >= 3) {
+          final groupId = routeParts[2];
+          if (groupId.isNotEmpty) {
+            // Check if we have a specific message to scroll to
+            final messageId = data['messageId'];
+            if (messageId != null) {
+              // Navigate to group chat with message highlight
+              try {
+                GoRouter.of(ctx).goNamed(
+                  RouteNames.groupChat.name,
+                  pathParameters: {'groupId': groupId},
+                  queryParameters: {'messageId': messageId},
+                );
+              } catch (e) {
+                // Fallback to basic group chat navigation
+                GoRouter.of(ctx).goNamed(
+                  RouteNames.groupChat.name,
+                  pathParameters: {'groupId': groupId},
+                );
+              }
+            } else {
+              // Navigate to group chat normally
+              GoRouter.of(ctx).goNamed(
+                RouteNames.groupChat.name,
+                pathParameters: {'groupId': groupId},
+              );
+            }
+            return;
+          }
+        }
+      }
+
+      // If route parsing fails, fallback to groups main
+      GoRouter.of(ctx).goNamed(RouteNames.groups.name);
+    } catch (e) {
+      // Final fallback to notifications
+      GoRouter.of(ctx).goNamed(RouteNames.notifications.name);
+    }
+  }
+
+  /// Handle type-based navigation when no screen is provided
+  Future<void> _handleTypeBasedNavigation(
+      BuildContext ctx, String type, Map<String, dynamic> data) async {
+    try {
+      switch (type) {
+        case 'group_message':
+          // Try to extract groupId and navigate to group chat
+          final groupId = data['groupId'];
+          if (groupId != null) {
+            GoRouter.of(ctx).goNamed(
+              RouteNames.groupChat.name,
+              pathParameters: {'groupId': groupId},
+            );
+          } else {
+            GoRouter.of(ctx).goNamed(RouteNames.groups.name);
+          }
+          break;
+
+        case 'community_notification':
+          // Try to navigate to post details or community
+          final postId = data['postId'];
+          if (postId != null) {
+            try {
+              GoRouter.of(ctx).goNamed(
+                RouteNames.postDetail.name,
+                pathParameters: {'postId': postId},
+              );
+            } catch (e) {
+              GoRouter.of(ctx).goNamed(RouteNames.community.name);
+            }
+          } else {
+            GoRouter.of(ctx).goNamed(RouteNames.community.name);
+          }
+          break;
+
+        case 'smart_alert':
+          // Navigate to appropriate smart alert screen or notifications
+          GoRouter.of(ctx).goNamed(RouteNames.notifications.name);
+          break;
+
+        case 'friend_signed_up':
+        case 'friend_task_progress':
+        case 'friend_verified':
+        case 'friend_subscribed':
+        case 'milestone_reached':
+        case 'reward_ready':
+          // Referral notifications for referrer - navigate to referral dashboard
+          GoRouter.of(ctx).goNamed(RouteNames.referralDashboard.name);
+          break;
+
+        case 'welcome':
+        case 'task_completed':
+        case 'progress_update':
+        case 'verification_complete':
+        case 'premium_activated':
+          // Referral notifications for referee - navigate to checklist progress
+          final userId = data['userId'];
+          if (userId != null && userId.toString().isNotEmpty) {
+            GoRouter.of(ctx).pushNamed(
+              RouteNames.checklistProgress.name,
+              pathParameters: {'userId': userId.toString()},
+            );
+          } else {
+            // Fallback to referral dashboard
+            GoRouter.of(ctx).goNamed(RouteNames.referralDashboard.name);
+          }
+          break;
+
+        default:
+          // Unknown type, fallback to notifications
+          GoRouter.of(ctx).goNamed(RouteNames.notifications.name);
+      }
+    } catch (e) {
+      // Final fallback to notifications
+      GoRouter.of(ctx).goNamed(RouteNames.notifications.name);
+    }
+  }
+
+  /// Call this **after** the UI & GoRouter are ready (e.g. from MyApp) to
+  /// process any message that was received while the app was terminated.
+  void processQueuedMessage() {
+    if (_queuedMessage != null) {
+      final msg = _queuedMessage!;
+      // Do NOT clear _queuedMessage yet. Let _handleNotificationNavigation
+      // clear it when navigation actually succeeds (ctx available).
+      _handleNotificationNavigation(msg);
+    }
+  }
+}
+
+@Riverpod(keepAlive: true)
+FlutterLocalNotificationsPlugin localNotificationPlugin(Ref ref) {
+  return FlutterLocalNotificationsPlugin();
+}
+
+@Riverpod(keepAlive: true)
+FirebaseMessaging messaging(Ref ref) {
+  return FirebaseMessaging.instance;
+}
+
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await MessagingService.instance.setupFlutterNotification(message);
+  await MessagingService.instance.storeNotification(message);
+  await MessagingService.instance.showNotification(message);
+}

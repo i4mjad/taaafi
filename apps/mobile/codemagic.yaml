@@ -1,0 +1,441 @@
+workflows:
+  android-release-workflow:
+    max_build_duration: 120
+    name: Android Release Workflow
+    environment:
+      android_signing:
+        - android-signing-key
+      flutter: 3.32.5
+      groups:
+        - google_credentials
+        - SHOREBIRD
+      vars:
+        PACKAGE_NAME: "com.amjadkhalfan.reboot_app_3"
+        GOOGLE_PLAY_TRACK: alpha
+    scripts:
+      - name: Install Shorebird
+        script: |
+          # Install Shorebird
+          curl --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/shorebirdtech/install/main/install.sh -sSf | bash
+
+          # Add Shorebird to PATH
+          echo PATH="$HOME/.shorebird/bin:$PATH" >> $CM_ENV
+      - name: Set up local.properties
+        script: |
+          echo "flutter.sdk=$HOME/programs/flutter" > "$CM_BUILD_DIR/android/local.properties"
+      - name: Get Flutter packages
+        script: |
+          flutter --version
+          flutter pub cache clean fl_chart
+          flutter packages pub get
+      - name: Build AAB file (Shorebird)
+        script: |
+          VERSION=$(cat pubspec.yaml | grep 'version:' | head -1 | awk '{print $2}' | cut -d '+' -f 1)
+          LATEST_BUILD_NUMBER=$(google-play get-latest-build-number --package-name "$PACKAGE_NAME" --tracks="$GOOGLE_PLAY_TRACK")
+          BUILD_NUMBER=$((LATEST_BUILD_NUMBER + 1))
+          if [ $BUILD_NUMBER -lt 10 ]; then
+            BUILD_NUMBER="0$BUILD_NUMBER"
+          fi
+          shorebird release android --flutter-version=3.32.5 \
+            --build-name=$VERSION \
+            --build-number=$BUILD_NUMBER \
+            --target lib/main.dart
+      
+    artifacts:
+      - build/**/outputs/**/*.aab
+      - build/**/outputs/**/mapping.txt
+      - flutter_drive.log
+    publishing:
+      email:
+        recipients:
+          - i4mjad@gmail.com
+        notify:
+          success: true
+          failure: true
+      google_play:
+        credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
+        track: closed
+        submit_as_draft: false
+        # changes_not_sent_for_review: true
+
+  ios-release-workflow:
+    name: iOS Release Workflow
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.amjadkhalfan.RebootApp
+      flutter: 3.32.5
+      groups:
+        - SHOREBIRD
+      vars:
+        APP_STORE_APPLE_ID: 1531562469
+    scripts:
+      - name: Install Shorebird
+        script: |
+          # Install Shorebird
+          curl --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/shorebirdtech/install/main/install.sh -sSf | bash
+
+          # Add Shorebird to PATH
+          echo PATH="$HOME/.shorebird/bin:$PATH" >> $CM_ENV
+      - name: Set up code signing settings on Xcode project
+        script: xcode-project use-profiles
+      - name: Get Flutter packages
+        script: |
+          flutter packages pub get
+      - name: Install pods
+        script: |
+          find . -name "Podfile" -execdir pod install \;
+      - name: Update Info.plist
+        script: |
+          # Extract version and build number from codemagic.yaml
+          VERSION=$(cat pubspec.yaml | grep 'version:' | head -1 | awk '{print $2}' | cut -d '+' -f 1)
+          BUILD_NUMBER=$(($(app-store-connect get-latest-testflight-build-number "$APP_STORE_APPLE_ID") + 1))
+
+          # Path to Info.plist
+          PLIST_PATH="./ios/Runner/Info.plist"
+
+          # Update CFBundleShortVersionString and CFBundleVersion in Info.plist
+          /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" "$PLIST_PATH"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" "$PLIST_PATH"
+
+      - name: Flutter build ipa (Shorebird release)
+        script: |
+          VERSION=$(cat pubspec.yaml | grep 'version:' | head -1 | awk '{print $2}' | cut -d '+' -f 1)
+          BUILD_NUMBER=$(app-store-connect get-latest-testflight-build-number "$APP_STORE_APPLE_ID")
+          shorebird release ios --flutter-version=3.32.5
+    artifacts:
+        - build/ios/ipa/*.ipa
+        - /tmp/xcodebuild_logs/*.log
+        - flutter_drive.log
+    integrations:
+      app_store_connect: Taa'afi Codemagic
+    publishing:
+      email:
+        recipients:
+          - i4mjad@gmail.com
+        notify:
+          success: true
+          failure: true
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: false
+
+  ios-patch-workflow:
+    name: iOS Patch Workflow
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.amjadkhalfan.RebootApp
+      flutter: 3.32.5
+      groups:
+        - SHOREBIRD
+      vars:
+        APP_STORE_APPLE_ID: 1531562469
+        # XCODE_WORKSPACE: "Runner.xcworkspace"
+        # XCODE_SCHEME: "Runner-NoDA"
+    scripts:
+      - name: Install Shorebird
+        script: |
+          curl --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/shorebirdtech/install/main/install.sh -sSf | bash
+          echo PATH="$HOME/.shorebird/bin:$PATH" >> $CM_ENV
+
+      - name: Set up code signing settings on Xcode project
+        script: |
+          xcode-project use-profiles --warn-only
+
+      - name: Get Flutter packages
+        script: |
+          flutter --version
+          flutter pub cache clean fl_chart
+          flutter packages pub get
+
+      - name: Install pods
+        script: |
+          find . -name "Podfile" -execdir pod install \;
+
+      # - name: Remove Device Activity Extension from build
+      #   script: |
+      #     # Create backup of project file
+      #     cp ios/Runner.xcodeproj/project.pbxproj ios/Runner.xcodeproj/project.pbxproj.backup
+      #     
+      #     # Remove the extension from Embed Foundation Extensions build phase (two lines)
+      #     sed -i '' '/6DB3DF102E507DAD0063474F.*FocusDeviceActivityMonitor\.appex.*Embed Foundation Extensions/d' ios/Runner.xcodeproj/project.pbxproj
+      #     sed -i '' '/6DB3DF102E507DAD0063474F.*FocusDeviceActivityMonitor\.appex in Embed Foundation Extensions/d' ios/Runner.xcodeproj/project.pbxproj
+      #     
+      #     echo "✅ Device Activity Extension removed from build process"
+
+      - name: Determine Release Version
+        script: |
+          VERSION=$(cat pubspec.yaml | grep 'version:' | head -1 | awk '{print $2}' | cut -d '+' -f 1)
+          BUILD_NUMBER=$(app-store-connect get-latest-testflight-build-number "$APP_STORE_APPLE_ID")
+          RELEASE_VERSION="$VERSION+$BUILD_NUMBER"
+          echo "RELEASE_VERSION=$RELEASE_VERSION" >> $CM_ENV
+
+      - name: Shorebird Patch
+        script: |
+          shorebird patch ios \
+            --release-version="$RELEASE_VERSION" \
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - flutter_drive.log
+    integrations:
+      app_store_connect: Taa'afi Codemagic
+    publishing:
+      email:
+        recipients:
+          - i4mjad@gmail.com
+        notify:
+          success: true
+          failure: true
+
+  android-patch-workflow:
+    name: Android Patch Workflow
+    max_build_duration: 60
+    environment:
+      android_signing:
+        - android-signing-key
+      flutter: 3.32.5
+      groups:
+        - google_credentials
+        - SHOREBIRD
+      vars:
+        PACKAGE_NAME: "com.amjadkhalfan.reboot_app_3"
+        GOOGLE_PLAY_TRACK: alpha
+    scripts:
+      - name: Install Shorebird
+        script: |
+          # Install Shorebird
+          curl --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/shorebirdtech/install/main/install.sh -sSf | bash
+
+          # Add Shorebird to PATH
+          echo PATH="$HOME/.shorebird/bin:$PATH" >> $CM_ENV
+      - name: Set up local.properties
+        script: |
+          echo "flutter.sdk=$HOME/programs/flutter" > "$CM_BUILD_DIR/android/local.properties"
+      - name: Get Flutter packages
+        script: |
+          flutter --version
+          flutter pub cache clean fl_chart
+          flutter packages pub get
+      - name: Determine Release Version
+        script: |
+          VERSION=$(cat pubspec.yaml | grep 'version:' | head -1 | awk '{print $2}' | cut -d '+' -f 1)
+          BUILD_NUMBER=$(google-play get-latest-build-number --package-name "$PACKAGE_NAME" --tracks="$GOOGLE_PLAY_TRACK")
+          RELEASE_VERSION="$VERSION+$BUILD_NUMBER"
+          # Persist for subsequent steps
+          echo "RELEASE_VERSION=$RELEASE_VERSION" >> $CM_ENV
+      - name: Shorebird Patch
+        script: |
+          shorebird patch android \
+            --release-version="$RELEASE_VERSION" \
+            --target lib/main.dart
+    artifacts:
+      - build/**/outputs/**/*.aab
+      - flutter_drive.log
+    publishing:
+      email:
+        recipients:
+          - i4mjad@gmail.com
+        notify:
+          success: true
+          failure: true
+
+  combined-patch-workflow:
+    name: Combined iOS and Android Patch Workflow
+    max_build_duration: 120
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.amjadkhalfan.RebootApp
+      android_signing:
+        - android-signing-key
+      flutter: 3.32.5
+      groups:
+        - google_credentials
+        - SHOREBIRD
+      vars:
+        APP_STORE_APPLE_ID: 1531562469
+        PACKAGE_NAME: "com.amjadkhalfan.reboot_app_3"
+        GOOGLE_PLAY_TRACK: alpha
+        # XCODE_WORKSPACE: "Runner.xcworkspace"
+        # XCODE_SCHEME: "Runner-NoDA"
+    scripts:
+      - name: Install Shorebird
+        script: |
+          curl --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/shorebirdtech/install/main/install.sh -sSf | bash
+          echo PATH="$HOME/.shorebird/bin:$PATH" >> $CM_ENV
+
+      - name: Set up code signing settings on Xcode project
+        script: |
+          xcode-project use-profiles --warn-only
+
+      - name: Set up local.properties
+        script: |
+          echo "flutter.sdk=$HOME/programs/flutter" > "$CM_BUILD_DIR/android/local.properties"
+
+      - name: Get Flutter packages
+        script: |
+          flutter --version
+          flutter pub cache clean fl_chart
+          flutter packages pub get
+
+      - name: Install pods
+        script: |
+          find . -name "Podfile" -execdir pod install \;
+
+      # - name: Remove Device Activity Extension from build
+      #   script: |
+      #     # Create backup of project file
+      #     cp ios/Runner.xcodeproj/project.pbxproj ios/Runner.xcodeproj/project.pbxproj.backup
+      #     
+      #     # Remove the extension from Embed Foundation Extensions build phase (two lines)
+      #     sed -i '' '/6DB3DF102E507DAD0063474F.*FocusDeviceActivityMonitor\.appex.*Embed Foundation Extensions/d' ios/Runner.xcodeproj/project.pbxproj
+      #     sed -i '' '/6DB3DF102E507DAD0063474F.*FocusDeviceActivityMonitor\.appex in Embed Foundation Extensions/d' ios/Runner.xcodeproj/project.pbxproj
+      #     
+      #     echo "✅ Device Activity Extension removed from build process"
+
+      - name: Determine Android Release Version
+        script: |
+          VERSION=$(cat pubspec.yaml | grep 'version:' | head -1 | awk '{print $2}' | cut -d '+' -f 1)
+          BUILD_NUMBER_ANDROID=$(google-play get-latest-build-number --package-name "$PACKAGE_NAME" --tracks="$GOOGLE_PLAY_TRACK")
+          ANDROID_RELEASE_VERSION="$VERSION+$BUILD_NUMBER_ANDROID"
+          echo "ANDROID_RELEASE_VERSION=$ANDROID_RELEASE_VERSION" >> $CM_ENV
+
+      - name: Determine iOS Release Version
+        script: |
+          VERSION=$(cat pubspec.yaml | grep 'version:' | head -1 | awk '{print $2}' | cut -d '+' -f 1)
+          BUILD_NUMBER_IOS=$(app-store-connect get-latest-testflight-build-number "$APP_STORE_APPLE_ID")
+          IOS_RELEASE_VERSION="$VERSION+$BUILD_NUMBER_IOS"
+          echo "IOS_RELEASE_VERSION=$IOS_RELEASE_VERSION" >> $CM_ENV
+
+      - name: Shorebird Patch Android
+        script: |
+          shorebird patch android \
+            --release-version="$ANDROID_RELEASE_VERSION" \
+            --target lib/main.dart
+
+      - name: Shorebird Patch iOS
+        script: |
+          shorebird patch ios \
+            --release-version="$IOS_RELEASE_VERSION" \
+    artifacts:
+      - build/**/outputs/**/*.aab
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - flutter_drive.log
+    integrations:
+      app_store_connect: Taa'afi Codemagic
+    publishing:
+      email:
+        recipients:
+          - i4mjad@gmail.com
+        notify:
+          success: true
+          failure: true
+
+  combined-release-workflow:
+    name: Combined iOS and Android Release Workflow
+    max_build_duration: 120
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.amjadkhalfan.RebootApp
+      android_signing:
+        - android-signing-key
+      flutter: 3.32.5
+      groups:
+        - google_credentials
+        - SHOREBIRD
+      vars:
+        APP_STORE_APPLE_ID: 1531562469
+        PACKAGE_NAME: "com.amjadkhalfan.reboot_app_3"
+        GOOGLE_PLAY_TRACK: alpha
+        # XCODE_WORKSPACE: "Runner.xcworkspace"
+        # XCODE_SCHEME: "Runner-NoDA"
+    scripts:
+      - name: Install Shorebird
+        script: |
+          curl --proto '=https' --tlsv1.2 https://raw.githubusercontent.com/shorebirdtech/install/main/install.sh -sSf | bash
+          echo PATH="$HOME/.shorebird/bin:$PATH" >> $CM_ENV
+
+      - name: Set up code signing settings on Xcode project
+        script: |
+          xcode-project use-profiles --warn-only
+
+      - name: Set up local.properties
+        script: |
+          echo "flutter.sdk=$HOME/programs/flutter" > "$CM_BUILD_DIR/android/local.properties"
+
+      - name: Get Flutter packages
+        script: |
+          flutter --version
+          flutter pub cache clean fl_chart
+          flutter packages pub get
+
+      - name: Install pods
+        script: |
+          find . -name "Podfile" -execdir pod install \;
+
+      - name: Prepare Android build number
+        script: |
+          VERSION=$(cat pubspec.yaml | grep 'version:' | head -1 | awk '{print $2}' | cut -d '+' -f 1)
+          LATEST_BUILD_NUMBER=$(google-play get-latest-build-number --package-name "$PACKAGE_NAME" --tracks="$GOOGLE_PLAY_TRACK")
+          BUILD_NUMBER=$((LATEST_BUILD_NUMBER + 1))
+          if [ $BUILD_NUMBER -lt 10 ]; then
+            BUILD_NUMBER="0$BUILD_NUMBER"
+          fi
+          echo "VERSION=$VERSION" >> $CM_ENV
+          echo "ANDROID_BUILD_NUMBER=$BUILD_NUMBER" >> $CM_ENV
+
+      - name: Update Info.plist for iOS
+        script: |
+          VERSION=$(cat pubspec.yaml | grep 'version:' | head -1 | awk '{print $2}' | cut -d '+' -f 1)
+          BUILD_NUMBER_IOS=$(($(app-store-connect get-latest-testflight-build-number "$APP_STORE_APPLE_ID") + 1))
+          PLIST_PATH="./ios/Runner/Info.plist"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" "$PLIST_PATH"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER_IOS" "$PLIST_PATH"
+          echo "IOS_BUILD_NUMBER=$BUILD_NUMBER_IOS" >> $CM_ENV
+
+      # - name: Remove Device Activity Extension from build
+      #   script: |
+      #     # Create backup of project file
+      #     cp ios/Runner.xcodeproj/project.pbxproj ios/Runner.xcodeproj/project.pbxproj.backup
+      #     
+      #     # Remove the extension from Embed Foundation Extensions build phase (two lines)
+      #     sed -i '' '/6DB3DF102E507DAD0063474F.*FocusDeviceActivityMonitor\.appex.*Embed Foundation Extensions/d' ios/Runner.xcodeproj/project.pbxproj
+      #     sed -i '' '/6DB3DF102E507DAD0063474F.*FocusDeviceActivityMonitor\.appex in Embed Foundation Extensions/d' ios/Runner.xcodeproj/project.pbxproj
+      #     
+      #     echo "✅ Device Activity Extension removed from build process"
+
+      - name: Shorebird Release Android
+        script: |
+          shorebird release android --flutter-version=3.32.5 \
+            --build-name=$VERSION \
+            --build-number=$ANDROID_BUILD_NUMBER \
+            --target lib/main.dart
+
+      - name: Shorebird Release iOS
+        script: |
+          shorebird release ios --flutter-version=3.32.5 \
+    artifacts:
+      - build/**/outputs/**/*.aab
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - flutter_drive.log
+    integrations:
+      app_store_connect: Taa'afi Codemagic
+    publishing:
+      email:
+        recipients:
+          - i4mjad@gmail.com
+        notify:
+          success: true
+          failure: true
+      google_play:
+        credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
+        track: closed
+        submit_as_draft: false
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: false

@@ -1,0 +1,799 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lucide_icons/lucide_icons.dart';
+import 'package:go_router/go_router.dart';
+import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
+import '../../providers/ban_warning_providers.dart' as ban_providers;
+import '../../data/models/ban.dart';
+import '../../utils/ban_display_formatter.dart';
+import '../../../../core/localization/localization.dart';
+import '../../../../core/theming/app-themes.dart';
+import '../../../../core/theming/custom_theme_data.dart';
+import '../../../../core/theming/text_styles.dart';
+import '../../../../core/theming/spacing.dart';
+import '../../../../core/routing/route_names.dart';
+import '../../../../core/helpers/date_display_formater.dart';
+import '../../data/app_features_config.dart';
+import '../../../../core/shared_widgets/snackbar.dart';
+
+/// Widget that guards access to specific features based on user bans
+class FeatureAccessGuard extends ConsumerWidget {
+  final String featureUniqueName;
+  final Widget child;
+  final VoidCallback? onTap;
+  final String? customBanMessage;
+
+  const FeatureAccessGuard({
+    Key? key,
+    required this.featureUniqueName,
+    required this.child,
+    this.onTap,
+    this.customBanMessage,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Always show the child widget with tap handler
+    return GestureDetector(
+      onTap: () => _handleTap(context, ref),
+      child: child,
+    );
+  }
+
+  Future<void> _handleTap(BuildContext context, WidgetRef ref) async {
+    // Show loading modal bottom sheet
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      isDismissible: false,
+      enableDrag: false,
+      builder: (BuildContext modalContext) {
+        return _FeatureAccessModal(
+          featureUniqueName: featureUniqueName,
+          customBanMessage: customBanMessage,
+          onAccessGranted: () {
+            // Close modal and execute original callback
+            Navigator.of(modalContext).pop();
+            onTap?.call();
+          },
+          ref: ref,
+        );
+      },
+    );
+  }
+}
+
+/// Modal widget that shows loading and then ban details or allows access
+class _FeatureAccessModal extends ConsumerStatefulWidget {
+  final String featureUniqueName;
+  final String? customBanMessage;
+  final VoidCallback onAccessGranted;
+  final WidgetRef ref;
+
+  const _FeatureAccessModal({
+    Key? key,
+    required this.featureUniqueName,
+    this.customBanMessage,
+    required this.onAccessGranted,
+    required this.ref,
+  }) : super(key: key);
+
+  @override
+  ConsumerState<_FeatureAccessModal> createState() =>
+      _FeatureAccessModalState();
+}
+
+class _FeatureAccessModalState extends ConsumerState<_FeatureAccessModal> {
+  bool _isLoading = true;
+  Ban? _ban;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkFeatureAccess();
+  }
+
+  Future<void> _checkFeatureAccess() async {
+    try {
+      final canAccess = await checkFeatureAccess(ref, widget.featureUniqueName);
+
+      if (canAccess) {
+        // User has access, close modal and execute callback
+        widget.onAccessGranted();
+      } else {
+        // User is banned, get ban details
+        final ban = await ref.read(
+          ban_providers
+              .currentUserFeatureBanProvider(widget.featureUniqueName)
+              .future,
+        );
+
+        if (mounted) {
+          setState(() {
+            _ban = ban;
+
+            _isLoading = false;
+          });
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = AppTheme.of(context);
+    final localizations = AppLocalizations.of(context);
+
+    return DraggableScrollableSheet(
+      initialChildSize: _isLoading ? 0.25 : 0.5,
+      minChildSize: _isLoading ? 0.2 : 0.3,
+      maxChildSize: _isLoading ? 0.3 : 0.8,
+      builder: (context, scrollController) {
+        return Container(
+          decoration: BoxDecoration(
+            color: theme.backgroundColor,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: SingleChildScrollView(
+            controller: scrollController,
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: _isLoading
+                  ? _buildLoadingContent(context, theme, localizations)
+                  : _buildBanContent(context, theme, localizations),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildLoadingContent(BuildContext context, CustomThemeData theme,
+      AppLocalizations localizations) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Handle bar
+        Container(
+          width: 40,
+          height: 4,
+          decoration: BoxDecoration(
+            color: theme.grey[300],
+            borderRadius: BorderRadius.circular(2),
+          ),
+        ),
+        const SizedBox(height: 40),
+
+        // Simple loading indicator
+        Spinner(
+          strokeWidth: 3,
+          valueColor: theme.primary[600],
+        ),
+
+        const SizedBox(height: 40),
+      ],
+    );
+  }
+
+  Widget _buildBanContent(BuildContext context, CustomThemeData theme,
+      AppLocalizations localizations) {
+    final ban = _ban;
+    final locale = ref.watch(localeNotifierProvider);
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Handle bar
+        Center(
+          child: Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: theme.grey[300],
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+        ),
+        const SizedBox(height: 24),
+
+        // Ban icon
+        Center(
+          child: Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              color: theme.error[50],
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              LucideIcons.shieldOff,
+              size: 28,
+              color: theme.error[600],
+            ),
+          ),
+        ),
+
+        const SizedBox(height: 24),
+
+        // Title
+        Center(
+          child: Text(
+            localizations.translate('feature-access-restricted'),
+            style: TextStyles.h3.copyWith(
+              color: theme.error[800],
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+
+        const SizedBox(height: 8),
+
+        // Message
+        Center(
+          child: Text(
+            widget.customBanMessage ??
+                localizations.translate('feature-restricted-message'),
+            style: TextStyles.body.copyWith(
+              color: theme.grey[600],
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+
+        if (ban != null) ...[
+          const SizedBox(height: 24),
+
+          // Ban details
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: theme.error[50],
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: theme.error[200]!, width: 1),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Duration
+                Row(
+                  children: [
+                    Icon(
+                      LucideIcons.clock,
+                      size: 16,
+                      color: theme.error[600],
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      localizations.translate('duration'),
+                      style: TextStyles.small.copyWith(
+                        color: theme.error[700],
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const Spacer(),
+                    Text(
+                      BanDisplayFormatter.formatBanDuration(ban, context),
+                      style: TextStyles.small.copyWith(
+                        color: theme.error[800],
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 12),
+
+                // Reason
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      LucideIcons.alertTriangle,
+                      size: 16,
+                      color: theme.error[600],
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            localizations.translate('reason'),
+                            style: TextStyles.small.copyWith(
+                              color: theme.error[700],
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            ban.reason,
+                            style: TextStyles.small.copyWith(
+                              color: theme.error[800],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+
+                if (ban.expiresAt != null) ...[
+                  const SizedBox(height: 12),
+
+                  // Expires at
+                  Row(
+                    children: [
+                      Icon(
+                        LucideIcons.calendarX,
+                        size: 16,
+                        color: theme.error[600],
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        localizations.translate('expires-on'),
+                        style: TextStyles.small.copyWith(
+                          color: theme.error[700],
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const Spacer(),
+                      Text(
+                        getDisplayDate(
+                            ban.expiresAt!, locale?.languageCode ?? 'en'),
+                        style: TextStyles.small.copyWith(
+                          color: theme.error[800],
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+
+        const SizedBox(height: 24),
+
+        // Action buttons
+        Row(
+          children: [
+            // Close button
+            Expanded(
+              child: OutlinedButton(
+                onPressed: () => Navigator.of(context).pop(),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  side: BorderSide(color: theme.grey[400]!),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: Text(
+                  localizations.translate('close'),
+                  style: TextStyles.body.copyWith(
+                    color: theme.grey[700],
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ),
+
+            const SizedBox(width: 12),
+
+            // View details button
+            Expanded(
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  context.pushNamed(RouteNames.userProfile.name);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: theme.primary[600],
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  elevation: 0,
+                ),
+                child: Text(
+                  localizations.translate('view-details'),
+                  style: TextStyles.body.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+/// Simplified guard that just prevents action without showing a message
+class SilentFeatureGuard extends ConsumerWidget {
+  final String featureUniqueName;
+  final VoidCallback? onAccessDenied;
+  final VoidCallback onAccessGranted;
+
+  const SilentFeatureGuard({
+    Key? key,
+    required this.featureUniqueName,
+    required this.onAccessGranted,
+    this.onAccessDenied,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // 🚀 OPTIMIZED: Use lazy loading for specific feature only
+    final featureAccessAsync = ref
+        .watch(ban_providers.specificFeatureAccessProvider(featureUniqueName));
+    return featureAccessAsync.when(
+      loading: () => const SizedBox.shrink(),
+      error: (e, _) => const SizedBox.shrink(),
+      data: (canAccess) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (canAccess) {
+            onAccessGranted();
+          } else if (onAccessDenied != null) {
+            onAccessDenied!();
+          }
+        });
+
+        return const SizedBox.shrink();
+      },
+    );
+  }
+}
+
+/// Helper function to check feature access programmatically
+/// 🚀 OPTIMIZED: Uses lazy loading - only checks the specific feature needed
+Future<bool> checkFeatureAccess(WidgetRef ref, String featureUniqueName) async {
+  try {
+    // Use the new lazy loading provider - much faster!
+    final canAccess = await ref.read(
+        ban_providers.specificFeatureAccessProvider(featureUniqueName).future);
+    return canAccess;
+  } catch (e) {
+    // Fail-safe: allow access on error
+    return true;
+  }
+}
+
+/// Helper function to show ban message dialog
+Future<void> showFeatureBanDialog(
+  BuildContext context,
+  String featureUniqueName, {
+  String? customMessage,
+}) async {
+  final theme = AppTheme.of(context);
+  final l10n = AppLocalizations.of(context);
+
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      backgroundColor: theme.backgroundColor,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      title: Row(
+        children: [
+          Icon(
+            LucideIcons.shieldOff,
+            color: theme.error[600],
+            size: 24,
+          ),
+          horizontalSpace(Spacing.points8),
+          Text(
+            l10n.translate('access-restricted'),
+            style: TextStyles.h6.copyWith(
+              color: theme.error[800],
+            ),
+          ),
+        ],
+      ),
+      content: Text(
+        customMessage ?? l10n.translate('feature-ban-default-message'),
+        style: TextStyles.body.copyWith(
+          color: theme.grey[700],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(
+            l10n.translate('understood'),
+            style: TextStyles.body.copyWith(
+              color: theme.primary[600],
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+/// Helper function to check feature access and show ban snackbar if restricted
+Future<bool> checkFeatureAccessAndShowBanSnackbar(
+  BuildContext context,
+  WidgetRef ref,
+  String featureUniqueName, {
+  String? customMessage,
+}) async {
+  final canAccess = await checkFeatureAccess(ref, featureUniqueName);
+
+  if (!canAccess) {
+    // Get ban details to determine if it's permanent or temporary
+    final ban = await ref.read(
+      ban_providers.currentUserFeatureBanProvider(featureUniqueName).future,
+    );
+
+    final isPermanent = ban?.severity == BanSeverity.permanent;
+
+    // Use the existing showBanSnackBar function
+    showBanSnackBar(
+      context,
+      customMessage ??
+          AppLocalizations.of(context).translate('feature-access-restricted'),
+      onViewDetails: () {
+        // Navigate to user profile screen to show ban details
+        context.pushNamed(RouteNames.userProfile.name);
+      },
+      isPermanent: isPermanent,
+    );
+  }
+
+  return canAccess;
+}
+
+/// Enhanced Feature Access Guard with instant feedback support
+/// Perfect for community interactions where users expect immediate visual feedback
+class QuickActionGuard extends ConsumerStatefulWidget {
+  final String featureUniqueName;
+  final Widget child;
+  final VoidCallback onAccessGranted;
+  final VoidCallback? onAccessDenied;
+  final String? customBanMessage;
+  final bool showInstantFeedback;
+  final Duration feedbackDuration;
+
+  const QuickActionGuard({
+    Key? key,
+    required this.featureUniqueName,
+    required this.child,
+    required this.onAccessGranted,
+    this.onAccessDenied,
+    this.customBanMessage,
+    this.showInstantFeedback = true,
+    this.feedbackDuration = const Duration(milliseconds: 300),
+  }) : super(key: key);
+
+  @override
+  ConsumerState<QuickActionGuard> createState() => _QuickActionGuardState();
+}
+
+class _QuickActionGuardState extends ConsumerState<QuickActionGuard>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _scaleAnimation;
+  bool _isProcessing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: widget.feedbackDuration,
+      vsync: this,
+    );
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.95,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    ));
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: _handleTap,
+      child: AnimatedBuilder(
+        animation: _scaleAnimation,
+        builder: (context, child) {
+          return Transform.scale(
+            scale: _scaleAnimation.value,
+            child: widget.child,
+          );
+        },
+      ),
+    );
+  }
+
+  Future<void> _handleTap() async {
+    if (_isProcessing) return;
+
+    setState(() => _isProcessing = true);
+
+    // Show instant visual feedback
+    if (widget.showInstantFeedback) {
+      await _animationController.forward();
+      await _animationController.reverse();
+    }
+
+    // Check feature access
+    try {
+      final canAccess = await checkFeatureAccess(ref, widget.featureUniqueName);
+
+      if (canAccess) {
+        // Execute the action
+        widget.onAccessGranted();
+      } else {
+        // Show quick ban notification
+        await _showQuickBanFeedback();
+        widget.onAccessDenied?.call();
+      }
+    } catch (e) {
+      // On error, allow the action (fail-safe approach)
+      widget.onAccessGranted();
+    } finally {
+      if (mounted) {
+        setState(() => _isProcessing = false);
+      }
+    }
+  }
+
+  Future<void> _showQuickBanFeedback() async {
+    if (!mounted) return;
+
+    final ban = await ref.read(
+      ban_providers
+          .currentUserFeatureBanProvider(widget.featureUniqueName)
+          .future,
+    );
+
+    final isPermanent = ban?.severity == BanSeverity.permanent;
+
+    // Use the existing showBanSnackBar function
+    showBanSnackBar(
+      context,
+      widget.customBanMessage ??
+          AppLocalizations.of(context).translate('feature-access-restricted'),
+      onViewDetails: () {
+        // Navigate to user profile screen to show ban details
+        context.pushNamed(RouteNames.userProfile.name);
+      },
+      isPermanent: isPermanent,
+    );
+  }
+}
+
+/// Smart Feature Guard that adapts UX based on action type
+class SmartFeatureGuard extends ConsumerWidget {
+  final String featureUniqueName;
+  final Widget child;
+  final VoidCallback onAccessGranted;
+  final VoidCallback? onAccessDenied;
+  final String? customBanMessage;
+  final FeatureGuardMode mode;
+
+  const SmartFeatureGuard({
+    Key? key,
+    required this.featureUniqueName,
+    required this.child,
+    required this.onAccessGranted,
+    this.onAccessDenied,
+    this.customBanMessage,
+    this.mode = FeatureGuardMode.modal,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    switch (mode) {
+      case FeatureGuardMode.quick:
+        return QuickActionGuard(
+          featureUniqueName: featureUniqueName,
+          onAccessGranted: onAccessGranted,
+          onAccessDenied: onAccessDenied,
+          customBanMessage: customBanMessage,
+          child: child,
+        );
+      case FeatureGuardMode.modal:
+        return FeatureAccessGuard(
+          featureUniqueName: featureUniqueName,
+          onTap: onAccessGranted,
+          customBanMessage: customBanMessage,
+          child: child,
+        );
+      case FeatureGuardMode.silent:
+        return SilentFeatureGuard(
+          featureUniqueName: featureUniqueName,
+          onAccessGranted: onAccessGranted,
+          onAccessDenied: onAccessDenied,
+        );
+    }
+  }
+}
+
+/// Determines how the feature guard should behave
+enum FeatureGuardMode {
+  /// Shows instant feedback, then processes action - for quick interactions
+  quick,
+
+  /// Shows modal with ban details - for major actions like posting
+  modal,
+
+  /// No UI, just programmatic check - for background operations
+  silent,
+}
+
+/// Convenient wrapper for community posting actions
+class CommunityPostGuard extends StatelessWidget {
+  final Widget child;
+  final VoidCallback onAccessGranted;
+  final VoidCallback? onAccessDenied;
+
+  const CommunityPostGuard({
+    Key? key,
+    required this.child,
+    required this.onAccessGranted,
+    this.onAccessDenied,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SmartFeatureGuard(
+      featureUniqueName: AppFeaturesConfig.postCreation,
+      mode: FeatureGuardMode.modal,
+      onAccessGranted: onAccessGranted,
+      onAccessDenied: onAccessDenied,
+      customBanMessage:
+          AppLocalizations.of(context).translate('post-creation-restricted'),
+      child: child,
+    );
+  }
+}
+
+/// Convenient wrapper for community commenting actions
+class CommunityCommentGuard extends StatelessWidget {
+  final Widget child;
+  final VoidCallback onAccessGranted;
+  final VoidCallback? onAccessDenied;
+
+  const CommunityCommentGuard({
+    Key? key,
+    required this.child,
+    required this.onAccessGranted,
+    this.onAccessDenied,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SmartFeatureGuard(
+      featureUniqueName: AppFeaturesConfig.commentCreation,
+      mode: FeatureGuardMode.quick,
+      onAccessGranted: onAccessGranted,
+      onAccessDenied: onAccessDenied,
+      customBanMessage:
+          AppLocalizations.of(context).translate('comment-creation-restricted'),
+      child: child,
+    );
+  }
+}

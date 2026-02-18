@@ -1,0 +1,151 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lucide_icons/lucide_icons.dart';
+import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
+import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
+import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
+import 'package:reboot_app_3/core/theming/app-themes.dart';
+import 'package:reboot_app_3/core/theming/spacing.dart';
+import 'package:reboot_app_3/core/theming/text_styles.dart';
+import 'package:reboot_app_3/core/utils/localization_helper.dart';
+import 'package:reboot_app_3/features/vault/application/library/library_notifier.dart';
+import 'package:reboot_app_3/features/vault/data/library/models/cursor_content.dart';
+import 'package:reboot_app_3/features/vault/data/library/models/cursor_content_type.dart';
+import 'package:reboot_app_3/features/vault/presentation/library/content_item_widget.dart';
+
+class ContentTypeScreen extends ConsumerStatefulWidget {
+  const ContentTypeScreen(this.typeId, {super.key});
+
+  final String typeId;
+  @override
+  ConsumerState<ConsumerStatefulWidget> createState() =>
+      _ContentTypeScreenState();
+}
+
+class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
+  final TextEditingController searchController = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
+  bool _isLoading = true;
+
+  List<CursorContent> content = [];
+  List<CursorContent> filteredData = [];
+  CursorContentType? contentType;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+
+    searchController.addListener(_onSearchChanged);
+  }
+
+  Future<void> _loadData() async {
+    try {
+      final results = await Future.wait([
+        ref
+            .read(libraryNotifierProvider.notifier)
+            .getContentTypeById(widget.typeId),
+        ref
+            .read(libraryNotifierProvider.notifier)
+            .getContentByType(widget.typeId),
+      ]);
+
+      final fetchedContentType = results[0] as CursorContentType;
+      final contentList = results[1] as List<CursorContent>;
+
+      setState(() {
+        contentType = fetchedContentType;
+        content = contentList;
+        filteredData = contentList;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      // You might want to show an error message here
+    }
+  }
+
+  void _onSearchChanged() {
+    setState(() {
+      String searchQuery = searchController.text.toLowerCase();
+      filteredData = content
+          .where((item) =>
+              item.name.toLowerCase().contains(searchQuery) ||
+              (item.nameAr?.toLowerCase().contains(searchQuery) ?? false))
+          .toList();
+    });
+  }
+
+  @override
+  void dispose() {
+    searchController.removeListener(_onSearchChanged);
+    searchController.dispose();
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = AppTheme.of(context);
+
+    return Scaffold(
+      backgroundColor: theme.backgroundColor,
+      appBar: appBar(
+          context,
+          ref,
+          contentType != null
+              ? LocalizationHelper.getLocalizedName(
+                  context, contentType!.name, contentType!.nameAr)
+              : '',
+          false,
+          true),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CustomTextField(
+                validator: (data) => null,
+                controller: searchController,
+                prefixIcon: LucideIcons.search,
+                inputType: TextInputType.text,
+                focusNode: _focusNode,
+              ),
+              verticalSpace(Spacing.points16),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: _isLoading
+                      ? Center(
+                          child: Spinner(),
+                        )
+                      : filteredData.isEmpty
+                          ? Center(
+                              child: Text(
+                                'No content found',
+                                style: TextStyles.body.copyWith(
+                                  color: theme.grey[600],
+                                ),
+                              ),
+                            )
+                          : ListView.separated(
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              itemCount: filteredData.length,
+                              separatorBuilder: (_, __) =>
+                                  verticalSpace(Spacing.points8),
+                              itemBuilder: (context, index) => ContentItem(
+                                content: filteredData[index],
+                              ),
+                            ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

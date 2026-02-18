@@ -1,0 +1,87 @@
+import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:reboot_app_3/features/vault/application/emotion_service.dart';
+import 'package:reboot_app_3/features/vault/data/models/emotion_model.dart';
+import 'package:reboot_app_3/features/vault/data/emotions/emotion_repository.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'emotion_notifier.g.dart';
+
+@riverpod
+class EmotionNotifier extends _$EmotionNotifier {
+  EmotionService get service => ref.read(emotionServiceProvider);
+
+  @override
+  FutureOr<List<EmotionModel>> build() async {
+    final date = DateTime.now(); // or any default date
+    return await service.readEmotionsByDate(date);
+  }
+
+  Future<void> createEmotion(EmotionModel emotion) async {
+    state = const AsyncValue.loading();
+    try {
+      await service.createEmotion(emotion: emotion);
+      state = AsyncValue.data(await build());
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
+
+  Future<List<EmotionModel>> getEmotionsByDate(DateTime date) async {
+    return await service.readEmotionsByDate(date);
+  }
+
+  Future<void> updateEmotion(EmotionModel emotion) async {
+    state = const AsyncValue.loading();
+    try {
+      await service.updateEmotion(emotion: emotion);
+      state = AsyncValue.data(await build());
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
+
+  Future<void> deleteEmotion(String emotionId) async {
+    state = const AsyncValue.loading();
+    try {
+      await service.deleteEmotion(emotionId: emotionId);
+      state = AsyncValue.data(await build());
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
+
+  Future<void> deleteAllEmotions(DateTime date) async {
+    state = const AsyncValue.loading();
+    try {
+      await service.deleteAllEmotions();
+      state = AsyncValue.data(await build());
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
+
+  Future<void> createMultipleEmotions(List<EmotionModel> emotions) async {
+    state = const AsyncValue.loading();
+    try {
+      await service.createMultipleEmotions(emotions: emotions);
+      state = AsyncValue.data(await build());
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
+
+  Stream<List<EmotionModel>> watchEmotionsByDate(DateTime date) {
+    return service.watchEmotionsByDate(date);
+  }
+}
+
+@Riverpod(keepAlive: true)
+EmotionService emotionService(Ref ref) {
+  final firestore = FirebaseFirestore.instance;
+  final auth = FirebaseAuth.instance;
+  final repository = EmotionRepository(firestore, auth);
+  return EmotionService(repository);
+}

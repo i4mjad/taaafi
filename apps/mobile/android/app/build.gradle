@@ -1,0 +1,113 @@
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    id "dev.flutter.flutter-gradle-plugin"
+    id "com.google.gms.google-services"
+    id "com.google.firebase.crashlytics"
+}
+
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localProperties.load(localPropertiesFile.newReader('UTF-8'))
+}
+
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file("key.properties")
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
+def flutterVersionCode = project.hasProperty('VERSION_CODE') ? project.VERSION_CODE.toInteger() : localProperties.getProperty('flutter.versionCode', '10000').toInteger()
+def flutterVersionName = project.hasProperty('VERSION_NAME') ? project.VERSION_NAME : localProperties.getProperty('flutter.versionName', '1.0.0')
+
+
+
+android {
+
+    namespace "com.amjadkhalfan.reboot_app_3"
+
+
+  compileSdkVersion 35
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+
+    lintOptions {
+        disable 'InvalidPackage'
+    }
+
+    defaultConfig {
+        multiDexEnabled true
+        applicationId "com.amjadkhalfan.reboot_app_3"
+        targetSdkVersion 35
+        minSdkVersion 23
+        versionCode flutterVersionCode
+        versionName flutterVersionName
+        //TODO: uncomment this to create a new version
+        // 
+        
+    }
+
+    // compileOptions {
+    //     // Flag to enable support for the new language APIs
+    //     coreLibraryDesugaringEnabled true
+    //     // Sets Java compatibility to Java 8
+    //     sourceCompatibility JavaVersion.VERSION_17
+    //     targetCompatibility JavaVersion.VERSION_17
+    // }
+
+    compileOptions {
+    // Flag to enable support for the new language APIs
+        coreLibraryDesugaringEnabled true
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+
+    buildFeatures {
+        viewBinding = true
+        buildConfig true
+    }
+
+    flutter {
+        source '../..'
+    }
+
+    dependencies {
+        coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'
+        implementation "com.android.billingclient:billing-ktx:7.1.1"
+        implementation platform('com.google.firebase:firebase-bom:33.8.0')
+        implementation 'com.google.firebase:firebase-messaging:24.1.0'
+        implementation 'com.google.firebase:firebase-analytics'
+//        implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    }
+
+    signingConfigs {
+        release {
+            if (System.getenv()["CI"]) { // CI=true is exported by Codemagic
+                storeFile file(System.getenv()["CM_KEYSTORE_PATH"])
+                storePassword System.getenv()["CM_KEYSTORE_PASSWORD"]
+                keyAlias System.getenv()["CM_KEY_ALIAS"]
+                keyPassword System.getenv()["CM_KEY_PASSWORD"]
+            } else {
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+                storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
+                storePassword keystoreProperties['storePassword']
+            }
+        }
+    }
+
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+        }
+    }
+
+}
+
