@@ -1,0 +1,28 @@
+# Environment files
+.env
+.env.*
+.env.local
+.env.production
+
+# Service account keys
+*-service-account*.json
+**/service-account*.json
+**/*-d135eb*.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+downloaded-logs-*.json
+
+# Firebase
+firebase-debug.log
+firebase-debug.*.log
+ui-debug.log
+.firebase/
+functions/lib/
