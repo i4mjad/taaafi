@@ -87,6 +87,9 @@ class UsageNotifier extends _$UsageNotifier {
       return UsageSummary.empty(DateTime.now());
     }
 
+    // Start iOS monitoring (schedules threshold events via DeviceActivityMonitor)
+    await bridge.startIosMonitoring();
+
     // Fetch fresh data from native
     _log('UsageNotifier.build → fetching native usage');
     final summary = await bridge.getTodayUsage();

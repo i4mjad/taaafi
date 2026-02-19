@@ -10,6 +10,7 @@ import 'package:reboot_app_3/features/fort/data/notifiers/fort_state_notifier.da
 import 'package:reboot_app_3/features/fort/data/notifiers/usage_notifier.dart';
 import 'package:reboot_app_3/features/fort/presentation/widgets/fort_hero_section.dart';
 import 'package:reboot_app_3/features/fort/presentation/widgets/fort_permission_card.dart';
+import 'dart:io';
 import 'package:reboot_app_3/features/fort/presentation/widgets/ios_usage_report_trigger.dart';
 import 'package:reboot_app_3/features/fort/presentation/widgets/usage_summary_card.dart';
 
@@ -112,11 +113,16 @@ class _UsageSection extends ConsumerWidget {
 
     return Column(
       children: [
-        // Hidden platform view that triggers the iOS DeviceActivityReportExtension.
-        // When it renders, the extension aggregates usage and writes to UserDefaults.
-        IosUsageReportTrigger(
-          onDataReady: () => ref.invalidate(usageNotifierProvider),
-        ),
+        // On iOS: show native DeviceActivityReport view (the ONLY way to
+        // display actual usage data — the report extension is sandboxed).
+        if (Platform.isIOS)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: IosUsageReportView(
+              onReady: () => ref.invalidate(usageNotifierProvider),
+            ),
+          ),
+        // On Android (or if monitor data is available on iOS): show Dart widget
         usageAsync.when(
           data: (summary) => UsageSummaryCard(summary: summary),
           loading: () => const UsageSummaryCard.loading(),

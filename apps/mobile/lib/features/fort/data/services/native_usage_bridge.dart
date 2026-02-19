@@ -120,6 +120,32 @@ class NativeUsageBridge {
       return UsageSummary.empty(DateTime.now());
     }
   }
+
+  /// Start daily monitoring on iOS. The DeviceActivityMonitor extension
+  /// writes threshold events to app group UserDefaults.
+  Future<bool> startIosMonitoring() async {
+    if (!Platform.isIOS) return false;
+    _log('startIosMonitoring → calling ios_startMonitoring');
+    try {
+      final result = await _channel.invokeMethod<bool>('ios_startMonitoring');
+      _log('startIosMonitoring ← result', result);
+      return result ?? false;
+    } on PlatformException catch (e) {
+      _log('startIosMonitoring ← ERROR', '${e.code}: ${e.message}');
+      return false;
+    }
+  }
+
+  /// Get raw monitor event log (diagnostics).
+  Future<String> getIosMonitorEvents() async {
+    if (!Platform.isIOS) return '[]';
+    try {
+      final result = await _channel.invokeMethod<String>('ios_getMonitorEvents');
+      return result ?? '[]';
+    } on PlatformException {
+      return '[]';
+    }
+  }
 }
 
 @Riverpod(keepAlive: true)

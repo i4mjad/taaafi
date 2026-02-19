@@ -210,13 +210,15 @@ class _FortDiagnosticsScreenState
             ),
           ),
 
-          // iOS: Embedded DeviceActivityReport trigger
+          // iOS: Embedded DeviceActivityReport view (visual only — sandboxed)
           if (Platform.isIOS)
-            IosUsageReportTrigger(
-              onDataReady: () {
-                _addLog('IOS', 'DeviceActivityReport view rendered — data should be ready');
-                _fetchUsage();
-              },
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: IosUsageReportView(
+                onReady: () {
+                  _addLog('IOS', 'DeviceActivityReport view rendered');
+                },
+              ),
             ),
 
           // Action buttons
@@ -238,6 +240,24 @@ class _FortDiagnosticsScreenState
                   onPressed: _fetchUsage,
                 ),
                 if (Platform.isIOS) ...[
+                  _ActionChip(
+                    label: 'Start Monitor',
+                    onPressed: () async {
+                      _addLog('MON', 'Starting iOS monitoring...');
+                      final bridge = ref.read(nativeUsageBridgeProvider);
+                      final ok = await bridge.startIosMonitoring();
+                      _addLog('MON', 'startMonitoring result: $ok');
+                    },
+                  ),
+                  _ActionChip(
+                    label: 'Get Events',
+                    onPressed: () async {
+                      _addLog('MON', 'Fetching monitor events...');
+                      final bridge = ref.read(nativeUsageBridgeProvider);
+                      final events = await bridge.getIosMonitorEvents();
+                      _addLog('MON', 'Events: $events');
+                    },
+                  ),
                   _ActionChip(
                     label: 'Raw: checkAuth',
                     onPressed: () =>
