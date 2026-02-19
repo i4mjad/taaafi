@@ -4,14 +4,14 @@ import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDTqyzIxVboEDvW3g5S_zCnGK0smR-jqg8",
-  authDomain: "rebootapp-37a30.firebaseapp.com",
-  databaseURL: "https://rebootapp-37a30.firebaseio.com",
-  projectId: "rebootapp-37a30",
-  storageBucket: "rebootapp-37a30.appspot.com",
-  messagingSenderId: "364568176835",
-  appId: "1:364568176835:web:169cbadb6e2a85ffe31a76",
-  measurementId: "G-E3PBLR6YFF"
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
 const app = initializeApp(firebaseConfig);

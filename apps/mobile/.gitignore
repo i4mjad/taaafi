@@ -118,3 +118,16 @@ app.*.symbols
 ios/Runner.xcodeproj/project.pbxproj
 
 android/app/release/app-release.aab
+
+# Environment files
+.env
+.env.*
+functions/.env
+functions/.env.*
+functions/src/.env.*
+
+# Service account keys
+**/service-account*.json
+**/*-d135eb9693d6.json
+tool/*.json
+!tool/package.json
