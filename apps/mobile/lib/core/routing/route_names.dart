@@ -77,4 +77,6 @@ enum RouteNames {
   // Direct Messaging routes
   communityChats,
   directChat,
+  // Fort
+  fortDiagnostics,
 }

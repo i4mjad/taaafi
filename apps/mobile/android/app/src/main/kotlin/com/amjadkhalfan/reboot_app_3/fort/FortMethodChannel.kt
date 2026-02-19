@@ -2,6 +2,8 @@ package com.amjadkhalfan.reboot_app_3.fort
 
 import android.app.usage.UsageStatsManager
 import android.content.Context
+import android.content.Intent
+import android.provider.Settings
 import com.amjadkhalfan.reboot_app_3.FocusLog
 import com.amjadkhalfan.reboot_app_3.PickupStore
 import com.amjadkhalfan.reboot_app_3.UsageBridge
@@ -35,7 +37,15 @@ class FortMethodChannel(
                 }
                 "android_checkUsageAccess" -> {
                     val hasAccess = usageBridge.hasUsageAccess()
+                    FocusLog.d("Fort Android→Dart ${call.method} OK", hasAccess)
                     result.success(hasAccess)
+                }
+                "android_requestUsageAccess" -> {
+                    FocusLog.d("Fort: opening usage access settings")
+                    val intent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    context.startActivity(intent)
+                    result.success(true)
                 }
                 else -> {
                     FocusLog.d("Fort Android→Dart ${call.method} NOT_IMPLEMENTED")

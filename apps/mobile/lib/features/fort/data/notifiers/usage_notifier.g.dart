@@ -28,7 +28,7 @@ final monthlyUsageSummariesProvider =
 // ignore: unused_element
 typedef MonthlyUsageSummariesRef
     = AutoDisposeFutureProviderRef<List<UsageSummary>>;
-String _$usagePermissionHash() => r'23d5da2649981a7819c989b50facd47072ff776f';
+String _$usagePermissionHash() => r'3ea1b76a6fbcca70584d845c503435f4b67a2f43';
 
 /// Whether the user has granted usage access permission.
 ///
@@ -46,7 +46,7 @@ final usagePermissionProvider =
 );
 
 typedef _$UsagePermission = AutoDisposeAsyncNotifier<bool>;
-String _$usageNotifierHash() => r'0db96076b2844b3c82c878578f6b0164b711c92e';
+String _$usageNotifierHash() => r'edeac2b551e70f052483a338378f0720e4f3f322';
 
 /// Today's usage data — fetches from native and persists to Firestore.
 ///

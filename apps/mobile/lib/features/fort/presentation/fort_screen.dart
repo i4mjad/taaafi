@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
+import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
@@ -35,11 +37,27 @@ class FortScreen extends ConsumerWidget {
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
-                  child: Text(
-                    t.translate('fort'),
-                    style: TextStyles.screenHeadding.copyWith(
-                      color: isDark ? theme.grey[100] : theme.grey[900],
-                    ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          t.translate('fort'),
+                          style: TextStyles.screenHeadding.copyWith(
+                            color: isDark ? theme.grey[100] : theme.grey[900],
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          Icons.bug_report_outlined,
+                          color: isDark ? theme.grey[500] : theme.grey[400],
+                          size: 20,
+                        ),
+                        onPressed: () => context
+                            .goNamed(RouteNames.fortDiagnostics.name),
+                        tooltip: 'Diagnostics',
+                      ),
+                    ],
                   ),
                 ),
               ),

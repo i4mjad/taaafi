@@ -28,10 +28,22 @@ class UsageSummary {
             ?.map((c) => UsageCategory.fromJson(c as Map<String, dynamic>))
             .toList() ??
         [];
+
+    // Handle date as DateTime, ISO string, or Unix timestamp (seconds)
+    DateTime date;
+    final rawDate = json['date'];
+    if (rawDate is DateTime) {
+      date = rawDate;
+    } else if (rawDate is String) {
+      date = DateTime.tryParse(rawDate) ?? DateTime.now();
+    } else if (rawDate is num) {
+      date = DateTime.fromMillisecondsSinceEpoch(rawDate.toInt() * 1000);
+    } else {
+      date = DateTime.now();
+    }
+
     return UsageSummary(
-      date: json['date'] is DateTime
-          ? json['date'] as DateTime
-          : DateTime.parse(json['date'] as String),
+      date: date,
       categories: cats,
       totalScreenTimeMinutes: (json['totalScreenTimeMinutes'] as num?)?.toInt() ?? 0,
       pickups: (json['pickups'] as num?)?.toInt() ?? 0,
@@ -57,8 +69,10 @@ class UsageCategory {
   });
 
   factory UsageCategory.fromJson(Map<String, dynamic> json) {
+    // Android sends 'type', iOS report extension sends 'name'
+    final typeStr = (json['type'] as String?) ?? (json['name'] as String?) ?? 'other';
     return UsageCategory(
-      type: UsageCategoryType.fromString(json['type'] as String? ?? 'other'),
+      type: UsageCategoryType.fromString(typeStr),
       minutes: (json['minutes'] as num?)?.toInt() ?? 0,
     );
   }

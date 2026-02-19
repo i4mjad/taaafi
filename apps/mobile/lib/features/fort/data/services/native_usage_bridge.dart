@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer' as developer;
 import 'dart:io';
 
 import 'package:flutter/services.dart';
@@ -10,172 +11,114 @@ part 'native_usage_bridge.g.dart';
 
 /// Unified bridge for native usage data on iOS and Android.
 ///
-/// Android: Uses existing `analytics.usage` MethodChannel with UsageStatsManager.
+/// Android: Uses `com.taaafi.fort` MethodChannel with category-level UsageStats.
 /// iOS: Uses `com.taaafi.fort` MethodChannel with Screen Time API (FamilyControls).
 class NativeUsageBridge {
-  static const _androidChannel = MethodChannel('analytics.usage');
-  static const _iosChannel = MethodChannel('com.taaafi.fort');
+  static const _channel = MethodChannel('com.taaafi.fort');
+
+  static void _log(String message, [Object? data]) {
+    final msg = data != null ? '[Fort Bridge] $message: $data' : '[Fort Bridge] $message';
+    developer.log(msg, name: 'fort');
+    // Also print so it shows in flutter run console
+    // ignore: avoid_print
+    print(msg);
+  }
 
   /// Check if the app has permission to read usage data.
   Future<bool> checkUsagePermission() async {
+    final method = Platform.isIOS ? 'ios_checkFamilyControlsAuth' : 'android_checkUsageAccess';
+    _log('checkUsagePermission → calling $method');
     try {
-      if (Platform.isAndroid) {
-        final result =
-            await _androidChannel.invokeMethod<bool>('android_checkUsageAccess');
-        return result ?? false;
-      } else if (Platform.isIOS) {
-        final result =
-            await _iosChannel.invokeMethod<bool>('ios_checkFamilyControlsAuth');
-        return result ?? false;
-      }
+      final result = await _channel.invokeMethod<bool>(method);
+      _log('checkUsagePermission ← result', result);
+      return result ?? false;
+    } on PlatformException catch (e) {
+      _log('checkUsagePermission ← ERROR', '${e.code}: ${e.message}');
       return false;
-    } on PlatformException {
+    } on MissingPluginException catch (e) {
+      _log('checkUsagePermission ← MISSING PLUGIN (channel not registered?)', e.message);
       return false;
     }
   }
 
-  /// Request permission to read usage data (opens system settings on Android,
-  /// triggers FamilyControls auth on iOS).
+  /// Request permission to read usage data.
   Future<bool> requestUsagePermission() async {
+    final method = Platform.isIOS ? 'ios_requestFamilyControlsAuth' : 'android_requestUsageAccess';
+    _log('requestUsagePermission → calling $method');
     try {
       if (Platform.isAndroid) {
-        await _androidChannel.invokeMethod<bool>('android_requestUsageAccess');
+        await _channel.invokeMethod<bool>(method);
         // Android opens settings — user must come back, so we re-check
         return checkUsagePermission();
-      } else if (Platform.isIOS) {
-        final result = await _iosChannel
-            .invokeMethod<bool>('ios_requestFamilyControlsAuth');
+      } else {
+        final result = await _channel.invokeMethod<bool>(method);
+        _log('requestUsagePermission ← result', result);
         return result ?? false;
       }
+    } on PlatformException catch (e) {
+      _log('requestUsagePermission ← ERROR', '${e.code}: ${e.message}');
       return false;
-    } on PlatformException {
+    } on MissingPluginException catch (e) {
+      _log('requestUsagePermission ← MISSING PLUGIN', e.message);
       return false;
     }
   }
 
   /// Get today's usage data from the native platform.
   Future<UsageSummary> getTodayUsage() async {
+    _log('getTodayUsage → platform=${Platform.operatingSystem}');
     try {
       if (Platform.isAndroid) {
         return _getAndroidUsage();
       } else if (Platform.isIOS) {
         return _getIosUsage();
       }
+      _log('getTodayUsage ← unsupported platform');
       return UsageSummary.empty(DateTime.now());
-    } on PlatformException {
+    } on PlatformException catch (e) {
+      _log('getTodayUsage ← ERROR', '${e.code}: ${e.message}');
+      return UsageSummary.empty(DateTime.now());
+    } on MissingPluginException catch (e) {
+      _log('getTodayUsage ← MISSING PLUGIN', e.message);
       return UsageSummary.empty(DateTime.now());
     }
   }
 
   Future<UsageSummary> _getAndroidUsage() async {
+    _log('_getAndroidUsage → calling android_getCategoryUsage');
     final rawJson =
-        await _androidChannel.invokeMethod<String>('android_getSnapshot');
-    if (rawJson == null) return UsageSummary.empty(DateTime.now());
-
-    final data = jsonDecode(rawJson) as Map<String, dynamic>;
-    final apps = data['apps'] as List<dynamic>? ?? [];
-    final pickups = (data['pickups'] as num?)?.toInt() ?? 0;
-
-    // Aggregate apps into categories
-    final categoryMinutes = <UsageCategoryType, int>{};
-    for (final app in apps) {
-      final pkg = app['pkg'] as String? ?? '';
-      final minutes = (app['minutes'] as num?)?.toInt() ?? 0;
-      final category = _categorizePackage(pkg);
-      categoryMinutes[category] =
-          (categoryMinutes[category] ?? 0) + minutes;
+        await _channel.invokeMethod<String>('android_getCategoryUsage');
+    _log('_getAndroidUsage ← rawJson length', rawJson?.length ?? 'null');
+    if (rawJson == null) {
+      _log('_getAndroidUsage ← null response, returning empty');
+      return UsageSummary.empty(DateTime.now());
     }
 
-    final categories = categoryMinutes.entries
-        .map((e) => UsageCategory(type: e.key, minutes: e.value))
-        .toList()
-      ..sort((a, b) => b.minutes.compareTo(a.minutes));
-
-    final totalMinutes =
-        categories.fold<int>(0, (sum, c) => sum + c.minutes);
-
-    return UsageSummary(
-      date: DateTime.now(),
-      categories: categories,
-      totalScreenTimeMinutes: totalMinutes,
-      pickups: pickups,
-    );
+    _log('_getAndroidUsage ← raw', rawJson);
+    final data = jsonDecode(rawJson) as Map<String, dynamic>;
+    return UsageSummary.fromJson(data);
   }
 
   Future<UsageSummary> _getIosUsage() async {
+    _log('_getIosUsage → calling ios_getUsageReport');
     try {
       final rawJson =
-          await _iosChannel.invokeMethod<String>('ios_getUsageReport');
-      if (rawJson == null) return UsageSummary.empty(DateTime.now());
+          await _channel.invokeMethod<String>('ios_getUsageReport');
+      _log('_getIosUsage ← rawJson length', rawJson?.length ?? 'null');
+      if (rawJson == null) {
+        _log('_getIosUsage ← null response, returning empty');
+        return UsageSummary.empty(DateTime.now());
+      }
 
+      _log('_getIosUsage ← raw', rawJson);
       final data = jsonDecode(rawJson) as Map<String, dynamic>;
-      return UsageSummary.fromJson(data);
-    } on PlatformException {
+      final summary = UsageSummary.fromJson(data);
+      _log('_getIosUsage ← parsed: categories=${summary.categories.length}, total=${summary.totalScreenTimeMinutes}min, pickups=${summary.pickups}');
+      return summary;
+    } on PlatformException catch (e) {
+      _log('_getIosUsage ← ERROR', '${e.code}: ${e.message}');
       return UsageSummary.empty(DateTime.now());
     }
-  }
-
-  /// Map an Android package name to a usage category.
-  static UsageCategoryType _categorizePackage(String packageName) {
-    final pkg = packageName.toLowerCase();
-
-    // Social media
-    if (_matchesAny(pkg, [
-      'instagram', 'facebook', 'twitter', 'tiktok', 'snapchat',
-      'reddit', 'linkedin', 'pinterest', 'tumblr', 'threads',
-      'com.zhiliaoapp.musically', // TikTok
-    ])) return UsageCategoryType.socialMedia;
-
-    // Entertainment
-    if (_matchesAny(pkg, [
-      'youtube', 'netflix', 'spotify', 'twitch', 'hulu',
-      'disney', 'hbo', 'vimeo', 'deezer', 'anghami',
-      'video', 'music', 'media', 'player',
-    ])) return UsageCategoryType.entertainment;
-
-    // Games
-    if (_matchesAny(pkg, [
-      'game', 'games', 'gaming', 'supercell', 'rovio',
-      'king.com', 'gameloft', 'ea.game', 'com.kiloo',
-    ])) return UsageCategoryType.games;
-
-    // Communication
-    if (_matchesAny(pkg, [
-      'whatsapp', 'telegram', 'signal', 'messenger', 'viber',
-      'wechat', 'line', 'kakaotalk', 'discord', 'slack',
-      'com.google.android.apps.messaging', 'sms', 'dialer', 'phone',
-    ])) return UsageCategoryType.communication;
-
-    // Productivity
-    if (_matchesAny(pkg, [
-      'docs', 'sheets', 'slides', 'drive', 'notion', 'todoist',
-      'trello', 'asana', 'evernote', 'onenote', 'office',
-      'calendar', 'calculator', 'clock', 'files',
-    ])) return UsageCategoryType.productivity;
-
-    // Education
-    if (_matchesAny(pkg, [
-      'duolingo', 'coursera', 'udemy', 'khan', 'quizlet',
-      'learn', 'education', 'school', 'university',
-    ])) return UsageCategoryType.education;
-
-    // Health
-    if (_matchesAny(pkg, [
-      'health', 'fitness', 'workout', 'meditation', 'calm',
-      'headspace', 'strava', 'fitbit', 'myfitnesspal',
-    ])) return UsageCategoryType.health;
-
-    // News
-    if (_matchesAny(pkg, [
-      'news', 'bbc', 'cnn', 'aljazeera', 'reuters',
-      'guardian', 'nytimes', 'flipboard',
-    ])) return UsageCategoryType.news;
-
-    return UsageCategoryType.other;
-  }
-
-  static bool _matchesAny(String pkg, List<String> keywords) {
-    return keywords.any((kw) => pkg.contains(kw));
   }
 }
 
