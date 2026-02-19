@@ -1,9 +1,10 @@
-package com.amjadkhalfan.reboot_app_3      
+package com.amjadkhalfan.reboot_app_3
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 import android.content.Intent
 import android.provider.Settings
+import com.amjadkhalfan.reboot_app_3.fort.FortMethodChannel
 
 class MainActivity: FlutterActivity() {
   private val CHANNEL = "analytics.usage"
@@ -17,6 +18,8 @@ class MainActivity: FlutterActivity() {
   override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
     super.configureFlutterEngine(flutterEngine)
     val bridge = UsageBridge(this)
+
+    // Existing analytics.usage channel
     MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler { call, result ->
       FocusLog.d("Dart→Android ${call.method}", call.arguments)
       try {
@@ -56,5 +59,10 @@ class MainActivity: FlutterActivity() {
         result.error("bridge_error", t.message, null)
       }
     }
+
+    // Fort feature channel (com.taaafi.fort) — category-level usage
+    val fortHandler = FortMethodChannel(this, bridge)
+    MethodChannel(flutterEngine.dartExecutor.binaryMessenger, FortMethodChannel.CHANNEL_NAME)
+      .setMethodCallHandler(fortHandler)
   }
 }

@@ -8,6 +8,13 @@ import Flutter
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
     GeneratedPluginRegistrant.register(with: self)
+
+    // Register Fort method channel (com.taaafi.fort)
+    if let controller = window?.rootViewController as? FlutterViewController {
+      let fortChannel = FortMethodChannel()
+      fortChannel.register(with: controller.binaryMessenger)
+    }
+
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 

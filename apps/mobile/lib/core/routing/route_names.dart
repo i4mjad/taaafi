@@ -4,6 +4,7 @@ enum RouteNames {
   home,
   account,
   vault,
+  fort,
   ta3afiPlus,
   plusFeaturesGuide,
   contents,

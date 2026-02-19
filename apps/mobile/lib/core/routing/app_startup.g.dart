@@ -27,7 +27,7 @@ final startupSecurityServiceProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef StartupSecurityServiceRef = ProviderRef<StartupSecurityService>;
-String _$appStartupHash() => r'03d2bb21cfe65f0efc582ce59109ed2049767b1c';
+String _$appStartupHash() => r'7160ed2af70aa601f306a7f36e7b90b203691221';
 
 /// See also [appStartup].
 @ProviderFor(appStartup)
