@@ -13,6 +13,15 @@ import Flutter
     if let controller = window?.rootViewController as? FlutterViewController {
       let fortChannel = FortMethodChannel()
       fortChannel.register(with: controller.binaryMessenger)
+
+      // Register DeviceActivityReport platform view so Flutter can embed it
+      if #available(iOS 16.0, *) {
+        let registrar = self.registrar(forPlugin: "FortUsageReportView")!
+        registrar.register(
+          FortUsageReportViewFactory(),
+          withId: "com.taaafi.fort/usageReportView"
+        )
+      }
     }
 
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)

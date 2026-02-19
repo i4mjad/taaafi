@@ -10,6 +10,7 @@ import 'package:reboot_app_3/features/fort/data/notifiers/fort_state_notifier.da
 import 'package:reboot_app_3/features/fort/data/notifiers/usage_notifier.dart';
 import 'package:reboot_app_3/features/fort/presentation/widgets/fort_hero_section.dart';
 import 'package:reboot_app_3/features/fort/presentation/widgets/fort_permission_card.dart';
+import 'package:reboot_app_3/features/fort/presentation/widgets/ios_usage_report_trigger.dart';
 import 'package:reboot_app_3/features/fort/presentation/widgets/usage_summary_card.dart';
 
 class FortScreen extends ConsumerWidget {
@@ -109,10 +110,19 @@ class _UsageSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final usageAsync = ref.watch(usageNotifierProvider);
 
-    return usageAsync.when(
-      data: (summary) => UsageSummaryCard(summary: summary),
-      loading: () => const UsageSummaryCard.loading(),
-      error: (_, __) => const UsageSummaryCard.loading(),
+    return Column(
+      children: [
+        // Hidden platform view that triggers the iOS DeviceActivityReportExtension.
+        // When it renders, the extension aggregates usage and writes to UserDefaults.
+        IosUsageReportTrigger(
+          onDataReady: () => ref.invalidate(usageNotifierProvider),
+        ),
+        usageAsync.when(
+          data: (summary) => UsageSummaryCard(summary: summary),
+          loading: () => const UsageSummaryCard.loading(),
+          error: (_, __) => const UsageSummaryCard.loading(),
+        ),
+      ],
     );
   }
 }

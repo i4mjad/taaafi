@@ -13,6 +13,7 @@
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
 		6D32B7F42F4782740069B270 /* FamilyControlsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D32B7F12F4782740069B270 /* FamilyControlsManager.swift */; };
 		6D32B7F52F4782740069B270 /* FortMethodChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D32B7F22F4782740069B270 /* FortMethodChannel.swift */; };
+		6D32B8502F479A000069B270 /* FortUsageReportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D32B84F2F479A000069B270 /* FortUsageReportView.swift */; };
 		6D32B7FB2F47836C0069B270 /* DeviceActivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6DB3DF072E507DAD0063474F /* DeviceActivity.framework */; };
 		6D32B8032F47836C0069B270 /* DeviceActivityMonitorExtension.appex in Embed App Extensions (PlugIns) */ = {isa = PBXBuildFile; fileRef = 6D32B7FA2F47836C0069B270 /* DeviceActivityMonitorExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		6D32B80F2F47847D0069B270 /* ManagedSettings.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6D32B80E2F47847D0069B270 /* ManagedSettings.framework */; };
@@ -106,6 +107,7 @@
 		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
 		6D32B7F12F4782740069B270 /* FamilyControlsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FamilyControlsManager.swift; sourceTree = "<group>"; };
 		6D32B7F22F4782740069B270 /* FortMethodChannel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FortMethodChannel.swift; sourceTree = "<group>"; };
+		6D32B84F2F479A000069B270 /* FortUsageReportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FortUsageReportView.swift; sourceTree = "<group>"; };
 		6D32B7FA2F47836C0069B270 /* DeviceActivityMonitorExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = DeviceActivityMonitorExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		6D32B80D2F47847C0069B270 /* ShieldActionExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ShieldActionExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		6D32B80E2F47847D0069B270 /* ManagedSettings.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ManagedSettings.framework; path = System/Library/Frameworks/ManagedSettings.framework; sourceTree = SDKROOT; };
@@ -279,6 +281,7 @@
 			children = (
 				6D32B7F12F4782740069B270 /* FamilyControlsManager.swift */,
 				6D32B7F22F4782740069B270 /* FortMethodChannel.swift */,
+				6D32B84F2F479A000069B270 /* FortUsageReportView.swift */,
 			);
 			path = Fort;
 			sourceTree = "<group>";
@@ -697,6 +700,7 @@
 				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
 				6D32B7F42F4782740069B270 /* FamilyControlsManager.swift in Sources */,
 				6D32B7F52F4782740069B270 /* FortMethodChannel.swift in Sources */,
+				6D32B8502F479A000069B270 /* FortUsageReportView.swift in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -8,6 +8,7 @@ import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/features/fort/data/notifiers/fort_state_notifier.dart';
 import 'package:reboot_app_3/features/fort/data/notifiers/usage_notifier.dart';
 import 'package:reboot_app_3/features/fort/data/services/native_usage_bridge.dart';
+import 'package:reboot_app_3/features/fort/presentation/widgets/ios_usage_report_trigger.dart';
 
 /// In-app diagnostics screen for the Fort native bridge.
 /// Shows live state, raw native responses, and a scrollable event log.
@@ -208,6 +209,15 @@ class _FortDiagnosticsScreenState
               ],
             ),
           ),
+
+          // iOS: Embedded DeviceActivityReport trigger
+          if (Platform.isIOS)
+            IosUsageReportTrigger(
+              onDataReady: () {
+                _addLog('IOS', 'DeviceActivityReport view rendered — data should be ready');
+                _fetchUsage();
+              },
+            ),
 
           // Action buttons
           SingleChildScrollView(
