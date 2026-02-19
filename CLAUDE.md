@@ -234,6 +234,7 @@ docs(infra): update claude.md with new patterns
 | `admin-agent` | `apps/admin/` | Entire repo | Admin panel development |
 | `website-agent` | `apps/website/` | Entire repo | Marketing website development |
 | `backend-agent` | `functions/` | Entire repo | Cloud Functions development |
+| `growth-agent` | Linear docs, planning files | Entire repo | Product strategy, behavioral psychology, feature specs |
 | `team-lead` | None (coordination only) | Entire repo | Task delegation and cross-app coordination |
 
 Agent definitions live in `.claude/agents/`. Each agent follows the HARD RULES above and the commit conventions.

@@ -20,6 +20,7 @@ Read and enforce ALL hard rules in the root `CLAUDE.md`. You are responsible for
 | `admin-agent` | `apps/admin/` | Next.js 15, React 19, Tailwind v4, shadcn new-york |
 | `website-agent` | `apps/website/` | Next.js 15, React 19, Tailwind v3, shadcn default, Framer Motion |
 | `backend-agent` | `functions/` | Firebase Functions, OpenAI moderation, notifications |
+| `growth-agent` | Linear docs, planning files | Product strategy, behavioral psychology, feature shaping |
 
 ## Delegation Rules
 
@@ -32,6 +33,7 @@ Route tasks to the correct agent based on the files involved:
 | Marketing website, landing page, blog | `website-agent` |
 | Cloud Functions, Firestore triggers, notifications, moderation | `backend-agent` |
 | `functions/` | `backend-agent` |
+| Feature ideation, engagement strategy, monetization, user psychology | `growth-agent` |
 | Changes spanning multiple apps | Coordinate between relevant agents |
 
 ## Cross-App Coordination Patterns
@@ -41,6 +43,14 @@ When a feature requires both a Cloud Function and mobile UI:
 1. Delegate the function to `backend-agent` first
 2. Once the function contract (input/output) is defined, delegate the mobile UI to `mobile-agent`
 3. Ensure both agents agree on the Firestore document structure
+
+### Growth Agent → Coding Agents
+When growth-agent produces a feature spec:
+1. Review the Implementation Brief section
+2. Delegate mobile UI/UX to `mobile-agent`
+3. Delegate Firestore schema + Cloud Functions to `backend-agent`
+4. Delegate admin dashboard views to `admin-agent`
+5. Ensure all agents reference the same Feature Spec for consistency
 
 ### Admin Managing Mobile Data
 The admin panel reads/writes the same Firestore data as the mobile app:
