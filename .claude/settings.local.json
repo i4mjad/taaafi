@@ -1,0 +1,37 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C /Users/amjadkhalfan/development/taaafi ls-files)",
+      "Bash(git -C /Users/amjadkhalfan/development/taaafi log --all --full-history -- \"apps/mobile/tool/rebootapp-37a30-d135eb9693d6.json\")",
+      "Bash(git -C /Users/amjadkhalfan/development/taaafi log --all --oneline -- \"apps/mobile/tool/rebootapp-37a30-d135eb9693d6.json\")",
+      "Bash(git -C /Users/amjadkhalfan/development/taaafi log --all --oneline -- \"apps/mobile/functions/src/moderateGroupUpdate.ts\")",
+      "Bash(git -C /Users/amjadkhalfan/development/taaafi log --all --oneline -- \"apps/admin/src/lib/firebase.ts\")",
+      "Bash(git -C /Users/amjadkhalfan/development/taaafi log --all --oneline -- \"apps/mobile/functions/.env\")",
+      "Bash(git -C /Users/amjadkhalfan/development/taaafi show HEAD:apps/mobile/functions/.env)",
+      "Bash(git -C /Users/amjadkhalfan/development/taaafi show HEAD:apps/mobile/tool/rebootapp-37a30-d135eb9693d6.json)",
+      "Bash(git -C /Users/amjadkhalfan/development/taaafi show HEAD:apps/mobile/functions/src/moderateGroupUpdate.ts)",
+      "Bash(git -C /Users/amjadkhalfan/development/taaafi log --oneline)",
+      "Bash(git rm:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm install:*)",
+      "Bash(npm ls:*)",
+      "Bash(find:*)",
+      "Bash(xargs:*)",
+      "Bash(ls:*)",
+      "Bash(grep:*)",
+      "Bash(git -C /Users/amjadkhalfan/development/taaafi status CLAUDE.md .claude/agents/)",
+      "Bash(wc -l:*)",
+      "Bash(yarn install:*)",
+      "Bash(node -e:*)",
+      "Bash(git add:*)",
+      "Bash(git reset:*)",
+      "Bash(git commit:*)",
+      "mcp__linear-server__list_issues",
+      "mcp__linear-server__get_issue",
+      "WebSearch",
+      "WebFetch(domain:pub.dev)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:riedel.wtf)"
+    ]
+  }
+}
