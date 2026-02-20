@@ -12,16 +12,24 @@ import Foundation
 @Observable
 class ScreenTimeManager {
     var authorizationStatus: AuthorizationStatus = .notDetermined
+    var isLoading = true
 
     init() {
-        authorizationStatus = AuthorizationCenter.shared.authorizationStatus
-        Task {
-            do {
-                try await AuthorizationCenter.shared.requestAuthorization(for: .individual)
-            } catch {}
-            authorizationStatus = AuthorizationCenter.shared.authorizationStatus
-            if authorizationStatus == .approved {
-                startMonitoring()
+        let status = AuthorizationCenter.shared.authorizationStatus
+        authorizationStatus = status
+        if status == .approved {
+            isLoading = false
+            startMonitoring()
+        } else {
+            // Status can return .notDetermined briefly on cold launch
+            // even if already authorized — re-check after a short delay
+            Task {
+                try? await Task.sleep(for: .milliseconds(500))
+                authorizationStatus = AuthorizationCenter.shared.authorizationStatus
+                if authorizationStatus == .approved {
+                    startMonitoring()
+                }
+                isLoading = false
             }
         }
     }

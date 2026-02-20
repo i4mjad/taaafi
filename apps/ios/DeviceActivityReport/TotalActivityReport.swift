@@ -20,7 +20,9 @@ struct TotalActivityReport: DeviceActivityReportScene {
     let content: (ActivityReport) -> TotalActivityView
 
     func makeConfiguration(representing data: DeviceActivityResults<DeviceActivityData>) async -> ActivityReport {
-        let classificationMap = CategoryClassification.current()
+        // Use hardcoded defaults directly — UserDefaults via App Group
+        // can fail in the extension's sandboxed process
+        let classificationMap = CategoryClassification.defaults
 
         var totalDuration: TimeInterval = 0
         var totalPickups = 0
@@ -46,7 +48,7 @@ struct TotalActivityReport: DeviceActivityReportScene {
                     case .neutral: break
                     }
                     hourlyMap[hour] = hourEntry
-
+ 
                     // Category aggregation
                     var existing = categoryMap[categoryName] ?? (duration: 0, apps: [:])
                     existing.duration += catDuration

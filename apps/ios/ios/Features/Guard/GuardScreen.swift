@@ -16,16 +16,30 @@ extension DeviceActivityReport.Context {
 struct GuardScreen: View {
     @Environment(ScreenTimeManager.self) private var screenTimeManager
     @State private var selectedDate = Date.now
-    @State private var reportID = UUID()
+    @State private var showDatePicker = false
 
     private var isToday: Bool {
         Calendar.current.isDateInToday(selectedDate)
     }
 
+    private var isYesterday: Bool {
+        Calendar.current.isDateInYesterday(selectedDate)
+    }
+
+    private var dateLabel: String {
+        if isToday { return "Today" }
+        if isYesterday { return "Yesterday" }
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        return formatter.string(from: selectedDate)
+    }
+
     var body: some View {
         NavigationStack {
             Group {
-                if screenTimeManager.authorizationStatus == .approved {
+                if screenTimeManager.isLoading {
+                    ProgressView()
+                } else if screenTimeManager.authorizationStatus == .approved {
                     authorizedView
                 } else {
                     permissionView
@@ -33,11 +47,42 @@ struct GuardScreen: View {
             }
             .navigationTitle("Guard")
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: .topBarLeading) {
                     NavigationLink(destination: GuardSettingsScreen()) {
                         Image(systemName: "gearshape")
                     }
                 }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        showDatePicker = true
+                    } label: {
+                        Text(dateLabel)
+                            .font(.subheadline.weight(.medium))
+                    }
+                }
+            }
+            .sheet(isPresented: $showDatePicker) {
+                NavigationStack {
+                    DatePicker(
+                        "Select Date",
+                        selection: $selectedDate,
+                        in: ...Date.now,
+                        displayedComponents: .date
+                    )
+                    .datePickerStyle(.graphical)
+                    .labelsHidden()
+                    .padding()
+                    .navigationTitle("Select Date")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .confirmationAction) {
+                            Button("Done") {
+                                showDatePicker = false
+                            }
+                        }
+                    }
+                }
+                .presentationDetents([.height(480)])
             }
         }
     }
@@ -45,71 +90,20 @@ struct GuardScreen: View {
     // MARK: - Authorized
 
     private var authorizedView: some View {
-        ScrollView {
-            VStack(spacing: 0) {
-                dateToolbar
-                    .padding(.bottom, 16)
-
-                DeviceActivityReport(
-                    .totalActivity,
-                    filter: DeviceActivityFilter(
-                        segment: .hourly(
-                            during: DateInterval(
-                                start: Calendar.current.startOfDay(for: selectedDate),
-                                end: isToday ? .now : startOfNextDay(selectedDate)
-                            )
-                        )
+        DeviceActivityReport(
+            .totalActivity,
+            filter: DeviceActivityFilter(
+                segment: .hourly(
+                    during: DateInterval(
+                        start: Calendar.current.startOfDay(for: selectedDate),
+                        end: isToday ? .now : startOfNextDay(selectedDate)
                     )
                 )
-                .id(reportID)
-                .frame(height: 1500)
-                .task {
-                    // Workaround: extension can render blank on first load,
-                    // force a re-render after a short delay
-                    try? await Task.sleep(for: .milliseconds(500))
-                    reportID = UUID()
-                }
-            }
-            .padding()
+            )
+        )
+        .onChange(of: selectedDate) {
+            showDatePicker = false
         }
-    }
-
-    // MARK: - Date Toolbar
-
-    private var dateToolbar: some View {
-        HStack {
-            Button {
-                selectedDate = Calendar.current.date(byAdding: .day, value: -1, to: selectedDate) ?? selectedDate
-            } label: {
-                Image(systemName: "chevron.left")
-                    .font(.title3.bold())
-            }
-
-            Spacer()
-
-            Text(dateLabelText)
-                .font(.headline)
-
-            Spacer()
-
-            Button {
-                selectedDate = Calendar.current.date(byAdding: .day, value: 1, to: selectedDate) ?? selectedDate
-            } label: {
-                Image(systemName: "chevron.right")
-                    .font(.title3.bold())
-            }
-            .disabled(isToday)
-        }
-        .padding(.horizontal, 8)
-    }
-
-    private var dateLabelText: String {
-        if isToday {
-            return "Today"
-        }
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        return formatter.string(from: selectedDate)
     }
 
     private func startOfNextDay(_ date: Date) -> Date {

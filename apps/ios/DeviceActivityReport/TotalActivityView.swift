@@ -11,6 +11,7 @@ struct TotalActivityView: View {
     let report: ActivityReport
 
     var body: some View {
+        ScrollView {
         VStack(spacing: 20) {
             // Total screen time
             Text(formatDuration(report.totalDuration))
@@ -59,9 +60,10 @@ struct TotalActivityView: View {
                 CategoryRow(category: category, maxDuration: report.categories.first?.duration ?? 1)
             }
 
-            Spacer(minLength: 0)
         }
         .padding()
+        }
+
     }
 
     private var scoreColor: Color {
