@@ -12,6 +12,17 @@ struct ActivityReport {
     let totalPickups: Int
     let totalNotifications: Int
     let categories: [CategoryUsage]
+    let guardScore: Int
+    let safeDuration: TimeInterval
+    let threatDuration: TimeInterval
+    let hourlyBreakdown: [HourlyUsage]
+}
+
+struct HourlyUsage: Identifiable {
+    let id: Int
+    let hour: Int
+    let safeDuration: TimeInterval
+    let threatDuration: TimeInterval
 }
 
 struct CategoryUsage: Identifiable {
@@ -19,6 +30,7 @@ struct CategoryUsage: Identifiable {
     let name: String
     let duration: TimeInterval
     let apps: [AppUsage]
+    let classification: CategoryClass
 }
 
 struct AppUsage: Identifiable {

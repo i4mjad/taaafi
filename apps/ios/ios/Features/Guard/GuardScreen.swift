@@ -32,6 +32,13 @@ struct GuardScreen: View {
                 }
             }
             .navigationTitle("Guard")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    NavigationLink(destination: GuardSettingsScreen()) {
+                        Image(systemName: "gearshape")
+                    }
+                }
+            }
         }
     }
 
