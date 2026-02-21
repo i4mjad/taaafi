@@ -6,70 +6,119 @@
 //
 
 import SwiftUI
+import os
+
+// #region agent log
+private let dbg = Logger(subsystem: "com.taaafi.debug", category: "86f59f")
+// #endregion
 
 struct TotalActivityView: View {
     let report: ActivityReport
 
+    private var threats: [AppDetail] { report.apps.filter { $0.classification == .threat } }
+    private var safes: [AppDetail] { report.apps.filter { $0.classification == .safe } }
+    private var neutrals: [AppDetail] { report.apps.filter { $0.classification == .neutral } }
+
     var body: some View {
-        ScrollView {
-        VStack(spacing: 20) {
-            // Total screen time
-            Text(formatDuration(report.totalDuration))
-                .font(.system(size: 40, weight: .bold, design: .rounded))
-                .padding(.top, 8)
+        List {
+            Section {
+                Text(formatDuration(report.totalDuration))
+                    .font(.system(size: 40, weight: .bold, design: .rounded))
+                    .frame(maxWidth: .infinity)
+                    .listRowSeparator(.hidden)
 
-            // Guard Score + Pickups + Notifications
-            HStack(spacing: 8) {
-                StatCard(
-                    icon: "shield.fill",
-                    value: "\(report.guardScore)%",
-                    label: "guard",
-                    color: scoreColor
-                )
-                StatCard(
-                    icon: "iphone.and.arrow.forward",
-                    value: "\(report.totalPickups)",
-                    label: "pickups",
-                    color: .secondary
-                )
-                StatCard(
-                    icon: "bell.fill",
-                    value: "\(report.totalNotifications)",
-                    label: "notifs",
-                    color: .secondary
-                )
+                HStack(spacing: 8) {
+                    StatCard(icon: "shield.fill", value: "\(report.guardScore)%", label: "guard", color: scoreColor)
+                    StatCard(icon: "iphone.and.arrow.forward", value: "\(report.totalPickups)", label: "pickups", color: .secondary)
+                    StatCard(icon: "bell.fill", value: "\(report.totalNotifications)", label: "notifs", color: .secondary)
+                }
+                .listRowSeparator(.hidden)
             }
 
-            // Hourly bar chart
-            HourlyBarChart(hourlyData: report.hourlyBreakdown)
-
-            Divider()
-
-            // Categories grouped by classification: threats, safe, neutral
-            let threats = report.categories.filter { $0.classification == .threat }
-            let safes = report.categories.filter { $0.classification == .safe }
-            let neutrals = report.categories.filter { $0.classification == .neutral }
-
-            ForEach(threats) { category in
-                CategoryRow(category: category, maxDuration: report.categories.first?.duration ?? 1)
-            }
-            ForEach(safes) { category in
-                CategoryRow(category: category, maxDuration: report.categories.first?.duration ?? 1)
-            }
-            ForEach(neutrals) { category in
-                CategoryRow(category: category, maxDuration: report.categories.first?.duration ?? 1)
+            if !threats.isEmpty {
+                Section(header: Label("Threats (\(threats.count))", systemImage: "exclamationmark.shield").foregroundStyle(.red)) {
+                    ForEach(threats) { app in
+                        AppRow(app: app, color: .red, maxDuration: report.apps.first?.duration ?? 1)
+                    }
+                }
             }
 
+            if !safes.isEmpty {
+                Section(header: Label("Safe (\(safes.count))", systemImage: "checkmark.shield").foregroundStyle(.green)) {
+                    ForEach(safes) { app in
+                        AppRow(app: app, color: .green, maxDuration: report.apps.first?.duration ?? 1)
+                    }
+                }
+            }
+
+            if !neutrals.isEmpty {
+                Section(header: Label("Other (\(neutrals.count))", systemImage: "shield").foregroundStyle(.gray)) {
+                    ForEach(neutrals) { app in
+                        AppRow(app: app, color: .gray, maxDuration: report.apps.first?.duration ?? 1)
+                    }
+                }
+            }
+
+            // #region agent log
+            if !report.debugInfo.isEmpty {
+                Section {
+                    Text(report.debugInfo)
+                        .font(.system(size: 9, design: .monospaced))
+                        .foregroundStyle(.tertiary)
+                }
+            }
+            // #endregion
         }
-        .padding()
+        .listStyle(.insetGrouped)
+        // #region agent log
+        .onAppear {
+            dbg.notice("[H4] view_onAppear totalDur=\(report.totalDuration, privacy: .public) apps=\(report.apps.count, privacy: .public) score=\(report.guardScore, privacy: .public)")
         }
-
+        // #endregion
     }
 
     private var scoreColor: Color {
         if report.guardScore >= 70 { return .green }
         if report.guardScore >= 40 { return .orange }
         return .red
+    }
+
+    private func formatDuration(_ interval: TimeInterval) -> String {
+        let hours = Int(interval) / 3600
+        let minutes = (Int(interval) % 3600) / 60
+        if hours > 0 {
+            return "\(hours)h \(minutes)m"
+        } else {
+            return "\(minutes)m"
+        }
+    }
+}
+
+// MARK: - App Row
+
+private struct AppRow: View {
+    let app: AppDetail
+    let color: Color
+    let maxDuration: TimeInterval
+
+    var body: some View {
+        HStack {
+            Circle().fill(color).frame(width: 8, height: 8)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(app.name)
+                    .font(.subheadline)
+                Text(app.categoryName)
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
+            }
+
+            Spacer()
+
+            Text(formatDuration(app.duration))
+                .font(.subheadline.monospacedDigit())
+                .foregroundStyle(.secondary)
+        }
     }
 
     private func formatDuration(_ interval: TimeInterval) -> String {
@@ -124,7 +173,6 @@ private struct HourlyBarChart: View {
 
     var body: some View {
         VStack(spacing: 6) {
-            // Legend
             HStack(spacing: 16) {
                 HStack(spacing: 4) {
                     Circle().fill(.green).frame(width: 8, height: 8)
@@ -136,15 +184,12 @@ private struct HourlyBarChart: View {
                 }
             }
 
-            // Bars
             HStack(alignment: .bottom, spacing: 2) {
                 ForEach(visibleHours) { hour in
                     HStack(alignment: .bottom, spacing: 1) {
-                        // Safe bar (green)
                         RoundedRectangle(cornerRadius: 2)
                             .fill(.green)
                             .frame(height: barHeight(hour.safeDuration))
-                        // Threat bar (red)
                         RoundedRectangle(cornerRadius: 2)
                             .fill(.red)
                             .frame(height: barHeight(hour.threatDuration))
@@ -154,7 +199,6 @@ private struct HourlyBarChart: View {
             }
             .frame(height: 100)
 
-            // Hour labels
             HStack(spacing: 0) {
                 ForEach(visibleHours) { hour in
                     Text(hour.hour % 3 == 0 ? "\(hour.hour)" : "")
@@ -176,94 +220,19 @@ private struct HourlyBarChart: View {
     }
 }
 
-// MARK: - Category Row
-
-private struct CategoryRow: View {
-    let category: CategoryUsage
-    let maxDuration: TimeInterval
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Circle()
-                    .fill(classColor)
-                    .frame(width: 10, height: 10)
-
-                Text(category.name)
-                    .font(.subheadline.bold())
-
-                Spacer()
-
-                Text(formatDuration(category.duration))
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
-
-            // Duration bar
-            GeometryReader { geo in
-                RoundedRectangle(cornerRadius: 4)
-                    .fill(classColor.opacity(0.3))
-                    .frame(
-                        width: geo.size.width * CGFloat(category.duration / maxDuration),
-                        height: 6
-                    )
-            }
-            .frame(height: 6)
-
-            // Top apps
-            ForEach(category.apps) { app in
-                HStack {
-                    Text(app.name)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .padding(.leading, 20)
-                    Spacer()
-                    Text(formatDuration(app.duration))
-                        .font(.caption)
-                        .foregroundStyle(.tertiary)
-                }
-            }
-        }
-    }
-
-    private var classColor: Color {
-        switch category.classification {
-        case .safe: return .green
-        case .threat: return .red
-        case .neutral: return .gray
-        }
-    }
-
-    private func formatDuration(_ interval: TimeInterval) -> String {
-        let hours = Int(interval) / 3600
-        let minutes = (Int(interval) % 3600) / 60
-        if hours > 0 {
-            return "\(hours)h \(minutes)m"
-        } else {
-            return "\(minutes)m"
-        }
-    }
-}
-
 #Preview {
     TotalActivityView(report: ActivityReport(
         totalDuration: 22620,
         totalPickups: 42,
         totalNotifications: 89,
-        categories: [
-            CategoryUsage(name: "Social Networking", duration: 10920, apps: [
-                AppUsage(name: "Instagram", duration: 6300, pickups: 15, notifications: 30),
-                AppUsage(name: "Twitter", duration: 3120, pickups: 8, notifications: 12),
-                AppUsage(name: "WhatsApp", duration: 1500, pickups: 10, notifications: 25)
-            ], classification: .threat),
-            CategoryUsage(name: "Entertainment", duration: 5400, apps: [
-                AppUsage(name: "YouTube", duration: 4320, pickups: 5, notifications: 8),
-                AppUsage(name: "Netflix", duration: 1080, pickups: 2, notifications: 3)
-            ], classification: .threat),
-            CategoryUsage(name: "Productivity", duration: 2700, apps: [
-                AppUsage(name: "Notes", duration: 1800, pickups: 3, notifications: 0),
-                AppUsage(name: "Safari", duration: 900, pickups: 4, notifications: 1)
-            ], classification: .safe)
+        apps: [
+            AppDetail(name: "Instagram", categoryName: "Social Networking", duration: 6300, pickups: 15, notifications: 30, classification: .threat),
+            AppDetail(name: "YouTube", categoryName: "Entertainment", duration: 4320, pickups: 5, notifications: 8, classification: .threat),
+            AppDetail(name: "Twitter", categoryName: "Social Networking", duration: 3120, pickups: 8, notifications: 12, classification: .threat),
+            AppDetail(name: "Notes", categoryName: "Productivity", duration: 1800, pickups: 3, notifications: 0, classification: .safe),
+            AppDetail(name: "WhatsApp", categoryName: "Social Networking", duration: 1500, pickups: 10, notifications: 25, classification: .threat),
+            AppDetail(name: "Netflix", categoryName: "Entertainment", duration: 1080, pickups: 2, notifications: 3, classification: .threat),
+            AppDetail(name: "Safari", categoryName: "Productivity", duration: 900, pickups: 4, notifications: 1, classification: .safe)
         ],
         guardScore: 14,
         safeDuration: 2700,

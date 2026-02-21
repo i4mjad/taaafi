@@ -9,9 +9,14 @@ import DeviceActivity
 import ExtensionKit
 import ManagedSettings
 import SwiftUI
+import os
+
+// #region agent log
+private let dbg = Logger(subsystem: "com.taaafi.debug", category: "86f59f")
+// #endregion
 
 extension DeviceActivityReport.Context {
-    static let totalActivity = Self("Total Activity")
+    static let totalActivity = Self("total-activity")
 }
 
 struct TotalActivityReport: DeviceActivityReportScene {
@@ -20,14 +25,24 @@ struct TotalActivityReport: DeviceActivityReportScene {
     let content: (ActivityReport) -> TotalActivityView
 
     func makeConfiguration(representing data: DeviceActivityResults<DeviceActivityData>) async -> ActivityReport {
-        // Use hardcoded defaults directly — UserDefaults via App Group
-        // can fail in the extension's sandboxed process
-        let classificationMap = CategoryClassification.defaults
+        // #region agent log
+        dbg.notice("[H2,H5] config_start context=\(context.rawValue, privacy: .public)")
+        let cfgT0 = CFAbsoluteTimeGetCurrent()
+        // #endregion
+
+        // #region agent log
+        let appGroupStore = UserDefaults(suiteName: CategoryClassification.suiteName)
+        let savedRaw = appGroupStore?.dictionary(forKey: CategoryClassification.defaultsKey) as? [String: String]
+        let dbgSrc = savedRaw != nil ? "appgroup(\(savedRaw!.count)keys)" : "defaults"
+        dbg.notice("[H6] classification_source=\(dbgSrc, privacy: .public)")
+        // #endregion
+
+        let classificationMap = CategoryClassification.current()
 
         var totalDuration: TimeInterval = 0
         var totalPickups = 0
         var totalNotifications = 0
-        var categoryMap: [String: (duration: TimeInterval, apps: [String: (duration: TimeInterval, pickups: Int, notifications: Int)])] = [:]
+        var appMap: [String: (category: String, duration: TimeInterval, pickups: Int, notifications: Int)] = [:]
         var hourlyMap: [Int: (safe: TimeInterval, threat: TimeInterval)] = [:]
 
         for await dataItem in data {
@@ -37,21 +52,15 @@ struct TotalActivityReport: DeviceActivityReportScene {
 
                 for await categoryActivity in segment.categories {
                     let categoryName = categoryActivity.category.localizedDisplayName ?? "Other"
-                    let catDuration = categoryActivity.totalActivityDuration
                     let cls = classificationMap[categoryName] ?? .neutral
 
-                    // Accumulate hourly safe/threat
                     var hourEntry = hourlyMap[hour] ?? (safe: 0, threat: 0)
                     switch cls {
-                    case .safe: hourEntry.safe += catDuration
-                    case .threat: hourEntry.threat += catDuration
+                    case .safe: hourEntry.safe += categoryActivity.totalActivityDuration
+                    case .threat: hourEntry.threat += categoryActivity.totalActivityDuration
                     case .neutral: break
                     }
                     hourlyMap[hour] = hourEntry
- 
-                    // Category aggregation
-                    var existing = categoryMap[categoryName] ?? (duration: 0, apps: [:])
-                    existing.duration += catDuration
 
                     for await appActivity in categoryActivity.applications {
                         let appName = appActivity.application.localizedDisplayName ?? "Unknown"
@@ -61,58 +70,56 @@ struct TotalActivityReport: DeviceActivityReportScene {
                         totalPickups += appPickups
                         totalNotifications += appNotifications
 
-                        var appEntry = existing.apps[appName] ?? (duration: 0, pickups: 0, notifications: 0)
-                        appEntry.duration += appDuration
-                        appEntry.pickups += appPickups
-                        appEntry.notifications += appNotifications
-                        existing.apps[appName] = appEntry
+                        var entry = appMap[appName] ?? (category: categoryName, duration: 0, pickups: 0, notifications: 0)
+                        entry.duration += appDuration
+                        entry.pickups += appPickups
+                        entry.notifications += appNotifications
+                        appMap[appName] = entry
                     }
-
-                    categoryMap[categoryName] = existing
                 }
             }
         }
 
-        // Build categories with classification
-        let categories = categoryMap.compactMap { name, value -> CategoryUsage? in
-            guard value.duration >= 30 else { return nil }
+        let apps = appMap
+            .filter { $0.value.duration >= 30 }
+            .map { name, val in
+                AppDetail(
+                    name: name,
+                    categoryName: val.category,
+                    duration: val.duration,
+                    pickups: val.pickups,
+                    notifications: val.notifications,
+                    classification: classificationMap[val.category] ?? .neutral
+                )
+            }
+            .sorted { $0.duration > $1.duration }
 
-            let apps = value.apps
-                .filter { $0.value.duration >= 30 }
-                .map { AppUsage(name: $0.key, duration: $0.value.duration, pickups: $0.value.pickups, notifications: $0.value.notifications) }
-                .sorted { $0.duration > $1.duration }
-            let topApps = Array(apps.prefix(3))
-            let cls = classificationMap[name] ?? .neutral
-
-            return CategoryUsage(
-                name: name,
-                duration: value.duration,
-                apps: topApps,
-                classification: cls
-            )
-        }.sorted { $0.duration > $1.duration }
-
-        // Compute guard score
-        let safeDuration = categories.filter { $0.classification == .safe }.reduce(0) { $0 + $1.duration }
-        let threatDuration = categories.filter { $0.classification == .threat }.reduce(0) { $0 + $1.duration }
+        let safeDuration = apps.filter { $0.classification == .safe }.reduce(0) { $0 + $1.duration }
+        let threatDuration = apps.filter { $0.classification == .threat }.reduce(0) { $0 + $1.duration }
         let total = safeDuration + threatDuration
         let guardScore = total > 0 ? Int((safeDuration / total) * 100) : 100
 
-        // Build hourly breakdown (0-23)
         let hourlyBreakdown = (0...23).map { hour in
             let entry = hourlyMap[hour] ?? (safe: 0, threat: 0)
             return HourlyUsage(id: hour, hour: hour, safeDuration: entry.safe, threatDuration: entry.threat)
         }
 
+        // #region agent log
+        dbg.notice("[H2] config_end guardScore=\(guardScore, privacy: .public) apps=\(apps.count, privacy: .public) elapsed=\(CFAbsoluteTimeGetCurrent() - cfgT0, privacy: .public)")
+        // #endregion
+
         return ActivityReport(
             totalDuration: totalDuration,
             totalPickups: totalPickups,
             totalNotifications: totalNotifications,
-            categories: categories,
+            apps: apps,
             guardScore: guardScore,
             safeDuration: safeDuration,
             threatDuration: threatDuration,
-            hourlyBreakdown: hourlyBreakdown
+            hourlyBreakdown: hourlyBreakdown,
+            // #region agent log
+            debugInfo: "src:\(dbgSrc)"
+            // #endregion
         )
     }
 }

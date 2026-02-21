@@ -11,11 +11,14 @@ struct ActivityReport {
     let totalDuration: TimeInterval
     let totalPickups: Int
     let totalNotifications: Int
-    let categories: [CategoryUsage]
+    let apps: [AppDetail]
     let guardScore: Int
     let safeDuration: TimeInterval
     let threatDuration: TimeInterval
     let hourlyBreakdown: [HourlyUsage]
+    // #region agent log
+    var debugInfo: String = ""
+    // #endregion
 }
 
 struct HourlyUsage: Identifiable {
@@ -25,18 +28,12 @@ struct HourlyUsage: Identifiable {
     let threatDuration: TimeInterval
 }
 
-struct CategoryUsage: Identifiable {
-    let id = UUID()
+struct AppDetail: Identifiable {
+    var id: String { name }
     let name: String
-    let duration: TimeInterval
-    let apps: [AppUsage]
-    let classification: CategoryClass
-}
-
-struct AppUsage: Identifiable {
-    let id = UUID()
-    let name: String
+    let categoryName: String
     let duration: TimeInterval
     let pickups: Int
     let notifications: Int
+    let classification: CategoryClass
 }
