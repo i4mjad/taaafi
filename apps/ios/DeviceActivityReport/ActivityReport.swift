@@ -16,9 +16,6 @@ struct ActivityReport {
     let safeDuration: TimeInterval
     let threatDuration: TimeInterval
     let hourlyBreakdown: [HourlyUsage]
-    // #region agent log
-    var debugInfo: String = ""
-    // #endregion
 }
 
 struct HourlyUsage: Identifiable {

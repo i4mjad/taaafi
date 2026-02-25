@@ -10,22 +10,12 @@ import SwiftUI
 struct GuardSettingsScreen: View {
     @State private var classifications: [String: CategoryClass] = CategoryClassification.current()
 
-    private let allCategories = [
-        "Social Networking",
-        "Entertainment",
-        "Games",
-        "Productivity & Finance",
-        "Education",
-        "Health & Fitness",
-        "Creativity",
-        "Information & Reading",
-        "Other",
-    ]
-
     var body: some View {
         List {
             Section {
-                ForEach(allCategories, id: \.self) { category in
+                ForEach(CategoryClassification.allCategories, id: \.self) { category in
+                    let isLocked = CategoryClassification.lockedCategories.contains(category)
+
                     VStack(alignment: .leading, spacing: 8) {
                         HStack {
                             Circle()
@@ -33,6 +23,11 @@ struct GuardSettingsScreen: View {
                                 .frame(width: 10, height: 10)
                             Text(category)
                                 .font(.body)
+                            if isLocked {
+                                Image(systemName: "lock.fill")
+                                    .font(.caption2)
+                                    .foregroundStyle(.tertiary)
+                            }
                         }
 
                         Picker("", selection: binding(for: category)) {
@@ -41,13 +36,14 @@ struct GuardSettingsScreen: View {
                             Text("Threat").tag(CategoryClass.threat)
                         }
                         .pickerStyle(.segmented)
+                        .disabled(isLocked)
                     }
                     .padding(.vertical, 4)
                 }
             } header: {
                 Text("Category Classifications")
             } footer: {
-                Text("Threat categories count against your Guard Score. Safe categories improve it. Neutral categories are excluded.")
+                Text("Threat categories count against your Guard Score. Safe categories improve it. Neutral categories are excluded. Social categories are locked as threats.")
             }
         }
         .navigationTitle("Guard Settings")
@@ -57,6 +53,7 @@ struct GuardSettingsScreen: View {
         Binding(
             get: { classifications[category] ?? .neutral },
             set: { newValue in
+                guard !CategoryClassification.lockedCategories.contains(category) else { return }
                 classifications[category] = newValue
                 CategoryClassification.save(classifications)
             }

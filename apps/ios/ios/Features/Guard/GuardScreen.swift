@@ -8,11 +8,6 @@
 import SwiftUI
 import FamilyControls
 import DeviceActivity
-import os
-
-// #region agent log
-private let dbg = Logger(subsystem: "com.taaafi.debug", category: "86f59f")
-// #endregion
 
 extension DeviceActivityReport.Context {
     static let totalActivity = Self("total-activity")
@@ -22,7 +17,6 @@ struct GuardScreen: View {
     @Environment(ScreenTimeManager.self) private var screenTimeManager
     @State private var selectedDate = Date.now
     @State private var showDatePicker = false
-    @State private var refreshToken = 0
 
     private var isToday: Bool {
         Calendar.current.isDateInToday(selectedDate)
@@ -52,6 +46,7 @@ struct GuardScreen: View {
                 }
             }
             .navigationTitle("Guard")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     NavigationLink(destination: GuardSettingsScreen()) {
@@ -59,18 +54,11 @@ struct GuardScreen: View {
                     }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    HStack(spacing: 12) {
-                        Button {
-                            refreshToken += 1
-                        } label: {
-                            Image(systemName: "arrow.clockwise")
-                        }
-                        Button {
-                            showDatePicker = true
-                        } label: {
-                            Text(dateLabel)
-                                .font(.subheadline.weight(.medium))
-                        }
+                    Button {
+                        showDatePicker = true
+                    } label: {
+                        Text(dateLabel)
+                            .font(.subheadline.weight(.medium))
                     }
                 }
             }
@@ -106,10 +94,6 @@ struct GuardScreen: View {
         let start = Calendar.current.startOfDay(for: selectedDate)
         let end = isToday ? .now : startOfNextDay(selectedDate)
 
-        // #region agent log
-        let _ = dbg.notice("[H3] host_filter isToday=\(isToday, privacy: .public) start=\(start.timeIntervalSince1970, privacy: .public) end=\(end.timeIntervalSince1970, privacy: .public)")
-        // #endregion
-
         let filter = DeviceActivityFilter(
             segment: .hourly(
                 during: DateInterval(
@@ -120,12 +104,6 @@ struct GuardScreen: View {
         )
 
         return DeviceActivityReport(.totalActivity, filter: filter)
-            .id(refreshToken)
-        // #region agent log
-        .onAppear {
-            dbg.notice("[H3] host_report_onAppear")
-        }
-        // #endregion
         .onChange(of: selectedDate) {
             showDatePicker = false
         }

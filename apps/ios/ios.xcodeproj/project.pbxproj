@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		6D32B9E92F4862090069B270 /* DeviceActivityReport.appex in Embed ExtensionKit Extensions */ = {isa = PBXBuildFile; fileRef = 6D32B9DD2F4862090069B270 /* DeviceActivityReport.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		6D32B9F72F48632B0069B270 /* DeviceActivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6D32B9F62F48632B0069B270 /* DeviceActivity.framework */; };
+		6D32BA102F4870000069B270 /* Charts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6D32BA112F4870000069B270 /* Charts.framework */; };
 		6D32B9FF2F48632B0069B270 /* DeviceActivityMonitor.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 6D32B9F42F48632B0069B270 /* DeviceActivityMonitor.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
@@ -59,6 +60,7 @@
 		6D32B9DD2F4862090069B270 /* DeviceActivityReport.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.extensionkit-extension"; includeInIndex = 0; path = DeviceActivityReport.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		6D32B9F42F48632B0069B270 /* DeviceActivityMonitor.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = DeviceActivityMonitor.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		6D32B9F62F48632B0069B270 /* DeviceActivity.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DeviceActivity.framework; path = System/Library/Frameworks/DeviceActivity.framework; sourceTree = SDKROOT; };
+		6D32BA112F4870000069B270 /* Charts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Charts.framework; path = System/Library/Frameworks/Charts.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -114,6 +116,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6D32BA102F4870000069B270 /* Charts.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -153,6 +156,7 @@
 			isa = PBXGroup;
 			children = (
 				6D32B9F62F48632B0069B270 /* DeviceActivity.framework */,
+				6D32BA112F4870000069B270 /* Charts.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
