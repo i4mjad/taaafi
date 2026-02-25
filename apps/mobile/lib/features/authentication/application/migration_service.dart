@@ -112,12 +112,17 @@ class MigrationService {
       gender: document.gender,
       locale: document.locale,
       dayOfBirth: document.dayOfBirth,
-      userFirstDate: document.userFirstDate,
+      userFirstDate: document.userFirstDate ??
+          Timestamp.fromDate(DateTime.now().toUtc()),
       role: role,
       messagingToken: fcmToken,
       userRelapses: document.userRelapses,
       userWatchingWithoutMasturbating: document.userWatchingWithoutMasturbating,
       userMasturbatingWithoutWatching: document.userMasturbatingWithoutWatching,
+      isPlusUser: document.isPlusUser,
+      lastPlusCheck: document.lastPlusCheck,
+      isRequestedToBeDeleted: document.isRequestedToBeDeleted,
+      hasCheckedForDataLoss: document.hasCheckedForDataLoss,
     );
 
     await _migerationRepository.updateUserDocument(newDocuemnt);

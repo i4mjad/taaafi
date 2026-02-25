@@ -4,7 +4,6 @@ enum RouteNames {
   home,
   account,
   vault,
-  fort,
   ta3afiPlus,
   plusFeaturesGuide,
   contents,
@@ -77,6 +76,4 @@ enum RouteNames {
   // Direct Messaging routes
   communityChats,
   directChat,
-  // Fort
-  fortDiagnostics,
 }

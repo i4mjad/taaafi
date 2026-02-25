@@ -113,7 +113,7 @@ class UserDocument {
 
   @override
   String toString() {
-    return 'UserDocument( uid: $uid, devicesIds: $devicesIds, displayName: $displayName, email: $email, gender: $gender, locale: $locale, dayOfBirth: $dayOfBirth, userFirstDate: $userFirstDate, role: $role, messagingToken: $messagingToken, userRelapses: $userRelapses, userMasturbatingWithoutWatching: $userMasturbatingWithoutWatching, userWatchingWithoutMasturbating: $userWatchingWithoutMasturbating, isPlusUser: $isPlusUser, lastPlusCheck: $lastPlusCheck, isRequestedToBeDeleted: $isRequestedToBeDeleted)';
+    return 'UserDocument( uid: $uid, devicesIds: $devicesIds, displayName: $displayName, email: $email, gender: $gender, locale: $locale, dayOfBirth: $dayOfBirth, userFirstDate: $userFirstDate, role: $role, messagingToken: $messagingToken, userRelapses: $userRelapses, userMasturbatingWithoutWatching: $userMasturbatingWithoutWatching, userWatchingWithoutMasturbating: $userWatchingWithoutMasturbating, isPlusUser: $isPlusUser, lastPlusCheck: $lastPlusCheck, isRequestedToBeDeleted: $isRequestedToBeDeleted, hasCheckedForDataLoss: $hasCheckedForDataLoss)';
   }
 
   UserDocument copyWith({
@@ -133,6 +133,7 @@ class UserDocument {
     bool? isPlusUser,
     Timestamp? lastPlusCheck,
     bool? isRequestedToBeDeleted,
+    bool? hasCheckedForDataLoss,
   }) {
     return UserDocument(
       uid: uid ?? this.uid,
@@ -153,6 +154,8 @@ class UserDocument {
       isPlusUser: isPlusUser ?? this.isPlusUser,
       lastPlusCheck: lastPlusCheck ?? this.lastPlusCheck,
       isRequestedToBeDeleted: isRequestedToBeDeleted ?? this.isRequestedToBeDeleted,
+      hasCheckedForDataLoss:
+          hasCheckedForDataLoss ?? this.hasCheckedForDataLoss,
     );
   }
 
@@ -178,7 +181,8 @@ class UserDocument {
             userWatchingWithoutMasturbating) &&
         other.isPlusUser == isPlusUser &&
         other.lastPlusCheck == lastPlusCheck &&
-        other.isRequestedToBeDeleted == isRequestedToBeDeleted;
+        other.isRequestedToBeDeleted == isRequestedToBeDeleted &&
+        other.hasCheckedForDataLoss == hasCheckedForDataLoss;
   }
 
   @override
@@ -198,6 +202,7 @@ class UserDocument {
         userWatchingWithoutMasturbating.hashCode ^
         isPlusUser.hashCode ^
         lastPlusCheck.hashCode ^
-        isRequestedToBeDeleted.hashCode;
+        isRequestedToBeDeleted.hashCode ^
+        hasCheckedForDataLoss.hashCode;
   }
 }

@@ -110,6 +110,8 @@ class MigerationRepository {
 
     try {
       var updatedDocument = newDocument.toFirestore();
+      // Do not send null values in merge writes to avoid clobbering existing fields.
+      updatedDocument.removeWhere((key, value) => value == null);
 
       await _addUserIdentifierToTrackers(_auth.currentUser!);
       await docRef.set(updatedDocument, SetOptions(merge: true));

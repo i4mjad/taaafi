@@ -767,7 +767,6 @@ const Map<String, String> kAr = {
   "groups": "الزمالات",
   "activities-settings": "إعدادات التمارين",
   "vault": "الخزنة",
-  "fort": "الحصن",
   "fellowship": "الزمالة",
   "taaafi-groups": "زمالات تعافي",
   "login": "تسجيل الدخول",
@@ -2072,29 +2071,6 @@ const Map<String, String> kAr = {
   'interaction_failed': 'فشل التفاعل',
   'invalid_interaction_value': 'قيمة تفاعل غير صحيحة',
 
-  // Guard/Focus feature - ميزة الحماية والتركيز
-  'guard': 'الحصن',
-  'focus_score': 'نقاط التركيز',
-  'screen_time_today': 'وقت الشاشة اليوم',
-  'total_screen_time': 'إجمالي وقت الشاشة',
-  'focus_breaks': 'فترات انقطاع التركيز',
-  'pickups': 'مرات فتح الجهاز',
-  'top_apps': 'التطبيقات الأكثر استخداماً',
-  'most_used': 'الأكثر استخداماً',
-  'time_offline': 'الوقت دون اتصال',
-  'of_your_day': 'من يومك',
-  'block_now': 'احجب الآن',
-  'live': 'مباشر',
-  'refresh_now': 'تحديث الآن',
-  'no_app_usage_data': 'لا توجد بيانات استخدام للتطبيقات بعد',
-  'start_monitoring_to_see_results': 'ابدأ المراقبة لرؤية النتائج',
-  'select_apps_and_sites': 'اختر التطبيقات والمواقع',
-  'start_monitoring': 'ابدأ المراقبة',
-  'hourly_monitoring_started': 'بدأت المراقبة كل ساعة',
-  'usage_access_required': 'صلاحية الوصول للاستخدام مطلوبة لحساب نقاط التركيز',
-  'focus_controls': 'أدوات التحكم في التركيز',
-  'choose_apps_to_monitor': 'اختر التطبيقات لمراقبتها',
-  'begin_usage_tracking': 'ابدأ تتبع الاستخدام',
   'last_7_days': 'آخر ٧ أيام',
   'error_loading_data': 'خطأ في تحميل البيانات',
 
@@ -4082,101 +4058,4 @@ const Map<String, String> kAr = {
   'common.view': 'عرض',
   'common.got_it': 'فهمت',
 
-  // Fort (الحصن) feature
-  'fort_level': 'المستوى',
-  'fort_xp': 'نقاط الخبرة',
-
-  // Fort — Usage categories
-  'fort_category_socialMedia': 'وسائل التواصل',
-  'fort_category_entertainment': 'الترفيه',
-  'fort_category_games': 'الألعاب',
-  'fort_category_productivity': 'الإنتاجية',
-  'fort_category_communication': 'التواصل',
-  'fort_category_education': 'التعليم',
-  'fort_category_health': 'الصحة',
-  'fort_category_news': 'الأخبار',
-  'fort_category_other': 'أخرى',
-
-  // Fort — Permission
-  'fort_permission_title': 'تفعيل رؤى الاستخدام',
-  'fort_permission_description_android':
-      'اسمح لتعافي بقراءة بيانات وقت الشاشة حتى تتمكن من تتبع عاداتك الرقمية وتقوية حصنك.',
-  'fort_permission_description_ios':
-      'اسمح لتعافي بالوصول إلى بيانات وقت الشاشة حتى تتمكن من تتبع عاداتك الرقمية وتقوية حصنك.',
-  'fort_enable_tracking': 'تفعيل التتبع',
-
-  // Fort — Empty / Error
-  'fort_no_data': 'لا توجد بيانات استخدام بعد',
-  'fort_no_data_description': 'ستظهر بيانات الاستخدام هنا بمجرد تفعيل التتبع',
-
-  // Fort — Premium
-  'fort_premium_history': 'سجل الاستخدام',
-  'fort_premium_history_description': 'افتح سجل الاستخدام الكامل مع تعافي+',
-
-  // Fort — Zones
-  'fort_zone_walls': 'الأسوار',
-  'fort_zone_garden': 'الحديقة',
-  'fort_zone_watchtower': 'برج المراقبة',
-  'fort_zone_library': 'المكتبة',
-  'fort_zone_prayerRoom': 'المصلى',
-
-  // Fort — Zone tiers (Walls)
-  'fort_zone_walls_tier_1': 'سياج خشبي',
-  'fort_zone_walls_tier_2': 'جدار حجري',
-  'fort_zone_walls_tier_3': 'جدار محصّن',
-  'fort_zone_walls_tier_4': 'جدار بأبراج',
-  'fort_zone_walls_tier_5': 'جدار ذهبي',
-
-  // Fort — Zone tiers (Garden)
-  'fort_zone_garden_tier_1': 'تربة جرداء',
-  'fort_zone_garden_tier_2': 'نباتات صغيرة',
-  'fort_zone_garden_tier_3': 'أزهار',
-  'fort_zone_garden_tier_4': 'بستان',
-  'fort_zone_garden_tier_5': 'حديقة الفردوس',
-
-  // Fort — Zone tiers (Watchtower)
-  'fort_zone_watchtower_tier_1': 'مرقب خشبي',
-  'fort_zone_watchtower_tier_2': 'برج حجري',
-  'fort_zone_watchtower_tier_3': 'برج عالٍ',
-  'fort_zone_watchtower_tier_4': 'برج محصّن',
-  'fort_zone_watchtower_tier_5': 'شعاع النور',
-
-  // Fort — Zone tiers (Library)
-  'fort_zone_library_tier_1': 'رف صغير',
-  'fort_zone_library_tier_2': 'خزانة كتب',
-  'fort_zone_library_tier_3': 'غرفة قراءة',
-  'fort_zone_library_tier_4': 'مكتبة كاملة',
-  'fort_zone_library_tier_5': 'قبة عظيمة',
-
-  // Fort — Zone tiers (Prayer Room)
-  'fort_zone_prayerRoom_tier_1': 'سجادة صلاة',
-  'fort_zone_prayerRoom_tier_2': 'محراب صغير',
-  'fort_zone_prayerRoom_tier_3': 'غرفة مزخرفة',
-  'fort_zone_prayerRoom_tier_4': 'مسجد',
-  'fort_zone_prayerRoom_tier_5': 'جامع كبير',
-
-  // Fort — Inhabitants
-  'fort_inhabitant_guardian': 'الحارس',
-  'fort_inhabitant_scholar': 'العالم',
-  'fort_inhabitant_gardener': 'البستاني',
-  'fort_inhabitant_watchman': 'الرقيب',
-  'fort_inhabitant_imam': 'الإمام',
-  'fort_inhabitant_healer': 'الطبيب',
-  'fort_inhabitant_storyteller': 'الراوي',
-  'fort_inhabitant_commander': 'القائد',
-
-  // Fort — Seasons
-  'fort_season_spring': 'الربيع',
-  'fort_season_summer': 'الصيف',
-  'fort_season_autumn': 'الخريف',
-  'fort_season_winter': 'الشتاء',
-  'fort_season_ramadan': 'رمضان',
-  'fort_season_eid': 'العيد',
-
-  // Fort — Daily summary
-  'fort_daily_standing': 'حصنك يقف شامخاً الليلة',
-  'fort_daily_healing': 'حصنك يتعافى',
-  'fort_clean_day_bonus': 'مكافأة اليوم النظيف',
-  'fort_streak_bonus': 'مكافأة السلسلة',
-  'fort_low_screen_time_bonus': 'مكافأة وقت شاشة قليل',
 };

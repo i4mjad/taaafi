@@ -565,6 +565,7 @@ class AuthService {
     } catch (e, stackTrace) {
       print('❌ COMPLETE REG ERROR: $e');
       ref.read(errorLoggerProvider).logException(e, stackTrace);
+      rethrow;
     }
   }
 }

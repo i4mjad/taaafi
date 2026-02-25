@@ -354,7 +354,12 @@ class _ConfirmUserDetailsScreenState
                                     dayOfBirth: selectedBirthDate != null
                                         ? Timestamp.fromDate(selectedBirthDate!)
                                         : null,
-                                    userFirstDate: userDocument.userFirstDate,
+                                    userFirstDate: selectedUserFirstDate != null
+                                        ? Timestamp.fromDate(
+                                            selectedUserFirstDate!.toUtc())
+                                        : userDocument.userFirstDate ??
+                                            Timestamp.fromDate(
+                                                DateTime.now().toUtc()),
                                     email: emailController.text.trim(),
                                     role: "user",
                                     locale: selectedLocale?.value,

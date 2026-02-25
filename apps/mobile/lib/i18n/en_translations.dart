@@ -1008,7 +1008,6 @@ const Map<String, String> kEn = {
   "no-follow-ups-yet": "No follow up yet of this type",
   "last-follow-up": "Last follow up: ",
   "vault": "Vault",
-  "fort": "Fort",
   "Group": "Group",
   "about-app": "About App",
   "about-ta3afi":
@@ -2108,30 +2107,6 @@ const Map<String, String> kEn = {
   'thumbs_up': 'Thumbs Up',
   'thumbs_down': 'Thumbs Down',
   'interaction_failed': 'Interaction failed',
-
-  // Guard/Focus feature
-  'guard': 'Guard',
-  'focus_score': 'Focus Score',
-  'screen_time_today': 'Screen Time Today',
-  'total_screen_time': 'Total screen time',
-  'focus_breaks': 'Focus breaks',
-  'pickups': 'Pickups',
-  'top_apps': 'Top Apps',
-  'most_used': 'Most Used',
-  'time_offline': 'Time Offline',
-  'of_your_day': 'of your day',
-  'block_now': 'Block Now',
-  'live': 'LIVE',
-  'refresh_now': 'Refresh now',
-  'no_app_usage_data': 'No app usage data yet',
-  'start_monitoring_to_see_results': 'Start monitoring to see results',
-  'select_apps_and_sites': 'Select apps & sites',
-  'start_monitoring': 'Start monitoring',
-  'hourly_monitoring_started': 'Hourly monitoring started',
-  'usage_access_required': 'Usage Access is required to compute Focus Score',
-  'focus_controls': 'Focus Controls',
-  'choose_apps_to_monitor': 'Choose apps to monitor',
-  'begin_usage_tracking': 'Begin usage tracking',
 
   'last_7_days': 'Last 7 Days',
 
@@ -4181,101 +4156,4 @@ const Map<String, String> kEn = {
   'common.view': 'View',
   'common.got_it': 'Got it',
 
-  // Fort (الحصن) feature
-  'fort_level': 'Level',
-  'fort_xp': 'XP',
-
-  // Fort — Usage categories
-  'fort_category_socialMedia': 'Social Media',
-  'fort_category_entertainment': 'Entertainment',
-  'fort_category_games': 'Games',
-  'fort_category_productivity': 'Productivity',
-  'fort_category_communication': 'Communication',
-  'fort_category_education': 'Education',
-  'fort_category_health': 'Health',
-  'fort_category_news': 'News',
-  'fort_category_other': 'Other',
-
-  // Fort — Permission
-  'fort_permission_title': 'Enable Usage Insights',
-  'fort_permission_description_android':
-      'Allow Ta\'aafi to read your screen time data so you can track your digital habits and strengthen your fort.',
-  'fort_permission_description_ios':
-      'Allow Ta\'aafi to access Screen Time data so you can track your digital habits and strengthen your fort.',
-  'fort_enable_tracking': 'Enable Tracking',
-
-  // Fort — Empty / Error
-  'fort_no_data': 'No usage data yet',
-  'fort_no_data_description': 'Usage data will appear here once tracking is enabled',
-
-  // Fort — Premium
-  'fort_premium_history': 'Usage History',
-  'fort_premium_history_description': 'Unlock full usage history with Ta\'aafi+',
-
-  // Fort — Zones
-  'fort_zone_walls': 'Walls',
-  'fort_zone_garden': 'Garden',
-  'fort_zone_watchtower': 'Watchtower',
-  'fort_zone_library': 'Library',
-  'fort_zone_prayerRoom': 'Prayer Room',
-
-  // Fort — Zone tiers (Walls)
-  'fort_zone_walls_tier_1': 'Wooden Fence',
-  'fort_zone_walls_tier_2': 'Stone Wall',
-  'fort_zone_walls_tier_3': 'Fortified Wall',
-  'fort_zone_walls_tier_4': 'Towered Wall',
-  'fort_zone_walls_tier_5': 'Golden Wall',
-
-  // Fort — Zone tiers (Garden)
-  'fort_zone_garden_tier_1': 'Bare Soil',
-  'fort_zone_garden_tier_2': 'Small Plants',
-  'fort_zone_garden_tier_3': 'Flowers',
-  'fort_zone_garden_tier_4': 'Orchard',
-  'fort_zone_garden_tier_5': 'Paradise Garden',
-
-  // Fort — Zone tiers (Watchtower)
-  'fort_zone_watchtower_tier_1': 'Wooden Lookout',
-  'fort_zone_watchtower_tier_2': 'Stone Tower',
-  'fort_zone_watchtower_tier_3': 'Tall Tower',
-  'fort_zone_watchtower_tier_4': 'Fortified Tower',
-  'fort_zone_watchtower_tier_5': 'Light Beam',
-
-  // Fort — Zone tiers (Library)
-  'fort_zone_library_tier_1': 'Small Shelf',
-  'fort_zone_library_tier_2': 'Bookcase',
-  'fort_zone_library_tier_3': 'Reading Room',
-  'fort_zone_library_tier_4': 'Full Library',
-  'fort_zone_library_tier_5': 'Grand Dome',
-
-  // Fort — Zone tiers (Prayer Room)
-  'fort_zone_prayerRoom_tier_1': 'Prayer Mat',
-  'fort_zone_prayerRoom_tier_2': 'Small Mihrab',
-  'fort_zone_prayerRoom_tier_3': 'Decorated Room',
-  'fort_zone_prayerRoom_tier_4': 'Mosque',
-  'fort_zone_prayerRoom_tier_5': 'Grand Mosque',
-
-  // Fort — Inhabitants
-  'fort_inhabitant_guardian': 'The Guardian',
-  'fort_inhabitant_scholar': 'The Scholar',
-  'fort_inhabitant_gardener': 'The Gardener',
-  'fort_inhabitant_watchman': 'The Watchman',
-  'fort_inhabitant_imam': 'The Imam',
-  'fort_inhabitant_healer': 'The Healer',
-  'fort_inhabitant_storyteller': 'The Storyteller',
-  'fort_inhabitant_commander': 'The Commander',
-
-  // Fort — Seasons
-  'fort_season_spring': 'Spring',
-  'fort_season_summer': 'Summer',
-  'fort_season_autumn': 'Autumn',
-  'fort_season_winter': 'Winter',
-  'fort_season_ramadan': 'Ramadan',
-  'fort_season_eid': 'Eid',
-
-  // Fort — Daily summary
-  'fort_daily_standing': 'Your fort stands strong tonight',
-  'fort_daily_healing': 'Your fort is healing',
-  'fort_clean_day_bonus': 'Clean day bonus',
-  'fort_streak_bonus': 'Streak bonus',
-  'fort_low_screen_time_bonus': 'Low screen time bonus',
 };

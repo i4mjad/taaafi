@@ -116,6 +116,7 @@ class AuthRepository {
       print('❌ CREATE DOC ERROR: $e');
       print('Stack trace: $stackTrace');
       ref.read(errorLoggerProvider).logException(e, stackTrace);
+      rethrow;
     }
   }
 

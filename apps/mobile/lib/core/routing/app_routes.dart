@@ -77,8 +77,6 @@ import 'package:reboot_app_3/features/vault/presentation/library/list_screen.dar
 import 'package:reboot_app_3/features/vault/presentation/vault_settings/activities_notifications_settings_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/vault_settings/smart_alerts_settings_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/vault_screen.dart';
-import 'package:reboot_app_3/features/fort/presentation/fort_screen.dart';
-import 'package:reboot_app_3/features/fort/presentation/fort_diagnostics_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/premium_analytics_screen.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:reboot_app_3/features/authentication/data/models/user_document.dart';
@@ -430,32 +428,6 @@ GoRouter goRouter(Ref<GoRouter> ref) {
                       name: RouteNames.premiumAnalytics.name,
                       child: PremiumAnalyticsScreen(),
                     ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-
-          // * Fort
-          StatefulShellBranch(
-            navigatorKey: shellNavigatorFortKey,
-            observers: [
-              GoRouterObserver(ref.read(analyticsFacadeProvider)),
-            ],
-            routes: [
-              GoRoute(
-                name: RouteNames.fort.name,
-                path: '/fort',
-                pageBuilder: (context, state) => NoTransitionPage<void>(
-                  name: RouteNames.fort.name,
-                  child: FortScreen(),
-                ),
-                routes: [
-                  GoRoute(
-                    name: RouteNames.fortDiagnostics.name,
-                    path: 'diagnostics',
-                    builder: (context, state) =>
-                        const FortDiagnosticsScreen(),
                   ),
                 ],
               ),
