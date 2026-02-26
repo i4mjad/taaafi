@@ -19,9 +19,10 @@ struct PaywallScreen: View {
 
             // Branding
             VStack(spacing: Spacing.md) {
-                Image(systemName: "crown.fill")
-                    .font(.system(size: 48))
-                    .foregroundStyle(AppColors.primary)
+                Image(AppIcon.plusIconName)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 80, height: 80)
 
                 Text(String(localized: "paywall.title"))
                     .font(Typography.h4)
