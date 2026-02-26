@@ -191,15 +191,35 @@ To add a new color: create a `.colorset` in `Assets.xcassets/Colors/` with light
 
 ### Fonts (`AppFont.swift`)
 
-**IBM Plex Sans Arabic** is the app font. Font files are in `Resources/Fonts/`. Use `AppFont.custom(size:weight:)`:
+**IBM Plex Sans Arabic** is the app font. Font files are in `Resources/Fonts/`. Registered via `Info.plist` `UIAppFonts` array.
+
+Use `AppFont.custom(size:weight:)` for SwiftUI views:
 
 | `AppFontWeight` | IBM Plex File |
 |-----------------|---------------|
-| `.light` | Regular |
+| `.thin` | Thin |
+| `.extraLight` | ExtraLight |
+| `.light` | Light |
+| `.regular` | Regular |
 | `.book` | Medium |
 | `.medium` | SemiBold |
 | `.semiBold` | Bold |
 | `.bold` | Bold (capped) |
+
+### Native UI Element Fonts (`AppAppearance.swift`)
+
+Native UIKit elements (nav bar, tab bar) are overridden via `UIAppearance` APIs in `AppAppearance.configure()`, called in `iosApp.init()` before `FirebaseApp.configure()`.
+
+`AppAppearance` is `@MainActor` — `UIAppearance` proxies must run on the main thread.
+
+| Element | Size | Weight |
+|---------|------|--------|
+| Nav bar large title | 34pt | `.regular` (IBMPlexSansArabic-Regular) |
+| Nav bar inline title | 17pt | `.medium` (IBMPlexSansArabic-SemiBold) |
+| Back button text | 17pt | `.regular` (IBMPlexSansArabic-Regular) |
+| Tab bar label | 10pt | `.regular` (IBMPlexSansArabic-Regular) |
+
+Do **not** use SwiftUI `.font()` modifiers to style these elements — the appearance proxy handles them globally.
 
 ### Typography (`Typography.swift`)
 
