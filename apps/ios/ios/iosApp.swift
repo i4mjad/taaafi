@@ -32,6 +32,7 @@ struct iosApp: App {
     @State private var isStartupComplete = false
 
     init() {
+        AppAppearance.configure()
         FirebaseApp.configure()
 
         // Firebase-dependent services (must initialize after FirebaseApp.configure)
