@@ -27,12 +27,6 @@ final class AuthService {
         setupAuthStateListener()
     }
 
-    deinit {
-        if let handle = authStateHandle {
-            Auth.auth().removeStateDidChangeListener(handle)
-        }
-    }
-
     /// Configure with dependencies (called from iosApp after all services are created)
     func configure(analytics: AnalyticsFacade, errorLogger: ErrorLogger) {
         self.analytics = analytics
