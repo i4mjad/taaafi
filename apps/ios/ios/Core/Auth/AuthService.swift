@@ -37,8 +37,8 @@ final class AuthService {
 
     private func setupAuthStateListener() {
         authStateHandle = Auth.auth().addStateDidChangeListener { [weak self] _, user in
-            guard let self else { return }
-            Task { @MainActor in
+            DispatchQueue.main.async {
+                guard let self else { return }
                 self.currentUser = user
                 self.isLoading = false
 
