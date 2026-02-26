@@ -97,11 +97,21 @@
 			);
 			target = 6D32B9F32F48632B0069B270 /* DeviceActivityMonitor */;
 		};
+		6D87B8502F60B00000DDEDDB /* Exceptions for "ios" folder in "ios" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 6D32B9CA2F47F5BF0069B270 /* ios */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		6D32B9CD2F47F5BF0069B270 /* ios */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				6D87B8502F60B00000DDEDDB /* Exceptions for "ios" folder in "ios" target */,
+			);
 			path = ios;
 			sourceTree = "<group>";
 		};
@@ -579,8 +589,8 @@
 				DEVELOPMENT_TEAM = JA8SVE4GX4;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ios/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Ta'aafi Dev";
-				INFOPLIST_KEY_UIAppFonts = "$(inherited) Fonts/IBMPlexSansArabic-Regular.ttf Fonts/IBMPlexSansArabic-Medium.ttf Fonts/IBMPlexSansArabic-SemiBold.ttf Fonts/IBMPlexSansArabic-Bold.ttf";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -621,8 +631,8 @@
 				DEVELOPMENT_TEAM = JA8SVE4GX4;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ios/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Ta'aafi Dev";
-				INFOPLIST_KEY_UIAppFonts = "$(inherited) Fonts/IBMPlexSansArabic-Regular.ttf Fonts/IBMPlexSansArabic-Medium.ttf Fonts/IBMPlexSansArabic-SemiBold.ttf Fonts/IBMPlexSansArabic-Bold.ttf";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
