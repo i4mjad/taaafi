@@ -26,7 +26,7 @@ struct AppDatePicker: View {
 
     var body: some View {
         Button {
-            tempDate = getValidInitialDate(
+            tempDate = Self.getValidInitialDate(
                 first: range?.lowerBound,
                 last: range?.upperBound,
                 current: value

@@ -1,4 +1,5 @@
 import Testing
+import SwiftUI
 @testable import ios
 
 @Suite("AppSlider formatting and snapping")

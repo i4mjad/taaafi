@@ -11,7 +11,7 @@ final class AccountDeletionManager {
     private(set) var isCancelling = false
     private(set) var error: Error?
 
-    static let deletionDelayDays = 30
+    nonisolated static let deletionDelayDays = 30
     private static let collection = "accountDeleteRequests"
 
     init(firestoreService: FirestoreService) {
@@ -59,7 +59,7 @@ final class AccountDeletionManager {
         }
     }
 
-    static func computeScheduledDate(from requestedAt: Date) -> Date {
+    nonisolated static func computeScheduledDate(from requestedAt: Date) -> Date {
         Calendar.current.date(byAdding: .day, value: deletionDelayDays, to: requestedAt) ?? requestedAt
     }
 

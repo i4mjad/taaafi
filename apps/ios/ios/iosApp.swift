@@ -11,6 +11,7 @@ import FirebaseCore
 @main
 struct iosApp: App {
     @State private var screenTimeManager = ScreenTimeManager()
+    @State private var toastManager = ToastManager()
 
     // Core Services (initialized in init after FirebaseApp.configure)
     @State private var errorLogger = ErrorLogger()
@@ -64,6 +65,7 @@ struct iosApp: App {
                     MainTabView()
                 }
             }
+            .toastOverlay()
             .environment(screenTimeManager)
             .environment(errorLogger)
             .environment(analytics)
@@ -74,6 +76,7 @@ struct iosApp: App {
             .environment(deviceTrackingService)
             .environment(emailSyncService)
             .environment(routeSecurityService)
+            .environment(toastManager)
             .environment(\.locale, Locale(identifier: "ar"))
             .task {
                 // Configure auth service with dependencies
