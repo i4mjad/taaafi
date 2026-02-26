@@ -1,306 +1,325 @@
 {
   "sourceLanguage" : "ar",
   "strings" : {
-    "tab.home" : {
+    "" : {
+
+    },
+    "account.cancelDeletion" : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "الرئيسية"
+            "value" : "إلغاء حذف الحساب"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Home"
+            "value" : "Cancel Account Deletion"
           }
         }
       }
     },
-    "tab.vault" : {
+    "account.cancelDeletionConfirmMessage" : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "الخزنة"
+            "value" : "هل أنت متأكد أنك تريد إلغاء طلب حذف حسابك؟"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vault"
+            "value" : "Are you sure you want to cancel your account deletion request?"
           }
         }
       }
     },
-    "tab.guard" : {
+    "account.cancelDeletionConfirmTitle" : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "الحارس"
+            "value" : "إلغاء الحذف"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Guard"
+            "value" : "Cancel Deletion"
           }
         }
       }
     },
-    "tab.community" : {
+    "account.completeRegistration" : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "المجتمع"
+            "value" : "أكمل التسجيل"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Community"
+            "value" : "Complete Registration"
           }
         }
       }
     },
-    "tab.account" : {
+    "account.completeRegistrationButton" : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "الحساب"
+            "value" : "إكمال التسجيل"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Account"
+            "value" : "Complete Registration"
           }
         }
       }
     },
-    "guard.today" : {
+    "account.completeRegistrationSubtitle" : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "اليوم"
+            "value" : "أكمل بياناتك للاستفادة من جميع المزايا"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Today"
+            "value" : "Complete your information to access all features"
           }
         }
       }
     },
-    "guard.yesterday" : {
+    "account.confirmDetails" : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "أمس"
+            "value" : "تأكيد البيانات"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Yesterday"
+            "value" : "Confirm Details"
           }
         }
       }
     },
-    "guard.screenTimePermission" : {
+    "account.confirmDetailsButton" : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "إذن وقت الشاشة"
+            "value" : "تأكيد البيانات"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Screen Time Permission"
+            "value" : "Confirm Details"
           }
         }
       }
     },
-    "guard.screenTimeDescription" : {
+    "account.confirmDetailsSubtitle" : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "امنح إذن وقت الشاشة ليتمكن الحارس من عرض استخدامك اليومي ومساعدتك على البقاء في المسار الصحيح."
+            "value" : "يرجى تأكيد بياناتك الشخصية"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Grant Screen Time access so Guard can show your daily usage and help you stay on track."
+            "value" : "Please confirm your personal details"
           }
         }
       }
     },
-    "guard.enableAccess" : {
+    "account.deletionCancelFailed" : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "تفعيل إذن وقت الشاشة"
+            "value" : "فشل إلغاء طلب الحذف"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Enable Screen Time Access"
+            "value" : "Failed to cancel deletion request"
           }
         }
       }
     },
-    "guard.selectDate" : {
+    "account.deletionCancelled" : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "اختر التاريخ"
+            "value" : "تم إلغاء طلب الحذف بنجاح"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Select Date"
+            "value" : "Deletion request cancelled successfully"
           }
         }
       }
     },
-    "guard.done" : {
+    "account.deletionScheduled" : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "تم"
+            "value" : "سيتم حذف حسابك في %@"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Done"
+            "value" : "Your account will be deleted on %@"
           }
         }
       }
     },
-    "guard.settings" : {
+    "account.emailVerification" : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "إعدادات الحارس"
+            "value" : "تأكيد البريد الإلكتروني"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Guard Settings"
+            "value" : "Verify Email"
           }
         }
       }
     },
-    "guard.safe" : {
+    "account.emailVerificationButton" : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "آمن"
+            "value" : "تأكيد البريد"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Safe"
+            "value" : "Verify Email"
           }
         }
       }
     },
-    "guard.neutral" : {
+    "account.emailVerificationSubtitle" : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "محايد"
+            "value" : "يرجى تأكيد بريدك الإلكتروني"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Neutral"
+            "value" : "Please verify your email address"
           }
         }
       }
     },
-    "guard.threat" : {
+    "account.error" : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "تهديد"
+            "value" : "حدث خطأ"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Threat"
+            "value" : "An error occurred"
           }
         }
       }
     },
-    "guard.categoryClassifications" : {
+    "account.errorSubtitle" : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "تصنيفات الفئات"
+            "value" : "يرجى المحاولة مرة أخرى"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Category Classifications"
+            "value" : "Please try again"
           }
         }
       }
     },
-    "guard.categoryFooter" : {
+    "account.pendingDeletion" : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "فئات التهديد تحتسب ضد نقاط الحارس. الفئات الآمنة تحسّنها. الفئات المحايدة مستثناة. الفئات الاجتماعية مقفلة كتهديدات."
+            "value" : "حذف الحساب معلّق"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Threat categories count against your Guard Score. Safe categories improve it. Neutral categories are excluded. Social categories are locked as threats."
+            "value" : "Account Deletion Pending"
           }
         }
       }
     },
-    "common.loading" : {
+    "account.pendingDeletionSubtitle" : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "جاري التحميل..."
+            "value" : "تم طلب حذف حسابك"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Loading..."
+            "value" : "Your account deletion has been requested"
+          }
+        }
+      }
+    },
+    "banner.warningCount" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لديك %lld تحذير"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You have %lld warning(s)"
           }
         }
       }
@@ -337,6 +356,278 @@
         }
       }
     },
+    "common.cancel" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إلغاء"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        }
+      }
+    },
+    "common.confirm" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تأكيد"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirm"
+          }
+        }
+      }
+    },
+    "common.done" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تم"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
+          }
+        }
+      }
+    },
+    "common.loading" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جاري التحميل..."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading..."
+          }
+        }
+      }
+    },
+    "common.retry" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إعادة المحاولة"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retry"
+          }
+        }
+      }
+    },
+    "common.signOut" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تسجيل الخروج"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign Out"
+          }
+        }
+      }
+    },
+    "guard.categoryClassifications" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تصنيفات الفئات"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Category Classifications"
+          }
+        }
+      }
+    },
+    "guard.categoryFooter" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "فئات التهديد تحتسب ضد نقاط الحارس. الفئات الآمنة تحسّنها. الفئات المحايدة مستثناة. الفئات الاجتماعية مقفلة كتهديدات."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Threat categories count against your Guard Score. Safe categories improve it. Neutral categories are excluded. Social categories are locked as threats."
+          }
+        }
+      }
+    },
+    "guard.done" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تم"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
+          }
+        }
+      }
+    },
+    "guard.enableAccess" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تفعيل إذن وقت الشاشة"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enable Screen Time Access"
+          }
+        }
+      }
+    },
+    "guard.neutral" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "محايد"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neutral"
+          }
+        }
+      }
+    },
+    "guard.safe" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "آمن"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Safe"
+          }
+        }
+      }
+    },
+    "guard.screenTimeDescription" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "امنح إذن وقت الشاشة ليتمكن الحارس من عرض استخدامك اليومي ومساعدتك على البقاء في المسار الصحيح."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grant Screen Time access so Guard can show your daily usage and help you stay on track."
+          }
+        }
+      }
+    },
+    "guard.screenTimePermission" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إذن وقت الشاشة"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Screen Time Permission"
+          }
+        }
+      }
+    },
+    "guard.selectDate" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اختر التاريخ"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select Date"
+          }
+        }
+      }
+    },
+    "guard.settings" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إعدادات الحارس"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guard Settings"
+          }
+        }
+      }
+    },
+    "guard.threat" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تهديد"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Threat"
+          }
+        }
+      }
+    },
     "guard.title" : {
       "localizations" : {
         "ar" : {
@@ -349,6 +640,150 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Guard"
+          }
+        }
+      }
+    },
+    "guard.today" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اليوم"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Today"
+          }
+        }
+      }
+    },
+    "guard.yesterday" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أمس"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yesterday"
+          }
+        }
+      }
+    },
+    "premium.unlockAnalytics" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "افتح التحليلات المميزة"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unlock premium analytics"
+          }
+        }
+      }
+    },
+    "premium.upgradeToPlus" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ترقية إلى بلس"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upgrade to Plus"
+          }
+        }
+      }
+    },
+    "tab.account" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الحساب"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Account"
+          }
+        }
+      }
+    },
+    "tab.community" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "المجتمع"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Community"
+          }
+        }
+      }
+    },
+    "tab.guard" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الحارس"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guard"
+          }
+        }
+      }
+    },
+    "tab.home" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الرئيسية"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Home"
+          }
+        }
+      }
+    },
+    "tab.vault" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الخزنة"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vault"
           }
         }
       }
