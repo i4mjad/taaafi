@@ -29,22 +29,27 @@ apps/ios/
 │   │   ├── Models/                   # Ban, Warning, AppFeature
 │   │   ├── Network/                  # CloudFunctionsService, StorageService
 │   │   ├── Security/                 # BanWarningFacade, RouteSecurityService, StartupSecurityService
-│   │   └── Services/                 # AnalyticsFacade, ErrorLogger, DeviceTrackingService
+│   │   ├── Services/                 # AnalyticsFacade, ErrorLogger, DeviceTrackingService
+│   │   └── Theme/                    # Spacing, AppFont, AppColors, Typography, Strings
 │   ├── Features/
 │   │   └── Guard/
 │   │       ├── GuardScreen.swift           # Screen Time report UI + date picker
 │   │       ├── GuardSettingsScreen.swift    # Category classification settings
 │   │       ├── ScreenTimeManager.swift     # @Observable auth + monitoring manager
 │   │       └── CategoryClassification.swift # Category-to-threat mapping
+│   ├── Localizable.xcstrings          # String Catalog (ar source + en)
 │   └── Resources/
 │       ├── Assets.xcassets/          # Colors and image assets
+│       │   └── Colors/              # 8 color families, light/dark adaptive
+│       ├── Fonts/                    # IBM Plex Sans Arabic TTFs
 │       └── AppIconDev.icon/          # App icon (SVG-based)
 ├── iosTests/                         # Unit tests (Swift Testing framework)
 │   └── Core/                         # Mirrors main target Core/ structure
 │       ├── Auth/                     # AuthModelsTests
 │       ├── Models/                   # BanTests, AppFeatureTests
 │       ├── Security/                 # SecurityResultTests, RouteSecurityServiceTests, etc.
-│       └── Services/                 # AnalyticsFacadeTests, mocks
+│       ├── Services/                 # AnalyticsFacadeTests, mocks
+│       └── Theme/                    # SpacingTests, AppFontTests, AppColorsTests, TypographyTests, StringsTests
 ├── DeviceActivityReport/             # ExtensionKit UI extension
 │   ├── DeviceActivityReport.swift    # Extension entry point
 │   ├── TotalActivityReport.swift     # Data processing scene
@@ -77,7 +82,8 @@ apps/ios/
 | CI | Xcode Cloud |
 | Extensions | DeviceActivityReport, DeviceActivityMonitor |
 | Testing | Swift Testing framework (`@Test`, `#expect`, `@Suite`) |
-| External dependencies | Firebase SDK (SPM) |
+| External dependencies | Firebase SDK, GoogleSignIn, RevenueCat (SPM) |
+| Font | IBM Plex Sans Arabic (Regular, Medium, SemiBold, Bold) |
 
 ---
 
@@ -147,19 +153,89 @@ UserDefaults(suiteName: "group.com.taaafi.app")
 
 ---
 
-## Spacing System
+## Theming System
 
-4pt baseline grid used across all views:
+All theming primitives live in `ios/Core/Theme/`. Use these instead of hardcoded values.
+
+### Spacing (`Spacing.swift`)
+
+4pt baseline grid. Use `Spacing.*` for all padding, spacing, and layout values:
 
 | Token | Value |
 |-------|-------|
-| `xxs` | 4 |
-| `xs` | 8 |
-| `sm` | 12 |
-| `md` | 16 |
-| `lg` | 20 |
-| `xl` | 24 |
-| `xxl` | 32 |
+| `Spacing.xxs` | 4 |
+| `Spacing.xs` | 8 |
+| `Spacing.sm` | 12 |
+| `Spacing.md` | 16 |
+| `Spacing.lg` | 20 |
+| `Spacing.xl` | 24 |
+| `Spacing.xxl` | 32 |
+
+### Colors (`AppColors.swift` + Asset Catalog)
+
+Colors are defined as **Asset Catalog color sets** in `Resources/Assets.xcassets/Colors/` with light/dark appearances. `AppColors` provides type-safe access:
+
+```swift
+AppColors.primary      // primary500 alias
+AppColors.primary500   // specific shade
+AppColors.error        // error500 alias
+AppColors.background   // adaptive background
+AppColors.grey500      // neutral text
+```
+
+**8 color families:** `primary`, `secondary`, `tint`, `success`, `warning`, `error`, `grey`, `background`
+**10 shades per family:** `50`, `100`, `200`, `300`, `400`, `500`, `600`, `700`, `800`, `900`
+**Semantic aliases:** `primary`, `secondary`, `success`, `warning`, `error` → `*500`
+
+To add a new color: create a `.colorset` in `Assets.xcassets/Colors/` with light + dark appearances, then add a `static let` in `AppColors.swift`.
+
+### Fonts (`AppFont.swift`)
+
+**IBM Plex Sans Arabic** is the app font. Font files are in `Resources/Fonts/`. Use `AppFont.custom(size:weight:)`:
+
+| `AppFontWeight` | IBM Plex File |
+|-----------------|---------------|
+| `.light` | Regular |
+| `.book` | Medium |
+| `.medium` | SemiBold |
+| `.semiBold` | Bold |
+| `.bold` | Bold (capped) |
+
+### Typography (`Typography.swift`)
+
+Named text styles using `AppFont`. Use `Typography.*` for all `.font()` modifiers:
+
+| Style | Size | Weight |
+|-------|------|--------|
+| `Typography.h1` | 40 | semiBold |
+| `Typography.h2` | 30 | semiBold |
+| `Typography.h3` | 28 | semiBold |
+| `Typography.h4` | 24 | semiBold |
+| `Typography.h5` | 21 | semiBold |
+| `Typography.h6` | 16 | semiBold |
+| `Typography.bodyLarge` | 18 | book |
+| `Typography.body` | 16 | book |
+| `Typography.footnote` | 14 | book |
+| `Typography.caption` | 13 | book |
+| `Typography.small` | 12 | book |
+| `Typography.bodyTiny` | 10 | medium |
+| `Typography.screenHeading` | 28 | bold |
+
+### Strings (`Strings.swift` + `Localizable.xcstrings`)
+
+All user-facing strings are in the String Catalog (`Localizable.xcstrings`) with Arabic as source language. Access via `Strings.*`:
+
+```swift
+Strings.Tab.home          // "الرئيسية" / "Home"
+Strings.Guard.title       // "الحارس" / "Guard"
+Strings.Common.loading    // "جاري التحميل..." / "Loading..."
+```
+
+**Groups:** `Strings.Tab`, `Strings.Guard`, `Strings.Common`
+
+To add a new string:
+1. Add the key + translations to `Localizable.xcstrings`
+2. Add a `static let` in the appropriate `Strings.*` group
 
 ---
 
@@ -302,7 +378,7 @@ Commit after each small, atomic change. One logical change = one commit.
 
 1. **Duplicate `CategoryClassification.swift`** — The main app and DeviceActivityReport extension each have their own copy because extensions are separate compilation units. Keep them in sync manually.
 2. **Extensions cannot use `@Observable`** — Cross-process state sharing must go through App Group `UserDefaults`.
-3. **Arabic locale hardcoded** — Set in `iosApp.swift` via `.environment(\.locale, ...)`. Users cannot change locale at runtime yet.
+3. **Arabic locale hardcoded** — Set in `iosApp.swift` via `.environment(\.locale, ...)`. String Catalog provides AR+EN translations but locale selection is not yet user-facing.
 4. **DeviceActivityMonitor is a stub** — All lifecycle methods call `super` with no custom logic.
 5. **Only Guard tab is implemented** — Home, Vault, Community, and Account tabs show placeholder text.
 
