@@ -76,8 +76,8 @@ final class AuthService {
             currentUser = result.user
 
             // Send email verification
-            if let user = result.user, !user.isEmailVerified {
-                try? await user.sendEmailVerification()
+            if !result.user.isEmailVerified {
+                try? await result.user.sendEmailVerification()
             }
 
             analytics?.trackUserSignup()
