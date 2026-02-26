@@ -27,8 +27,8 @@ struct GuardScreen: View {
     }
 
     private var dateLabel: String {
-        if isToday { return "Today" }
-        if isYesterday { return "Yesterday" }
+        if isToday { return Strings.Guard.today }
+        if isYesterday { return Strings.Guard.yesterday }
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
         return formatter.string(from: selectedDate)
@@ -45,7 +45,7 @@ struct GuardScreen: View {
                     permissionView
                 }
             }
-            .navigationTitle("Guard")
+            .navigationTitle(Strings.Guard.title)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -65,7 +65,7 @@ struct GuardScreen: View {
             .sheet(isPresented: $showDatePicker) {
                 NavigationStack {
                     DatePicker(
-                        "Select Date",
+                        Strings.Guard.selectDate,
                         selection: $selectedDate,
                         in: ...Date.now,
                         displayedComponents: .date
@@ -73,11 +73,11 @@ struct GuardScreen: View {
                     .datePickerStyle(.graphical)
                     .labelsHidden()
                     .padding()
-                    .navigationTitle("Select Date")
+                    .navigationTitle(Strings.Guard.selectDate)
                     .navigationBarTitleDisplayMode(.inline)
                     .toolbar {
                         ToolbarItem(placement: .confirmationAction) {
-                            Button("Done") {
+                            Button(Strings.Guard.done) {
                                 showDatePicker = false
                             }
                         }
@@ -124,10 +124,10 @@ struct GuardScreen: View {
                 .font(.system(size: 80))
                 .foregroundStyle(AppColors.primary)
 
-            Text("Screen Time Permission")
+            Text(Strings.Guard.screenTimePermission)
                 .font(Typography.h4)
 
-            Text("Grant Screen Time access so Guard can show your daily usage and help you stay on track.")
+            Text(Strings.Guard.screenTimeDescription)
                 .font(Typography.body)
                 .foregroundStyle(AppColors.grey500)
                 .multilineTextAlignment(.center)
@@ -141,7 +141,7 @@ struct GuardScreen: View {
                     }
                 }
             } label: {
-                Text("Enable Screen Time Access")
+                Text(Strings.Guard.enableAccess)
                     .font(Typography.h6)
                     .frame(maxWidth: .infinity)
                     .padding(Spacing.md)

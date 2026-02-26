@@ -12,30 +12,30 @@ struct MainTabView: View {
 
     var body: some View {
         TabView(selection: $selectedTab) {
-            Tab("Home", systemImage: "house.fill", value: 0) {
-                Text("Home")
+            Tab(Strings.Tab.home, systemImage: "house.fill", value: 0) {
+                Text(Strings.Tab.home)
                     .font(Typography.h4)
                     .foregroundStyle(AppColors.grey500)
             }
 
-            Tab("Vault", systemImage: "lock.fill", value: 1) {
-                Text("Vault")
+            Tab(Strings.Tab.vault, systemImage: "lock.fill", value: 1) {
+                Text(Strings.Tab.vault)
                     .font(Typography.h4)
                     .foregroundStyle(AppColors.grey500)
             }
 
-            Tab("Guard", systemImage: "shield.lefthalf.filled", value: 2) {
+            Tab(Strings.Tab.guard, systemImage: "shield.lefthalf.filled", value: 2) {
                 GuardScreen()
             }
 
-            Tab("Community", systemImage: "person.2.fill", value: 3) {
-                Text("Community")
+            Tab(Strings.Tab.community, systemImage: "person.2.fill", value: 3) {
+                Text(Strings.Tab.community)
                     .font(Typography.h4)
                     .foregroundStyle(AppColors.grey500)
             }
 
-            Tab("Account", systemImage: "person.fill", value: 4) {
-                Text("Account")
+            Tab(Strings.Tab.account, systemImage: "person.fill", value: 4) {
+                Text(Strings.Tab.account)
                     .font(Typography.h4)
                     .foregroundStyle(AppColors.grey500)
             }

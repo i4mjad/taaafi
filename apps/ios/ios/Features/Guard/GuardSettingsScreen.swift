@@ -31,9 +31,9 @@ struct GuardSettingsScreen: View {
                         }
 
                         Picker("", selection: binding(for: category)) {
-                            Text("Safe").tag(CategoryClass.safe)
-                            Text("Neutral").tag(CategoryClass.neutral)
-                            Text("Threat").tag(CategoryClass.threat)
+                            Text(Strings.Guard.safe).tag(CategoryClass.safe)
+                            Text(Strings.Guard.neutral).tag(CategoryClass.neutral)
+                            Text(Strings.Guard.threat).tag(CategoryClass.threat)
                         }
                         .pickerStyle(.segmented)
                         .disabled(isLocked)
@@ -41,12 +41,12 @@ struct GuardSettingsScreen: View {
                     .padding(.vertical, Spacing.xxs)
                 }
             } header: {
-                Text("Category Classifications")
+                Text(Strings.Guard.categoryClassifications)
             } footer: {
-                Text("Threat categories count against your Guard Score. Safe categories improve it. Neutral categories are excluded. Social categories are locked as threats.")
+                Text(Strings.Guard.categoryFooter)
             }
         }
-        .navigationTitle("Guard Settings")
+        .navigationTitle(Strings.Guard.settings)
     }
 
     private func binding(for category: String) -> Binding<CategoryClass> {

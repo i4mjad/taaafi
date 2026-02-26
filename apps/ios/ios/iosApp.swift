@@ -101,7 +101,7 @@ struct iosApp: App {
         VStack(spacing: Spacing.md) {
             ProgressView()
                 .controlSize(.large)
-            Text("Loading...")
+            Text(Strings.Common.loading)
                 .font(Typography.footnote)
                 .foregroundStyle(AppColors.grey500)
         }
@@ -115,10 +115,10 @@ struct iosApp: App {
                 .font(.system(size: 64))
                 .foregroundStyle(AppColors.error)
 
-            Text("Access Restricted")
+            Text(Strings.Common.accessRestricted)
                 .font(Typography.h4)
 
-            Text(result.message ?? "Your access has been restricted.")
+            Text(result.message ?? Strings.Common.accessRestrictedMessage)
                 .font(Typography.body)
                 .foregroundStyle(AppColors.grey500)
                 .multilineTextAlignment(.center)
