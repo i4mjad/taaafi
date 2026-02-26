@@ -7,17 +7,32 @@ struct AppFontTests {
 
     // MARK: - Weight Cases
 
-    @Test("AppFontWeight has all 5 cases")
+    @Test("AppFontWeight has all 8 cases")
     func allWeightCases() {
-        let cases: [AppFontWeight] = [.light, .book, .medium, .semiBold, .bold]
-        #expect(cases.count == 5)
+        let cases = AppFontWeight.allCases
+        #expect(cases.count == 8)
     }
 
     // MARK: - Font Name Mapping
 
-    @Test("light weight maps to Regular font")
-    func lightMapsToRegular() {
-        #expect(AppFont.fontName(for: .light) == "IBMPlexSansArabic-Regular")
+    @Test("thin weight maps to Thin font")
+    func thinMapToThin() {
+        #expect(AppFont.fontName(for: .thin) == "IBMPlexSansArabic-Thin")
+    }
+
+    @Test("extraLight weight maps to ExtraLight font")
+    func extraLightMapsToExtraLight() {
+        #expect(AppFont.fontName(for: .extraLight) == "IBMPlexSansArabic-ExtraLight")
+    }
+
+    @Test("light weight maps to Light font")
+    func lightMapsToLight() {
+        #expect(AppFont.fontName(for: .light) == "IBMPlexSansArabic-Light")
+    }
+
+    @Test("regular weight maps to Regular font")
+    func regularMapsToRegular() {
+        #expect(AppFont.fontName(for: .regular) == "IBMPlexSansArabic-Regular")
     }
 
     @Test("book weight maps to Medium font")
