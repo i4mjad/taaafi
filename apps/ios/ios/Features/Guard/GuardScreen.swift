@@ -58,7 +58,7 @@ struct GuardScreen: View {
                         showDatePicker = true
                     } label: {
                         Text(dateLabel)
-                            .font(.subheadline.weight(.medium))
+                            .font(Typography.footnote)
                     }
                 }
             }
@@ -117,21 +117,21 @@ struct GuardScreen: View {
     // MARK: - Permission Request
 
     private var permissionView: some View {
-        VStack(spacing: 24) {
+        VStack(spacing: Spacing.xl) {
             Spacer()
 
             Image(systemName: "shield.lefthalf.filled")
                 .font(.system(size: 80))
-                .foregroundStyle(.tint)
+                .foregroundStyle(AppColors.primary)
 
             Text("Screen Time Permission")
-                .font(.title2.bold())
+                .font(Typography.h4)
 
             Text("Grant Screen Time access so Guard can show your daily usage and help you stay on track.")
-                .font(.body)
-                .foregroundStyle(.secondary)
+                .font(Typography.body)
+                .foregroundStyle(AppColors.grey500)
                 .multilineTextAlignment(.center)
-                .padding(.horizontal, 32)
+                .padding(.horizontal, Spacing.xxl)
 
             Button {
                 Task {
@@ -142,14 +142,14 @@ struct GuardScreen: View {
                 }
             } label: {
                 Text("Enable Screen Time Access")
-                    .font(.headline)
+                    .font(Typography.h6)
                     .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(.tint)
+                    .padding(Spacing.md)
+                    .background(AppColors.primary)
                     .foregroundStyle(.white)
                     .clipShape(RoundedRectangle(cornerRadius: 14))
             }
-            .padding(.horizontal, 32)
+            .padding(.horizontal, Spacing.xxl)
 
             Spacer()
         }

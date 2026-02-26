@@ -98,31 +98,33 @@ struct iosApp: App {
     // MARK: - Startup Views
 
     private var startupView: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: Spacing.md) {
             ProgressView()
                 .controlSize(.large)
             Text("Loading...")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .font(Typography.footnote)
+                .foregroundStyle(AppColors.grey500)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(AppColors.background)
     }
 
     private func bannedView(result: SecurityStartupResult) -> some View {
-        VStack(spacing: 24) {
+        VStack(spacing: Spacing.xl) {
             Image(systemName: "hand.raised.fill")
                 .font(.system(size: 64))
-                .foregroundStyle(.red)
+                .foregroundStyle(AppColors.error)
 
             Text("Access Restricted")
-                .font(.title2.bold())
+                .font(Typography.h4)
 
             Text(result.message ?? "Your access has been restricted.")
-                .font(.body)
-                .foregroundStyle(.secondary)
+                .font(Typography.body)
+                .foregroundStyle(AppColors.grey500)
                 .multilineTextAlignment(.center)
-                .padding(.horizontal, 32)
+                .padding(.horizontal, Spacing.xxl)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(AppColors.background)
     }
 }

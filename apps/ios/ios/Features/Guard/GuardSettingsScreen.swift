@@ -16,16 +16,16 @@ struct GuardSettingsScreen: View {
                 ForEach(CategoryClassification.allCategories, id: \.self) { category in
                     let isLocked = CategoryClassification.lockedCategories.contains(category)
 
-                    VStack(alignment: .leading, spacing: 8) {
+                    VStack(alignment: .leading, spacing: Spacing.xs) {
                         HStack {
                             Circle()
                                 .fill(colorFor(classifications[category] ?? .neutral))
                                 .frame(width: 10, height: 10)
                             Text(category)
-                                .font(.body)
+                                .font(Typography.body)
                             if isLocked {
                                 Image(systemName: "lock.fill")
-                                    .font(.caption2)
+                                    .font(Typography.bodyTiny)
                                     .foregroundStyle(.tertiary)
                             }
                         }
@@ -38,7 +38,7 @@ struct GuardSettingsScreen: View {
                         .pickerStyle(.segmented)
                         .disabled(isLocked)
                     }
-                    .padding(.vertical, 4)
+                    .padding(.vertical, Spacing.xxs)
                 }
             } header: {
                 Text("Category Classifications")
@@ -62,9 +62,9 @@ struct GuardSettingsScreen: View {
 
     private func colorFor(_ cls: CategoryClass) -> Color {
         switch cls {
-        case .safe: return .green
-        case .threat: return .red
-        case .neutral: return .gray
+        case .safe: return AppColors.success
+        case .threat: return AppColors.error
+        case .neutral: return AppColors.grey500
         }
     }
 }

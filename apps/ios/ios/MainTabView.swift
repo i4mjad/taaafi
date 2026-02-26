@@ -14,14 +14,14 @@ struct MainTabView: View {
         TabView(selection: $selectedTab) {
             Tab("Home", systemImage: "house.fill", value: 0) {
                 Text("Home")
-                    .font(.title2)
-                    .foregroundStyle(.secondary)
+                    .font(Typography.h4)
+                    .foregroundStyle(AppColors.grey500)
             }
 
             Tab("Vault", systemImage: "lock.fill", value: 1) {
                 Text("Vault")
-                    .font(.title2)
-                    .foregroundStyle(.secondary)
+                    .font(Typography.h4)
+                    .foregroundStyle(AppColors.grey500)
             }
 
             Tab("Guard", systemImage: "shield.lefthalf.filled", value: 2) {
@@ -30,16 +30,17 @@ struct MainTabView: View {
 
             Tab("Community", systemImage: "person.2.fill", value: 3) {
                 Text("Community")
-                    .font(.title2)
-                    .foregroundStyle(.secondary)
+                    .font(Typography.h4)
+                    .foregroundStyle(AppColors.grey500)
             }
 
             Tab("Account", systemImage: "person.fill", value: 4) {
                 Text("Account")
-                    .font(.title2)
-                    .foregroundStyle(.secondary)
+                    .font(Typography.h4)
+                    .foregroundStyle(AppColors.grey500)
             }
         }
+        .tint(AppColors.primary)
     }
 }
 
