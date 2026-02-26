@@ -14,16 +14,10 @@ final class DeviceTrackingService {
     var deviceId: String = ""
 
     private let db = Firestore.firestore()
-    private nonisolated(unsafe) var authStateHandle: AuthStateDidChangeListenerHandle?
+    private var authStateHandle: AuthStateDidChangeListenerHandle?
 
     init() {
         deviceId = loadOrGenerateDeviceId()
-    }
-
-    deinit {
-        if let handle = authStateHandle {
-            Auth.auth().removeStateDidChangeListener(handle)
-        }
     }
 
     /// Set up auth state listener to auto-update device tracking on login
