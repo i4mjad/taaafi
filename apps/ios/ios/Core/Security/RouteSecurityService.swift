@@ -7,7 +7,7 @@ import FirebaseAuth
 @MainActor
 final class RouteSecurityService {
 
-    private let facade: BanWarningFacade
+    private let facade: BanWarningFacadeProtocol
 
     // Cache for device ban status
     private var cachedDeviceBanResult: SecurityCheckResult?
@@ -22,7 +22,7 @@ final class RouteSecurityService {
     private static let deviceBanCacheDuration: TimeInterval = 10 * 60 // 10 minutes
     private static let userBanCacheDuration: TimeInterval = 3 * 60   // 3 minutes
 
-    init(facade: BanWarningFacade) {
+    init(facade: BanWarningFacadeProtocol) {
         self.facade = facade
     }
 

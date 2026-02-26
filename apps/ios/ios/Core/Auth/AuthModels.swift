@@ -16,7 +16,7 @@ enum AuthResult {
 }
 
 /// Authentication errors
-enum AuthError: LocalizedError {
+enum AuthError: LocalizedError, Equatable {
     case invalidEmail
     case wrongPassword
     case userNotFound

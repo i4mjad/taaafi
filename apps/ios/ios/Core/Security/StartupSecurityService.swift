@@ -7,9 +7,9 @@ import FirebaseAuth
 @MainActor
 final class StartupSecurityService {
 
-    private let facade: BanWarningFacade
+    private let facade: BanWarningFacadeProtocol
 
-    init(facade: BanWarningFacade) {
+    init(facade: BanWarningFacadeProtocol) {
         self.facade = facade
     }
 

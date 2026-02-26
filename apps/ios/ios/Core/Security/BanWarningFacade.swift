@@ -4,7 +4,7 @@ import FirebaseAuth
 /// Facade coordinating ban, warning, and feature services
 /// Provides simplified interface for UI components
 /// Ported from: apps/mobile/lib/features/account/application/ban_warning_facade.dart
-final class BanWarningFacade {
+final class BanWarningFacade: BanWarningFacadeProtocol {
 
     private let banService: BanService
     private let warningService: WarningService
