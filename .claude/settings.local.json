@@ -50,7 +50,12 @@
       "WebFetch(domain:pedroesli.com)",
       "WebFetch(domain:forums.developer.apple.com)",
       "WebFetch(domain:wwdcnotes.com)",
-      "WebFetch(domain:screentimeapi.com)"
+      "WebFetch(domain:screentimeapi.com)",
+      "mcp__linear-server__list_projects",
+      "mcp__linear-server__list_issue_labels",
+      "mcp__linear-server__create_issue_label",
+      "mcp__linear-server__save_issue"
     ]
-  }
+  },
+  "outputStyle": "default"
 }
