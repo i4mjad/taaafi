@@ -23,6 +23,13 @@ apps/ios/
 ├── ios/                              # Main app target
 │   ├── iosApp.swift                  # @main entry point
 │   ├── MainTabView.swift             # 5-tab navigation (Guard is only active tab)
+│   ├── Core/                         # Shared services, models, security
+│   │   ├── Auth/                     # AuthService, AuthModels
+│   │   ├── Firestore/                # FirestoreService
+│   │   ├── Models/                   # Ban, Warning, AppFeature
+│   │   ├── Network/                  # CloudFunctionsService, StorageService
+│   │   ├── Security/                 # BanWarningFacade, RouteSecurityService, StartupSecurityService
+│   │   └── Services/                 # AnalyticsFacade, ErrorLogger, DeviceTrackingService
 │   ├── Features/
 │   │   └── Guard/
 │   │       ├── GuardScreen.swift           # Screen Time report UI + date picker
@@ -32,6 +39,12 @@ apps/ios/
 │   └── Resources/
 │       ├── Assets.xcassets/          # Colors and image assets
 │       └── AppIconDev.icon/          # App icon (SVG-based)
+├── iosTests/                         # Unit tests (Swift Testing framework)
+│   └── Core/                         # Mirrors main target Core/ structure
+│       ├── Auth/                     # AuthModelsTests
+│       ├── Models/                   # BanTests, AppFeatureTests
+│       ├── Security/                 # SecurityResultTests, RouteSecurityServiceTests, etc.
+│       └── Services/                 # AnalyticsFacadeTests, mocks
 ├── DeviceActivityReport/             # ExtensionKit UI extension
 │   ├── DeviceActivityReport.swift    # Extension entry point
 │   ├── TotalActivityReport.swift     # Data processing scene
@@ -63,7 +76,8 @@ apps/ios/
 | i18n | String Catalogs (`.xcstrings`), Arabic default |
 | CI | Xcode Cloud |
 | Extensions | DeviceActivityReport, DeviceActivityMonitor |
-| External dependencies | None (no SPM packages yet) |
+| Testing | Swift Testing framework (`@Test`, `#expect`, `@Suite`) |
+| External dependencies | Firebase SDK (SPM) |
 
 ---
 
@@ -187,6 +201,74 @@ Add Swift Package dependencies via Xcode UI or by editing `Package.resolved`. Ne
 
 ---
 
+## Test-Driven Development (STRICT)
+
+**TDD is mandatory for all iOS development.** Every new feature, bug fix, and refactor must follow the Red-Green-Refactor cycle. This is non-negotiable.
+
+### The Cycle
+
+1. **Red** — Write a failing test FIRST that describes the expected behavior
+2. **Green** — Write the minimum production code to make the test pass
+3. **Refactor** — Clean up while keeping tests green
+
+### Rules
+
+1. **No production code without a failing test** — If there is no test demanding the code, do not write it.
+2. **Test behavior, not implementation** — Tests describe WHAT the code does, not HOW it does it. Ask "what should happen when...?" not "does this function get called?".
+3. **Tests are first-class citizens** — Test code gets the same care as production code. No sloppy test names, no copy-paste test bodies, no magic values without context.
+4. **One logical assertion per test** — Each `@Test` function verifies one behavior. Multiple `#expect` calls are fine if they describe facets of the same behavior.
+5. **Never chase coverage numbers** — 80% coverage of the wrong things is worse than 40% coverage of critical behavior. Test the logic that matters: state transitions, edge cases, error paths, business rules.
+6. **Keep tests fast and isolated** — No Firebase, no network, no disk in unit tests. Use protocols + mocks to isolate the unit under test. Pure logic tests need zero mocks.
+
+### What to Test
+
+| Always test | Skip testing |
+|-------------|-------------|
+| Business logic and state transitions | SwiftUI view layout |
+| Error handling and edge cases | Trivial getters/setters with no logic |
+| Data transformations and parsing | Third-party library internals |
+| Security checks and access control | Auto-generated code |
+| Cache behavior (hit, miss, expiry) | One-line pass-through wrappers |
+
+### Test Structure
+
+```swift
+import Testing
+@testable import ios
+
+@Suite("FeatureName")
+struct FeatureNameTests {
+
+    @Test("description of expected behavior")
+    func behaviorUnderTest() {
+        // Given — set up preconditions
+        // When — perform the action
+        // Then — assert the outcome with #expect
+    }
+}
+```
+
+### Mocking Strategy
+
+- **Pure logic** (models, enums, helpers) — test directly, no mocks needed
+- **Services with dependencies** — extract a protocol, inject a mock
+- **Protocol naming** — `<TypeName>Protocol` (e.g., `BanWarningFacadeProtocol`)
+- **Mock naming** — `Mock<TypeName>` (e.g., `MockBanWarningFacade`)
+- **Mock location** — `iosTests/` mirroring the source structure
+
+### Commands
+
+```bash
+# Run all tests
+cd apps/ios && xcodebuild -project ios.xcodeproj -scheme ios \
+  -destination 'platform=iOS Simulator,name=iPhone 16' test
+
+# Run tests from Xcode
+Cmd+U
+```
+
+---
+
 ## Naming Conventions
 
 | Element | Convention | Example |
@@ -221,9 +303,8 @@ Commit after each small, atomic change. One logical change = one commit.
 1. **Duplicate `CategoryClassification.swift`** — The main app and DeviceActivityReport extension each have their own copy because extensions are separate compilation units. Keep them in sync manually.
 2. **Extensions cannot use `@Observable`** — Cross-process state sharing must go through App Group `UserDefaults`.
 3. **Arabic locale hardcoded** — Set in `iosApp.swift` via `.environment(\.locale, ...)`. Users cannot change locale at runtime yet.
-4. **No Firebase SDK yet** — Firebase integration is planned for an upcoming phase.
-5. **DeviceActivityMonitor is a stub** — All lifecycle methods call `super` with no custom logic.
-6. **Only Guard tab is implemented** — Home, Vault, Community, and Account tabs show placeholder text.
+4. **DeviceActivityMonitor is a stub** — All lifecycle methods call `super` with no custom logic.
+5. **Only Guard tab is implemented** — Home, Vault, Community, and Account tabs show placeholder text.
 
 ---
 
