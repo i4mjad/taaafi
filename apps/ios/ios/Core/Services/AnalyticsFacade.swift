@@ -1,7 +1,7 @@
 import Foundation
 
-/// Facade that dispatches analytics events to multiple clients (Mixpanel + Firebase)
-/// Ported from: apps/mobile/lib/core/monitoring/analytics_facade.dart
+/// Facade that dispatches analytics events to all registered clients
+/// Currently Firebase Analytics only; protocol-based design allows adding more clients later
 @Observable
 @MainActor
 final class AnalyticsFacade {
@@ -14,7 +14,6 @@ final class AnalyticsFacade {
 
     convenience init() {
         self.init(clients: [
-            MixpanelAnalyticsClient(),
             FirebaseAnalyticsClient(),
         ])
     }
