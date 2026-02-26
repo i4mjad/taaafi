@@ -338,9 +338,10 @@
 				};
 			};
 			buildConfigurationList = 6D32B9C62F47F5BF0069B270 /* Build configuration list for PBXProject "ios" */;
-			developmentRegion = en;
+			developmentRegion = ar;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				ar,
 				en,
 				Base,
 			);
