@@ -7,6 +7,7 @@
 
 import SwiftUI
 import FirebaseCore
+import FirebaseAuth
 
 @main
 struct iosApp: App {
@@ -21,6 +22,7 @@ struct iosApp: App {
     @State private var cloudFunctionsService: CloudFunctionsService
     @State private var storageService: StorageService
     @State private var emailSyncService: EmailSyncService
+    @State private var userDocumentService: UserDocumentService
 
     // Services requiring shared initialization
     @State private var deviceTrackingService: DeviceTrackingService
@@ -37,12 +39,14 @@ struct iosApp: App {
         FirebaseApp.configure()
 
         // Firebase-dependent services (must initialize after FirebaseApp.configure)
+        let firestore = FirestoreService()
         _analytics = State(initialValue: AnalyticsFacade())
         _authService = State(initialValue: AuthService())
-        _firestoreService = State(initialValue: FirestoreService())
+        _firestoreService = State(initialValue: firestore)
         _cloudFunctionsService = State(initialValue: CloudFunctionsService())
         _storageService = State(initialValue: StorageService())
         _emailSyncService = State(initialValue: EmailSyncService())
+        _userDocumentService = State(initialValue: UserDocumentService(firestoreService: firestore))
 
         // Single DeviceTrackingService shared by all security services
         let deviceTracking = DeviceTrackingService()
@@ -62,7 +66,7 @@ struct iosApp: App {
                 } else if let result = startupResult, result.isBlocked {
                     bannedView(result: result)
                 } else {
-                    MainTabView()
+                    AuthRouter()
                 }
             }
             .toastOverlay()
@@ -76,6 +80,7 @@ struct iosApp: App {
             .environment(deviceTrackingService)
             .environment(emailSyncService)
             .environment(routeSecurityService)
+            .environment(userDocumentService)
             .environment(toastManager)
             .environment(\.locale, Locale(identifier: "ar"))
             .task {
@@ -94,6 +99,20 @@ struct iosApp: App {
                 if !result.isBlocked {
                     analytics.trackAppOpened()
                     await emailSyncService.syncUserEmailIfNeeded()
+
+                    // Start/stop UserDocumentService listener based on auth state
+                    if let uid = authService.currentUser?.uid {
+                        userDocumentService.startListening(userId: uid)
+                    } else {
+                        userDocumentService.stopListening()
+                    }
+                }
+            }
+            .onChange(of: authService.currentUser?.uid) { _, newUid in
+                if let uid = newUid {
+                    userDocumentService.startListening(userId: uid)
+                } else {
+                    userDocumentService.stopListening()
                 }
             }
         }

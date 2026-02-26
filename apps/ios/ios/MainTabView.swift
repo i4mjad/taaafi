@@ -13,9 +13,7 @@ struct MainTabView: View {
     var body: some View {
         TabView(selection: $selectedTab) {
             Tab(Strings.Tab.home, systemImage: "house.fill", value: 0) {
-                Text(Strings.Tab.home)
-                    .font(Typography.h4)
-                    .foregroundStyle(AppColors.grey500)
+                HomeScreen()
             }
 
             Tab(Strings.Tab.vault, systemImage: "lock.fill", value: 1) {

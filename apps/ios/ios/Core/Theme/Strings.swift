@@ -34,6 +34,7 @@ enum Strings {
         static let done = String(localized: "common.done")
         static let cancel = String(localized: "common.cancel")
         static let confirm = String(localized: "common.confirm")
+        static let ok = String(localized: "common.ok")
         static let signOut = String(localized: "common.signOut")
         static let retry = String(localized: "common.retry")
     }
@@ -67,5 +68,113 @@ enum Strings {
 
     enum Banner {
         static let warningCount = String(localized: "banner.warningCount")
+    }
+
+    enum Auth {
+        static let email = String(localized: "auth.email")
+        static let enterEmail = String(localized: "auth.enterEmail")
+        static let password = String(localized: "auth.password")
+        static let login = String(localized: "auth.login")
+        static let signUp = String(localized: "auth.signUp")
+        static let forgotPassword = String(localized: "auth.forgotPassword")
+        static let forgotPasswordTitle = String(localized: "auth.forgotPasswordTitle")
+        static let forgotPasswordDescription = String(localized: "auth.forgotPasswordDescription")
+        static let sendResetLink = String(localized: "auth.sendResetLink")
+        static let resetLinkSent = String(localized: "auth.resetLinkSent")
+        static let signInWithGoogle = String(localized: "auth.signInWithGoogle")
+        static let noAccount = String(localized: "auth.noAccount")
+        static let or = String(localized: "auth.or")
+        static let fillAllFields = String(localized: "auth.fillAllFields")
+        static let errorTitle = String(localized: "auth.errorTitle")
+        static let errorMessage = String(localized: "auth.errorMessage")
+    }
+
+    enum Onboarding {
+        static let getStarted = String(localized: "onboarding.getStarted")
+        static let signIn = String(localized: "onboarding.signIn")
+    }
+
+    enum Registration {
+        static let credentialsTitle = String(localized: "registration.credentialsTitle")
+        static let profileTitle = String(localized: "registration.profileTitle")
+        static let languageTitle = String(localized: "registration.languageTitle")
+        static let languageDescription = String(localized: "registration.languageDescription")
+        static let recoveryDateTitle = String(localized: "registration.recoveryDateTitle")
+        static let recoveryDateDescription = String(localized: "registration.recoveryDateDescription")
+        static let emailVerificationTitle = String(localized: "registration.emailVerificationTitle")
+        static let emailVerificationDescription = String(localized: "registration.emailVerificationDescription")
+        static let emailVerified = String(localized: "registration.emailVerified")
+        static let referralTitle = String(localized: "registration.referralTitle")
+        static let referralDescription = String(localized: "registration.referralDescription")
+        static let referralCode = String(localized: "registration.referralCode")
+        static let termsTitle = String(localized: "registration.termsTitle")
+        static let acceptTerms = String(localized: "registration.acceptTerms")
+        static let viewTerms = String(localized: "registration.viewTerms")
+        static let confirmPassword = String(localized: "registration.confirmPassword")
+        static let name = String(localized: "registration.name")
+        static let dateOfBirth = String(localized: "registration.dateOfBirth")
+        static let gender = String(localized: "registration.gender")
+        static let male = String(localized: "registration.male")
+        static let female = String(localized: "registration.female")
+        static let arabic = String(localized: "registration.arabic")
+        static let english = String(localized: "registration.english")
+        static let startFromNow = String(localized: "registration.startFromNow")
+        static let chooseDate = String(localized: "registration.chooseDate")
+        static let recoveryStartDate = String(localized: "registration.recoveryStartDate")
+        static let resendEmail = String(localized: "registration.resendEmail")
+        static let skip = String(localized: "registration.skip")
+        static let next = String(localized: "registration.next")
+        static let back = String(localized: "registration.back")
+        static let submit = String(localized: "registration.submit")
+        static let invalidEmail = String(localized: "registration.invalidEmail")
+        static let weakPassword = String(localized: "registration.weakPassword")
+        static let passwordMismatch = String(localized: "registration.passwordMismatch")
+        static let nameRequired = String(localized: "registration.nameRequired")
+    }
+
+    enum ConfirmDetails {
+        static let title = String(localized: "confirmDetails.title")
+        static let description = String(localized: "confirmDetails.description")
+        static let save = String(localized: "confirmDetails.save")
+        static let saved = String(localized: "confirmDetails.saved")
+    }
+
+    enum ConfirmEmail {
+        static let title = String(localized: "confirmEmail.title")
+        static let description = String(localized: "confirmEmail.description")
+        static let checkVerification = String(localized: "confirmEmail.checkVerification")
+        static let resend = String(localized: "confirmEmail.resend")
+        static let verified = String(localized: "confirmEmail.verified")
+        static let changeEmail = String(localized: "confirmEmail.changeEmail")
+        static let changeEmailTitle = String(localized: "confirmEmail.changeEmailTitle")
+        static let changeEmailDescription = String(localized: "confirmEmail.changeEmailDescription")
+        static let newEmail = String(localized: "confirmEmail.newEmail")
+        static let updateEmail = String(localized: "confirmEmail.updateEmail")
+        static let emailChangeSent = String(localized: "confirmEmail.emailChangeSent")
+    }
+
+    enum Paywall {
+        static let title = String(localized: "paywall.title")
+        static let subtitle = String(localized: "paywall.subtitle")
+        static let subscribe = String(localized: "paywall.subscribe")
+        static let maybeLater = String(localized: "paywall.maybeLater")
+        static let comingSoon = String(localized: "paywall.comingSoon")
+        static let comingSoonMessage = String(localized: "paywall.comingSoonMessage")
+    }
+
+    enum Home {
+        static let welcomeBack = String(localized: "home.welcomeBack")
+        static let comingSoon = String(localized: "home.comingSoon")
+        static let quickActions = String(localized: "home.quickActions")
+        static let streaks = String(localized: "home.streaks")
+        static let calendar = String(localized: "home.calendar")
+        static let community = String(localized: "home.community")
+    }
+
+    enum Report {
+        static let title = String(localized: "reports.title")
+        static let empty = String(localized: "reports.empty")
+        static let emptySubtitle = String(localized: "reports.emptySubtitle")
+        static let errorLoading = String(localized: "reports.errorLoading")
     }
 }
