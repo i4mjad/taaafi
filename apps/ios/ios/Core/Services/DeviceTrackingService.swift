@@ -14,7 +14,7 @@ final class DeviceTrackingService {
     var deviceId: String = ""
 
     private let db = Firestore.firestore()
-    private var authStateHandle: AuthStateDidChangeListenerHandle?
+    private nonisolated(unsafe) var authStateHandle: AuthStateDidChangeListenerHandle?
 
     init() {
         deviceId = loadOrGenerateDeviceId()
