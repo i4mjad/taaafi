@@ -12,14 +12,14 @@ import FirebaseCore
 struct iosApp: App {
     @State private var screenTimeManager = ScreenTimeManager()
 
-    // Core Services
+    // Core Services (initialized in init after FirebaseApp.configure)
     @State private var errorLogger = ErrorLogger()
-    @State private var analytics = AnalyticsFacade()
-    @State private var authService = AuthService()
-    @State private var firestoreService = FirestoreService()
-    @State private var cloudFunctionsService = CloudFunctionsService()
-    @State private var storageService = StorageService()
-    @State private var emailSyncService = EmailSyncService()
+    @State private var analytics: AnalyticsFacade
+    @State private var authService: AuthService
+    @State private var firestoreService: FirestoreService
+    @State private var cloudFunctionsService: CloudFunctionsService
+    @State private var storageService: StorageService
+    @State private var emailSyncService: EmailSyncService
 
     // Services requiring shared initialization
     @State private var deviceTrackingService: DeviceTrackingService
@@ -33,6 +33,14 @@ struct iosApp: App {
 
     init() {
         FirebaseApp.configure()
+
+        // Firebase-dependent services (must initialize after FirebaseApp.configure)
+        _analytics = State(initialValue: AnalyticsFacade())
+        _authService = State(initialValue: AuthService())
+        _firestoreService = State(initialValue: FirestoreService())
+        _cloudFunctionsService = State(initialValue: CloudFunctionsService())
+        _storageService = State(initialValue: StorageService())
+        _emailSyncService = State(initialValue: EmailSyncService())
 
         // Single DeviceTrackingService shared by all security services
         let deviceTracking = DeviceTrackingService()
