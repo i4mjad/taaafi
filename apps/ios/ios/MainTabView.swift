@@ -17,9 +17,7 @@ struct MainTabView: View {
             }
 
             Tab(Strings.Tab.vault, systemImage: "lock.fill", value: 1) {
-                Text(Strings.Tab.vault)
-                    .font(Typography.h4)
-                    .foregroundStyle(AppColors.grey500)
+                VaultScreen()
             }
 
             Tab(Strings.Tab.guard, systemImage: "shield.lefthalf.filled", value: 2) {
