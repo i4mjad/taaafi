@@ -209,4 +209,175 @@ enum Strings {
         static let emptySubtitle = String(localized: "reports.emptySubtitle")
         static let errorLoading = String(localized: "reports.errorLoading")
     }
+
+    enum Vault {
+        // Tab labels
+        static let title = String(localized: "vault.title")
+        static let tabVault = String(localized: "vault.tab.vault")
+        static let tabActivities = String(localized: "vault.tab.activities")
+        static let tabLibrary = String(localized: "vault.tab.library")
+        static let tabDiaries = String(localized: "vault.tab.diaries")
+        static let tabMessaging = String(localized: "vault.tab.messaging")
+        static let tabSettings = String(localized: "vault.tab.settings")
+
+        // Section titles
+        static let sectionStreaks = String(localized: "vault.section.streaks")
+        static let sectionStatistics = String(localized: "vault.section.statistics")
+        static let sectionCalendar = String(localized: "vault.section.calendar")
+        static let sectionStreakAverages = String(localized: "vault.section.streakAverages")
+        static let sectionRiskClock = String(localized: "vault.section.riskClock")
+        static let sectionHeatMap = String(localized: "vault.section.heatMap")
+        static let sectionTriggerRadar = String(localized: "vault.section.triggerRadar")
+        static let sectionMoodCorrelation = String(localized: "vault.section.moodCorrelation")
+
+        // Section descriptions
+        static let sectionStreaksDesc = String(localized: "vault.section.streaks.desc")
+        static let sectionStatisticsDesc = String(localized: "vault.section.statistics.desc")
+        static let sectionCalendarDesc = String(localized: "vault.section.calendar.desc")
+        static let sectionStreakAveragesDesc = String(localized: "vault.section.streakAverages.desc")
+        static let sectionRiskClockDesc = String(localized: "vault.section.riskClock.desc")
+        static let sectionHeatMapDesc = String(localized: "vault.section.heatMap.desc")
+        static let sectionTriggerRadarDesc = String(localized: "vault.section.triggerRadar.desc")
+        static let sectionMoodCorrelationDesc = String(localized: "vault.section.moodCorrelation.desc")
+
+        // Streaks
+        static let currentStreaks = String(localized: "vault.currentStreaks")
+        static let relapseStreak = String(localized: "vault.relapseStreak")
+        static let pornOnlyStreak = String(localized: "vault.pornOnlyStreak")
+        static let mastOnlyStreak = String(localized: "vault.mastOnlyStreak")
+        static let slipUpStreak = String(localized: "vault.slipUpStreak")
+        static let days = String(localized: "vault.days")
+
+        // Statistics
+        static let daysWithoutRelapse = String(localized: "vault.daysWithoutRelapse")
+        static let relapsesLast30Days = String(localized: "vault.relapsesLast30Days")
+        static let longestStreak = String(localized: "vault.longestStreak")
+
+        // Follow-up
+        static let dailyFollowUp = String(localized: "vault.dailyFollowUp")
+        static let followUp = String(localized: "vault.followUp")
+        static let freeDay = String(localized: "vault.freeDay")
+        static let relapse = String(localized: "vault.relapse")
+        static let pornOnly = String(localized: "vault.pornOnly")
+        static let mastOnly = String(localized: "vault.mastOnly")
+        static let slipUp = String(localized: "vault.slipUp")
+        static let noIncident = String(localized: "vault.noIncident")
+        static let selectType = String(localized: "vault.selectType")
+        static let selectTriggers = String(localized: "vault.selectTriggers")
+        static let selectEmotions = String(localized: "vault.selectEmotions")
+        static let addNotes = String(localized: "vault.addNotes")
+        static let save = String(localized: "vault.save")
+        static let addAllFollowUps = String(localized: "vault.addAllFollowUps")
+        static let freeDaySuccess = String(localized: "vault.freeDaySuccess")
+
+        // Emotions
+        static let emotions = String(localized: "vault.emotions")
+        static let howDoYouFeel = String(localized: "vault.howDoYouFeel")
+        static let negativeFeelings = String(localized: "vault.negativeFeelings")
+        static let positiveFeelings = String(localized: "vault.positiveFeelings")
+
+        // Triggers
+        static let commonTriggers = String(localized: "vault.commonTriggers")
+        static let whatTriggeredYou = String(localized: "vault.whatTriggeredYou")
+        static let noTriggersRecorded = String(localized: "vault.noTriggersRecorded")
+
+        // Trigger names
+        static let triggerStress = String(localized: "vault.trigger.stress")
+        static let triggerBoredom = String(localized: "vault.trigger.boredom")
+        static let triggerLoneliness = String(localized: "vault.trigger.loneliness")
+        static let triggerLateNight = String(localized: "vault.trigger.lateNight")
+        static let triggerSocialMedia = String(localized: "vault.trigger.socialMedia")
+        static let triggerUrges = String(localized: "vault.trigger.urges")
+        static let triggerAnxiety = String(localized: "vault.trigger.anxiety")
+        static let triggerAnger = String(localized: "vault.trigger.anger")
+        static let triggerSadness = String(localized: "vault.trigger.sadness")
+        static let triggerPeerPressure = String(localized: "vault.trigger.peerPressure")
+
+        // Emotion names
+        static let emotionAngry = String(localized: "emotion.angry")
+        static let emotionSad = String(localized: "emotion.sad")
+        static let emotionRegret = String(localized: "emotion.regret")
+        static let emotionAnxious = String(localized: "emotion.anxious")
+        static let emotionFear = String(localized: "emotion.fear")
+        static let emotionFrustration = String(localized: "emotion.frustration")
+        static let emotionOverwhelmed = String(localized: "emotion.overwhelmed")
+        static let emotionDisgust = String(localized: "emotion.disgust")
+        static let emotionDespair = String(localized: "emotion.despair")
+        static let emotionResentment = String(localized: "emotion.resentment")
+        static let emotionDisappointment = String(localized: "emotion.disappointment")
+        static let emotionDread = String(localized: "emotion.dread")
+        static let emotionConfusion = String(localized: "emotion.confusion")
+        static let emotionAwkwardness = String(localized: "emotion.awkwardness")
+        static let emotionExhaustion = String(localized: "emotion.exhaustion")
+        static let emotionHappy = String(localized: "emotion.happy")
+        static let emotionGratitude = String(localized: "emotion.gratitude")
+        static let emotionSerenity = String(localized: "emotion.serenity")
+        static let emotionConfidence = String(localized: "emotion.confidence")
+        static let emotionSatisfaction = String(localized: "emotion.satisfaction")
+        static let emotionExcitement = String(localized: "emotion.excitement")
+        static let emotionLove = String(localized: "emotion.love")
+        static let emotionContentment = String(localized: "emotion.contentment")
+        static let emotionCompassion = String(localized: "emotion.compassion")
+        static let emotionPride = String(localized: "emotion.pride")
+        static let emotionJoy = String(localized: "emotion.joy")
+        static let emotionInspiration = String(localized: "emotion.inspiration")
+        static let emotionConnection = String(localized: "emotion.connection")
+        static let emotionDetermination = String(localized: "emotion.determination")
+
+        // Calendar
+        static let calendar = String(localized: "vault.calendar")
+        static let dayOverview = String(localized: "vault.dayOverview")
+        static let noFollowUps = String(localized: "vault.noFollowUps")
+        static let noEmotions = String(localized: "vault.noEmotions")
+        static let noDiaries = String(localized: "vault.noDiaries")
+        static let addFollowUps = String(localized: "vault.addFollowUps")
+        static let cannotSelectFuture = String(localized: "vault.cannotSelectFuture")
+        static let cannotSelectBeforeStart = String(localized: "vault.cannotSelectBeforeStart")
+
+        // Activities
+        static let activities = String(localized: "vault.activities")
+        static let addActivity = String(localized: "vault.addActivity")
+        static let todayTasks = String(localized: "vault.todayTasks")
+        static let showAll = String(localized: "vault.showAll")
+        static let ongoingActivities = String(localized: "vault.ongoingActivities")
+        static let noOngoingActivities = String(localized: "vault.noOngoingActivities")
+        static let noTasksToday = String(localized: "vault.noTasksToday")
+        static let allTasks = String(localized: "vault.allTasks")
+        static let subscribe = String(localized: "vault.subscribe")
+        static let unsubscribe = String(localized: "vault.unsubscribe")
+        static let subscribers = String(localized: "vault.subscribers")
+        static let activityTasks = String(localized: "vault.activityTasks")
+        static let progress = String(localized: "vault.progress")
+        static let startDate = String(localized: "vault.startDate")
+        static let difficulty = String(localized: "vault.difficulty")
+        static let starter = String(localized: "vault.starter")
+        static let intermediate = String(localized: "vault.intermediate")
+        static let advanced = String(localized: "vault.advanced")
+        static let daily = String(localized: "vault.daily")
+        static let weekly = String(localized: "vault.weekly")
+        static let monthly = String(localized: "vault.monthly")
+        static let searchActivities = String(localized: "vault.searchActivities")
+
+        // Analytics
+        static let streakAverages = String(localized: "vault.streakAverages")
+        static let sevenDays = String(localized: "vault.sevenDays")
+        static let thirtyDays = String(localized: "vault.thirtyDays")
+        static let ninetyDays = String(localized: "vault.ninetyDays")
+        static let riskClock = String(localized: "vault.riskClock")
+        static let heatMap = String(localized: "vault.heatMap")
+        static let triggerRadar = String(localized: "vault.triggerRadar")
+        static let moodCorrelation = String(localized: "vault.moodCorrelation")
+        static let cleanDays = String(localized: "vault.cleanDays")
+        static let relapseDays = String(localized: "vault.relapseDays")
+
+        // Layout settings
+        static let layoutSettings = String(localized: "vault.layoutSettings")
+        static let tabOrder = String(localized: "vault.tabOrder")
+        static let sectionOrder = String(localized: "vault.sectionOrder")
+        static let resetToDefault = String(localized: "vault.resetToDefault")
+
+        // Placeholders
+        static let comingSoon = String(localized: "vault.comingSoon")
+        static let comingSoonMessage = String(localized: "vault.comingSoonMessage")
+    }
 }
