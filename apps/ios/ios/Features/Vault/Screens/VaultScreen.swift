@@ -16,23 +16,20 @@ struct VaultScreen: View {
     var body: some View {
         NavigationStack(path: $containerVM.navigationPath) {
             ScrollView {
-                LazyVStack(spacing: 0, pinnedViews: .sectionHeaders) {
-                    Section {
-                        tabContent
-                    } header: {
-                        VStack(spacing: 0) {
-                            XTabBar(
-                                tabs: containerVM.visibleTabs,
-                                selectedTab: $containerVM.selectedTab,
-                                label: { $0.label },
-                                icon: { $0.icon },
-                                color: { $0.color }
-                            )
-                            Divider()
-                        }
-                        .background(AppColors.background)
-                    }
+                tabContent
+            }
+            .safeAreaInset(edge: .top, spacing: 0) {
+                VStack(spacing: 0) {
+                    XTabBar(
+                        tabs: containerVM.visibleTabs,
+                        selectedTab: $containerVM.selectedTab,
+                        label: { $0.label },
+                        icon: { $0.icon },
+                        color: { $0.color }
+                    )
+                    Divider()
                 }
+                .background(AppColors.background)
             }
             .background(AppColors.background)
             .refreshable {
