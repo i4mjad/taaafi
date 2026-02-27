@@ -285,13 +285,13 @@ enum Strings {
         static let triggerStress = String(localized: "vault.trigger.stress")
         static let triggerBoredom = String(localized: "vault.trigger.boredom")
         static let triggerLoneliness = String(localized: "vault.trigger.loneliness")
-        static let triggerLateNight = String(localized: "vault.trigger.lateNight")
-        static let triggerSocialMedia = String(localized: "vault.trigger.socialMedia")
+        static let triggerLateNight = String(localized: "vault.trigger.late-night")
+        static let triggerSocialMedia = String(localized: "vault.trigger.social-media")
         static let triggerUrges = String(localized: "vault.trigger.urges")
         static let triggerAnxiety = String(localized: "vault.trigger.anxiety")
         static let triggerAnger = String(localized: "vault.trigger.anger")
         static let triggerSadness = String(localized: "vault.trigger.sadness")
-        static let triggerPeerPressure = String(localized: "vault.trigger.peerPressure")
+        static let triggerPeerPressure = String(localized: "vault.trigger.peer-pressure")
 
         // Emotion names
         static let emotionAngry = String(localized: "emotion.angry")
