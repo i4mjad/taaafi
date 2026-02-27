@@ -40,8 +40,6 @@ struct VaultScreen: View {
             }
             .navigationTitle(Strings.Vault.title)
             .navigationBarTitleDisplayMode(.large)
-            .toolbarBackground(AppColors.background, for: .navigationBar)
-            .toolbarBackground(.visible, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     HStack(spacing: Spacing.sm) {

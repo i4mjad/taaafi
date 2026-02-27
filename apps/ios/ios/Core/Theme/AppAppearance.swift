@@ -9,33 +9,40 @@ enum AppAppearance {
     }
 
     static func configureNavigationBar() {
-        let appearance = UINavigationBarAppearance()
-        appearance.configureWithDefaultBackground()
+        let navBackground = UIColor(named: "Background") ?? UIColor.systemBackground
 
-        // Large title: 34pt Regular (Apple HIG default)
-        appearance.largeTitleTextAttributes = [
-            .font: UIFont(name: AppFont.fontName(for: .regular), size: 34)
-                   ?? .systemFont(ofSize: 34)
-        ]
+        let largeTitleFont = UIFont(name: AppFont.fontName(for: .regular), size: 34)
+            ?? .systemFont(ofSize: 34)
+        let inlineTitleFont = UIFont(name: AppFont.fontName(for: .medium), size: 17)
+            ?? .boldSystemFont(ofSize: 17)
+        let buttonFont = UIFont(name: AppFont.fontName(for: .regular), size: 17)
+            ?? .systemFont(ofSize: 17)
 
-        // Inline title: 17pt SemiBold (Apple HIG default)
-        appearance.titleTextAttributes = [
-            .font: UIFont(name: AppFont.fontName(for: .medium), size: 17)
-                   ?? .boldSystemFont(ofSize: 17)
-        ]
-
-        // Back button: 17pt Regular
         let buttonAppearance = UIBarButtonItemAppearance()
-        buttonAppearance.normal.titleTextAttributes = [
-            .font: UIFont(name: AppFont.fontName(for: .regular), size: 17)
-                   ?? .systemFont(ofSize: 17)
-        ]
-        appearance.backButtonAppearance = buttonAppearance
-        appearance.buttonAppearance = buttonAppearance
+        buttonAppearance.normal.titleTextAttributes = [.font: buttonFont]
 
-        UINavigationBar.appearance().standardAppearance = appearance
-        UINavigationBar.appearance().compactAppearance = appearance
-        UINavigationBar.appearance().scrollEdgeAppearance = appearance
+        // Standard appearance: shown when scrolled (inline title, with separator)
+        let standard = UINavigationBarAppearance()
+        standard.configureWithOpaqueBackground()
+        standard.backgroundColor = navBackground
+        standard.largeTitleTextAttributes = [.font: largeTitleFont]
+        standard.titleTextAttributes = [.font: inlineTitleFont]
+        standard.backButtonAppearance = buttonAppearance
+        standard.buttonAppearance = buttonAppearance
+
+        // Scroll-edge appearance: shown at top (large title, no separator)
+        let scrollEdge = UINavigationBarAppearance()
+        scrollEdge.configureWithOpaqueBackground()
+        scrollEdge.backgroundColor = navBackground
+        scrollEdge.shadowColor = .clear
+        scrollEdge.largeTitleTextAttributes = [.font: largeTitleFont]
+        scrollEdge.titleTextAttributes = [.font: inlineTitleFont]
+        scrollEdge.backButtonAppearance = buttonAppearance
+        scrollEdge.buttonAppearance = buttonAppearance
+
+        UINavigationBar.appearance().standardAppearance = standard
+        UINavigationBar.appearance().compactAppearance = standard
+        UINavigationBar.appearance().scrollEdgeAppearance = scrollEdge
     }
 
     static func configureTabBar() {
