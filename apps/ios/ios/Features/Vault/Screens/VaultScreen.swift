@@ -9,36 +9,24 @@ struct VaultScreen: View {
     @State private var dashboardVM: VaultDashboardViewModel?
     @State private var activitiesVM: ActivitiesViewModel?
 
-    // XTabBar height: content ~28pt + vertical padding 16pt + Divider 1pt = 45pt
-    private let tabBarReservedHeight: CGFloat = 45
-
     init() {
         _containerVM = State(initialValue: VaultContainerViewModel())
     }
 
     var body: some View {
         NavigationStack(path: $containerVM.navigationPath) {
-            ScrollView {
+            VStack(spacing: 0) {
+                XTabBar(
+                    tabs: containerVM.visibleTabs,
+                    selectedTab: $containerVM.selectedTab,
+                    label: { $0.label },
+                    icon: { $0.icon },
+                    color: { $0.color }
+                )
+                Divider()
                 tabContent
             }
-            .contentMargins(.top, tabBarReservedHeight, for: .scrollContent)
-            .overlay(alignment: .top) {
-                VStack(spacing: 0) {
-                    XTabBar(
-                        tabs: containerVM.visibleTabs,
-                        selectedTab: $containerVM.selectedTab,
-                        label: { $0.label },
-                        icon: { $0.icon },
-                        color: { $0.color }
-                    )
-                    Divider()
-                }
-                .background(AppColors.background)
-            }
             .background(AppColors.background)
-            .refreshable {
-                await refreshCurrentTab()
-            }
             .navigationTitle(Strings.Vault.title)
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
@@ -117,7 +105,7 @@ struct VaultScreen: View {
     }
 
     private var vaultDashboard: some View {
-        Group {
+        ScrollView {
             if let vm = dashboardVM {
                 LazyVStack(spacing: Spacing.md) {
                     ForEach(containerVM.visibleSections) { section in
@@ -126,6 +114,9 @@ struct VaultScreen: View {
                 }
                 .padding(.vertical, Spacing.md)
             }
+        }
+        .refreshable {
+            await dashboardVM?.loadData()
         }
     }
 
@@ -184,7 +175,7 @@ struct VaultScreen: View {
     }
 
     private var activitiesTab: some View {
-        Group {
+        ScrollView {
             if let vm = activitiesVM {
                 LazyVStack(spacing: Spacing.md) {
                     // Today's Tasks
@@ -250,6 +241,9 @@ struct VaultScreen: View {
                 .padding(.vertical, Spacing.md)
             }
         }
+        .refreshable {
+            await activitiesVM?.loadData()
+        }
     }
 
     private var placeholderTab: some View {
@@ -267,8 +261,7 @@ struct VaultScreen: View {
                 .foregroundStyle(AppColors.grey400)
                 .multilineTextAlignment(.center)
         }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 100)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     private func emptyState(icon: String, message: String) -> some View {
@@ -337,11 +330,4 @@ struct VaultScreen: View {
         await activitiesVM?.loadData()
     }
 
-    private func refreshCurrentTab() async {
-        switch containerVM.selectedTab {
-        case .vault: await dashboardVM?.loadData()
-        case .activities: await activitiesVM?.loadData()
-        default: break
-        }
-    }
 }
