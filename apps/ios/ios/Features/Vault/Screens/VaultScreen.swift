@@ -8,6 +8,7 @@ struct VaultScreen: View {
     @State private var containerVM: VaultContainerViewModel
     @State private var dashboardVM: VaultDashboardViewModel?
     @State private var activitiesVM: ActivitiesViewModel?
+    @State private var tabBarHeight: CGFloat = 44
 
     init() {
         _containerVM = State(initialValue: VaultContainerViewModel())
@@ -16,9 +17,15 @@ struct VaultScreen: View {
     var body: some View {
         NavigationStack(path: $containerVM.navigationPath) {
             ScrollView {
-                tabContent
+                VStack(spacing: 0) {
+                    // Spacer that reserves the tab bar's height so content
+                    // starts below the overlaid tab bar.
+                    Color.clear.frame(height: tabBarHeight)
+
+                    tabContent
+                }
             }
-            .safeAreaInset(edge: .top, spacing: 0) {
+            .overlay(alignment: .top) {
                 VStack(spacing: 0) {
                     XTabBar(
                         tabs: containerVM.visibleTabs,
@@ -30,6 +37,9 @@ struct VaultScreen: View {
                     Divider()
                 }
                 .background(AppColors.background)
+                .onGeometryChange(for: CGFloat.self) { $0.size.height } action: {
+                    tabBarHeight = $0
+                }
             }
             .background(AppColors.background)
             .refreshable {
