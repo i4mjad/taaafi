@@ -31,6 +31,7 @@ struct HomeScreen: View {
             }
             .background(AppColors.background)
             .navigationTitle(String(localized: "home.welcomeBack"))
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     HStack(spacing: Spacing.sm) {
