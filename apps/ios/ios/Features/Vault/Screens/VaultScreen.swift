@@ -28,7 +28,7 @@ struct VaultScreen: View {
             }
             .background(AppColors.background)
             .navigationTitle(Strings.Vault.title)
-            .navigationBarTitleDisplayMode(.large)
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     HStack(spacing: Spacing.sm) {
