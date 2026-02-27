@@ -171,6 +171,38 @@ enum Strings {
         static let community = String(localized: "home.community")
     }
 
+    enum Ban {
+        static let deviceRestricted = String(localized: "ban.deviceRestricted")
+        static let accountRestricted = String(localized: "ban.accountRestricted")
+        static let details = String(localized: "ban.details")
+        static let scopeAppWide = String(localized: "ban.scopeAppWide")
+        static let scopeFeature = String(localized: "ban.scopeFeature")
+        static let typeUser = String(localized: "ban.typeUser")
+        static let typeDevice = String(localized: "ban.typeDevice")
+        static let typeFeature = String(localized: "ban.typeFeature")
+        static let reason = String(localized: "ban.reason")
+        static let description = String(localized: "ban.description")
+        static let duration = String(localized: "ban.duration")
+        static let issuedDate = String(localized: "ban.issuedDate")
+        static let expiresOn = String(localized: "ban.expiresOn")
+        static let banId = String(localized: "ban.banId")
+        static let permanent = String(localized: "ban.permanent")
+        static let unknown = String(localized: "ban.unknown")
+        static let expired = String(localized: "ban.expired")
+        static let checkBanStatus = String(localized: "ban.checkBanStatus")
+        static let deviceBanNoLogoutMessage = String(localized: "ban.deviceBanNoLogoutMessage")
+        static let unableToLoadDetails = String(localized: "ban.unableToLoadDetails")
+        static let accountRestrictedMessage = String(localized: "ban.accountRestrictedMessage")
+        static let devicePermanentlyRestricted = String(localized: "ban.devicePermanentlyRestricted")
+        static let appealInfo = String(localized: "ban.appealInfo")
+        static let day = String(localized: "ban.day")
+        static let days = String(localized: "ban.days")
+        static let hour = String(localized: "ban.hour")
+        static let hours = String(localized: "ban.hours")
+        static let minute = String(localized: "ban.minute")
+        static let minutes = String(localized: "ban.minutes")
+    }
+
     enum Report {
         static let title = String(localized: "reports.title")
         static let empty = String(localized: "reports.empty")

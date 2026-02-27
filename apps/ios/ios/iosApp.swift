@@ -35,6 +35,7 @@ struct iosApp: App {
     // Startup state
     @State private var startupResult: SecurityStartupResult?
     @State private var isStartupComplete = false
+    @State private var hasStartedDeferredWork = false
 
     init() {
         AppAppearance.configure()
@@ -72,7 +73,18 @@ struct iosApp: App {
                 if !isStartupComplete {
                     startupView
                 } else if let result = startupResult, result.isBlocked {
-                    bannedView(result: result)
+                    BannedScreen(
+                        result: result,
+                        banWarningFacade: banWarningFacade,
+                        onRefresh: {
+                            let newResult = await startupSecurityService.initializeAppSecurity()
+                            if newResult.isBlocked {
+                                startupResult = newResult
+                            } else {
+                                startupResult = nil
+                            }
+                        }
+                    )
                 } else {
                     AuthRouter()
                 }
@@ -92,41 +104,32 @@ struct iosApp: App {
             .environment(toastManager)
             .environment(\.locale, Locale(identifier: "ar"))
             .task {
-                // Configure auth service with dependencies
                 authService.configure(analytics: analytics, errorLogger: errorLogger)
-
-                // Start device tracking auth listener
-                deviceTrackingService.startListeningToAuthState()
-
-                // Launch security check in background — don't block startup.
-                // Firestore calls can exhaust the cooperative thread pool AND
-                // block the main thread, so we must never await this at startup.
-                Task {
-                    let result = await startupSecurityService.initializeAppSecurity()
-                    if result.isBlocked {
-                        startupResult = result
-                    }
-                }
-
-                // Proceed immediately — don't wait for security check
                 isStartupComplete = true
-
-                // Post-startup tasks
                 analytics.trackAppOpened()
-                await emailSyncService.syncUserEmailIfNeeded()
-
-                // Start/stop UserDocumentService listener based on auth state
-                if let uid = authService.currentUser?.uid {
-                    userDocumentService.startListening(userId: uid)
-                } else {
-                    userDocumentService.stopListening()
-                }
             }
             .onChange(of: authService.currentUser?.uid) { _, newUid in
                 if let uid = newUid {
                     userDocumentService.startListening(userId: uid)
                 } else {
                     userDocumentService.stopListening()
+                }
+            }
+            .onChange(of: userDocumentService.accountStatus) { _, newStatus in
+                guard !hasStartedDeferredWork, newStatus != .loading else { return }
+                hasStartedDeferredWork = true
+
+                // Firestore getDocument() blocks the SDK's gRPC channel and prevents
+                // addSnapshotListener from receiving data. Only start getDocument()-based
+                // work AFTER the essential snapshot listener has delivered its first value.
+                Task {
+                    let securityResult = await startupSecurityService.initializeAppSecurity()
+                    if securityResult.isBlocked {
+                        startupResult = securityResult
+                    }
+
+                    await emailSyncService.syncUserEmailIfNeeded()
+                    deviceTrackingService.startListeningToAuthState()
                 }
             }
         }
@@ -146,22 +149,4 @@ struct iosApp: App {
         .background(AppColors.background)
     }
 
-    private func bannedView(result: SecurityStartupResult) -> some View {
-        VStack(spacing: Spacing.xl) {
-            Image(systemName: "hand.raised.fill")
-                .font(.system(size: 64))
-                .foregroundStyle(AppColors.error)
-
-            Text(Strings.Common.accessRestricted)
-                .font(Typography.h4)
-
-            Text(result.message ?? Strings.Common.accessRestrictedMessage)
-                .font(Typography.body)
-                .foregroundStyle(AppColors.grey500)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, Spacing.xxl)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(AppColors.background)
-    }
 }
