@@ -44,6 +44,10 @@ final class FirestoreService {
                 query = query.whereField(field, arrayContainsAny: values)
             case .isIn(let field, let values):
                 query = query.whereField(field, in: values)
+            case .isGreaterThanOrEqualTo(let field, let value):
+                query = query.whereField(field, isGreaterThanOrEqualTo: value)
+            case .isLessThanOrEqualTo(let field, let value):
+                query = query.whereField(field, isLessThanOrEqualTo: value)
             }
         }
 
@@ -67,6 +71,11 @@ final class FirestoreService {
 
     func updateDocument(collection: String, id: String, fields: [String: Any]) async throws {
         try await db.collection(collection).document(id).updateData(fields)
+    }
+
+    func addDocument<T: Encodable>(collection: String, data: T) async throws -> String {
+        let ref = try db.collection(collection).addDocument(from: data)
+        return ref.documentID
     }
 
     func deleteDocument(collection: String, id: String) async throws {
@@ -129,6 +138,10 @@ final class FirestoreService {
                     query = query.whereField(field, arrayContainsAny: values)
                 case .isIn(let field, let values):
                     query = query.whereField(field, in: values)
+                case .isGreaterThanOrEqualTo(let field, let value):
+                    query = query.whereField(field, isGreaterThanOrEqualTo: value)
+                case .isLessThanOrEqualTo(let field, let value):
+                    query = query.whereField(field, isLessThanOrEqualTo: value)
                 }
             }
 
@@ -177,6 +190,8 @@ enum FirestoreFilter {
     case arrayContains(field: String, value: Any)
     case arrayContainsAny(field: String, values: [Any])
     case isIn(field: String, values: [Any])
+    case isGreaterThanOrEqualTo(field: String, value: Any)
+    case isLessThanOrEqualTo(field: String, value: Any)
 }
 
 // MARK: - Errors
