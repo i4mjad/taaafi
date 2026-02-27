@@ -2,6 +2,7 @@ import Foundation
 @testable import ios
 
 final class MockBanWarningFacade: BanWarningFacadeProtocol {
+    var currentUserId: String? = "test-user-123"
     var deviceId = "test-device-123"
     var deviceBans: [Ban] = []
     var isUserBanned = false

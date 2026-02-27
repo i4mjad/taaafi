@@ -6,6 +6,10 @@ import FirebaseAuth
 /// Ported from: apps/mobile/lib/features/account/application/ban_warning_facade.dart
 final class BanWarningFacade: BanWarningFacadeProtocol {
 
+    var currentUserId: String? {
+        Auth.auth().currentUser?.uid
+    }
+
     private let banService: BanService
     private let warningService: WarningService
     private let featureService: AppFeatureService

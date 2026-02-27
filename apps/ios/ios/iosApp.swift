@@ -11,10 +11,12 @@ import FirebaseAuth
 
 @main
 struct iosApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+
     @State private var screenTimeManager = ScreenTimeManager()
     @State private var toastManager = ToastManager()
 
-    // Core Services (initialized in init after FirebaseApp.configure)
+    // Core Services (Firebase configured via AppDelegate before init)
     @State private var errorLogger = ErrorLogger()
     @State private var analytics: AnalyticsFacade
     @State private var authService: AuthService
@@ -36,9 +38,15 @@ struct iosApp: App {
 
     init() {
         AppAppearance.configure()
-        FirebaseApp.configure()
 
-        // Firebase-dependent services (must initialize after FirebaseApp.configure)
+        // Ensure Firebase is configured before creating services.
+        // Prefer AppDelegate (UIApplication fully initialized), but fall back here
+        // for test hosts or cases where didFinishLaunchingWithOptions hasn't run yet.
+        if FirebaseApp.app() == nil {
+            FirebaseApp.configure()
+        }
+
+        // Firebase-dependent services
         let firestore = FirestoreService()
         _analytics = State(initialValue: AnalyticsFacade())
         _authService = State(initialValue: AuthService())
@@ -90,22 +98,28 @@ struct iosApp: App {
                 // Start device tracking auth listener
                 deviceTrackingService.startListeningToAuthState()
 
-                // Run startup security check
-                let result = await startupSecurityService.initializeAppSecurity()
-                startupResult = result
+                // Launch security check in background — don't block startup.
+                // Firestore calls can exhaust the cooperative thread pool AND
+                // block the main thread, so we must never await this at startup.
+                Task {
+                    let result = await startupSecurityService.initializeAppSecurity()
+                    if result.isBlocked {
+                        startupResult = result
+                    }
+                }
+
+                // Proceed immediately — don't wait for security check
                 isStartupComplete = true
 
-                // Post-startup tasks (only if not blocked)
-                if !result.isBlocked {
-                    analytics.trackAppOpened()
-                    await emailSyncService.syncUserEmailIfNeeded()
+                // Post-startup tasks
+                analytics.trackAppOpened()
+                await emailSyncService.syncUserEmailIfNeeded()
 
-                    // Start/stop UserDocumentService listener based on auth state
-                    if let uid = authService.currentUser?.uid {
-                        userDocumentService.startListening(userId: uid)
-                    } else {
-                        userDocumentService.stopListening()
-                    }
+                // Start/stop UserDocumentService listener based on auth state
+                if let uid = authService.currentUser?.uid {
+                    userDocumentService.startListening(userId: uid)
+                } else {
+                    userDocumentService.stopListening()
                 }
             }
             .onChange(of: authService.currentUser?.uid) { _, newUid in

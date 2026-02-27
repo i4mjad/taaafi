@@ -1,3153 +1,3176 @@
 {
-  "sourceLanguage": "ar",
-  "strings": {
-    "": {},
-    "%lld/%lld": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "new",
-            "value": "%1$lld/%2$lld"
+  "sourceLanguage" : "ar",
+  "strings" : {
+    "" : {
+
+    },
+    "%lld" : {
+
+    },
+    "%lld/%lld" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld/%2$lld"
           }
         }
       }
+    },
+    "%lld/220" : {
+
     },
-    "account.cancelDeletion": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "إلغاء حذف الحساب"
+    "account.cancelDeletion" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إلغاء حذف الحساب"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cancel Account Deletion"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel Account Deletion"
           }
         }
       }
     },
-    "account.cancelDeletionConfirmMessage": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "هل أنت متأكد أنك تريد إلغاء طلب حذف حسابك؟"
+    "account.cancelDeletionConfirmMessage" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "هل أنت متأكد أنك تريد إلغاء طلب حذف حسابك؟"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Are you sure you want to cancel your account deletion request?"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to cancel your account deletion request?"
           }
         }
       }
     },
-    "account.cancelDeletionConfirmTitle": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "إلغاء الحذف"
+    "account.cancelDeletionConfirmTitle" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إلغاء الحذف"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cancel Deletion"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel Deletion"
           }
         }
       }
     },
-    "account.completeRegistration": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "أكمل التسجيل"
+    "account.completeRegistration" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أكمل التسجيل"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Complete Registration"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Complete Registration"
           }
         }
       }
     },
-    "account.completeRegistrationButton": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "إكمال التسجيل"
+    "account.completeRegistrationButton" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إكمال التسجيل"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Complete Registration"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Complete Registration"
           }
         }
       }
     },
-    "account.completeRegistrationSubtitle": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "أكمل بياناتك للاستفادة من جميع المزايا"
+    "account.completeRegistrationSubtitle" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أكمل بياناتك للاستفادة من جميع المزايا"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Complete your information to access all features"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Complete your information to access all features"
           }
         }
       }
     },
-    "account.confirmDetails": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تأكيد البيانات"
+    "account.confirmDetails" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تأكيد البيانات"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Confirm Details"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirm Details"
           }
         }
       }
     },
-    "account.confirmDetailsButton": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تأكيد البيانات"
+    "account.confirmDetailsButton" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تأكيد البيانات"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Confirm Details"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirm Details"
           }
         }
       }
     },
-    "account.confirmDetailsSubtitle": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "يرجى تأكيد بياناتك الشخصية"
+    "account.confirmDetailsSubtitle" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يرجى تأكيد بياناتك الشخصية"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Please confirm your personal details"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Please confirm your personal details"
           }
         }
       }
     },
-    "account.deletionCancelFailed": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "فشل إلغاء طلب الحذف"
+    "account.deletionCancelFailed" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "فشل إلغاء طلب الحذف"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Failed to cancel deletion request"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to cancel deletion request"
           }
         }
       }
     },
-    "account.deletionCancelled": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تم إلغاء طلب الحذف بنجاح"
+    "account.deletionCancelled" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تم إلغاء طلب الحذف بنجاح"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Deletion request cancelled successfully"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deletion request cancelled successfully"
           }
         }
       }
     },
-    "account.deletionScheduled": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "سيتم حذف حسابك في %@"
+    "account.deletionScheduled" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "سيتم حذف حسابك في %@"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Your account will be deleted on %@"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your account will be deleted on %@"
           }
         }
       }
     },
-    "account.emailVerification": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تأكيد البريد الإلكتروني"
+    "account.emailVerification" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تأكيد البريد الإلكتروني"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Verify Email"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verify Email"
           }
         }
       }
     },
-    "account.emailVerificationButton": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تأكيد البريد"
+    "account.emailVerificationButton" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تأكيد البريد"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Verify Email"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verify Email"
           }
         }
       }
     },
-    "account.emailVerificationSubtitle": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "يرجى تأكيد بريدك الإلكتروني"
+    "account.emailVerificationSubtitle" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يرجى تأكيد بريدك الإلكتروني"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Please verify your email address"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Please verify your email address"
           }
         }
       }
     },
-    "account.error": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "حدث خطأ"
+    "account.error" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حدث خطأ"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "An error occurred"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An error occurred"
           }
         }
       }
     },
-    "account.errorSubtitle": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "يرجى المحاولة مرة أخرى"
+    "account.errorSubtitle" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يرجى المحاولة مرة أخرى"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Please try again"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Please try again"
           }
         }
       }
     },
-    "account.pendingDeletion": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "حذف الحساب معلّق"
+    "account.pendingDeletion" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حذف الحساب معلّق"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Account Deletion Pending"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Account Deletion Pending"
           }
         }
       }
     },
-    "account.pendingDeletionSubtitle": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تم طلب حذف حسابك"
+    "account.pendingDeletionSubtitle" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تم طلب حذف حسابك"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Your account deletion has been requested"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your account deletion has been requested"
           }
         }
       }
     },
-    "auth.email": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "البريد الإلكتروني"
+    "auth.email" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "البريد الإلكتروني"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Email"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Email"
           }
         }
       }
     },
-    "auth.enterEmail": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "أدخل بريدك الإلكتروني"
+    "auth.enterEmail" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أدخل بريدك الإلكتروني"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Enter your email"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter your email"
           }
         }
       }
     },
-    "auth.errorMessage": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "حدث خطأ. يرجى المحاولة لاحقاً."
+    "auth.errorMessage" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حدث خطأ. يرجى المحاولة لاحقاً."
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Something went wrong. Please try again later."
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Something went wrong. Please try again later."
           }
         }
       }
     },
-    "auth.errorTitle": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "حدث خطأ"
+    "auth.errorTitle" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حدث خطأ"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Error"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error"
           }
         }
       }
     },
-    "auth.fillAllFields": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "يرجى ملء جميع الحقول"
+    "auth.fillAllFields" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يرجى ملء جميع الحقول"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Please fill in all fields"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Please fill in all fields"
           }
         }
       }
     },
-    "auth.forgotPassword": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "نسيت كلمة المرور؟"
+    "auth.forgotPassword" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "نسيت كلمة المرور؟"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Forgot Password?"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Forgot Password?"
           }
         }
       }
     },
-    "auth.forgotPasswordDescription": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "أدخل بريدك الإلكتروني وسنرسل لك رابط إعادة تعيين كلمة المرور."
+    "auth.forgotPasswordDescription" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أدخل بريدك الإلكتروني وسنرسل لك رابط إعادة تعيين كلمة المرور."
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Enter your email and we'll send you a password reset link."
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter your email and we'll send you a password reset link."
           }
         }
       }
     },
-    "auth.forgotPasswordTitle": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "نسيت كلمة المرور"
+    "auth.forgotPasswordTitle" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "نسيت كلمة المرور"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Forgot Password"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Forgot Password"
           }
         }
       }
     },
-    "auth.login": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تسجيل الدخول"
+    "auth.login" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تسجيل الدخول"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Log In"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Log In"
           }
         }
       }
     },
-    "auth.noAccount": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ليس لديك حساب؟"
+    "auth.noAccount" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ليس لديك حساب؟"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Don't have an account?"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Don't have an account?"
           }
         }
       }
     },
-    "auth.or": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "أو"
+    "auth.or" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أو"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "or"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "or"
           }
         }
       }
     },
-    "auth.password": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "كلمة المرور"
+    "auth.password" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "كلمة المرور"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Password"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Password"
           }
         }
       }
     },
-    "auth.resetLinkSent": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تم إرسال رابط إعادة تعيين كلمة المرور"
+    "auth.resetLinkSent" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تم إرسال رابط إعادة تعيين كلمة المرور"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Password reset link sent"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Password reset link sent"
           }
         }
       }
     },
-    "auth.sendResetLink": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "إرسال رابط إعادة التعيين"
+    "auth.sendResetLink" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إرسال رابط إعادة التعيين"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Send Reset Link"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send Reset Link"
           }
         }
       }
     },
-    "auth.signInWithGoogle": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تسجيل الدخول بجوجل"
+    "auth.signInWithGoogle" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تسجيل الدخول بجوجل"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sign in with Google"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign in with Google"
           }
         }
       }
     },
-    "auth.signUp": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "إنشاء حساب"
+    "auth.signUp" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إنشاء حساب"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sign Up"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign Up"
           }
         }
       }
     },
-    "banner.warningCount": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "لديك %lld تحذير"
+    "banner.warningCount" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لديك %lld تحذير"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "You have %lld warning(s)"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You have %lld warning(s)"
           }
         }
       }
     },
-    "common.accessRestricted": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "الوصول مقيّد"
+    "common.accessRestricted" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الوصول مقيّد"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Access Restricted"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Access Restricted"
           }
         }
       }
     },
-    "common.accessRestrictedMessage": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تم تقييد وصولك."
+    "common.accessRestrictedMessage" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تم تقييد وصولك."
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Your access has been restricted."
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your access has been restricted."
           }
         }
       }
     },
-    "common.cancel": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "إلغاء"
+    "common.cancel" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إلغاء"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cancel"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
           }
         }
       }
     },
-    "common.confirm": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تأكيد"
+    "common.confirm" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تأكيد"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Confirm"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirm"
           }
         }
       }
     },
-    "common.done": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تم"
+    "common.done" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تم"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Done"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
           }
         }
       }
     },
-    "common.loading": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "جاري التحميل..."
+    "common.loading" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جاري التحميل..."
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Loading..."
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading..."
           }
         }
       }
     },
-    "common.ok": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "حسناً"
+    "common.ok" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حسناً"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "OK"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
           }
         }
       }
     },
-    "common.retry": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "إعادة المحاولة"
+    "common.retry" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إعادة المحاولة"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Retry"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retry"
           }
         }
       }
     },
-    "common.signOut": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تسجيل الخروج"
+    "common.signOut" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تسجيل الخروج"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sign Out"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign Out"
           }
         }
       }
     },
-    "confirmDetails.description": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "يرجى مراجعة وتحديث بياناتك الشخصية."
+    "confirmDetails.description" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يرجى مراجعة وتحديث بياناتك الشخصية."
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Please review and update your personal details."
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Please review and update your personal details."
           }
         }
       }
     },
-    "confirmDetails.save": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "حفظ"
+    "confirmDetails.save" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حفظ"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Save"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
           }
         }
       }
     },
-    "confirmDetails.saved": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تم حفظ البيانات بنجاح"
+    "confirmDetails.saved" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تم حفظ البيانات بنجاح"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Details saved successfully"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Details saved successfully"
           }
         }
       }
     },
-    "confirmDetails.title": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تأكيد البيانات"
+    "confirmDetails.title" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تأكيد البيانات"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Confirm Details"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirm Details"
           }
         }
       }
     },
-    "confirmEmail.changeEmail": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تغيير البريد الإلكتروني"
+    "confirmEmail.changeEmail" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تغيير البريد الإلكتروني"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Change Email"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change Email"
           }
         }
       }
     },
-    "confirmEmail.changeEmailDescription": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "أدخل بريدك الإلكتروني الجديد. سنرسل رسالة تحقق إلى العنوان الجديد."
+    "confirmEmail.changeEmailDescription" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أدخل بريدك الإلكتروني الجديد. سنرسل رسالة تحقق إلى العنوان الجديد."
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Enter your new email address. We'll send a verification email to the new address."
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter your new email address. We'll send a verification email to the new address."
           }
         }
       }
     },
-    "confirmEmail.changeEmailTitle": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تغيير البريد الإلكتروني"
+    "confirmEmail.changeEmailTitle" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تغيير البريد الإلكتروني"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Change Email"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change Email"
           }
         }
       }
     },
-    "confirmEmail.checkVerification": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "التحقق من التأكيد"
+    "confirmEmail.checkVerification" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "التحقق من التأكيد"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Check Verification"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check Verification"
           }
         }
       }
     },
-    "confirmEmail.description": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "يرجى تأكيد بريدك الإلكتروني لمتابعة استخدام التطبيق."
+    "confirmEmail.description" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يرجى تأكيد بريدك الإلكتروني لمتابعة استخدام التطبيق."
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Please verify your email address to continue using the app."
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Please verify your email address to continue using the app."
           }
         }
       }
     },
-    "confirmEmail.emailChangeSent": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تم إرسال رسالة التحقق إلى بريدك الجديد"
+    "confirmEmail.emailChangeSent" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تم إرسال رسالة التحقق إلى بريدك الجديد"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Verification email sent to your new address"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verification email sent to your new address"
           }
         }
       }
     },
-    "confirmEmail.logoutIn %lld": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تسجيل الخروج خلال %lld ثانية"
+    "confirmEmail.logoutIn %lld" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تسجيل الخروج خلال %lld ثانية"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Logging out in %lld seconds"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Logging out in %lld seconds"
           }
         }
       }
     },
-    "confirmEmail.newEmail": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "البريد الإلكتروني الجديد"
+    "confirmEmail.newEmail" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "البريد الإلكتروني الجديد"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "New Email"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New Email"
           }
         }
       }
     },
-    "confirmEmail.resend": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "إعادة إرسال رسالة التحقق"
+    "confirmEmail.resend" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إعادة إرسال رسالة التحقق"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Resend Verification Email"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resend Verification Email"
           }
         }
       }
     },
-    "confirmEmail.title": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تأكيد البريد الإلكتروني"
+    "confirmEmail.title" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تأكيد البريد الإلكتروني"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Verify Email"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verify Email"
           }
         }
       }
     },
-    "confirmEmail.updateEmail": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تحديث البريد الإلكتروني"
+    "confirmEmail.updateEmail" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تحديث البريد الإلكتروني"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Update Email"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update Email"
           }
         }
       }
     },
-    "confirmEmail.verified": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تم التحقق من البريد الإلكتروني"
+    "confirmEmail.verified" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تم التحقق من البريد الإلكتروني"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Email Verified"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Email Verified"
           }
         }
       }
     },
-    "guard.categoryClassifications": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تصنيفات الفئات"
+    "guard.categoryClassifications" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تصنيفات الفئات"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Category Classifications"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Category Classifications"
           }
         }
       }
     },
-    "guard.categoryFooter": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "فئات التهديد تحتسب ضد نقاط الحارس. الفئات الآمنة تحسّنها. الفئات المحايدة مستثناة. الفئات الاجتماعية مقفلة كتهديدات."
+    "guard.categoryFooter" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "فئات التهديد تحتسب ضد نقاط الحارس. الفئات الآمنة تحسّنها. الفئات المحايدة مستثناة. الفئات الاجتماعية مقفلة كتهديدات."
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Threat categories count against your Guard Score. Safe categories improve it. Neutral categories are excluded. Social categories are locked as threats."
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Threat categories count against your Guard Score. Safe categories improve it. Neutral categories are excluded. Social categories are locked as threats."
           }
         }
       }
     },
-    "guard.done": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تم"
+    "guard.done" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تم"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Done"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
           }
         }
       }
     },
-    "guard.enableAccess": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تفعيل إذن وقت الشاشة"
+    "guard.enableAccess" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تفعيل إذن وقت الشاشة"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Enable Screen Time Access"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enable Screen Time Access"
           }
         }
       }
     },
-    "guard.neutral": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "محايد"
+    "guard.neutral" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "محايد"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Neutral"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neutral"
           }
         }
       }
     },
-    "guard.safe": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "آمن"
+    "guard.safe" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "آمن"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Safe"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Safe"
           }
         }
       }
     },
-    "guard.screenTimeDescription": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "امنح إذن وقت الشاشة ليتمكن الحارس من عرض استخدامك اليومي ومساعدتك على البقاء في المسار الصحيح."
+    "guard.screenTimeDescription" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "امنح إذن وقت الشاشة ليتمكن الحارس من عرض استخدامك اليومي ومساعدتك على البقاء في المسار الصحيح."
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Grant Screen Time access so Guard can show your daily usage and help you stay on track."
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grant Screen Time access so Guard can show your daily usage and help you stay on track."
           }
         }
       }
     },
-    "guard.screenTimePermission": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "إذن وقت الشاشة"
+    "guard.screenTimePermission" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إذن وقت الشاشة"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Screen Time Permission"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Screen Time Permission"
           }
         }
       }
     },
-    "guard.selectDate": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "اختر التاريخ"
+    "guard.selectDate" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اختر التاريخ"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Select Date"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select Date"
           }
         }
       }
     },
-    "guard.settings": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "إعدادات الحارس"
+    "guard.settings" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إعدادات الحارس"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Guard Settings"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guard Settings"
           }
         }
       }
     },
-    "guard.threat": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تهديد"
+    "guard.threat" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تهديد"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Threat"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Threat"
           }
         }
       }
     },
-    "guard.title": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "الحارس"
+    "guard.title" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الحارس"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Guard"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guard"
           }
         }
       }
     },
-    "guard.today": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "اليوم"
+    "guard.today" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اليوم"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Today"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Today"
           }
         }
       }
     },
-    "guard.yesterday": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "أمس"
+    "guard.yesterday" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أمس"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Yesterday"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yesterday"
           }
         }
       }
     },
-    "home.action.addDiary": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "إضافة يومية"
+    "home.action.addDiary" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إضافة يومية"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Add Diary"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Diary"
           }
         }
       }
     },
-    "home.action.exploreContent": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "استكشاف المحتوى"
+    "home.action.exploreContent" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "استكشاف المحتوى"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Explore Content"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Explore Content"
           }
         }
       }
     },
-    "home.action.followUp": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "متابعة"
+    "home.action.followUp" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "متابعة"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Follow-up"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Follow-up"
           }
         }
       }
     },
-    "home.action.statistics": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "الإحصائيات"
+    "home.action.statistics" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الإحصائيات"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Statistics"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Statistics"
           }
         }
       }
     },
-    "home.calendar": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "التقويم"
+    "home.calendar" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "التقويم"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Calendar"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Calendar"
           }
         }
       }
     },
-    "home.comingSoon": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "قريباً"
+    "home.comingSoon" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "قريباً"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Coming Soon"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coming Soon"
           }
         }
       }
     },
-    "home.community": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "المجتمع"
+    "home.community" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "المجتمع"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Community"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Community"
           }
         }
       }
     },
-    "home.community.browseCategories": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تصفح الفئات"
+    "home.community.browseCategories" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تصفح الفئات"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Browse Categories"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Browse Categories"
           }
         }
       }
     },
-    "home.community.browseCategoriesSubtitle": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "استكشف فئات مختلفة من المحتوى"
+    "home.community.browseCategoriesSubtitle" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "استكشف فئات مختلفة من المحتوى"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Explore different content categories"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Explore different content categories"
           }
         }
       }
     },
-    "home.community.discover": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "اكتشف"
+    "home.community.discover" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اكتشف"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Discover"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Discover"
           }
         }
       }
     },
-    "home.community.discoverSubtitle": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "محتوى جديد يومياً لدعم رحلتك"
+    "home.community.discoverSubtitle" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "محتوى جديد يومياً لدعم رحلتك"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "New daily content to support your journey"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New daily content to support your journey"
           }
         }
       }
     },
-    "home.community.needSupport": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تحتاج دعم؟"
+    "home.community.needSupport" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تحتاج دعم؟"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Need Support?"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Need Support?"
           }
         }
       }
     },
-    "home.community.needSupportSubtitle": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تواصل مع المجتمع واحصل على المساعدة"
+    "home.community.needSupportSubtitle" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تواصل مع المجتمع واحصل على المساعدة"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Connect with the community and get help"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connect with the community and get help"
           }
         }
       }
     },
-    "home.community.shareStory": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "شارك قصتك"
+    "home.community.shareStory" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "شارك قصتك"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Share Your Story"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share Your Story"
           }
         }
       }
     },
-    "home.community.shareStorySubtitle": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ألهم الآخرين بمشاركة تجربتك"
+    "home.community.shareStorySubtitle" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ألهم الآخرين بمشاركة تجربتك"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Inspire others by sharing your experience"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inspire others by sharing your experience"
           }
         }
       }
     },
-    "home.notification.enableSubtitle": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "فعّل الإشعارات للحصول على تذكيرات مهمة"
+    "home.notification.enableSubtitle" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "فعّل الإشعارات للحصول على تذكيرات مهمة"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Enable notifications to receive important reminders"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enable notifications to receive important reminders"
           }
         }
       }
     },
-    "home.notification.enableTitle": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "فعّل الإشعارات"
+    "home.notification.enableTitle" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "فعّل الإشعارات"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Enable Notifications"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enable Notifications"
           }
         }
       }
     },
-    "home.quickActions": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "إجراءات سريعة"
+    "home.quickActions" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إجراءات سريعة"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Quick Actions"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quick Actions"
           }
         }
       }
     },
-    "home.streak.cleanDays": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "أيام نظيفة"
+    "home.streak.cleanDays" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أيام نظيفة"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Clean Days"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clean Days"
           }
         }
       }
     },
-    "home.streak.pornFree": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "بدون إباحية"
+    "home.streak.pornFree" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "بدون إباحية"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Porn Free"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Porn Free"
           }
         }
       }
     },
-    "home.streak.relapseFree": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "بدون انتكاس"
+    "home.streak.relapseFree" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "بدون انتكاس"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Relapse Free"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Relapse Free"
           }
         }
       }
     },
-    "home.streak.slipUpFree": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "بدون زلات"
+    "home.streak.slipUpFree" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "بدون زلات"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Slip-up Free"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slip-up Free"
           }
         }
       }
     },
-    "home.streaks": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "السلاسل"
+    "home.streaks" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "السلاسل"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Streaks"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Streaks"
           }
         }
       }
     },
-    "home.welcomeBack": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "مرحباً بعودتك"
+    "home.welcomeBack" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مرحباً بعودتك"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Welcome Back"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Welcome Back"
           }
         }
       }
     },
-    "onboarding.getStarted": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ابدأ الآن"
+    "onboarding.getStarted" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ابدأ الآن"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Get Started"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Get Started"
           }
         }
       }
     },
-    "onboarding.signIn": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تسجيل الدخول"
+    "onboarding.signIn" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تسجيل الدخول"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sign In"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign In"
           }
         }
       }
     },
-    "onboarding.step1Description": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "احفظ المحتوى الملهم والنصائح المهمة في مكان آمن وخاص بك."
+    "onboarding.step1Description" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "احفظ المحتوى الملهم والنصائح المهمة في مكان آمن وخاص بك."
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Save inspiring content and important tips in your own safe space."
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save inspiring content and important tips in your own safe space."
           }
         }
       }
     },
-    "onboarding.step1Title": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "الخزنة"
+    "onboarding.step1Title" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الخزنة"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vault"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vault"
           }
         }
       }
     },
-    "onboarding.step2Description": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تمارين عملية مبنية على أسس نفسية تساعدك في رحلة التعافي."
+    "onboarding.step2Description" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تمارين عملية مبنية على أسس نفسية تساعدك في رحلة التعافي."
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Practical exercises built on psychological foundations to help your recovery journey."
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Practical exercises built on psychological foundations to help your recovery journey."
           }
         }
       }
     },
-    "onboarding.step2Title": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "التمارين"
+    "onboarding.step2Title" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "التمارين"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Exercises"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exercises"
           }
         }
       }
     },
-    "onboarding.step3Description": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تابع تقدمك وأهدافك بقوائم منظمة وسهلة الاستخدام."
+    "onboarding.step3Description" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تابع تقدمك وأهدافك بقوائم منظمة وسهلة الاستخدام."
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Track your progress and goals with organized, easy-to-use lists."
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Track your progress and goals with organized, easy-to-use lists."
           }
         }
       }
     },
-    "onboarding.step3Title": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "القوائم"
+    "onboarding.step3Title" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "القوائم"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Lists"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lists"
           }
         }
       }
     },
-    "onboarding.step4Description": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تذكيرات ذكية في الوقت المناسب لدعمك ومساعدتك على البقاء في المسار."
+    "onboarding.step4Description" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تذكيرات ذكية في الوقت المناسب لدعمك ومساعدتك على البقاء في المسار."
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Smart reminders at the right time to support you and help you stay on track."
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Smart reminders at the right time to support you and help you stay on track."
           }
         }
       }
     },
-    "onboarding.step4Title": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "التذكيرات"
+    "onboarding.step4Title" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "التذكيرات"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Reminders"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reminders"
           }
         }
       }
     },
-    "onboarding.step5Description": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "راقب استخدامك للهاتف واحمِ نفسك من المحتوى الضار."
+    "onboarding.step5Description" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "راقب استخدامك للهاتف واحمِ نفسك من المحتوى الضار."
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Monitor your phone usage and protect yourself from harmful content."
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Monitor your phone usage and protect yourself from harmful content."
           }
         }
       }
     },
-    "onboarding.step5Title": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "الحارس"
+    "onboarding.step5Title" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الحارس"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Guard"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guard"
           }
         }
       }
     },
-    "paywall.comingSoon": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "قريباً"
+    "paywall.comingSoon" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "قريباً"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Coming Soon"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coming Soon"
           }
         }
       }
     },
-    "paywall.comingSoonMessage": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "اشتراك تعافي بلس سيكون متاحاً قريباً. ترقبوا!"
+    "paywall.comingSoonMessage" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اشتراك تعافي بلس سيكون متاحاً قريباً. ترقبوا!"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ta'aafi Plus subscription will be available soon. Stay tuned!"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ta'aafi Plus subscription will be available soon. Stay tuned!"
           }
         }
       }
     },
-    "paywall.feature1": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "محتوى حصري ومتقدم"
+    "paywall.feature1" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "محتوى حصري ومتقدم"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Exclusive premium content"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exclusive premium content"
           }
         }
       }
     },
-    "paywall.feature2": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "إحصائيات وتحليلات متقدمة"
+    "paywall.feature2" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إحصائيات وتحليلات متقدمة"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Advanced statistics and analytics"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Advanced statistics and analytics"
           }
         }
       }
     },
-    "paywall.feature3": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تذكيرات ذكية ومخصصة"
+    "paywall.feature3" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تذكيرات ذكية ومخصصة"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Smart personalized reminders"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Smart personalized reminders"
           }
         }
       }
     },
-    "paywall.feature4": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "حماية متقدمة وأدوات إضافية"
+    "paywall.feature4" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حماية متقدمة وأدوات إضافية"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Advanced protection and extra tools"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Advanced protection and extra tools"
           }
         }
       }
     },
-    "paywall.feature5": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "دعم مجتمعي مميز"
+    "paywall.feature5" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "دعم مجتمعي مميز"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Premium community support"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Premium community support"
           }
         }
       }
     },
-    "paywall.maybeLater": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ربما لاحقاً"
+    "paywall.maybeLater" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ربما لاحقاً"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Maybe Later"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maybe Later"
           }
         }
       }
     },
-    "paywall.subscribe": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "اشترك الآن"
+    "paywall.subscribe" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اشترك الآن"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Subscribe Now"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subscribe Now"
           }
         }
       }
     },
-    "paywall.subtitle": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "افتح جميع المميزات واحصل على تجربة كاملة"
+    "paywall.subtitle" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "افتح جميع المميزات واحصل على تجربة كاملة"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Unlock all features and get the full experience"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unlock all features and get the full experience"
           }
         }
       }
     },
-    "paywall.title": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تعافي بلس"
+    "paywall.title" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعافي بلس"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ta'aafi Plus"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ta'aafi Plus"
           }
         }
       }
     },
-    "premium.unlockAnalytics": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "افتح التحليلات المميزة"
+    "premium.unlockAnalytics" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "افتح التحليلات المميزة"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Unlock premium analytics"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unlock premium analytics"
           }
         }
       }
     },
-    "premium.upgradeToPlus": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ترقية إلى بلس"
+    "premium.upgradeToPlus" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ترقية إلى بلس"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Upgrade to Plus"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upgrade to Plus"
           }
         }
       }
     },
-    "registration.acceptTerms": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "أوافق على الشروط والأحكام"
+    "registration.acceptTerms" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أوافق على الشروط والأحكام"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "I accept the Terms and Conditions"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I accept the Terms and Conditions"
           }
         }
       }
     },
-    "registration.arabic": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "العربية"
+    "registration.arabic" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "العربية"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Arabic"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arabic"
           }
         }
       }
     },
-    "registration.back": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "رجوع"
+    "registration.back" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "رجوع"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Back"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Back"
           }
         }
       }
     },
-    "registration.chooseDate": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "اختر تاريخاً"
+    "registration.chooseDate" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اختر تاريخاً"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Choose a date"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose a date"
           }
         }
       }
     },
-    "registration.confirmPassword": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تأكيد كلمة المرور"
+    "registration.confirmPassword" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تأكيد كلمة المرور"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Confirm Password"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirm Password"
           }
         }
       }
     },
-    "registration.credentialsTitle": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "إنشاء حسابك"
+    "registration.credentialsTitle" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إنشاء حسابك"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Create Your Account"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create Your Account"
           }
         }
       }
     },
-    "registration.dateOfBirth": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تاريخ الميلاد"
+    "registration.dateOfBirth" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تاريخ الميلاد"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Date of Birth"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Date of Birth"
           }
         }
       }
     },
-    "registration.emailVerificationDescription": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "أرسلنا رسالة تحقق إلى بريدك الإلكتروني. يرجى التحقق من بريدك."
+    "registration.emailVerificationDescription" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أرسلنا رسالة تحقق إلى بريدك الإلكتروني. يرجى التحقق من بريدك."
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "We sent a verification email to your address. Please check your inbox."
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "We sent a verification email to your address. Please check your inbox."
           }
         }
       }
     },
-    "registration.emailVerificationTitle": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تحقق من بريدك الإلكتروني"
+    "registration.emailVerificationTitle" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تحقق من بريدك الإلكتروني"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Verify Your Email"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verify Your Email"
           }
         }
       }
     },
-    "registration.emailVerified": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تم التحقق من البريد الإلكتروني"
+    "registration.emailVerified" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تم التحقق من البريد الإلكتروني"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Email verified"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Email verified"
           }
         }
       }
     },
-    "registration.english": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "English"
+    "registration.english" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "English"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "English"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "English"
           }
         }
       }
     },
-    "registration.female": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "أنثى"
+    "registration.female" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أنثى"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Female"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Female"
           }
         }
       }
     },
-    "registration.gender": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "الجنس"
+    "registration.gender" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الجنس"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Gender"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gender"
           }
         }
       }
     },
-    "registration.invalidEmail": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "البريد الإلكتروني غير صالح"
+    "registration.invalidEmail" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "البريد الإلكتروني غير صالح"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Invalid email address"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invalid email address"
           }
         }
       }
     },
-    "registration.languageDescription": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "اختر لغتك المفضلة للتطبيق."
+    "registration.languageDescription" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اختر لغتك المفضلة للتطبيق."
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Choose your preferred language for the app."
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose your preferred language for the app."
           }
         }
       }
     },
-    "registration.languageTitle": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "اللغة"
+    "registration.languageTitle" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اللغة"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Language"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Language"
           }
         }
       }
     },
-    "registration.male": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ذكر"
+    "registration.male" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ذكر"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Male"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Male"
           }
         }
       }
     },
-    "registration.name": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "الاسم"
+    "registration.name" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الاسم"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Name"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name"
           }
         }
       }
     },
-    "registration.nameRequired": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "الاسم مطلوب"
+    "registration.nameRequired" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الاسم مطلوب"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Name is required"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name is required"
           }
         }
       }
     },
-    "registration.next": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "التالي"
+    "registration.next" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "التالي"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Next"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next"
           }
         }
       }
     },
-    "registration.passwordMismatch": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "كلمتا المرور غير متطابقتين"
+    "registration.passwordMismatch" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "كلمتا المرور غير متطابقتين"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Passwords don't match"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwords don't match"
           }
         }
       }
     },
-    "registration.profileTitle": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "المعلومات الشخصية"
+    "registration.profileTitle" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "المعلومات الشخصية"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Personal Information"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personal Information"
           }
         }
       }
     },
-    "registration.recoveryDateDescription": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "حدد متى بدأت رحلة تعافيك. يمكنك البدء من الآن أو اختيار تاريخ سابق."
+    "registration.recoveryDateDescription" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حدد متى بدأت رحلة تعافيك. يمكنك البدء من الآن أو اختيار تاريخ سابق."
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Set when your recovery journey began. You can start from now or choose a past date."
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set when your recovery journey began. You can start from now or choose a past date."
           }
         }
       }
     },
-    "registration.recoveryDateTitle": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "بداية التعافي"
+    "registration.recoveryDateTitle" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "بداية التعافي"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Recovery Start"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recovery Start"
           }
         }
       }
     },
-    "registration.recoveryStartDate": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تاريخ بداية التعافي"
+    "registration.recoveryStartDate" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تاريخ بداية التعافي"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Recovery Start Date"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recovery Start Date"
           }
         }
       }
     },
-    "registration.referralCode": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "رمز الإحالة"
+    "registration.referralCode" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "رمز الإحالة"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Referral Code"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Referral Code"
           }
         }
       }
     },
-    "registration.referralDescription": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "إذا لديك رمز إحالة، أدخله هنا. يمكنك تخطي هذه الخطوة."
+    "registration.referralDescription" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إذا لديك رمز إحالة، أدخله هنا. يمكنك تخطي هذه الخطوة."
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "If you have a referral code, enter it here. You can skip this step."
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "If you have a referral code, enter it here. You can skip this step."
           }
         }
       }
     },
-    "registration.referralTitle": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "رمز الإحالة"
+    "registration.referralTitle" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "رمز الإحالة"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Referral Code"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Referral Code"
           }
         }
       }
     },
-    "registration.resendEmail": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "إعادة إرسال البريد"
+    "registration.resendEmail" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إعادة إرسال البريد"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Resend Email"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resend Email"
           }
         }
       }
     },
-    "registration.resendIn %lld": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "إعادة الإرسال خلال %lld ثانية"
+    "registration.resendIn %lld" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إعادة الإرسال خلال %lld ثانية"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Resend in %lld seconds"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resend in %lld seconds"
           }
         }
       }
     },
-    "registration.skip": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تخطي"
+    "registration.skip" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تخطي"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Skip"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skip"
           }
         }
       }
     },
-    "registration.startFromNow": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "البدء من الآن"
+    "registration.startFromNow" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "البدء من الآن"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Start from now"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start from now"
           }
         }
       }
     },
-    "registration.submit": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "إنشاء الحساب"
+    "registration.submit" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إنشاء الحساب"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Create Account"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create Account"
           }
         }
       }
     },
-    "registration.termsTitle": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "الشروط والأحكام"
+    "registration.termsTitle" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الشروط والأحكام"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Terms & Conditions"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terms & Conditions"
           }
         }
       }
     },
-    "registration.viewTerms": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "عرض الشروط والأحكام"
+    "registration.viewTerms" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "عرض الشروط والأحكام"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "View Terms & Conditions"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "View Terms & Conditions"
           }
         }
       }
     },
-    "registration.weakPassword": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "كلمة المرور ضعيفة. يجب أن تحتوي على 8 أحرف على الأقل ورقم ورمز خاص."
+    "registration.weakPassword" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "كلمة المرور ضعيفة. يجب أن تحتوي على 8 أحرف على الأقل ورقم ورمز خاص."
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Weak password. Must be at least 8 characters with a digit and special character."
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weak password. Must be at least 8 characters with a digit and special character."
           }
         }
       }
     },
-    "report.conversation.empty": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "لا توجد رسائل بعد"
+    "report.conversation.empty" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لا توجد رسائل بعد"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No messages yet"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No messages yet"
           }
         }
       }
     },
-    "report.conversation.loadError": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "فشل تحميل الرسائل"
+    "report.conversation.loadError" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "فشل تحميل الرسائل"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Failed to load messages"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to load messages"
           }
         }
       }
     },
-    "report.conversation.placeholder": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "اكتب رسالتك..."
+    "report.conversation.placeholder" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اكتب رسالتك..."
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Write your message..."
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Write your message..."
           }
         }
       }
     },
-    "report.conversation.sendError": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "فشل إرسال الرسالة"
+    "report.conversation.sendError" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "فشل إرسال الرسالة"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Failed to send message"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to send message"
           }
         }
       }
     },
-    "report.error.emptyMessage": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "الرسالة لا يمكن أن تكون فارغة"
+    "report.error.emptyMessage" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الرسالة لا يمكن أن تكون فارغة"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Message cannot be empty"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Message cannot be empty"
           }
         }
       }
     },
-    "report.error.messageTooLong": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "الرسالة طويلة جداً (الحد الأقصى 220 حرفاً)"
+    "report.error.messageTooLong" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الرسالة طويلة جداً (الحد الأقصى 220 حرفاً)"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Message is too long (max 220 characters)"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Message is too long (max 220 characters)"
           }
         }
       }
     },
-    "report.new.error": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "فشل إنشاء البلاغ"
+    "report.new.error" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "فشل إنشاء البلاغ"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Failed to create report"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to create report"
           }
         }
       }
     },
-    "report.new.messagePlaceholder": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "صف مشكلتك أو اقتراحك..."
+    "report.new.messagePlaceholder" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "صف مشكلتك أو اقتراحك..."
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Describe your issue or suggestion..."
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Describe your issue or suggestion..."
           }
         }
       }
     },
-    "report.new.messageSection": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "الرسالة"
+    "report.new.messageSection" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الرسالة"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Message"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Message"
           }
         }
       }
     },
-    "report.new.submit": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "إرسال"
+    "report.new.submit" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إرسال"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Submit"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Submit"
           }
         }
       }
     },
-    "report.new.success": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تم إرسال البلاغ بنجاح"
+    "report.new.success" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تم إرسال البلاغ بنجاح"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Report submitted successfully"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Report submitted successfully"
           }
         }
       }
     },
-    "report.new.title": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "بلاغ جديد"
+    "report.new.title" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "بلاغ جديد"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "New Report"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New Report"
           }
         }
       }
     },
-    "report.new.typeSection": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "نوع البلاغ"
+    "report.new.typeSection" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "نوع البلاغ"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Report Type"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Report Type"
           }
         }
       }
     },
-    "report.status.closed": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "مغلق"
+    "report.status.closed" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مغلق"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Closed"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Closed"
           }
         }
       }
     },
-    "report.status.finalized": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "منتهي"
+    "report.status.finalized" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "منتهي"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Finalized"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Finalized"
           }
         }
       }
     },
-    "report.status.inProgress": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "قيد المعالجة"
+    "report.status.inProgress" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "قيد المعالجة"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "In Progress"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In Progress"
           }
         }
       }
     },
-    "report.status.pending": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "قيد الانتظار"
+    "report.status.pending" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "قيد الانتظار"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pending"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pending"
           }
         }
       }
     },
-    "report.status.waiting": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "بانتظار الرد"
+    "report.status.waiting" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "بانتظار الرد"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Waiting for Response"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waiting for Response"
           }
         }
       }
     },
-    "report.type.commentReport": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "بلاغ تعليق"
+    "report.type.commentReport" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "بلاغ تعليق"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Comment Report"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comment Report"
           }
         }
       }
     },
-    "report.type.communityFeedback": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ملاحظات المجتمع"
+    "report.type.communityFeedback" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ملاحظات المجتمع"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Community Feedback"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Community Feedback"
           }
         }
       }
     },
-    "report.type.contactUs": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "تواصل معنا"
+    "report.type.contactUs" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تواصل معنا"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Contact Us"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contact Us"
           }
         }
       }
     },
-    "report.type.dataError": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "خطأ في البيانات"
+    "report.type.dataError" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "خطأ في البيانات"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Data Error"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Data Error"
           }
         }
       }
     },
-    "report.type.featureSuggestion": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "اقتراح ميزة"
+    "report.type.featureSuggestion" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اقتراح ميزة"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Feature Suggestion"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Feature Suggestion"
           }
         }
       }
     },
-    "report.type.groupUpdateReport": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "بلاغ تحديث مجموعة"
+    "report.type.groupUpdateReport" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "بلاغ تحديث مجموعة"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Group Update Report"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Group Update Report"
           }
         }
       }
     },
-    "report.type.messageReport": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "بلاغ رسالة"
+    "report.type.messageReport" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "بلاغ رسالة"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Message Report"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Message Report"
           }
         }
       }
     },
-    "report.type.postReport": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "بلاغ منشور"
+    "report.type.postReport" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "بلاغ منشور"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Post Report"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Post Report"
           }
         }
       }
     },
-    "report.type.userReport": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "بلاغ مستخدم"
+    "report.type.userReport" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "بلاغ مستخدم"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "User Report"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "User Report"
           }
         }
       }
     },
-    "reports.empty": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "لا توجد بلاغات"
+    "reports.empty" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لا توجد بلاغات"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No Reports"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Reports"
           }
         }
       }
     },
-    "reports.emptySubtitle": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "لم تقم بإرسال أي بلاغات بعد. اضغط + لإنشاء بلاغ جديد."
+    "reports.emptySubtitle" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لم تقم بإرسال أي بلاغات بعد. اضغط + لإنشاء بلاغ جديد."
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "You haven't submitted any reports yet. Tap + to create a new report."
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You haven't submitted any reports yet. Tap + to create a new report."
           }
         }
       }
     },
-    "reports.errorLoading": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "فشل تحميل البلاغات"
+    "reports.errorLoading" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "فشل تحميل البلاغات"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Failed to load reports"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to load reports"
           }
         }
       }
     },
-    "reports.title": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "البلاغات"
+    "reports.title" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "البلاغات"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Reports"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reports"
           }
         }
       }
     },
-    "tab.account": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "الحساب"
+    "tab.account" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الحساب"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Account"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Account"
           }
         }
       }
     },
-    "tab.community": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "المجتمع"
+    "tab.community" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "المجتمع"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Community"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Community"
           }
         }
       }
     },
-    "tab.guard": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "الحارس"
+    "tab.guard" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الحارس"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Guard"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guard"
           }
         }
       }
     },
-    "tab.home": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "الرئيسية"
+    "tab.home" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الرئيسية"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Home"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Home"
           }
         }
       }
     },
-    "tab.vault": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "الخزنة"
+    "tab.vault" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الخزنة"
           }
         },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vault"
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vault"
           }
         }
       }
     }
   },
-  "version": "1.0"
+  "version" : "1.0"
 }
