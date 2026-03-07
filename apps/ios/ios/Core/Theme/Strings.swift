@@ -61,6 +61,138 @@ enum Strings {
         static let errorSubtitle = String(localized: "account.errorSubtitle")
     }
 
+    enum Profile {
+        // Account screen
+        static let title = String(localized: "profile.title")
+        static let appearance = String(localized: "profile.appearance")
+        static let lightMode = String(localized: "profile.lightMode")
+        static let darkMode = String(localized: "profile.darkMode")
+        static let language = String(localized: "profile.language")
+        static let arabic = String(localized: "profile.arabic")
+        static let english = String(localized: "profile.english")
+        static let resetData = String(localized: "profile.resetData")
+        static let appReview = String(localized: "profile.appReview")
+        static let privacyPolicy = String(localized: "profile.privacyPolicy")
+        static let termsOfService = String(localized: "profile.termsOfService")
+        static let contactUs = String(localized: "profile.contactUs")
+        static let deleteAccount = String(localized: "profile.deleteAccount")
+        static let signOutConfirmTitle = String(localized: "profile.signOutConfirmTitle")
+        static let signOutConfirmMessage = String(localized: "profile.signOutConfirmMessage")
+        static let dangerZone = String(localized: "profile.dangerZone")
+        static let settings = String(localized: "profile.settings")
+
+        // User profile screen
+        static let profileDetails = String(localized: "profile.profileDetails")
+        static let name = String(localized: "profile.name")
+        static let email = String(localized: "profile.email")
+        static let age = String(localized: "profile.age")
+        static let memberSince = String(localized: "profile.memberSince")
+        static let status = String(localized: "profile.status")
+        static let editProfile = String(localized: "profile.editProfile")
+        static let subscription = String(localized: "profile.subscription")
+        static let plusActive = String(localized: "profile.plusActive")
+        static let freePlan = String(localized: "profile.freePlan")
+        static let freePlanDescription = String(localized: "profile.freePlanDescription")
+        static let upgradeToPremium = String(localized: "profile.upgradeToPremium")
+        static let warnings = String(localized: "profile.warnings")
+        static let bans = String(localized: "profile.bans")
+        static let noWarnings = String(localized: "profile.noWarnings")
+        static let noBans = String(localized: "profile.noBans")
+        static let showMore = String(localized: "profile.showMore")
+        static let yearsOld = String(localized: "profile.yearsOld")
+        static let refresh = String(localized: "profile.refresh")
+
+        // Update profile sheet
+        static let updateProfile = String(localized: "profile.updateProfile")
+        static let dateOfBirth = String(localized: "profile.dateOfBirth")
+        static let startingDate = String(localized: "profile.startingDate")
+        static let role = String(localized: "profile.role")
+        static let gender = String(localized: "profile.gender")
+        static let saveChanges = String(localized: "profile.saveChanges")
+        static let profileUpdated = String(localized: "profile.profileUpdated")
+        static let confirmUpdateTitle = String(localized: "profile.confirmUpdateTitle")
+        static let confirmUpdateMessage = String(localized: "profile.confirmUpdateMessage")
+
+        // Warning detail
+        static let warningDetail = String(localized: "profile.warningDetail")
+        static let warningSeverity = String(localized: "profile.warningSeverity")
+        static let warningType = String(localized: "profile.warningType")
+        static let warningIssuedDate = String(localized: "profile.warningIssuedDate")
+        static let warningStatus = String(localized: "profile.warningStatus")
+        static let warningId = String(localized: "profile.warningId")
+        static let relatedContent = String(localized: "profile.relatedContent")
+        static let importantNotice = String(localized: "profile.importantNotice")
+        static let guidelinesNotice = String(localized: "profile.guidelinesNotice")
+        static let active = String(localized: "profile.active")
+        static let inactive = String(localized: "profile.inactive")
+
+        // Ban detail
+        static let banDetail = String(localized: "profile.banDetail")
+        static let restrictedFeatures = String(localized: "profile.restrictedFeatures")
+
+        // Delete account
+        static let deleteAccountTitle = String(localized: "profile.deleteAccountTitle")
+        static let deleteAccountSubtitle = String(localized: "profile.deleteAccountSubtitle")
+        static let selectReason = String(localized: "profile.selectReason")
+        static let selectReasonSubtitle = String(localized: "profile.selectReasonSubtitle")
+        static let additionalDetails = String(localized: "profile.additionalDetails")
+        static let deleteConfirmTitle = String(localized: "profile.deleteConfirmTitle")
+        static let deleteConfirmMessage = String(localized: "profile.deleteConfirmMessage")
+        static let deleteButton = String(localized: "profile.deleteButton")
+        static let finalWarning = String(localized: "profile.finalWarning")
+        static let reconsider = String(localized: "profile.reconsider")
+        static let subscriptionWarning = String(localized: "profile.subscriptionWarning")
+
+        // Deletion info items
+        static let deletionInfoUserData = String(localized: "profile.deletionInfoUserData")
+        static let deletionInfoUserDataDesc = String(localized: "profile.deletionInfoUserDataDesc")
+        static let deletionInfoFollowUps = String(localized: "profile.deletionInfoFollowUps")
+        static let deletionInfoFollowUpsDesc = String(localized: "profile.deletionInfoFollowUpsDesc")
+        static let deletionInfoEmotions = String(localized: "profile.deletionInfoEmotions")
+        static let deletionInfoEmotionsDesc = String(localized: "profile.deletionInfoEmotionsDesc")
+        static let deletionInfoActivities = String(localized: "profile.deletionInfoActivities")
+        static let deletionInfoActivitiesDesc = String(localized: "profile.deletionInfoActivitiesDesc")
+
+        // Deletion reasons
+        static let deleteReasonPrivacyConcerns = String(localized: "profile.deleteReason.privacyConcerns")
+        static let deleteReasonDataSecurity = String(localized: "profile.deleteReason.dataSecurity")
+        static let deleteReasonNotHelpful = String(localized: "profile.deleteReason.notHelpful")
+        static let deleteReasonTooComplex = String(localized: "profile.deleteReason.tooComplex")
+        static let deleteReasonTechnicalIssues = String(localized: "profile.deleteReason.technicalIssues")
+        static let deleteReasonNoLongerNeeded = String(localized: "profile.deleteReason.noLongerNeeded")
+        static let deleteReasonSwitchingApps = String(localized: "profile.deleteReason.switchingApps")
+        static let deleteReasonTemporaryBreak = String(localized: "profile.deleteReason.temporaryBreak")
+        static let deleteReasonMissingFeatures = String(localized: "profile.deleteReason.missingFeatures")
+        static let deleteReasonContentInappropriate = String(localized: "profile.deleteReason.contentInappropriate")
+        static let deleteReasonPoorSupport = String(localized: "profile.deleteReason.poorSupport")
+        static let deleteReasonOther = String(localized: "profile.deleteReason.other")
+
+        // Retention offer
+        static let retentionTitle = String(localized: "profile.retentionTitle")
+        static let retentionDescription = String(localized: "profile.retentionDescription")
+        static let retentionBadge = String(localized: "profile.retentionBadge")
+        static let claimReward = String(localized: "profile.claimReward")
+        static let skipOffer = String(localized: "profile.skipOffer")
+        static let rewardClaimed = String(localized: "profile.rewardClaimed")
+
+        // Reset data
+        static let resetDataTitle = String(localized: "profile.resetDataTitle")
+        static let resetDataDescription = String(localized: "profile.resetDataDescription")
+        static let resetToToday = String(localized: "profile.resetToToday")
+        static let deleteFollowUps = String(localized: "profile.deleteFollowUps")
+        static let deleteEmotions = String(localized: "profile.deleteEmotions")
+        static let resetConfirm = String(localized: "profile.resetConfirm")
+        static let resetSuccess = String(localized: "profile.resetSuccess")
+        static let selectNewStartDate = String(localized: "profile.selectNewStartDate")
+
+        // Contact us
+        static let contactUsTitle = String(localized: "profile.contactUsTitle")
+        static let contactUsDescription = String(localized: "profile.contactUsDescription")
+        static let messageLabel = String(localized: "profile.messageLabel")
+        static let sendMessage = String(localized: "profile.sendMessage")
+        static let messageSent = String(localized: "profile.messageSent")
+    }
+
     enum Premium {
         static let upgradeToPlus = String(localized: "premium.upgradeToPlus")
         static let unlockAnalytics = String(localized: "premium.unlockAnalytics")
