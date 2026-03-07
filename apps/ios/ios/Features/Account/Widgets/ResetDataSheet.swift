@@ -1,11 +1,133 @@
 import SwiftUI
+import FirebaseAuth
 
 struct ResetDataSheet: View {
+    @Environment(UserDocumentService.self) private var userDocumentService
+    @Environment(AuthService.self) private var authService
+    @Environment(ToastManager.self) private var toastManager
     @Environment(\.dismiss) private var dismiss
 
+    @State private var viewModel: ResetDataViewModel?
+
     var body: some View {
-        Text(Strings.Profile.resetData)
-            .font(Typography.h4)
-            .foregroundStyle(AppColors.grey500)
+        NavigationStack {
+            VStack(spacing: Spacing.lg) {
+                Text(Strings.Profile.resetDataDescription)
+                    .font(Typography.footnote)
+                    .foregroundStyle(AppColors.grey500)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                dateSection
+
+                togglesSection
+
+                Spacer()
+
+                buttonsSection
+            }
+            .padding(.horizontal, Spacing.md)
+            .padding(.vertical, Spacing.md)
+            .navigationTitle(Strings.Profile.resetDataTitle)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(Strings.Common.cancel) { dismiss() }
+                }
+            }
+        }
+        .task {
+            guard let uid = authService.currentUser?.uid else { return }
+            viewModel = ResetDataViewModel(
+                userFirstDate: userDocumentService.userDocument?.userFirstDate,
+                userId: uid,
+                userDocumentService: userDocumentService
+            )
+        }
+    }
+
+    // MARK: - Date
+
+    private var dateSection: some View {
+        VStack(alignment: .leading, spacing: Spacing.xs) {
+            Text(Strings.Profile.selectNewStartDate)
+                .font(Typography.caption)
+                .foregroundStyle(AppColors.grey600)
+
+            if viewModel?.resetToToday != true {
+                DatePicker(
+                    "",
+                    selection: Binding(
+                        get: { viewModel?.selectedDate ?? Date() },
+                        set: { viewModel?.selectedDate = $0 }
+                    ),
+                    in: ...Date(),
+                    displayedComponents: .date
+                )
+                .datePickerStyle(.compact)
+                .labelsHidden()
+            }
+        }
+    }
+
+    // MARK: - Toggles
+
+    private var togglesSection: some View {
+        VStack(spacing: Spacing.sm) {
+            Toggle(Strings.Profile.resetToToday, isOn: Binding(
+                get: { viewModel?.resetToToday ?? false },
+                set: { viewModel?.resetToToday = $0 }
+            ))
+            .font(Typography.body)
+            .tint(AppColors.primary)
+
+            Toggle(Strings.Profile.deleteFollowUps, isOn: Binding(
+                get: { viewModel?.deleteFollowUps ?? false },
+                set: { viewModel?.deleteFollowUps = $0 }
+            ))
+            .font(Typography.body)
+            .tint(AppColors.error)
+
+            Toggle(Strings.Profile.deleteEmotions, isOn: Binding(
+                get: { viewModel?.deleteEmotions ?? false },
+                set: { viewModel?.deleteEmotions = $0 }
+            ))
+            .font(Typography.body)
+            .tint(AppColors.error)
+        }
+    }
+
+    // MARK: - Buttons
+
+    private var buttonsSection: some View {
+        VStack(spacing: Spacing.sm) {
+            Button {
+                Task { await handleConfirm() }
+            } label: {
+                Group {
+                    if viewModel?.isSubmitting == true {
+                        AppSpinner(tint: .white)
+                    } else {
+                        Text(Strings.Profile.resetConfirm)
+                    }
+                }
+                .font(Typography.body)
+                .fontWeight(.semibold)
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, Spacing.sm)
+                .background(AppColors.error600)
+                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            }
+            .disabled(viewModel?.isSubmitting == true)
+        }
+    }
+
+    private func handleConfirm() async {
+        guard let result = await viewModel?.confirm(), result else {
+            toastManager.show(.error, message: Strings.Account.error)
+            return
+        }
+        toastManager.show(.success, message: Strings.Profile.resetSuccess)
+        dismiss()
     }
 }
