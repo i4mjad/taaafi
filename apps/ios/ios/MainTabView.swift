@@ -31,9 +31,7 @@ struct MainTabView: View {
             }
 
             Tab(Strings.Tab.account, systemImage: "person.fill", value: 4) {
-                Text(Strings.Tab.account)
-                    .font(Typography.h4)
-                    .foregroundStyle(AppColors.grey500)
+                AccountScreen()
             }
         }
         .tint(AppColors.primary)
