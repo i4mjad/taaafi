@@ -6,6 +6,7 @@ protocol BanWarningFacadeProtocol {
     func getCurrentDeviceId() -> String
     func getDeviceBans(deviceId: String) async -> [Ban]
     func getCurrentUserBans() async -> [Ban]
+    func getCurrentUserWarnings() async -> [Warning]
     func isCurrentUserBannedFromApp() async -> Bool
     func initializeDeviceTracking() async
 }

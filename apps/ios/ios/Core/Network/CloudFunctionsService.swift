@@ -5,7 +5,7 @@ import FirebaseFunctions
 /// Region: us-central1 (matching existing functions config)
 @Observable
 @MainActor
-final class CloudFunctionsService {
+final class CloudFunctionsService: CloudFunctionsServiceProtocol {
 
     private let functions: Functions
 

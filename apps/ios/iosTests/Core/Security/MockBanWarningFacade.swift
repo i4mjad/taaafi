@@ -6,6 +6,7 @@ final class MockBanWarningFacade: BanWarningFacadeProtocol {
     var deviceId = "test-device-123"
     var deviceBans: [Ban] = []
     var userBans: [Ban] = []
+    var userWarnings: [Warning] = []
     var isUserBanned = false
     var initializeDeviceTrackingCallCount = 0
 
@@ -19,6 +20,10 @@ final class MockBanWarningFacade: BanWarningFacadeProtocol {
 
     func getCurrentUserBans() async -> [Ban] {
         userBans
+    }
+
+    func getCurrentUserWarnings() async -> [Warning] {
+        userWarnings
     }
 
     func isCurrentUserBannedFromApp() async -> Bool {

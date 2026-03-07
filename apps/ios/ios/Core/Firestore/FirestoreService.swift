@@ -5,7 +5,7 @@ import FirebaseFirestore
 /// Ported from various datasources across apps/mobile/lib/features/
 @Observable
 @MainActor
-final class FirestoreService {
+final class FirestoreService: FirestoreServiceProtocol {
 
     private let db = Firestore.firestore()
 
