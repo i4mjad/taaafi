@@ -5,6 +5,7 @@ import Foundation
 @Suite("DeleteAccountViewModel")
 struct DeleteAccountViewModelTests {
 
+    @MainActor
     private func makeVM(
         cloudFunctions: MockCloudFunctionsService = MockCloudFunctionsService(),
         firestore: MockFirestoreService = MockFirestoreService()

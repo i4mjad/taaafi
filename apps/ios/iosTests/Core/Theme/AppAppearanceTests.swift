@@ -10,7 +10,7 @@ struct AppAppearanceTests {
 
     @Test("configureNavigationBar sets large title font to 34pt Regular")
     func largeTitleFont() {
-        AppAppearance.configureNavigationBar()
+        AppAppearance.configureNavigationTitleFonts()
 
         let appearance = UINavigationBar.appearance().standardAppearance
         let attrs = appearance.largeTitleTextAttributes
@@ -23,7 +23,7 @@ struct AppAppearanceTests {
 
     @Test("configureNavigationBar sets inline title font to 17pt SemiBold")
     func inlineTitleFont() {
-        AppAppearance.configureNavigationBar()
+        AppAppearance.configureNavigationTitleFonts()
 
         let appearance = UINavigationBar.appearance().standardAppearance
         let attrs = appearance.titleTextAttributes
@@ -36,7 +36,7 @@ struct AppAppearanceTests {
 
     @Test("configureNavigationBar sets back button font to 17pt Regular")
     func backButtonFont() {
-        AppAppearance.configureNavigationBar()
+        AppAppearance.configureNavigationTitleFonts()
 
         let appearance = UINavigationBar.appearance().standardAppearance
         let attrs = appearance.backButtonAppearance.normal.titleTextAttributes
@@ -49,7 +49,7 @@ struct AppAppearanceTests {
 
     @Test("configureNavigationBar sets scroll edge appearance")
     func scrollEdgeAppearance() {
-        AppAppearance.configureNavigationBar()
+        AppAppearance.configureNavigationTitleFonts()
 
         let scrollEdge = UINavigationBar.appearance().scrollEdgeAppearance
         #expect(scrollEdge != nil)
