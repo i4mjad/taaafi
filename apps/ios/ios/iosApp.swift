@@ -100,6 +100,7 @@ struct iosApp: App {
             .environment(deviceTrackingService)
             .environment(emailSyncService)
             .environment(routeSecurityService)
+            .environment(banWarningFacade)
             .environment(userDocumentService)
             .environment(toastManager)
             .environment(\.locale, Locale(identifier: "ar"))

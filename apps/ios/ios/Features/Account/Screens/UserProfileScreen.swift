@@ -4,6 +4,7 @@ import FirebaseAuth
 struct UserProfileScreen: View {
     @Environment(UserDocumentService.self) private var userDocumentService
     @Environment(AuthService.self) private var authService
+    @Environment(BanWarningFacade.self) private var banWarningFacade
 
     @State private var viewModel: UserProfileViewModel?
     @State private var showUpdateProfile = false
@@ -31,8 +32,7 @@ struct UserProfileScreen: View {
         .navigationBarTitleDisplayMode(.inline)
         .task {
             if viewModel == nil {
-                // BanWarningFacade is not in environment as protocol, use concrete instance
-                viewModel = UserProfileViewModel(banWarningFacade: BanWarningFacade(deviceTrackingService: DeviceTrackingService()))
+                viewModel = UserProfileViewModel(banWarningFacade: banWarningFacade)
             }
             await viewModel?.loadWarnings()
             await viewModel?.loadBans()
