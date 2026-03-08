@@ -11,8 +11,9 @@ final class AccountViewModel {
     var showContactUsSheet = false
     var signOutError: Error?
 
-    @ObservationIgnored
-    @AppStorage("appTheme") var appTheme: String = "system"
+    var appTheme: String = UserDefaults.standard.string(forKey: "appTheme") ?? "system" {
+        didSet { UserDefaults.standard.set(appTheme, forKey: "appTheme") }
+    }
 
     init(authService: AuthService) {
         self.authService = authService
