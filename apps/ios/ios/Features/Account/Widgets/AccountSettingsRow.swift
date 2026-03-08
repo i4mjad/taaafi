@@ -1,11 +1,11 @@
 import SwiftUI
 
-struct AccountSettingsRow: View {
+struct AccountSettingsRow<Trailing: View>: View {
     let icon: String
     let label: String
-    var trailing: AnyView?
     var isDestructive: Bool = false
     var action: () -> Void = {}
+    @ViewBuilder var trailing: () -> Trailing
 
     var body: some View {
         Button(action: action) {
@@ -21,13 +21,7 @@ struct AccountSettingsRow: View {
 
                 Spacer()
 
-                if let trailing {
-                    trailing
-                } else {
-                    Image(systemName: AppIcon.chevronRight.systemName)
-                        .font(.system(size: 14))
-                        .foregroundStyle(AppColors.grey400)
-                }
+                trailing()
             }
             .padding(.vertical, Spacing.md)
             .padding(.horizontal, Spacing.md)
@@ -35,5 +29,28 @@ struct AccountSettingsRow: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel(label)
+    }
+}
+
+extension AccountSettingsRow where Trailing == DefaultChevron {
+    init(
+        icon: String,
+        label: String,
+        isDestructive: Bool = false,
+        action: @escaping () -> Void = {}
+    ) {
+        self.icon = icon
+        self.label = label
+        self.isDestructive = isDestructive
+        self.action = action
+        self.trailing = { DefaultChevron() }
+    }
+}
+
+struct DefaultChevron: View {
+    var body: some View {
+        Image(systemName: AppIcon.chevronRight.systemName)
+            .font(.system(size: 14))
+            .foregroundStyle(AppColors.grey400)
     }
 }
