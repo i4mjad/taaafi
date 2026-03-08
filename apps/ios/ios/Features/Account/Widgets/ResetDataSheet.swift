@@ -8,6 +8,10 @@ struct ResetDataSheet: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var viewModel: ResetDataViewModel?
+    @State private var selectedDate = Date()
+    @State private var resetToToday = false
+    @State private var deleteFollowUps = false
+    @State private var deleteEmotions = false
 
     var body: some View {
         NavigationStack {
@@ -53,18 +57,18 @@ struct ResetDataSheet: View {
                 .font(Typography.caption)
                 .foregroundStyle(AppColors.grey600)
 
-            if viewModel?.resetToToday != true {
+            if !resetToToday {
                 DatePicker(
                     "",
-                    selection: Binding(
-                        get: { viewModel?.selectedDate ?? Date() },
-                        set: { viewModel?.selectedDate = $0 }
-                    ),
+                    selection: $selectedDate,
                     in: ...Date(),
                     displayedComponents: .date
                 )
                 .datePickerStyle(.compact)
                 .labelsHidden()
+                .onChange(of: selectedDate) { _, newValue in
+                    viewModel?.selectedDate = newValue
+                }
             }
         }
     }
@@ -73,26 +77,26 @@ struct ResetDataSheet: View {
 
     private var togglesSection: some View {
         VStack(spacing: Spacing.sm) {
-            Toggle(Strings.Profile.resetToToday, isOn: Binding(
-                get: { viewModel?.resetToToday ?? false },
-                set: { viewModel?.resetToToday = $0 }
-            ))
-            .font(Typography.body)
-            .tint(AppColors.primary)
+            Toggle(Strings.Profile.resetToToday, isOn: $resetToToday)
+                .font(Typography.body)
+                .tint(AppColors.primary)
+                .onChange(of: resetToToday) { _, newValue in
+                    viewModel?.resetToToday = newValue
+                }
 
-            Toggle(Strings.Profile.deleteFollowUps, isOn: Binding(
-                get: { viewModel?.deleteFollowUps ?? false },
-                set: { viewModel?.deleteFollowUps = $0 }
-            ))
-            .font(Typography.body)
-            .tint(AppColors.error)
+            Toggle(Strings.Profile.deleteFollowUps, isOn: $deleteFollowUps)
+                .font(Typography.body)
+                .tint(AppColors.error)
+                .onChange(of: deleteFollowUps) { _, newValue in
+                    viewModel?.deleteFollowUps = newValue
+                }
 
-            Toggle(Strings.Profile.deleteEmotions, isOn: Binding(
-                get: { viewModel?.deleteEmotions ?? false },
-                set: { viewModel?.deleteEmotions = $0 }
-            ))
-            .font(Typography.body)
-            .tint(AppColors.error)
+            Toggle(Strings.Profile.deleteEmotions, isOn: $deleteEmotions)
+                .font(Typography.body)
+                .tint(AppColors.error)
+                .onChange(of: deleteEmotions) { _, newValue in
+                    viewModel?.deleteEmotions = newValue
+                }
         }
     }
 

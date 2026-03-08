@@ -8,6 +8,9 @@ struct UpdateProfileSheet: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var viewModel: UpdateProfileViewModel?
+    @State private var name = ""
+    @State private var dayOfBirth = Date()
+    @State private var language = "ar"
     @State private var showConfirmation = false
 
     private var userDocument: UserDocument? { userDocumentService.userDocument }
@@ -57,11 +60,15 @@ struct UpdateProfileSheet: View {
         }
         .task {
             guard let uid = authService.currentUser?.uid else { return }
-            viewModel = UpdateProfileViewModel(
+            let vm = UpdateProfileViewModel(
                 userDocument: userDocument,
                 userId: uid,
                 userDocumentService: userDocumentService
             )
+            viewModel = vm
+            name = vm.name
+            dayOfBirth = vm.dayOfBirth ?? Date()
+            language = vm.language
         }
         .confirmationSheet(
             isPresented: $showConfirmation,
@@ -79,13 +86,13 @@ struct UpdateProfileSheet: View {
 
     private var nameField: some View {
         AppTextField(
-            text: Binding(
-                get: { viewModel?.name ?? "" },
-                set: { viewModel?.name = $0 }
-            ),
+            text: $name,
             label: Strings.Profile.name,
             icon: AppIcon.person.systemName
         )
+        .onChange(of: name) { _, newValue in
+            viewModel?.name = newValue
+        }
     }
 
     private var emailField: some View {
@@ -113,13 +120,13 @@ struct UpdateProfileSheet: View {
 
             DatePicker(
                 "",
-                selection: Binding(
-                    get: { viewModel?.dayOfBirth ?? Date() },
-                    set: { viewModel?.dayOfBirth = $0 }
-                ),
+                selection: $dayOfBirth,
                 in: Self.dobRange,
                 displayedComponents: .date
             )
+            .onChange(of: dayOfBirth) { _, newValue in
+                viewModel?.dayOfBirth = newValue
+            }
             .datePickerStyle(.compact)
             .labelsHidden()
         }
@@ -182,14 +189,14 @@ struct UpdateProfileSheet: View {
                 .font(Typography.caption)
                 .foregroundStyle(AppColors.grey600)
 
-            Picker("", selection: Binding(
-                get: { viewModel?.language ?? "ar" },
-                set: { viewModel?.language = $0 }
-            )) {
+            Picker("", selection: $language) {
                 Text(Strings.Profile.arabic).tag("ar")
                 Text(Strings.Profile.english).tag("en")
             }
             .pickerStyle(.segmented)
+            .onChange(of: language) { _, newValue in
+                viewModel?.language = newValue
+            }
         }
     }
 

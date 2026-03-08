@@ -8,6 +8,7 @@ struct ContactUsSheet: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var viewModel: ContactUsViewModel?
+    @State private var messageText = ""
 
     var body: some View {
         NavigationStack {
@@ -18,13 +19,13 @@ struct ContactUsSheet: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
 
                 AppTextArea(
-                    text: Binding(
-                        get: { viewModel?.messageText ?? "" },
-                        set: { viewModel?.messageText = $0 }
-                    ),
+                    text: $messageText,
                     label: Strings.Profile.messageLabel,
                     maxLength: 220
                 )
+                .onChange(of: messageText) { _, newValue in
+                    viewModel?.messageText = newValue
+                }
 
                 Spacer()
 

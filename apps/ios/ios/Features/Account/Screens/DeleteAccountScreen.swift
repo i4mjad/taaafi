@@ -9,6 +9,7 @@ struct DeleteAccountScreen: View {
     @Environment(ToastManager.self) private var toastManager
 
     @State private var viewModel: DeleteAccountViewModel?
+    @State private var detailsText = ""
     @State private var showDeleteConfirmation = false
 
     private var isPlusUser: Bool { userDocumentService.userDocument?.isPlusUser ?? false }
@@ -135,13 +136,13 @@ struct DeleteAccountScreen: View {
 
     private var detailsField: some View {
         AppTextArea(
-            text: Binding(
-                get: { viewModel?.detailsText ?? "" },
-                set: { viewModel?.detailsText = $0 }
-            ),
+            text: $detailsText,
             label: Strings.Profile.additionalDetails,
             maxLength: 300
         )
+        .onChange(of: detailsText) { _, newValue in
+            viewModel?.detailsText = newValue
+        }
     }
 
     // MARK: - Subscription Warning

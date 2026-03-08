@@ -1,9 +1,11 @@
 import Foundation
+import Observation
 import FirebaseAuth
 
 /// Facade coordinating ban, warning, and feature services
 /// Provides simplified interface for UI components
 /// Ported from: apps/mobile/lib/features/account/application/ban_warning_facade.dart
+@Observable
 final class BanWarningFacade: BanWarningFacadeProtocol {
 
     var currentUserId: String? {
