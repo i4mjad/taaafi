@@ -6,9 +6,6 @@ import StoreKit
 final class AccountViewModel {
     private let authService: AuthService
 
-    var showSignOutConfirmation = false
-    var showResetDataSheet = false
-    var showContactUsSheet = false
     var signOutError: Error?
 
     var appTheme: String = UserDefaults.standard.string(forKey: "appTheme") ?? "system" {

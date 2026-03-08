@@ -10,6 +10,9 @@ struct AccountScreen: View {
     @State private var viewModel: AccountViewModel?
     @State private var deletionManager: AccountDeletionManager?
     @State private var path = NavigationPath()
+    @State private var showResetDataSheet = false
+    @State private var showContactUsSheet = false
+    @State private var showSignOutConfirmation = false
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -178,7 +181,7 @@ struct AccountScreen: View {
                     icon: AppIcon.arrowCounterclockwise.systemName,
                     label: Strings.Profile.resetData
                 ) {
-                    viewModel?.showResetDataSheet = true
+                    showResetDataSheet = true
                 }
 
                 Divider().padding(.horizontal, Spacing.md)
@@ -214,7 +217,7 @@ struct AccountScreen: View {
                     icon: AppIcon.paperplane.systemName,
                     label: Strings.Profile.contactUs
                 ) {
-                    viewModel?.showContactUsSheet = true
+                    showContactUsSheet = true
                 }
             }
             .background(AppColors.background)
@@ -224,17 +227,11 @@ struct AccountScreen: View {
                     .stroke(AppColors.grey200, lineWidth: 1)
             )
         }
-        .sheet(isPresented: Binding(
-            get: { viewModel?.showResetDataSheet ?? false },
-            set: { viewModel?.showResetDataSheet = $0 }
-        )) {
+        .sheet(isPresented: $showResetDataSheet) {
             ResetDataSheet()
                 .presentationDetents([.medium])
         }
-        .sheet(isPresented: Binding(
-            get: { viewModel?.showContactUsSheet ?? false },
-            set: { viewModel?.showContactUsSheet = $0 }
-        )) {
+        .sheet(isPresented: $showContactUsSheet) {
             ContactUsSheet()
                 .presentationDetents([.medium, .large])
         }
@@ -266,7 +263,7 @@ struct AccountScreen: View {
                     label: Strings.Common.signOut,
                     isDestructive: true
                 ) {
-                    viewModel?.showSignOutConfirmation = true
+                    showSignOutConfirmation = true
                 }
             }
             .background(AppColors.background)
@@ -277,10 +274,7 @@ struct AccountScreen: View {
             )
         }
         .confirmationSheet(
-            isPresented: Binding(
-                get: { viewModel?.showSignOutConfirmation ?? false },
-                set: { viewModel?.showSignOutConfirmation = $0 }
-            ),
+            isPresented: $showSignOutConfirmation,
             icon: AppIcon.signOut.systemName,
             title: Strings.Profile.signOutConfirmTitle,
             message: Strings.Profile.signOutConfirmMessage,
