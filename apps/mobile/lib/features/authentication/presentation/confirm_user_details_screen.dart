@@ -14,6 +14,7 @@ import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_segmented_button.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_textfield.dart';
+import 'package:reboot_app_3/core/shared_widgets/platform_date_picker.dart';
 import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/core/shared_widgets/spinner.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
@@ -281,20 +282,26 @@ class _ConfirmUserDetailsScreenState
                     );
                   }),
                   verticalSpace(Spacing.points8),
-                  CustomTextField(
-                    enabled: false,
-                    controller: userFirstDateController,
-                    hint:
-                        AppLocalizations.of(context).translate('starting-date'),
-                    prefixIcon: LucideIcons.calendar,
-                    inputType: TextInputType.datetime,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return AppLocalizations.of(context)
-                            .translate('cant-be-empty');
-                      }
-                      return null;
+                  PlatformDatePicker(
+                    value: selectedUserFirstDate,
+                    onChanged: (date) {
+                      setState(() {
+                        selectedUserFirstDate = date;
+                        if (date != null) {
+                          final locale = ref.read(localeNotifierProvider);
+                          userFirstDateController.text = DisplayDateTime(date, locale?.languageCode ?? 'en').displayDateTime;
+                        }
+                      });
                     },
+                    hint: AppLocalizations.of(context).translate('starting-date'),
+                    label: AppLocalizations.of(context).translate('starting-date'),
+                    firstDate: DateTime(2022),
+                    lastDate: DateTime.now(),
+                    dateFormatter: (date) {
+                      final locale = ref.read(localeNotifierProvider);
+                      return DisplayDateTime(date, locale?.languageCode ?? 'en').displayDateTime;
+                    },
+                    mode: PlatformDatePickerMode.dateTime,
                   ),
                   verticalSpace(Spacing.points4),
                   Text(
@@ -344,6 +351,18 @@ class _ConfirmUserDetailsScreenState
                                   return;
                                 }
 
+                                if (selectedUserFirstDate == null) {
+                                  getErrorSnackBar(context, 'starting-date-required');
+                                  setState(() => _isProcessing = false);
+                                  return;
+                                }
+
+                                if (selectedBirthDate == null) {
+                                  getErrorSnackBar(context, 'valid-birth-date-required');
+                                  setState(() => _isProcessing = false);
+                                  return;
+                                }
+
                                 try {
                                   // Create new user document
                                   final newUserDoc = UserDocument(
@@ -354,12 +373,8 @@ class _ConfirmUserDetailsScreenState
                                     dayOfBirth: selectedBirthDate != null
                                         ? Timestamp.fromDate(selectedBirthDate!)
                                         : null,
-                                    userFirstDate: selectedUserFirstDate != null
-                                        ? Timestamp.fromDate(
-                                            selectedUserFirstDate!.toUtc())
-                                        : userDocument.userFirstDate ??
-                                            Timestamp.fromDate(
-                                                DateTime.now().toUtc()),
+                                    userFirstDate: Timestamp.fromDate(
+                                        (selectedUserFirstDate ?? DateTime.now()).toUtc()),
                                     email: emailController.text.trim(),
                                     role: "user",
                                     locale: selectedLocale?.value,
@@ -371,6 +386,10 @@ class _ConfirmUserDetailsScreenState
                                     userMasturbatingWithoutWatching:
                                         userDocument
                                             .userMasturbatingWithoutWatching,
+                                    isPlusUser: userDocument.isPlusUser,
+                                    lastPlusCheck: userDocument.lastPlusCheck,
+                                    isRequestedToBeDeleted: userDocument.isRequestedToBeDeleted,
+                                    hasCheckedForDataLoss: userDocument.hasCheckedForDataLoss,
                                   );
 
                                   await migrateService

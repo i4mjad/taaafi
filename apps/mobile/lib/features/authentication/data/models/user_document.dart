@@ -99,10 +99,10 @@ class UserDocument {
       'userRelapses': userRelapses ?? [],
       'userMasturbatingWithoutWatching': userMasturbatingWithoutWatching ?? [],
       'userWatchingWithoutMasturbating': userWatchingWithoutMasturbating ?? [],
-      'isPlusUser': isPlusUser,
-      'lastPlusCheck': lastPlusCheck,
-      'isRequestedToBeDeleted': isRequestedToBeDeleted,
-      'hasCheckedForDataLoss': hasCheckedForDataLoss,
+      if (isPlusUser != null) 'isPlusUser': isPlusUser,
+      if (lastPlusCheck != null) 'lastPlusCheck': lastPlusCheck,
+      if (isRequestedToBeDeleted != null) 'isRequestedToBeDeleted': isRequestedToBeDeleted,
+      if (hasCheckedForDataLoss != null) 'hasCheckedForDataLoss': hasCheckedForDataLoss,
     };
   }
 
