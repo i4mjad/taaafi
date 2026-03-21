@@ -16,11 +16,19 @@ struct VaultScreen: View {
 
     var body: some View {
         NavigationStack(path: $containerVM.navigationPath) {
-            ScrollView {
-                LazyVStack(spacing: 0) {
-                    tabContent
+            ScrollViewReader { scrollProxy in
+                ScrollView {
+                    LazyVStack(spacing: 0) {
+                        tabContent
+                    }
+                    .padding(.top, tabBarHeight)
+                    .id("vaultScrollTop")
                 }
-                .padding(.top, tabBarHeight)
+                .onChange(of: containerVM.selectedTab) {
+                    withAnimation {
+                        scrollProxy.scrollTo("vaultScrollTop", anchor: .top)
+                    }
+                }
             }
             .overlay(alignment: .top) {
                 VStack(spacing: 0) {
