@@ -204,7 +204,7 @@ class OngoingActivitySettingsSheet extends ConsumerWidget {
             ],
           ),
           content: DropdownButtonFormField<Duration>(
-            value: selectedDuration,
+            initialValue: selectedDuration,
             decoration: InputDecoration(
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),

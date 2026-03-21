@@ -88,7 +88,7 @@ class PlatformPopupMenu extends StatelessWidget {
                               color: entry.value.isDestructive
                                   ? (Platform.isIOS
                                       ? CupertinoColors.systemRed
-                                          .withOpacity(0.7)
+                                          .withValues(alpha: 0.7)
                                       : theme.error[600])
                                   : (Platform.isIOS
                                       ? CupertinoColors.secondaryLabel

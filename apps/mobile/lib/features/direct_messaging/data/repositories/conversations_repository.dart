@@ -1,6 +1,5 @@
 import '../../domain/entities/direct_conversation_entity.dart';
 import '../datasources/conversations_firestore_datasource.dart';
-import '../models/direct_conversation_model.dart';
 
 /// Repository for conversation operations
 class ConversationsRepository {

@@ -302,7 +302,7 @@ communityProfiles/{cpId} {
 4. `lib/features/groups/presentation/widgets/member_profile_modal.dart`
 5. `lib/features/groups/presentation/widgets/edit_member_profile_modal.dart`
 6. `lib/core/services/haptic_service.dart`
-7. `docs/version-5.5.0-docs/groups-enhancements-sprints/sprint-4-implementation-summary.md`
+7. `docs/version-5.5.2-docs/groups-enhancements-sprints/sprint-4-implementation-summary.md`
 
 ---
 

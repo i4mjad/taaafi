@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../../core/localization/localization.dart';
-import '../../../../core/shared_widgets/spinner.dart';
 import '../../../../core/theming/app-themes.dart';
 import '../../../../core/theming/text_styles.dart';
 import '../../application/referral_providers.dart';

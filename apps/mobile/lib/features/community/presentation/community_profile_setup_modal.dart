@@ -255,7 +255,7 @@ class _CommunityProfileSetupModalState
                     ),
                     Switch(
                       value: _isAnonymous,
-                      activeColor: theme.success[500],
+                      activeThumbColor: theme.success[500],
                       inactiveTrackColor: theme.grey[200],
                       inactiveThumbColor: theme.grey[900],
                       onChanged: _isLoading

@@ -163,7 +163,7 @@ class _ResetDataModalSheetState extends ConsumerState<ResetDataModalSheet> {
                   ),
                   Switch(
                     value: userWantNowAsNewFirstDate,
-                    activeColor: theme.primary[600],
+                    activeThumbColor: theme.primary[600],
                     onChanged: isLoading
                         ? null
                         : (bool value) {

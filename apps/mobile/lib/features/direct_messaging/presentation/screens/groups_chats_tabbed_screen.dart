@@ -2,11 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:reboot_app_3/core/localization/localization.dart';
-import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/shared_widgets/custom_segmented_button.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/group_screen.dart';
-import 'community_chats_screen.dart';
 
 /// Tabbed screen that shows Groups and Chats tabs
 /// Note: This screen is displayed by GroupsMainScreen when user is in a group.

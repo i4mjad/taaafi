@@ -1012,7 +1012,7 @@ const Map<String, String> kEn = {
   "about-app": "About App",
   "about-ta3afi":
       "An app to raise awareness about the dangers of pornography and addiction to it by providing content and tools to help solve the problem.",
-  "version-number": "Version 5.5.0",
+  "version-number": "Version 5.5.2",
   "what-is-all-of-those": "What's the difference between these numbers?",
   "app-loading": "Initializing...",
   "processing": "Processing...",
@@ -4155,5 +4155,4 @@ const Map<String, String> kEn = {
   'common.loading': 'Loading...',
   'common.view': 'View',
   'common.got_it': 'Got it',
-
 };

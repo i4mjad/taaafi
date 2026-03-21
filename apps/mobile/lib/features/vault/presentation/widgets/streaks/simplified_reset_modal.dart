@@ -177,7 +177,7 @@ class _SimplifiedResetModalState extends ConsumerState<SimplifiedResetModal> {
                   ),
                   Switch(
                     value: resetToToday,
-                    activeColor: theme.primary[600],
+                    activeThumbColor: theme.primary[600],
                     onChanged: isLoading
                         ? null
                         : (bool value) {

@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 /// Entity representing a user block relationship
 class UserBlockEntity {

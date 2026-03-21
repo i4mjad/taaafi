@@ -393,7 +393,7 @@ class _SmartAlertsSettingsScreenState
                   value: isEnabled,
                   onChanged:
                       _isLoading ? null : (value) => _toggleAlert(type, value),
-                  activeColor: theme.primary[600],
+                  activeThumbColor: theme.primary[600],
                 ),
             ],
           ),

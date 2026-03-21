@@ -1,6 +1,6 @@
 # Groups New Features - Sprint Documentation
 
-This folder contains the complete sprint breakdown for implementing Groups New Features (Version 5.5.0).
+This folder contains the complete sprint breakdown for implementing Groups New Features (Version 5.5.2).
 
 ---
 
@@ -104,7 +104,7 @@ Before starting Sprint 5:
 
 ## 🔗 Related Documentation
 
-### Current Version (5.5.0)
+### Current Version (5.5.2)
 - [../groups-new-features.md](../groups-new-features.md) - Original specification
 - [../../groups/F3_Support_Groups_Collections_and_Schema.md](../../groups/F3_Support_Groups_Collections_and_Schema.md) - Database schema
 
@@ -149,5 +149,5 @@ Each sprint has specific deliverables. Overall success measured by:
 
 **Last Updated:** November 14, 2025  
 **Status:** Ready for Sprint 5 kickoff  
-**Version:** 5.5.0
+**Version:** 5.5.2
 

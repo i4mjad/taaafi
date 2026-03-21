@@ -1,6 +1,6 @@
 # Groups New Features - Sprints Overview
 
-**Version:** 5.5.0  
+**Version:** 5.5.2  
 **Document Date:** November 14, 2025  
 **Total Duration:** 12.5 weeks (Sprints 5-8)
 
@@ -8,7 +8,7 @@
 
 ## 📋 Executive Summary
 
-This document provides an overview of the 4 sprint cycles (Sprints 5-8) required to implement the new groups features for version 5.5.0. These sprints build upon the foundational work completed in Sprints 1-4.
+This document provides an overview of the 4 sprint cycles (Sprints 5-8) required to implement the new groups features for version 5.5.2. These sprints build upon the foundational work completed in Sprints 1-4.
 
 ### New Feature Categories
 1. **Group Challenges System** - Sprint 5 (3 weeks)
@@ -483,7 +483,7 @@ Week 8:     Sprint 8 - Onboarding & Polish
 
 ## 🏁 Conclusion
 
-This sprint plan provides a comprehensive roadmap for implementing all new groups features in version 5.5.0. The features are organized into logical sprints with clear dependencies, deliverables, and success criteria.
+This sprint plan provides a comprehensive roadmap for implementing all new groups features in version 5.5.2. The features are organized into logical sprints with clear dependencies, deliverables, and success criteria.
 
 ### Next Steps
 1. **Review** this document with all stakeholders

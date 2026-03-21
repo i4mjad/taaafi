@@ -520,7 +520,7 @@ class _AddTheActivitySheetState extends ConsumerState<AddTheActivitySheet> {
                   ),
                   Switch(
                     value: nowIsStartingDate,
-                    activeColor: theme.primary[600],
+                    activeThumbColor: theme.primary[600],
                     onChanged: (bool value) {
                       setState(() {
                         nowIsStartingDate = value;

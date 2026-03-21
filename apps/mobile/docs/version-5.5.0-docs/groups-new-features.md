@@ -1,8 +1,8 @@
-# Groups New Features - Version 5.5.0
+# Groups New Features - Version 5.5.2
 
 **Document Version:** 1.0  
 **Last Updated:** November 7, 2025  
-**Target Release:** Version 5.5.0  
+**Target Release:** Version 5.5.2  
 
 ---
 

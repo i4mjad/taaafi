@@ -194,7 +194,7 @@ class _AnonymityToggleModalState extends ConsumerState<AnonymityToggleModal> {
                                         _isAnonymous = value;
                                       });
                                     },
-                                    activeColor: theme.primary[500],
+                                    activeThumbColor: theme.primary[500],
                                   ),
                                 ],
                               ),

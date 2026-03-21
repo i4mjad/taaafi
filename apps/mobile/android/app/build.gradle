@@ -28,21 +28,20 @@ android {
     namespace "com.amjadkhalfan.reboot_app_3"
 
 
-  compileSdkVersion 35
+  compileSdkVersion 36
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
 
-    lintOptions {
+    lint {
         disable 'InvalidPackage'
     }
 
     defaultConfig {
-        multiDexEnabled true
         applicationId "com.amjadkhalfan.reboot_app_3"
-        targetSdkVersion 35
-        minSdkVersion 23
+        targetSdkVersion 36
+        minSdkVersion flutter.minSdkVersion
         versionCode flutterVersionCode
         versionName flutterVersionName
         //TODO: uncomment this to create a new version

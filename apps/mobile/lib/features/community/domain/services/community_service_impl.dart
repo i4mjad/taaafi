@@ -350,7 +350,7 @@ class CommunityServiceImpl implements CommunityService {
       final docData = doc.data();
 
       return doc.id; // Return the document ID which is the community profile ID
-    } catch (e, stackTrace) {
+    } catch (e) {
       return null;
     }
   }
@@ -533,7 +533,7 @@ class CommunityServiceImpl implements CommunityService {
       }
 
       return restoredProfile;
-    } catch (e, stackTrace) {
+    } catch (e) {
       if (e is CommunityException) {
         rethrow;
       }
