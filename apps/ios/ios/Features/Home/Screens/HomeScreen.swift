@@ -8,6 +8,7 @@ import SwiftUI
 struct HomeScreen: View {
     @Environment(ToastManager.self) private var toastManager
     @State private var viewModel = HomeViewModel()
+    private let goldColor = Color(red: 254/255, green: 186/255, blue: 1/255)
 
     var body: some View {
         NavigationStack {
@@ -34,10 +35,35 @@ struct HomeScreen: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    HStack(spacing: Spacing.sm) {
-                        PremiumCtaButton(isSubscribed: false)
+                    Button {
+                    } label: {
+                        Image(AppIcon.plusIconName)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 22, height: 22)
+                            .foregroundStyle(goldColor)
+                    }
+                }
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        toastManager.show(.info, message: String(localized: "home.comingSoon"))
+                    } label: {
+                        ZStack(alignment: .topTrailing) {
+                            Image(systemName: "bell.fill")
+                                .font(.system(size: 18))
+                                .foregroundStyle(AppColors.grey700)
 
-                        notificationBell
+                            if viewModel.notificationCount > 0 {
+                                Text("\(viewModel.notificationCount)")
+                                    .font(Typography.bodyTiny)
+                                    .foregroundStyle(.white)
+                                    .padding(.horizontal, 4)
+                                    .padding(.vertical, 1)
+                                    .background(AppColors.error)
+                                    .clipShape(Capsule())
+                                    .offset(x: 6, y: -6)
+                            }
+                        }
                     }
                 }
             }
@@ -50,28 +76,6 @@ struct HomeScreen: View {
         }
     }
 
-    private var notificationBell: some View {
-        Button {
-            toastManager.show(.info, message: String(localized: "home.comingSoon"))
-        } label: {
-            ZStack(alignment: .topTrailing) {
-                Image(systemName: "bell.fill")
-                    .font(.system(size: 18))
-                    .foregroundStyle(AppColors.grey700)
-
-                if viewModel.notificationCount > 0 {
-                    Text("\(viewModel.notificationCount)")
-                        .font(Typography.bodyTiny)
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, 4)
-                        .padding(.vertical, 1)
-                        .background(AppColors.error)
-                        .clipShape(Capsule())
-                        .offset(x: 6, y: -6)
-                }
-            }
-        }
-    }
 }
 
 #Preview {

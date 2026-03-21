@@ -8,6 +8,7 @@ struct VaultScreen: View {
     @State private var containerVM: VaultContainerViewModel
     @State private var dashboardVM: VaultDashboardViewModel?
     @State private var activitiesVM: ActivitiesViewModel?
+    @State private var tabBarHeight: CGFloat = 50
 
     init() {
         _containerVM = State(initialValue: VaultContainerViewModel())
@@ -15,32 +16,63 @@ struct VaultScreen: View {
 
     var body: some View {
         NavigationStack(path: $containerVM.navigationPath) {
-            VStack(spacing: 0) {
-                XTabBar(
-                    tabs: containerVM.visibleTabs,
-                    selectedTab: $containerVM.selectedTab,
-                    label: { $0.label },
-                    icon: { $0.icon },
-                    color: { $0.color }
-                )
-                Divider()
-                tabContent
+            ScrollView {
+                LazyVStack(spacing: 0) {
+                    tabContent
+                }
+                .padding(.top, tabBarHeight)
             }
+            .overlay(alignment: .top) {
+                VStack(spacing: 0) {
+                    XTabBar(
+                        tabs: containerVM.visibleTabs,
+                        selectedTab: $containerVM.selectedTab,
+                        label: { $0.label },
+                        icon: { $0.icon },
+                        color: { $0.color }
+                    )
+                    Divider()
+                }
+                .glassBackground()
+                .background {
+                    GeometryReader { proxy in
+                        Color.clear.preference(
+                            key: TabBarHeightKey.self,
+                            value: proxy.size.height
+                        )
+                    }
+                }
+            }
+            .onPreferenceChange(TabBarHeightKey.self) { tabBarHeight = $0 }
             .background(AppColors.background)
             .navigationTitle(Strings.Vault.title)
             .navigationBarTitleDisplayMode(.inline)
+            .hideNavBarGlassForUnifiedHeader()
+            .refreshable {
+                switch containerVM.selectedTab {
+                case .vault: await dashboardVM?.loadData()
+                case .activities: await activitiesVM?.loadData()
+                default: break
+                }
+            }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    HStack(spacing: Spacing.sm) {
-                        PremiumCtaButton(isSubscribed: false)
-
-                        Button {
-                            containerVM.showLayoutSettings = true
-                        } label: {
-                            Image(systemName: "gearshape")
-                                .font(.system(size: 18))
-                                .foregroundStyle(AppColors.grey700)
-                        }
+                    Button {
+                    } label: {
+                        Image(AppIcon.plusIconName)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 22, height: 22)
+                            .foregroundStyle(Color(red: 254/255, green: 186/255, blue: 1/255))
+                    }
+                }
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        containerVM.showLayoutSettings = true
+                    } label: {
+                        Image(systemName: "gearshape")
+                            .font(.system(size: 18))
+                            .foregroundStyle(AppColors.grey700)
                     }
                 }
             }
@@ -105,7 +137,7 @@ struct VaultScreen: View {
     }
 
     private var vaultDashboard: some View {
-        ScrollView {
+        Group {
             if let vm = dashboardVM {
                 LazyVStack(spacing: Spacing.md) {
                     ForEach(containerVM.visibleSections) { section in
@@ -115,28 +147,55 @@ struct VaultScreen: View {
                 .padding(.vertical, Spacing.md)
             }
         }
-        .refreshable {
-            await dashboardVM?.loadData()
-        }
     }
+
+    private let goldColor = Color(red: 254/255, green: 186/255, blue: 1/255)
 
     @ViewBuilder
     private func sectionView(for section: VaultSection, vm: VaultDashboardViewModel) -> some View {
-        let content = VaultSectionView(
-            icon: section.icon,
-            iconColor: section.color,
-            title: section.label,
-            description: String(localized: String.LocalizationValue(section.descriptionKey))
-        ) {
-            sectionContent(for: section, vm: vm)
-        }
+        let description = String(localized: String.LocalizationValue(section.descriptionKey))
 
-        if section.isPremium {
-            PremiumBlurOverlay(content: content)
-        } else {
-            content
-                .padding(.horizontal, Spacing.md)
+        VStack(alignment: .leading, spacing: Spacing.xs) {
+            // Header row — matches Flutter's _buildVaultElement header
+            HStack(spacing: 12) {
+                Image(systemName: section.icon)
+                    .font(.system(size: 20))
+                    .foregroundStyle(section.color)
+
+                Text(section.label)
+                    .font(Typography.h5)
+                    .foregroundStyle(section.isPremium ? goldColor : AppColors.grey700)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                Button {
+                    toastManager.show(.info, message: Strings.Vault.comingSoon)
+                } label: {
+                    Image(systemName: "questionmark.circle")
+                        .font(.system(size: 16))
+                        .foregroundStyle(AppColors.grey600)
+                        .padding(6)
+                        .background(AppColors.grey100)
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                }
+            }
+
+            if !description.isEmpty {
+                Text(description)
+                    .font(Typography.small)
+                    .foregroundStyle(AppColors.grey600)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.top, 4)
+            }
+
+            if section.isPremium {
+                PremiumBlurOverlay {
+                    sectionContent(for: section, vm: vm)
+                }
+            } else {
+                sectionContent(for: section, vm: vm)
+            }
         }
+        .padding(.horizontal, Spacing.md)
     }
 
     @ViewBuilder
@@ -175,7 +234,7 @@ struct VaultScreen: View {
     }
 
     private var activitiesTab: some View {
-        ScrollView {
+        Group {
             if let vm = activitiesVM {
                 LazyVStack(spacing: Spacing.md) {
                     // Today's Tasks
@@ -241,9 +300,6 @@ struct VaultScreen: View {
                 .padding(.vertical, Spacing.md)
             }
         }
-        .refreshable {
-            await activitiesVM?.loadData()
-        }
     }
 
     private var placeholderTab: some View {
@@ -261,7 +317,8 @@ struct VaultScreen: View {
                 .foregroundStyle(AppColors.grey400)
                 .multilineTextAlignment(.center)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, Spacing.xxl)
     }
 
     private func emptyState(icon: String, message: String) -> some View {
@@ -330,4 +387,37 @@ struct VaultScreen: View {
         await activitiesVM?.loadData()
     }
 
+}
+
+// MARK: - iOS 26 Liquid Glass
+
+private extension View {
+    @ViewBuilder
+    func glassBackground() -> some View {
+        if #available(iOS 26.0, *) {
+            self.background {
+                Color.clear
+                    .glassEffect(.regular, in: Rectangle())
+                    .ignoresSafeArea(.container, edges: .top)
+            }
+        } else {
+            self.background(AppColors.background)
+        }
+    }
+
+    @ViewBuilder
+    func hideNavBarGlassForUnifiedHeader() -> some View {
+        if #available(iOS 26.0, *) {
+            self.toolbarBackground(.hidden, for: .navigationBar)
+        } else {
+            self
+        }
+    }
+}
+
+private struct TabBarHeightKey: PreferenceKey {
+    static let defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = max(value, nextValue())
+    }
 }

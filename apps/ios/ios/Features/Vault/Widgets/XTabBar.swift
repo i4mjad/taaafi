@@ -19,7 +19,6 @@ struct XTabBar<Tab: Hashable & Identifiable>: View {
             .padding(.horizontal, Spacing.md)
         }
         .padding(.vertical, Spacing.xs)
-        .background(AppColors.background)
     }
 
     private func tabButton(for tab: Tab) -> some View {
@@ -30,24 +29,20 @@ struct XTabBar<Tab: Hashable & Identifiable>: View {
                 selectedTab = tab
             }
         } label: {
-            VStack(spacing: Spacing.xs) {
-                HStack(spacing: Spacing.xxs) {
-                    Image(systemName: icon(tab))
-                        .font(.system(size: 14))
-                    Text(label(tab))
-                        .font(Typography.footnote)
-                }
-                .foregroundStyle(isSelected ? color(tab) : AppColors.grey500)
-
+            HStack(spacing: Spacing.xxs) {
+                Image(systemName: icon(tab))
+                    .font(.system(size: 14))
+                Text(label(tab))
+                    .font(Typography.footnote)
+            }
+            .foregroundStyle(isSelected ? color(tab) : AppColors.grey500)
+            .padding(.bottom, Spacing.xs)
+            .overlay(alignment: .bottom) {
                 if isSelected {
                     Capsule()
                         .fill(color(tab))
                         .frame(height: 3)
                         .matchedGeometryEffect(id: "underline", in: underline)
-                } else {
-                    Capsule()
-                        .fill(Color.clear)
-                        .frame(height: 3)
                 }
             }
         }
