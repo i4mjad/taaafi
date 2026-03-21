@@ -70,7 +70,7 @@ struct DayOverviewScreen: View {
             if !followUp.triggers.isEmpty {
                 HStack(spacing: 4) {
                     ForEach(followUp.triggers.prefix(3), id: \.self) { trigger in
-                        Text(String(localized: String.LocalizationValue("vault.trigger.\(trigger)")))
+                        Text(String(localized: String.LocalizationValue("vault.trigger." + trigger)))
                             .font(Typography.bodyTiny)
                             .foregroundStyle(AppColors.primary)
                             .padding(.horizontal, 6)
@@ -108,7 +108,7 @@ struct DayOverviewScreen: View {
                         VStack(spacing: 2) {
                             Text(emotion.emotionEmoji)
                                 .font(.system(size: 28))
-                            Text(String(localized: String.LocalizationValue("emotion.\(emotion.emotionName)")))
+                            Text(String(localized: String.LocalizationValue("emotion." + emotion.emotionName)))
                                 .font(Typography.bodyTiny)
                                 .foregroundStyle(AppColors.grey500)
                         }

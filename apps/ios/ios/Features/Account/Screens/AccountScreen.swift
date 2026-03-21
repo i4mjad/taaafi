@@ -13,6 +13,7 @@ struct AccountScreen: View {
     @State private var showResetDataSheet = false
     @State private var showContactUsSheet = false
     @State private var showSignOutConfirmation = false
+    @State private var showAppearanceSheet = false
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -24,10 +25,6 @@ struct AccountScreen: View {
                     }
 
                     userHeader
-
-                    appearanceSection
-
-                    languageSection
 
                     settingsSection
 
@@ -68,105 +65,12 @@ struct AccountScreen: View {
         .buttonStyle(.plain)
     }
 
-    // MARK: - Appearance
-
-    private var appearanceSection: some View {
-        VStack(alignment: .leading, spacing: Spacing.sm) {
-            Text(Strings.Profile.appearance)
-                .font(Typography.h6)
-                .foregroundStyle(AppColors.grey900)
-                .padding(.horizontal, Spacing.xxs)
-
-            HStack(spacing: Spacing.sm) {
-                themeCard(
-                    icon: AppIcon.sunMax.systemName,
-                    label: Strings.Profile.lightMode,
-                    theme: "light"
-                )
-                themeCard(
-                    icon: AppIcon.moon.systemName,
-                    label: Strings.Profile.darkMode,
-                    theme: "dark"
-                )
-            }
-        }
-    }
-
-    private func themeCard(icon: String, label: String, theme: String) -> some View {
-        let isSelected = viewModel?.appTheme == theme
-        return Button {
-            viewModel?.appTheme = theme
-            applyTheme(theme)
-        } label: {
-            VStack(spacing: Spacing.xs) {
-                Image(systemName: icon)
-                    .font(.system(size: 24))
-                    .foregroundStyle(isSelected ? AppColors.primary600 : AppColors.grey500)
-                Text(label)
-                    .font(Typography.caption)
-                    .foregroundStyle(isSelected ? AppColors.primary600 : AppColors.grey600)
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, Spacing.md)
-            .background(isSelected ? AppColors.primary50 : AppColors.background)
-            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .stroke(isSelected ? AppColors.primary600 : AppColors.grey200, lineWidth: 1)
-            )
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel(label)
-    }
-
-    private func applyTheme(_ theme: String) {
-        guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene else { return }
-        for window in scene.windows {
-            window.overrideUserInterfaceStyle = theme == "light" ? .light : theme == "dark" ? .dark : .unspecified
-        }
-    }
-
-    // MARK: - Language
-
-    private var languageSection: some View {
-        VStack(alignment: .leading, spacing: Spacing.sm) {
-            Text(Strings.Profile.language)
-                .font(Typography.h6)
-                .foregroundStyle(AppColors.grey900)
-                .padding(.horizontal, Spacing.xxs)
-
-            HStack(spacing: Spacing.sm) {
-                languageButton(label: Strings.Profile.arabic, locale: "ar")
-                languageButton(label: Strings.Profile.english, locale: "en")
-            }
-        }
-    }
-
-    private func languageButton(label: String, locale: String) -> some View {
-        let isSelected = userDocumentService.userDocument?.locale == locale
-        return Button {
-            guard let uid = authService.currentUser?.uid else { return }
-            Task {
-                try? await userDocumentService.updateUserDocument(userId: uid, fields: ["locale": locale])
-            }
-        } label: {
-            Text(label)
-                .font(Typography.body)
-                .foregroundStyle(isSelected ? AppColors.primary600 : AppColors.grey600)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, Spacing.sm)
-                .background(isSelected ? AppColors.primary50 : AppColors.background)
-                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .stroke(isSelected ? AppColors.primary600 : AppColors.grey200, lineWidth: 1)
-                )
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel(label)
-    }
-
     // MARK: - Settings
+
+    private var currentAppearanceLabel: String {
+        let theme = viewModel?.appTheme ?? "light"
+        return theme == "dark" ? Strings.Profile.darkMode : Strings.Profile.lightMode
+    }
 
     private var settingsSection: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -177,6 +81,35 @@ struct AccountScreen: View {
                 .padding(.bottom, Spacing.xs)
 
             VStack(spacing: 0) {
+                AccountSettingsRow(
+                    icon: AppIcon.sunMax.systemName,
+                    label: Strings.Profile.appearance
+                ) {
+                    showAppearanceSheet = true
+                } trailing: {
+                    HStack(spacing: Spacing.xs) {
+                        Text(currentAppearanceLabel)
+                            .font(Typography.footnote)
+                            .foregroundStyle(AppColors.grey500)
+                        Image(systemName: AppIcon.chevronForward.systemName)
+                            .font(.system(size: 14))
+                            .foregroundStyle(AppColors.grey400)
+                    }
+                }
+
+                Divider().padding(.horizontal, Spacing.md)
+
+                AccountSettingsRow(
+                    icon: AppIcon.globe.systemName,
+                    label: Strings.Profile.language
+                ) {
+                    if let url = URL(string: UIApplication.openSettingsURLString) {
+                        UIApplication.shared.open(url)
+                    }
+                }
+
+                Divider().padding(.horizontal, Spacing.md)
+
                 AccountSettingsRow(
                     icon: AppIcon.arrowCounterclockwise.systemName,
                     label: Strings.Profile.resetData
@@ -220,12 +153,11 @@ struct AccountScreen: View {
                     showContactUsSheet = true
                 }
             }
-            .background(AppColors.background)
-            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .stroke(AppColors.grey200, lineWidth: 1)
-            )
+            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .cardShadow()
+        }
+        .sheet(isPresented: $showAppearanceSheet) {
+            AppearanceSheet()
         }
         .sheet(isPresented: $showResetDataSheet) {
             ResetDataSheet()
@@ -266,8 +198,8 @@ struct AccountScreen: View {
                     showSignOutConfirmation = true
                 }
             }
-            .background(AppColors.background)
-            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .cardShadow()
             .overlay(
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
                     .stroke(AppColors.error100, lineWidth: 1)

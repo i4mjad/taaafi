@@ -70,7 +70,7 @@ struct AppPicker<T: Hashable>: View {
                     .font(Typography.body)
                     .foregroundStyle(AppColors.primary)
 
-                Image(systemName: AppIcon.chevronRight.systemName)
+                Image(systemName: AppIcon.chevronForward.systemName)
                     .font(.system(size: 14))
                     .foregroundStyle(AppColors.grey400)
             }

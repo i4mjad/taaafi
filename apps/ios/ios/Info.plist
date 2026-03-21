@@ -4,13 +4,11 @@
 <dict>
 	<key>UIAppFonts</key>
 	<array>
-		<string>IBMPlexSansArabic-Thin.ttf</string>
-		<string>IBMPlexSansArabic-ExtraLight.ttf</string>
-		<string>IBMPlexSansArabic-Light.ttf</string>
-		<string>IBMPlexSansArabic-Regular.ttf</string>
-		<string>IBMPlexSansArabic-Medium.ttf</string>
-		<string>IBMPlexSansArabic-SemiBold.ttf</string>
-		<string>IBMPlexSansArabic-Bold.ttf</string>
+		<string>ExpoArabic-Light.ttf</string>
+		<string>ExpoArabic-Book.ttf</string>
+		<string>ExpoArabic-Medium.ttf</string>
+		<string>ExpoArabic-SemiBold.ttf</string>
+		<string>ExpoArabic-Bold.otf</string>
 	</array>
 </dict>
 </plist>

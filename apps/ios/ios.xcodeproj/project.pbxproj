@@ -22,6 +22,7 @@
 		6D87B8242F50495B00DDEDDB /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 6D87B8232F50495B00DDEDDB /* GoogleSignIn */; };
 		6D87B8262F50495B00DDEDDB /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 6D87B8252F50495B00DDEDDB /* GoogleSignInSwift */; };
 		6D87B8402F60A00000DDEDDB /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 6D87B8412F60A00000DDEDDB /* RevenueCat */; };
+		6DAAEA0A2F5DAE9B00D19DF7 /* ShadowKit in Frameworks */ = {isa = PBXBuildFile; productRef = 6DAAEA092F5DAE9B00D19DF7 /* ShadowKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -154,6 +155,7 @@
 				6D87B8152F5043F100DDEDDB /* FirebaseAuth in Frameworks */,
 				6D87B8242F50495B00DDEDDB /* GoogleSignIn in Frameworks */,
 				6D87B8402F60A00000DDEDDB /* RevenueCat in Frameworks */,
+				6DAAEA0A2F5DAE9B00D19DF7 /* ShadowKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -250,6 +252,7 @@
 				6D87B8232F50495B00DDEDDB /* GoogleSignIn */,
 				6D87B8252F50495B00DDEDDB /* GoogleSignInSwift */,
 				6D87B8412F60A00000DDEDDB /* RevenueCat */,
+				6DAAEA092F5DAE9B00D19DF7 /* ShadowKit */,
 			);
 			productName = ios;
 			productReference = 6D32B9CB2F47F5BF0069B270 /* ios.app */;
@@ -361,6 +364,7 @@
 				6D87B8112F5043F000DDEDDB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				6D87B8222F50495B00DDEDDB /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
 				6D87B8422F60A00000DDEDDB /* XCRemoteSwiftPackageReference "purchases-ios" */,
+				6DAAEA082F5DAE9B00D19DF7 /* XCRemoteSwiftPackageReference "ShadowKit-SwiftUI" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 6D32B9CC2F47F5BF0069B270 /* Products */;
@@ -902,6 +906,14 @@
 				minimumVersion = 5.0.0;
 			};
 		};
+		6DAAEA082F5DAE9B00D19DF7 /* XCRemoteSwiftPackageReference "ShadowKit-SwiftUI" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/metasidd/ShadowKit-SwiftUI.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.3.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -959,6 +971,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 6D87B8422F60A00000DDEDDB /* XCRemoteSwiftPackageReference "purchases-ios" */;
 			productName = RevenueCat;
+		};
+		6DAAEA092F5DAE9B00D19DF7 /* ShadowKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6DAAEA082F5DAE9B00D19DF7 /* XCRemoteSwiftPackageReference "ShadowKit-SwiftUI" */;
+			productName = ShadowKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

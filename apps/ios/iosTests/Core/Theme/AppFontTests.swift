@@ -15,44 +15,44 @@ struct AppFontTests {
 
     // MARK: - Font Name Mapping
 
-    @Test("thin weight maps to Thin font")
-    func thinMapToThin() {
-        #expect(AppFont.fontName(for: .thin) == "IBMPlexSansArabic-Thin")
+    @Test("thin weight maps to ExpoArabic-Light (fallback)")
+    func thinMapsToLight() {
+        #expect(AppFont.fontName(for: .thin) == "ExpoArabic-Light")
     }
 
-    @Test("extraLight weight maps to ExtraLight font")
-    func extraLightMapsToExtraLight() {
-        #expect(AppFont.fontName(for: .extraLight) == "IBMPlexSansArabic-ExtraLight")
+    @Test("extraLight weight maps to ExpoArabic-Light (fallback)")
+    func extraLightMapsToLight() {
+        #expect(AppFont.fontName(for: .extraLight) == "ExpoArabic-Light")
     }
 
-    @Test("light weight maps to Light font")
+    @Test("light weight maps to ExpoArabic-Light")
     func lightMapsToLight() {
-        #expect(AppFont.fontName(for: .light) == "IBMPlexSansArabic-Light")
+        #expect(AppFont.fontName(for: .light) == "ExpoArabic-Light")
     }
 
-    @Test("regular weight maps to Regular font")
-    func regularMapsToRegular() {
-        #expect(AppFont.fontName(for: .regular) == "IBMPlexSansArabic-Regular")
+    @Test("regular weight maps to ExpoArabic-Book")
+    func regularMapsToBook() {
+        #expect(AppFont.fontName(for: .regular) == "ExpoArabic-Book")
     }
 
-    @Test("book weight maps to Medium font")
+    @Test("book weight maps to ExpoArabic-Medium")
     func bookMapsToMedium() {
-        #expect(AppFont.fontName(for: .book) == "IBMPlexSansArabic-Medium")
+        #expect(AppFont.fontName(for: .book) == "ExpoArabic-Medium")
     }
 
-    @Test("medium weight maps to SemiBold font")
+    @Test("medium weight maps to ExpoArabic-SemiBold")
     func mediumMapsToSemiBold() {
-        #expect(AppFont.fontName(for: .medium) == "IBMPlexSansArabic-SemiBold")
+        #expect(AppFont.fontName(for: .medium) == "ExpoArabic-SemiBold")
     }
 
-    @Test("semiBold weight maps to Bold font")
+    @Test("semiBold weight maps to ExpoArabic-Bold")
     func semiBoldMapsToBold() {
-        #expect(AppFont.fontName(for: .semiBold) == "IBMPlexSansArabic-Bold")
+        #expect(AppFont.fontName(for: .semiBold) == "ExpoArabic-Bold")
     }
 
-    @Test("bold weight maps to Bold font (capped)")
+    @Test("bold weight maps to ExpoArabic-Bold (capped)")
     func boldMapsToBold() {
-        #expect(AppFont.fontName(for: .bold) == "IBMPlexSansArabic-Bold")
+        #expect(AppFont.fontName(for: .bold) == "ExpoArabic-Bold")
     }
 
     // MARK: - Font Creation

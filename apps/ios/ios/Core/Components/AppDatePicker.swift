@@ -45,7 +45,7 @@ struct AppDatePicker: View {
                     .font(Typography.body)
                     .foregroundStyle(value != nil ? AppColors.primary : AppColors.grey400)
 
-                Image(systemName: AppIcon.chevronRight.systemName)
+                Image(systemName: AppIcon.chevronForward.systemName)
                     .font(.system(size: 14))
                     .foregroundStyle(AppColors.grey400)
             }

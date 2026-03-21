@@ -1,5 +1,5 @@
 {
-  "originHash" : "18caf97d3d3f391f738cd087fc61c1ca05334c0b0b6314feb5623dc4fb8d13b1",
+  "originHash" : "657d4ce7524ee6469bc2eccd040bfc60512e34a40127e641103632b9a65b4fe7",
   "pins" : [
     {
       "identity" : "abseil-cpp-binary",
@@ -152,6 +152,15 @@
       "state" : {
         "revision" : "4d75c384d9169316d6aa5b74b541c02dd0e345ec",
         "version" : "5.60.0"
+      }
+    },
+    {
+      "identity" : "shadowkit-swiftui",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/metasidd/ShadowKit-SwiftUI.git",
+      "state" : {
+        "revision" : "f5b5d383ead2533ac423fa37d546cfcdb2f28c1c",
+        "version" : "0.3.0"
       }
     }
   ],

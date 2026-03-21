@@ -27,7 +27,7 @@ struct WarningNotificationBanner: View {
 
                     Spacer()
 
-                    Image(systemName: AppIcon.chevronRight.systemName)
+                    Image(systemName: AppIcon.chevronForward.systemName)
                         .font(.system(size: 14))
                         .foregroundStyle(AppColors.grey400)
                 }

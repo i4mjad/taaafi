@@ -29,7 +29,7 @@ struct BanItemRow: View {
             }
 
             HStack(spacing: Spacing.xxs) {
-                Image(systemName: AppIcon.chevronRight.systemName)
+                Image(systemName: AppIcon.chevronForward.systemName)
                     .font(.system(size: 10))
                     .foregroundStyle(AppColors.grey400)
                 Text(Strings.Ban.details)

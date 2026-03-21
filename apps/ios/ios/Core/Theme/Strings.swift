@@ -112,6 +112,9 @@ enum Strings {
         static let profileUpdated = String(localized: "profile.profileUpdated")
         static let confirmUpdateTitle = String(localized: "profile.confirmUpdateTitle")
         static let confirmUpdateMessage = String(localized: "profile.confirmUpdateMessage")
+        static let fieldLabel = String(localized: "profile.fieldLabel")
+        static let oldValue = String(localized: "profile.oldValue")
+        static let newValue = String(localized: "profile.newValue")
 
         // Warning detail
         static let warningDetail = String(localized: "profile.warningDetail")

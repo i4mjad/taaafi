@@ -105,6 +105,7 @@ struct iosApp: App {
             .environment(toastManager)
             .environment(\.locale, Locale(identifier: "ar"))
             .task {
+                AppAppearance.applySavedTheme()
                 authService.configure(analytics: analytics, errorLogger: errorLogger)
                 isStartupComplete = true
                 analytics.trackAppOpened()

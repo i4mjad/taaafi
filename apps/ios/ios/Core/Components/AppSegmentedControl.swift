@@ -22,6 +22,7 @@ struct AppSegmentedControl<T: Hashable>: View {
             Picker("", selection: $selection) {
                 ForEach(options) { option in
                     Text(option.label).tag(option.value)
+                        .padding(.vertical, 8)
                 }
             }
             .pickerStyle(.segmented)

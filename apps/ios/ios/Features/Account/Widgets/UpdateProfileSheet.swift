@@ -13,6 +13,10 @@ struct UpdateProfileSheet: View {
     @State private var language = "ar"
     @State private var showConfirmation = false
 
+    @State private var originalName = ""
+    @State private var originalDayOfBirth = Date()
+    @State private var originalLanguage = "ar"
+
     private var userDocument: UserDocument? { userDocumentService.userDocument }
 
     private static let dobRange: ClosedRange<Date> = {
@@ -24,35 +28,52 @@ struct UpdateProfileSheet: View {
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: Spacing.lg) {
+            Form {
+                Section {
                     nameField
-
-                    emailField
-
-                    dobField
-
-                    startingDateField
-
-                    roleField
-
-                    genderField
-
-                    languageField
+                } header: {
+                    Text(Strings.Profile.name)
+                        .font(Typography.caption)
                 }
-                .padding(.horizontal, Spacing.md)
-                .padding(.vertical, Spacing.md)
+
+                Section {
+                    emailField
+                } header: {
+                    Text(Strings.Profile.email)
+                        .font(Typography.caption)
+                }
+
+                Section {
+                    dobField
+                } header: {
+                    Text(Strings.Profile.dateOfBirth)
+                        .font(Typography.caption)
+                }
+
+                Section {
+                    languageField
+                } header: {
+                    Text(Strings.Profile.language)
+                        .font(Typography.caption)
+                }
             }
-            .background(AppColors.grey50)
             .navigationTitle(Strings.Profile.updateProfile)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button(Strings.Common.cancel) { dismiss() }
+                    Button {
+                        dismiss()
+                    } label: {
+                        Text(Strings.Common.cancel)
+                            .font(Typography.body)
+                    }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(Strings.Profile.saveChanges) {
+                    Button {
                         showConfirmation = true
+                    } label: {
+                        Text(Strings.Profile.saveChanges)
+                            .font(Typography.body)
                     }
                     .disabled(viewModel?.isValid != true || viewModel?.isSaving == true)
                 }
@@ -69,134 +90,68 @@ struct UpdateProfileSheet: View {
             name = vm.name
             dayOfBirth = vm.dayOfBirth ?? Date()
             language = vm.language
+            originalName = vm.name
+            originalDayOfBirth = vm.dayOfBirth ?? Date()
+            originalLanguage = vm.language
         }
-        .confirmationSheet(
-            isPresented: $showConfirmation,
-            icon: AppIcon.pencil.systemName,
-            title: Strings.Profile.confirmUpdateTitle,
-            message: Strings.Profile.confirmUpdateMessage,
-            confirmLabel: Strings.Profile.saveChanges,
-            onResult: { confirmed in
-                if confirmed { Task { await handleSave() } }
-            }
-        )
+        .sheet(isPresented: $showConfirmation) {
+            ProfileChangesConfirmationSheet(
+                originalName: originalName,
+                newName: name,
+                originalDayOfBirth: originalDayOfBirth,
+                newDayOfBirth: dayOfBirth,
+                originalLanguage: originalLanguage,
+                newLanguage: language,
+                onConfirm: { Task { await handleSave() } }
+            )
+            .presentationDetents([.medium])
+            .presentationDragIndicator(.hidden)
+        }
     }
 
     // MARK: - Fields
 
     private var nameField: some View {
-        AppTextField(
-            text: $name,
-            label: Strings.Profile.name,
-            icon: AppIcon.person.systemName
-        )
+        HStack(spacing: Spacing.sm) {
+            Image(systemName: AppIcon.person.systemName)
+                .foregroundStyle(AppColors.grey900)
+            TextField(Strings.Profile.name, text: $name)
+                .font(Typography.body)
+        }
         .onChange(of: name) { _, newValue in
             viewModel?.name = newValue
         }
     }
 
     private var emailField: some View {
-        VStack(alignment: .leading, spacing: Spacing.xs) {
-            Text(Strings.Profile.email)
-                .font(Typography.caption)
-                .foregroundStyle(AppColors.grey600)
-
-            Text(authService.currentUser?.email ?? userDocument?.email ?? "")
-                .font(Typography.body)
-                .foregroundStyle(AppColors.grey500)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, Spacing.md)
-                .padding(.vertical, Spacing.md)
-                .background(AppColors.grey100)
-                .clipShape(RoundedRectangle(cornerRadius: 10.5, style: .continuous))
-        }
+        Text(authService.currentUser?.email ?? userDocument?.email ?? "")
+            .font(Typography.body)
+            .foregroundStyle(.secondary)
     }
 
     private var dobField: some View {
-        VStack(alignment: .leading, spacing: Spacing.xs) {
-            Text(Strings.Profile.dateOfBirth)
-                .font(Typography.caption)
-                .foregroundStyle(AppColors.grey600)
-
-            DatePicker(
-                "",
-                selection: $dayOfBirth,
-                in: Self.dobRange,
-                displayedComponents: .date
-            )
-            .onChange(of: dayOfBirth) { _, newValue in
-                viewModel?.dayOfBirth = newValue
-            }
-            .datePickerStyle(.compact)
-            .labelsHidden()
+        DatePicker(
+            Strings.Profile.dateOfBirth,
+            selection: $dayOfBirth,
+            in: Self.dobRange,
+            displayedComponents: .date
+        )
+        .onChange(of: dayOfBirth) { _, newValue in
+            viewModel?.dayOfBirth = newValue
         }
+        .datePickerStyle(.compact)
+        .labelsHidden()
     }
 
-    private var startingDateField: some View {
-        VStack(alignment: .leading, spacing: Spacing.xs) {
-            Text(Strings.Profile.startingDate)
-                .font(Typography.caption)
-                .foregroundStyle(AppColors.grey600)
-
-            Text(userDocument?.userFirstDate?.formatted(date: .abbreviated, time: .omitted) ?? "")
-                .font(Typography.body)
-                .foregroundStyle(AppColors.grey500)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, Spacing.md)
-                .padding(.vertical, Spacing.md)
-                .background(AppColors.grey100)
-                .clipShape(RoundedRectangle(cornerRadius: 10.5, style: .continuous))
+private var languageField: some View {
+        Picker(Strings.Profile.language, selection: $language) {
+            Text(Strings.Profile.arabic).tag("ar")
+            Text(Strings.Profile.english).tag("en")
         }
-    }
-
-    private var roleField: some View {
-        VStack(alignment: .leading, spacing: Spacing.xs) {
-            Text(Strings.Profile.role)
-                .font(Typography.caption)
-                .foregroundStyle(AppColors.grey600)
-
-            Text(userDocument?.role ?? "user")
-                .font(Typography.body)
-                .foregroundStyle(AppColors.grey500)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, Spacing.md)
-                .padding(.vertical, Spacing.md)
-                .background(AppColors.grey100)
-                .clipShape(RoundedRectangle(cornerRadius: 10.5, style: .continuous))
-        }
-    }
-
-    private var genderField: some View {
-        VStack(alignment: .leading, spacing: Spacing.xs) {
-            Text(Strings.Profile.gender)
-                .font(Typography.caption)
-                .foregroundStyle(AppColors.grey600)
-
-            Text(userDocument?.gender ?? "")
-                .font(Typography.body)
-                .foregroundStyle(AppColors.grey500)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, Spacing.md)
-                .padding(.vertical, Spacing.md)
-                .background(AppColors.grey100)
-                .clipShape(RoundedRectangle(cornerRadius: 10.5, style: .continuous))
-        }
-    }
-
-    private var languageField: some View {
-        VStack(alignment: .leading, spacing: Spacing.xs) {
-            Text(Strings.Profile.language)
-                .font(Typography.caption)
-                .foregroundStyle(AppColors.grey600)
-
-            Picker("", selection: $language) {
-                Text(Strings.Profile.arabic).tag("ar")
-                Text(Strings.Profile.english).tag("en")
-            }
-            .pickerStyle(.segmented)
-            .onChange(of: language) { _, newValue in
-                viewModel?.language = newValue
-            }
+        .pickerStyle(.segmented)
+        .labelsHidden()
+        .onChange(of: language) { _, newValue in
+            viewModel?.language = newValue
         }
     }
 

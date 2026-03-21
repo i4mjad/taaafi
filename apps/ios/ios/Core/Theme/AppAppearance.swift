@@ -4,13 +4,11 @@ import UIKit
 enum AppAppearance {
 
     static func configure() {
-        configureNavigationBar()
+        configureNavigationTitleFonts()
         configureTabBar()
     }
 
-    static func configureNavigationBar() {
-        let navBackground = UIColor(named: "Background") ?? UIColor.systemBackground
-
+    static func configureNavigationTitleFonts() {
         let largeTitleFont = UIFont(name: AppFont.fontName(for: .regular), size: 34)
             ?? .systemFont(ofSize: 34)
         let inlineTitleFont = UIFont(name: AppFont.fontName(for: .medium), size: 17)
@@ -18,31 +16,50 @@ enum AppAppearance {
         let buttonFont = UIFont(name: AppFont.fontName(for: .regular), size: 17)
             ?? .systemFont(ofSize: 17)
 
+        let navBar = UINavigationBar.appearance()
+
         let buttonAppearance = UIBarButtonItemAppearance()
         buttonAppearance.normal.titleTextAttributes = [.font: buttonFont]
+        buttonAppearance.highlighted.titleTextAttributes = [.font: buttonFont]
 
-        // Standard appearance: shown when scrolled (inline title, with separator)
-        let standard = UINavigationBarAppearance()
-        standard.configureWithOpaqueBackground()
-        standard.backgroundColor = navBackground
-        standard.largeTitleTextAttributes = [.font: largeTitleFont]
-        standard.titleTextAttributes = [.font: inlineTitleFont]
-        standard.backButtonAppearance = buttonAppearance
+        let standard = (navBar.standardAppearance.copy() as? UINavigationBarAppearance) ?? UINavigationBarAppearance()
+        standard.largeTitleTextAttributes[.font] = largeTitleFont
+        standard.titleTextAttributes[.font] = inlineTitleFont
         standard.buttonAppearance = buttonAppearance
+        standard.doneButtonAppearance = buttonAppearance
 
-        // Scroll-edge appearance: shown at top (large title, no separator)
-        let scrollEdge = UINavigationBarAppearance()
-        scrollEdge.configureWithOpaqueBackground()
-        scrollEdge.backgroundColor = navBackground
-        scrollEdge.shadowColor = .clear
-        scrollEdge.largeTitleTextAttributes = [.font: largeTitleFont]
-        scrollEdge.titleTextAttributes = [.font: inlineTitleFont]
-        scrollEdge.backButtonAppearance = buttonAppearance
+        let compact = (navBar.compactAppearance?.copy() as? UINavigationBarAppearance) ?? standard
+        compact.largeTitleTextAttributes[.font] = largeTitleFont
+        compact.titleTextAttributes[.font] = inlineTitleFont
+        compact.buttonAppearance = buttonAppearance
+        compact.doneButtonAppearance = buttonAppearance
+
+        let scrollEdge = (navBar.scrollEdgeAppearance?.copy() as? UINavigationBarAppearance) ?? standard
+        scrollEdge.largeTitleTextAttributes[.font] = largeTitleFont
+        scrollEdge.titleTextAttributes[.font] = inlineTitleFont
         scrollEdge.buttonAppearance = buttonAppearance
+        scrollEdge.doneButtonAppearance = buttonAppearance
 
-        UINavigationBar.appearance().standardAppearance = standard
-        UINavigationBar.appearance().compactAppearance = standard
-        UINavigationBar.appearance().scrollEdgeAppearance = scrollEdge
+        navBar.standardAppearance = standard
+        navBar.compactAppearance = compact
+        navBar.scrollEdgeAppearance = scrollEdge
+    }
+
+    static func applySavedTheme() {
+        let theme = UserDefaults.standard.string(forKey: "appTheme") ?? "light"
+        applyTheme(theme)
+    }
+
+    static func applyTheme(_ theme: String) {
+        guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene else { return }
+        let style: UIUserInterfaceStyle = switch theme {
+        case "dark": .dark
+        case "light": .light
+        default: .unspecified
+        }
+        for window in scene.windows {
+            window.overrideUserInterfaceStyle = style
+        }
     }
 
     static func configureTabBar() {
@@ -65,4 +82,5 @@ enum AppAppearance {
         UITabBar.appearance().standardAppearance = appearance
         UITabBar.appearance().scrollEdgeAppearance = appearance
     }
+
 }

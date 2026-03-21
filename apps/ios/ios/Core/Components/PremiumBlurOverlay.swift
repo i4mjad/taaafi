@@ -6,6 +6,18 @@ struct PremiumBlurOverlay<Content: View>: View {
     var customSubtitle: String?
     var onTap: () -> Void = {}
 
+    init(
+        customTitle: String? = nil,
+        customSubtitle: String? = nil,
+        onTap: @escaping () -> Void = {},
+        @ViewBuilder content: () -> Content
+    ) {
+        self.content = content()
+        self.customTitle = customTitle
+        self.customSubtitle = customSubtitle
+        self.onTap = onTap
+    }
+
     @Environment(\.colorScheme) private var colorScheme
 
     private let goldColor = Color(red: 254/255, green: 186/255, blue: 1/255)

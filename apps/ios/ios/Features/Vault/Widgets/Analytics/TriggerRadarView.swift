@@ -61,6 +61,6 @@ struct TriggerRadarView: View {
     }
 
     private func localizedTrigger(_ key: String) -> String {
-        String(localized: String.LocalizationValue("vault.trigger.\(key)"))
+        String(localized: String.LocalizationValue("vault.trigger." + key))
     }
 }

@@ -17,6 +17,13 @@ struct VaultCalendarView: View {
             weekdayHeader
             daysGrid
         }
+        .padding(Spacing.md)
+        .background(AppColors.background)
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(AppColors.grey200, lineWidth: 0.5)
+        )
     }
 
     private var monthHeader: some View {
@@ -26,7 +33,7 @@ struct VaultCalendarView: View {
                     selectedMonth = calendar.date(byAdding: .month, value: -1, to: selectedMonth)!
                 }
             } label: {
-                Image(systemName: "chevron.right")
+                Image(systemName: AppIcon.chevronForward.systemName)
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundStyle(AppColors.primary)
             }

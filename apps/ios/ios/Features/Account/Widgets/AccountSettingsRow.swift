@@ -49,7 +49,7 @@ extension AccountSettingsRow where Trailing == DefaultChevron {
 
 struct DefaultChevron: View {
     var body: some View {
-        Image(systemName: AppIcon.chevronRight.systemName)
+        Image(systemName: AppIcon.chevronForward.systemName)
             .font(.system(size: 14))
             .foregroundStyle(AppColors.grey400)
     }

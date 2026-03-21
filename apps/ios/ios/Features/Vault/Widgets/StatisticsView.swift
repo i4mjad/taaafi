@@ -30,6 +30,13 @@ struct StatisticsView: View {
                 color: AppColors.warning
             )
         }
+        .padding(Spacing.md)
+        .background(AppColors.background)
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(AppColors.grey200, lineWidth: 0.5)
+        )
     }
 
     private func statisticRow(label: String, value: String, icon: String, color: Color) -> some View {
