@@ -511,6 +511,63 @@ enum Strings {
         static let sectionOrder = String(localized: "vault.sectionOrder")
         static let resetToDefault = String(localized: "vault.resetToDefault")
 
+        // Streak Settings
+        static let streakSettings = String(localized: "vault.streakSettings")
+        static let startingDate = String(localized: "vault.startingDate")
+        static let customize = String(localized: "vault.customize")
+        static let resetCounters = String(localized: "vault.resetCounters")
+        static let streakDisplayMode = String(localized: "vault.streakDisplayMode")
+        static let streakDisplayModeDesc = String(localized: "vault.streakDisplayModeDesc")
+        static let daysOnly = String(localized: "vault.daysOnly")
+        static let daysOnlyDesc = String(localized: "vault.daysOnlyDesc")
+        static let detailedMode = String(localized: "vault.detailedMode")
+        static let detailedModeDesc = String(localized: "vault.detailedModeDesc")
+        static let statisticsVisibility = String(localized: "vault.statisticsVisibility")
+        static let statisticsVisibilityDesc = String(localized: "vault.statisticsVisibilityDesc")
+
+        // Streak Periods
+        static let streakPeriods = String(localized: "vault.streakPeriods")
+        static let streakPeriodsDesc = String(localized: "vault.streakPeriodsDesc")
+        static let periodSummary = String(localized: "vault.periodSummary")
+        static let periodDetails = String(localized: "vault.periodDetails")
+        static let totalPeriods = String(localized: "vault.totalPeriods")
+        static let averageDuration = String(localized: "vault.averageDuration")
+
+        // Help
+        static let howToRead = String(localized: "vault.howToRead")
+        static let howToUse = String(localized: "vault.howToUse")
+
+        // Smart Alerts
+        static let smartAlertsTitle = String(localized: "vault.smartAlertsTitle")
+        static let smartAlertsDesc = String(localized: "vault.smartAlertsDesc")
+        static let enableSmartAlerts = String(localized: "vault.enableSmartAlerts")
+        static let alertTime = String(localized: "vault.alertTime")
+        static let smartAlertsEligible = String(localized: "vault.smartAlertsEligible")
+        static let smartAlertsNotEligible = String(localized: "vault.smartAlertsNotEligible")
+
+        // Data Restoration
+        static let dataRestoration = String(localized: "vault.dataRestoration")
+        static let analyzingData = String(localized: "vault.analyzingData")
+        static let dataUpToDate = String(localized: "vault.dataUpToDate")
+        static let migrationNeeded = String(localized: "vault.migrationNeeded")
+        static let restoreData = String(localized: "vault.restoreData")
+
+        // Data Error Report
+        static let reportDataError = String(localized: "vault.reportDataError")
+        static let describeIssue = String(localized: "vault.describeIssue")
+        static let existingReportFound = String(localized: "vault.existingReportFound")
+        static let existingReportDesc = String(localized: "vault.existingReportDesc")
+        static let reportSubmitted = String(localized: "vault.reportSubmitted")
+        static let submitReport = String(localized: "vault.submitReport")
+
+        // Vault Info
+        static let vaultFeatures = String(localized: "vault.vaultFeatures")
+        static let activitiesInfoDesc = String(localized: "vault.activitiesInfoDesc")
+        static let libraryTitle = String(localized: "vault.libraryTitle")
+        static let libraryInfoDesc = String(localized: "vault.libraryInfoDesc")
+        static let diariesTitle = String(localized: "vault.diariesTitle")
+        static let diariesInfoDesc = String(localized: "vault.diariesInfoDesc")
+
         // Placeholders
         static let comingSoon = String(localized: "vault.comingSoon")
         static let comingSoonMessage = String(localized: "vault.comingSoonMessage")

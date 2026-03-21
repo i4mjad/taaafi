@@ -58,6 +58,60 @@ struct StreakCalculator {
         )
     }
 
+    // MARK: - Periods
+
+    static func calculatePeriods(
+        for type: FollowUpType,
+        followUps: [FollowUpModel],
+        userFirstDate: Date
+    ) -> [StreakPeriod] {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        let startDate = calendar.startOfDay(for: userFirstDate)
+
+        // Group follow-ups by date
+        var followUpsByDate: [Date: [FollowUpType]] = [:]
+        for followUp in followUps {
+            let day = calendar.startOfDay(for: followUp.time)
+            followUpsByDate[day, default: []].append(followUp.type)
+        }
+
+        var periods: [StreakPeriod] = []
+        var periodStart = startDate
+        var currentDate = startDate
+
+        while currentDate <= today {
+            let types = followUpsByDate[currentDate] ?? []
+            if types.contains(type) {
+                // End of a streak period
+                let days = calendar.dateComponents([.day], from: periodStart, to: currentDate).day ?? 0
+                if days > 0 {
+                    periods.append(StreakPeriod(
+                        startDate: periodStart,
+                        endDate: calendar.date(byAdding: .day, value: -1, to: currentDate)!,
+                        durationDays: days,
+                        followUpType: type
+                    ))
+                }
+                periodStart = calendar.date(byAdding: .day, value: 1, to: currentDate)!
+            }
+            currentDate = calendar.date(byAdding: .day, value: 1, to: currentDate)!
+        }
+
+        // Add the current ongoing period
+        let ongoingDays = calendar.dateComponents([.day], from: periodStart, to: today).day ?? 0
+        if ongoingDays >= 0 {
+            periods.append(StreakPeriod(
+                startDate: periodStart,
+                endDate: today,
+                durationDays: ongoingDays + 1, // Include today
+                followUpType: type
+            ))
+        }
+
+        return periods
+    }
+
     // MARK: - Private
 
     private static func calculateStreak(
