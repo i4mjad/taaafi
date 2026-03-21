@@ -32,7 +32,7 @@ final class DataErrorReportViewModel {
         do {
             // Check for recent data error reports in last 7 days
             let sevenDaysAgo = Calendar.current.date(byAdding: .day, value: -7, to: Date())!
-            let reports: [UserReport] = try await firestoreService.getDocuments(
+            let reports: [DataErrorReport] = try await firestoreService.getDocuments(
                 collection: "users/\(userId)/reports",
                 filters: [
                     .isEqualTo(field: "type", value: "dataIssue"),
@@ -54,7 +54,7 @@ final class DataErrorReportViewModel {
         error = nil
 
         do {
-            let report = UserReport(
+            let report = DataErrorReport(
                 type: "dataIssue",
                 description: reportText.trimmingCharacters(in: .whitespacesAndNewlines),
                 createdAt: Date()
@@ -75,7 +75,7 @@ final class DataErrorReportViewModel {
 
 // MARK: - Report Model
 
-struct UserReport: Codable, Identifiable {
+struct DataErrorReport: Codable, Identifiable {
     @DocumentID var id: String?
     let type: String
     let description: String
