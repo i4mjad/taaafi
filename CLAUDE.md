@@ -238,3 +238,25 @@ docs(infra): update claude.md with new patterns
 | `team-lead` | None (coordination only) | Entire repo | Task delegation and cross-app coordination |
 
 Agent definitions live in `.claude/agents/`. Each agent follows the HARD RULES above and the commit conventions.
+
+---
+
+## Code Review Graph
+
+A persistent knowledge graph (`.code-review-graph/graph.db`) indexes the entire codebase — 613 files, 2,500+ nodes, 19,500+ edges across TypeScript, TSX, Swift, Kotlin, C, C++, and JavaScript.
+
+### How It Works
+- **Auto-updates** via hooks on file edits and commits — no manual rebuilds needed day-to-day.
+- **Manual rebuild** (after major refactors or branch switches):
+  ```
+  /code-review-graph:build-graph
+  ```
+
+### Code Review Commands
+| Command | When to Use |
+|---------|-------------|
+| `/code-review-graph:review-delta` | Review uncommitted changes with blast-radius analysis |
+| `/code-review-graph:review-pr` | Review a PR or branch diff with full structural context |
+
+### Agents
+All agents should use the graph-powered review commands when reviewing code changes in their scope.
