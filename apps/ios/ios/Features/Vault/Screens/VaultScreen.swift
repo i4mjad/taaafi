@@ -10,6 +10,17 @@ struct VaultScreen: View {
     @State private var activitiesVM: ActivitiesViewModel?
     @State private var tabBarHeight: CGFloat = 50
 
+    // Sheet states
+    @State private var streakDisplaySettings: StreakDisplaySettings = StreakSettingsStore().load()
+    @State private var showStreakSettings = false
+    @State private var showResetData = false
+    @State private var streakPeriodsType: FollowUpType?
+    @State private var helpSection: VaultSection?
+    @State private var showSmartAlerts = false
+    @State private var showDataRestoration = false
+    @State private var showDataErrorReport = false
+    @State private var showVaultInfo = false
+
     init() {
         _containerVM = State(initialValue: VaultContainerViewModel())
     }
@@ -66,6 +77,7 @@ struct VaultScreen: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
+                        showVaultInfo = true
                     } label: {
                         Image(AppIcon.plusIconName)
                             .resizable()
@@ -94,6 +106,7 @@ struct VaultScreen: View {
                     )
                 }
             }
+            // Follow-up sheet
             .sheet(isPresented: $containerVM.showFollowUpSheet) {
                 if let dashboardVM {
                     FollowUpSheet(
@@ -108,6 +121,7 @@ struct VaultScreen: View {
                     .presentationDetents([.large])
                 }
             }
+            // Layout settings sheet
             .sheet(isPresented: $containerVM.showLayoutSettings) {
                 VaultLayoutSettingsSheet(
                     viewModel: VaultLayoutSettingsViewModel(
@@ -119,6 +133,72 @@ struct VaultScreen: View {
                     }
                 )
                 .presentationDetents([.medium, .large])
+            }
+            // Streak settings sheet
+            .sheet(isPresented: $showStreakSettings) {
+                if let dashboardVM {
+                    StreakSettingsSheet(
+                        viewModel: StreakSettingsViewModel(
+                            userFirstDate: dashboardVM.streaks.userFirstDate
+                        ),
+                        onSave: { newSettings in
+                            streakDisplaySettings = newSettings
+                        }
+                    )
+                    .presentationDetents([.medium, .large])
+                }
+            }
+            // Reset data sheet
+            .sheet(isPresented: $showResetData) {
+                ResetDataSheet()
+            }
+            // Streak periods sheet
+            .sheet(item: $streakPeriodsType) { type in
+                if let dashboardVM {
+                    StreakPeriodsSheet(
+                        viewModel: StreakPeriodsViewModel(
+                            followUpType: type,
+                            followUpService: FollowUpService(firestoreService: firestoreService),
+                            userFirstDate: dashboardVM.streaks.userFirstDate
+                        )
+                    )
+                    .presentationDetents([.large])
+                }
+            }
+            // Help sheet
+            .sheet(item: $helpSection) { section in
+                HelpSheet(data: VaultHelpContent.content(for: section))
+                    .presentationDetents([.medium, .large])
+            }
+            // Smart alerts sheet
+            .sheet(isPresented: $showSmartAlerts) {
+                SmartAlertsSheet(
+                    viewModel: SmartAlertsViewModel(
+                        smartAlertService: SmartAlertService(firestoreService: firestoreService),
+                        followUpService: FollowUpService(firestoreService: firestoreService),
+                        userFirstDate: dashboardVM?.streaks.userFirstDate ?? Date()
+                    )
+                )
+                .presentationDetents([.medium, .large])
+            }
+            // Data restoration sheet
+            .sheet(isPresented: $showDataRestoration) {
+                DataRestorationSheet(
+                    viewModel: DataRestorationViewModel(userDocumentService: userDocumentService)
+                )
+                .presentationDetents([.medium])
+            }
+            // Data error report sheet
+            .sheet(isPresented: $showDataErrorReport) {
+                DataErrorReportSheet(
+                    viewModel: DataErrorReportViewModel(firestoreService: firestoreService)
+                )
+                .presentationDetents([.medium, .large])
+            }
+            // Vault info sheet
+            .sheet(isPresented: $showVaultInfo) {
+                VaultInfoSheet()
+                    .presentationDetents([.medium, .large])
             }
             .navigationDestination(for: VaultRoute.self) { route in
                 routeDestination(for: route)
@@ -164,7 +244,7 @@ struct VaultScreen: View {
         let description = String(localized: String.LocalizationValue(section.descriptionKey))
 
         VStack(alignment: .leading, spacing: Spacing.xs) {
-            // Header row — matches Flutter's _buildVaultElement header
+            // Header row
             HStack(spacing: 12) {
                 Image(systemName: section.icon)
                     .font(.system(size: 20))
@@ -176,7 +256,7 @@ struct VaultScreen: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
 
                 Button {
-                    toastManager.show(.info, message: Strings.Vault.comingSoon)
+                    helpSection = section
                 } label: {
                     Image(systemName: "questionmark.circle")
                         .font(.system(size: 16))
@@ -210,7 +290,19 @@ struct VaultScreen: View {
     private func sectionContent(for section: VaultSection, vm: VaultDashboardViewModel) -> some View {
         switch section {
         case .currentStreaks:
-            StreaksView(streaks: vm.streaks)
+            StreaksView(
+                streaks: vm.streaks,
+                settings: streakDisplaySettings,
+                onStreakTap: { type in
+                    streakPeriodsType = type
+                },
+                onCustomizeTap: {
+                    showStreakSettings = true
+                },
+                onResetTap: {
+                    showResetData = true
+                }
+            )
         case .statistics:
             StatisticsView(statistics: vm.statistics)
         case .calendar:
@@ -231,7 +323,24 @@ struct VaultScreen: View {
         case .streakAverages:
             StreakAveragesCard(averages: vm.streakAverages)
         case .riskClock:
-            RiskClockView(data: vm.riskClockData)
+            VStack(spacing: Spacing.xs) {
+                RiskClockView(data: vm.riskClockData)
+                Button {
+                    showSmartAlerts = true
+                } label: {
+                    HStack(spacing: Spacing.xxs) {
+                        Image(systemName: "shield.fill")
+                            .font(.system(size: 12))
+                        Text(Strings.Vault.smartAlertsTitle)
+                            .font(Typography.small)
+                    }
+                    .foregroundStyle(AppColors.primary)
+                    .padding(.horizontal, Spacing.sm)
+                    .padding(.vertical, Spacing.xxs)
+                    .background(AppColors.primary.opacity(0.08))
+                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                }
+            }
         case .heatMapCalendar:
             HeatMapCalendarView(data: vm.heatMapData)
         case .triggerRadar:
@@ -395,6 +504,12 @@ struct VaultScreen: View {
         await activitiesVM?.loadData()
     }
 
+}
+
+// MARK: - FollowUpType Identifiable Conformance
+
+extension FollowUpType: Identifiable {
+    public var id: String { rawValue }
 }
 
 // MARK: - iOS 26 Liquid Glass

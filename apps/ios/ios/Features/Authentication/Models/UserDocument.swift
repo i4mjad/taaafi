@@ -22,6 +22,14 @@ struct UserDocument: Codable, Equatable, Identifiable {
 
     var isRequestedToBeDeleted: Bool?
     var hasCheckedForDataLoss: Bool?
+    var migrationCompleted: Bool?
+
+    /// Checks if legacy array-based data exists that needs migration
+    var hasLegacyData: Bool {
+        (userRelapses?.isEmpty == false) ||
+        (userMasturbatingWithoutWatching?.isEmpty == false) ||
+        (userWatchingWithoutMasturbating?.isEmpty == false)
+    }
 
     /// Checks if document has missing required fields (legacy users)
     var hasMissingData: Bool {
