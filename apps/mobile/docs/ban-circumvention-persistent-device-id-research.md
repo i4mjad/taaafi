@@ -444,6 +444,83 @@ match /bannedDevices/{deviceId} {
 
 ---
 
+## 8. Alternative Packages Evaluated
+
+### `persistent_device_id` ^1.0.0
+
+- All-in-one package — Android uses MediaDrm + Keystore + EncryptedSharedPreferences fallback chain, iOS uses Keychain UUID
+- Single API call: `PersistentDeviceId.getDeviceId()`
+- **Concern:** Relatively new (v1.0.0), and on Android inherits MediaDrm's ~2.5% collision rate (same ID across different devices of same manufacturer)
+- **Verdict:** Convenient but risky for ban enforcement due to collision rate
+
+### `flutter_udid` ^4.1.1
+
+- Most mature cross-platform persistent UDID package
+- Requires Dart SDK `>=3.0.0 <4.0.0` (matches our constraint)
+- Provides `FlutterUdid.consistentUdid` (SHA-256 hash, consistent format)
+- **Concern:** On Android, wraps `ANDROID_ID` — same behavior as our recommended approach but adds a dependency
+- **Verdict:** Viable but unnecessary — DIY approach gives more control
+
+### MediaDrm (Widevine) ID (Android only)
+
+- Hardware-backed identifier via `PROPERTY_DEVICE_UNIQUE_ID`
+- Survives uninstall, reinstall, **and often factory reset**
+- **Critical flaw:** ~2.5% collision rate — multiple devices share the same ID (especially same-manufacturer models)
+- Can be spoofed on rooted devices via LSPosed/Xposed
+- **Verdict:** Not suitable as primary identifier due to collision rate. Could be used as a secondary signal.
+
+### Why DIY with `flutter_secure_storage` + `device_info_plus` is best
+
+1. Both packages are already in our dependency tree (or will be added with minimal footprint)
+2. Full control over fallback behavior and error handling
+3. No collision issues (UUID on iOS, Android ID per signing key on Android)
+4. No new untested packages in the critical ban enforcement path
+5. Transparent — we know exactly what identifier we're using on each platform
+
+---
+
+## 9. iOS First-Launch Cleanup Gotcha
+
+Since iOS Keychain persists across app reinstalls, if we later use `flutter_secure_storage` for auth tokens or other credentials, those would also survive reinstall. This creates a potential issue:
+
+**Problem:** User uninstalls app, reinstalls, and is auto-logged-in via stale Keychain tokens.
+
+**Solution:** On first launch after install, clear auth-related Keychain entries but **preserve** the persistent device ID:
+
+```dart
+final prefs = await SharedPreferences.getInstance();
+final isFirstRun = prefs.getBool('first_run') ?? true;
+
+if (isFirstRun) {
+  // Clear auth tokens but NOT the device ID
+  await secureStorage.delete(key: 'auth_token');
+  await secureStorage.delete(key: 'refresh_token');
+  // Do NOT delete 'persistent_device_id' — that's the whole point
+  await prefs.setBool('first_run', false);
+}
+```
+
+This is critical to implement alongside the persistent device ID to avoid unexpected behavior.
+
+---
+
+## 10. App Store / Play Store Compliance
+
+### Apple App Store
+
+- Storing a self-generated UUID in Keychain for first-party fraud prevention is **compliant**
+- Must NOT use it for cross-app tracking or share with third parties for advertising without ATT consent
+- Must include a `PrivacyInfo.xcprivacy` privacy manifest (mandatory since May 2024) — **we need to add this**
+- Device fingerprinting (combining multiple device signals) is **explicitly prohibited** regardless of consent
+- Declare identifier usage in App Privacy nutrition labels
+
+### Google Play Store
+
+- `ANDROID_ID` is a standard, sanctioned identifier — no special permissions required
+- Disclose persistent identifier usage in privacy policy
+
+---
+
 ## Summary of Changes Required
 
 | # | Change | Scope | Risk |
