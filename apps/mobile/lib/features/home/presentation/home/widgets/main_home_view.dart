@@ -15,6 +15,7 @@ import 'package:reboot_app_3/features/home/presentation/home/widgets/notificatio
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/features/vault/presentation/vault_settings/activities_notifications_settings_screen.dart';
 import 'package:reboot_app_3/core/shared_widgets/warning_notification_banner.dart';
+import 'package:reboot_app_3/features/account/presentation/widgets/optional_update_banner.dart';
 
 class MainHomeView extends ConsumerWidget {
   const MainHomeView({super.key});
@@ -29,6 +30,9 @@ class MainHomeView extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Optional app update banner
+          const OptionalUpdateBanner(),
+
           // Notification Promoter - show if notifications are disabled
           notificationsEnabledAsync.when(
             data: (enabled) => enabled
