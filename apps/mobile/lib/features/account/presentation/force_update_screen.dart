@@ -9,6 +9,7 @@ import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/core/routing/app_startup.dart';
+import 'package:reboot_app_3/features/account/application/force_update_service.dart';
 import 'package:reboot_app_3/features/account/application/startup_security_service.dart';
 
 /// Full-screen blocking widget shown when a forced app update is required.
@@ -47,9 +48,8 @@ class _ForceUpdateScreenState extends ConsumerState<ForceUpdateScreen> {
     if (_isRefreshing) return;
     setState(() => _isRefreshing = true);
 
+    ref.invalidate(forceUpdateCheckProvider);
     ref.invalidate(appStartupProvider);
-
-    await Future.delayed(const Duration(milliseconds: 500));
 
     if (mounted) {
       setState(() => _isRefreshing = false);
