@@ -12,7 +12,9 @@ import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/core/theming/theme_provider.dart';
 import 'package:reboot_app_3/core/theming/color_theme_provider.dart';
+import 'package:reboot_app_3/features/account/application/startup_security_service.dart';
 import 'package:reboot_app_3/features/account/presentation/banned_screen.dart';
+import 'package:reboot_app_3/features/account/presentation/force_update_screen.dart';
 import 'package:reboot_app_3/core/messaging/services/fcm_service.dart';
 
 class MyApp extends ConsumerWidget {
@@ -50,7 +52,35 @@ class MyApp extends ConsumerWidget {
           );
         },
         data: (securityResult) {
-          // ✅ Check if user/device is banned BEFORE creating the app
+          // ✅ PRIORITY 1: Force update blocks everything
+          if (securityResult.status == SecurityStartupStatus.updateRequired) {
+            final locale = ref.watch(localeNotifierProvider);
+            return MaterialApp(
+              debugShowCheckedModeBanner: false,
+              theme: themeController.darkTheme
+                  ? darkTheme
+                  : getLightTheme(colorTheme),
+              supportedLocales: const [Locale('ar', ''), Locale('en', '')],
+              locale: locale,
+              localizationsDelegates: const [
+                AppLocalizations.delegate,
+                GlobalMaterialLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+              ],
+              localeResolutionCallback: (locale, supportedLocales) {
+                for (var supportedLocale in supportedLocales) {
+                  if (supportedLocale.languageCode == locale?.languageCode) {
+                    return supportedLocale;
+                  }
+                }
+                return supportedLocales.first;
+              },
+              home: ForceUpdateScreen(securityResult: securityResult),
+            );
+          }
+
+          // ✅ PRIORITY 2: Check if user/device is banned
           if (securityResult.isBlocked) {
             final locale = ref.watch(localeNotifierProvider);
             return MaterialApp(
