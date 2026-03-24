@@ -25,6 +25,7 @@ final class DeviceTrackingService {
         authStateHandle = Auth.auth().addStateDidChangeListener { [weak self] _, user in
             guard let self, let user else { return }
             Task { @MainActor in
+                try? await self.migrateDeviceIdIfNeeded(userId: user.uid)
                 try? await self.updateUserDeviceIds(userId: user.uid)
             }
         }
@@ -33,13 +34,20 @@ final class DeviceTrackingService {
     // MARK: - Device ID
 
     private func loadOrGenerateDeviceId() -> String {
-        if let stored = UserDefaults.standard.string(forKey: Self.deviceIdKey) {
-            return stored
+        // Use Keychain-backed persistent ID (survives reinstall)
+        let persistentId = PersistentDeviceIdService.shared.getDeviceId()
+
+        // Migration: if we had an old UserDefaults-based ID, keep it registered too
+        // The old ID will be handled during Firestore device tracking update
+        if let oldId = UserDefaults.standard.string(forKey: Self.deviceIdKey), oldId != persistentId {
+            // Store the old ID for migration purposes
+            UserDefaults.standard.set(oldId, forKey: "old_device_id")
         }
 
-        let newId = UIDevice.current.identifierForVendor?.uuidString ?? "ios_\(UUID().uuidString)"
-        UserDefaults.standard.set(newId, forKey: Self.deviceIdKey)
-        return newId
+        // Store persistent ID in UserDefaults too (for code that reads from there)
+        UserDefaults.standard.set(persistentId, forKey: Self.deviceIdKey)
+
+        return persistentId
     }
 
     // MARK: - Firestore Device Tracking
@@ -76,6 +84,22 @@ final class DeviceTrackingService {
                 "lastDeviceUpdate": FieldValue.serverTimestamp(),
             ])
         }
+    }
+
+    /// Migrate from old IDFV-based device ID to persistent Keychain-backed ID.
+    /// Registers both IDs so existing bans still match.
+    func migrateDeviceIdIfNeeded(userId: String) async throws {
+        guard let oldId = UserDefaults.standard.string(forKey: "old_device_id"),
+              oldId != deviceId else { return }
+
+        let userRef = db.collection("users").document(userId)
+        try await userRef.updateData([
+            "devicesIds": FieldValue.arrayUnion([oldId, deviceId]),
+            "lastDeviceUpdate": FieldValue.serverTimestamp(),
+        ])
+
+        // Clear migration flag
+        UserDefaults.standard.removeObject(forKey: "old_device_id")
     }
 
     /// Get current user's device IDs from Firestore

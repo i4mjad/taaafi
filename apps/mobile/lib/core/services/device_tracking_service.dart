@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:reboot_app_3/core/services/persistent_device_id_service.dart';
 
 /// Service for managing device tracking and updating user device IDs
 /// Ensures no duplicate device IDs are stored in user documents
@@ -11,14 +12,18 @@ class DeviceTrackingService {
 
   static final DeviceTrackingService instance = DeviceTrackingService._();
 
-  static const String _deviceIdKey = 'device_id';
-
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   /// Initialize device tracking service
   Future<void> init() async {
     try {
+      // Handle first-run cleanup (iOS Keychain management)
+      await PersistentDeviceIdService.instance.handleFirstRunCleanup();
+
+      // Migrate old device ID if needed (register both old and new IDs)
+      await _migrateDeviceId();
+
       // Set up auth state listener
       _setupAuthStateListener();
 
@@ -30,42 +35,35 @@ class DeviceTrackingService {
     } catch (e) {}
   }
 
-  /// Generate and get device ID
-  Future<String> getDeviceId() async {
-    final prefs = await SharedPreferences.getInstance();
-    String? deviceId = prefs.getString(_deviceIdKey);
+  /// Migrate from old IDFV/SharedPreferences device ID to persistent ID.
+  /// Registers both old and new IDs in Firestore so existing bans still match.
+  Future<void> _migrateDeviceId() async {
+    try {
+      final persistentService = PersistentDeviceIdService.instance;
+      if (await persistentService.isMigrated()) return;
 
-    if (deviceId == null) {
-      deviceId = await _generateDeviceId();
-      await prefs.setString(_deviceIdKey, deviceId);
-    }
+      final oldDeviceId = await persistentService.getOldDeviceId();
+      final newDeviceId = await persistentService.getDeviceId();
 
-    return deviceId;
+      if (oldDeviceId != null && oldDeviceId != newDeviceId) {
+        // Register both device IDs for the current user
+        final user = _auth.currentUser;
+        if (user != null) {
+          final userRef = _firestore.collection('users').doc(user.uid);
+          await userRef.update({
+            'devicesIds': FieldValue.arrayUnion([oldDeviceId, newDeviceId]),
+            'lastDeviceUpdate': FieldValue.serverTimestamp(),
+          });
+        }
+      }
+
+      await persistentService.markMigrated();
+    } catch (_) {}
   }
 
-  /// Generate unique device ID using device_info_plus
-  Future<String> _generateDeviceId() async {
-    final deviceInfo = DeviceInfoPlugin();
-
-    try {
-      if (Platform.isAndroid) {
-        final androidInfo = await deviceInfo.androidInfo;
-        // Use Android ID as the primary identifier
-        return androidInfo.id;
-      } else if (Platform.isIOS) {
-        final iosInfo = await deviceInfo.iosInfo;
-        // Use identifierForVendor as the primary identifier
-        return iosInfo.identifierForVendor ?? 'unknown';
-      } else {
-        // Fallback for other platforms
-        final timestamp = DateTime.now().millisecondsSinceEpoch;
-        return 'device_${Platform.operatingSystem}_$timestamp';
-      }
-    } catch (e) {
-      // Fallback to timestamp-based ID
-      final timestamp = DateTime.now().millisecondsSinceEpoch;
-      return 'device_fallback_$timestamp';
-    }
+  /// Get persistent device ID (survives app reinstall)
+  Future<String> getDeviceId() async {
+    return await PersistentDeviceIdService.instance.getDeviceId();
   }
 
   /// Update device IDs list for user (no duplicates)

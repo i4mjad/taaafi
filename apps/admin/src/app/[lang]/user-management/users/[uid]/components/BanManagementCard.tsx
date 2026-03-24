@@ -485,7 +485,12 @@ export default function BanManagementCard({ userId, userDisplayName, userDevices
         expiresAt,
         isActive: true,
         restrictedFeatures: formData.scope === 'feature_specific' ? formData.restrictedFeatures : null,
-        deviceIds: userDevices.length > 0 ? userDevices : null, // Track device IDs
+        deviceIds: userDevices.length > 0 ? userDevices : null,
+        restrictedDevices: (formData.type === 'user_ban' || formData.type === 'device_ban')
+          ? userDevices
+          : formData.type === 'feature_ban'
+            ? []
+            : formData.restrictedDevices,
         relatedContent: formData.relatedContentId.trim() ? {
           type: formData.relatedContentType,
           id: formData.relatedContentId.trim(),
@@ -1058,28 +1063,23 @@ export default function BanManagementCard({ userId, userDisplayName, userDevices
                   </div>
                 )}
 
-                {/* Device-specific restrictions */}
-                {formData.type === 'device_ban' && userDevices.length > 0 && (
+                {/* Auto-included devices for user/device bans */}
+                {(formData.type === 'device_ban' || formData.type === 'user_ban') && userDevices.length > 0 && (
                   <div className="bg-orange-50 p-4 rounded-lg space-y-3">
                     <div className="flex items-center gap-2 mb-2">
                       <Smartphone className="h-4 w-4 text-orange-600" />
-                      <Label className="font-medium text-sm">{t('modules.userManagement.bans.restrictedDevices')}</Label>
+                      <Label className="font-medium text-sm">
+                        {userDevices.length} {userDevices.length === 1 ? 'device' : 'devices'} will be banned automatically
+                      </Label>
                     </div>
-                    <div className="grid grid-cols-2 gap-2 max-h-28 overflow-y-auto p-2 border rounded bg-white">
+                    <p className="text-xs text-orange-700">
+                      All devices associated with this user will be included in the ban. The ban applies regardless of which account is used on these devices.
+                    </p>
+                    <div className="max-h-28 overflow-y-auto p-2 border rounded bg-white">
                       {userDevices.map((deviceId) => (
-                        <div key={deviceId} className="flex items-center space-x-2 p-1.5 hover:bg-gray-50 rounded">
-                          <Checkbox
-                            id={`device-${deviceId}`}
-                            checked={formData.restrictedDevices.includes(deviceId)}
-                            onCheckedChange={() => handleDeviceToggle(deviceId)}
-                            className="h-3 w-3"
-                          />
-                          <Label 
-                            htmlFor={`device-${deviceId}`}
-                            className="text-xs font-normal cursor-pointer font-mono flex-1 truncate"
-                          >
-                            {deviceId}
-                          </Label>
+                        <div key={deviceId} className="flex items-center gap-2 p-1.5">
+                          <Smartphone className="h-3 w-3 text-gray-400 shrink-0" />
+                          <span className="text-xs font-mono text-gray-600 truncate">{deviceId}</span>
                         </div>
                       ))}
                     </div>
