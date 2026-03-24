@@ -9,7 +9,9 @@ import 'package:reboot_app_3/features/authentication/providers/user_document_pro
 import 'package:reboot_app_3/features/authentication/providers/user_provider.dart';
 import 'package:reboot_app_3/features/vault/presentation/notifiers/statistics_visibility_notifier.dart';
 import 'package:reboot_app_3/features/account/application/startup_security_service.dart';
+import 'package:reboot_app_3/features/account/application/force_update_service.dart';
 import 'package:reboot_app_3/features/account/presentation/banned_screen.dart';
+import 'package:reboot_app_3/features/account/presentation/force_update_screen.dart';
 import 'package:reboot_app_3/features/plus/application/revenue_cat_auth_sync_service.dart';
 import 'package:reboot_app_3/features/authentication/application/user_subscription_sync_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -33,14 +35,27 @@ Future<SecurityStartupResult> appStartup(Ref ref) async {
   });
 
   // 🚀 OPTIMIZATION: Run independent initializations in parallel
-  // SharedPreferences and user provider can load simultaneously
-  await Future.wait([
+  // SharedPreferences, user provider, and force update check can load simultaneously
+  final results = await Future.wait([
     ref.watch(sharedPreferencesProvider.future),
     ref.read(userNotifierProvider.future),
+    _checkForceUpdateSafe(ref),
   ]);
+
+  final forceUpdateResult = results[2] as ForceUpdateResult;
 
   // Initialize locale provider (sync - fast)
   ref.read(localeNotifierProvider);
+
+  // PRIORITY 1: Forced update blocks everything — check before security
+  if (forceUpdateResult.isForcedUpdate) {
+    return SecurityStartupResult.updateRequired(
+      storeLink: forceUpdateResult.storeLink ?? '',
+      updateTitle: forceUpdateResult.title ?? {'ar': '', 'en': ''},
+      updateMessage: forceUpdateResult.message ?? {'ar': '', 'en': ''},
+      minimumVersion: forceUpdateResult.minimumVersion ?? '',
+    );
+  }
 
   // 🚀 OPTIMIZATION: Fire RevenueCat initialization in background (non-blocking)
   unawaited(_initializeRevenueCatSafe(ref));
@@ -56,7 +71,31 @@ Future<SecurityStartupResult> appStartup(Ref ref) async {
     unawaited(_initializeSubscriptionSyncSafe(ref));
   }
 
+  // If security passed but optional update available, return with update info
+  if (securityResult.isSuccess && forceUpdateResult.isOptionalUpdate) {
+    return SecurityStartupResult.updateAvailable(
+      message: securityResult.message,
+      deviceId: securityResult.deviceId ?? '',
+      featureAccessMap: securityResult.featureAccessMap,
+      storeLink: forceUpdateResult.storeLink ?? '',
+      updateTitle: forceUpdateResult.title ?? {'ar': '', 'en': ''},
+      updateMessage: forceUpdateResult.message ?? {'ar': '', 'en': ''},
+      dismissCooldownHours: forceUpdateResult.dismissCooldownHours,
+      minimumVersion: forceUpdateResult.minimumVersion ?? '',
+    );
+  }
+
   return securityResult;
+}
+
+/// Safe force update check that won't throw
+Future<ForceUpdateResult> _checkForceUpdateSafe(Ref ref) async {
+  try {
+    return await ref.read(forceUpdateCheckProvider.future);
+  } catch (e) {
+    debugPrint('Force update check failed: $e');
+    return ForceUpdateResult.noUpdate();
+  }
 }
 
 /// Safe RevenueCat initialization that won't throw
@@ -87,8 +126,12 @@ class AppStartupWidget extends ConsumerWidget {
     final appStartupState = ref.watch(appStartupProvider);
     return appStartupState.when(
       data: (securityResult) {
-        // Check if device or user is banned
-        // Device bans have highest priority and are checked first in the security service
+        // PRIORITY 1: Force update blocks everything
+        if (securityResult.status == SecurityStartupStatus.updateRequired) {
+          return ForceUpdateScreen(securityResult: securityResult);
+        }
+
+        // PRIORITY 2: Check if device or user is banned
         if (securityResult.isBlocked) {
           return AppBannedWidget(securityResult: securityResult);
         }
@@ -96,7 +139,6 @@ class AppStartupWidget extends ConsumerWidget {
         // Show warning if security check failed but allow app to continue
         if (securityResult.hasWarning) {
           // Log warning but continue with app loading
-          // You could also show a snackbar or toast here
         }
 
         return onLoaded(context);

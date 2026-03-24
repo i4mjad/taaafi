@@ -20,6 +20,7 @@ import {
   ShieldIcon,
   TrophyIcon,
   UserPlusIcon,
+  DownloadIcon,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -119,6 +120,7 @@ export function AppSidebar({ lang, ...props }: AppSidebarProps) {
         items: [
           { titleKey: "featureFlags", url: `/${lang}/features`, icon: FlagIcon },
           { titleKey: "appFeatures", url: `/${lang}/features/app-features`, icon: SettingsIcon },
+          { titleKey: "forceUpdate", url: `/${lang}/features/force-update`, icon: DownloadIcon },
         ]
       },
     ],

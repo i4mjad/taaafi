@@ -1164,6 +1164,19 @@ const Map<String, String> kAr = {
       "اكتمل التحديث بنجاح! سيتم إعادة تشغيل التطبيق لتطبيق التغييرات.",
   "restart-now": "إعادة التشغيل الآن",
   "update-error-generic": "فشل في تحميل التحديث. يرجى المحاولة مرة أخرى.",
+
+  // التحديث الإجباري (من Firestore)
+  "force-update-title": "تحديث مطلوب",
+  "force-update-message":
+      "يتوفر إصدار جديد من تعافي. يرجى التحديث للاستمرار في استخدام التطبيق.",
+  "force-update-refresh": "لقد قمت بالتحديث بالفعل",
+  "optional-update-title": "تحديث متاح",
+  "optional-update-message":
+      "يتوفر إصدار جديد من تعافي يحتوي على تحسينات وإصلاحات.",
+  "update-now": "حدّث الآن",
+  "not-now": "ليس الآن",
+  "open-store": "فتح المتجر",
+
   "personal-data": "المجتمع",
   "relapses-number": "عدد الانتكاسات: ",
   "day": "يوم",
