@@ -10,7 +10,6 @@ import 'package:reboot_app_3/core/shared_widgets/container.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
-import 'package:reboot_app_3/features/account/application/startup_security_service.dart';
 
 const _kDismissedAtKey = 'optional_update_dismissed_at';
 const _kDismissedVersionKey = 'optional_update_dismissed_version';
