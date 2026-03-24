@@ -120,7 +120,15 @@
       "WebFetch(domain:openillumi.com)",
       "WebFetch(domain:www.index.dev)",
       "WebFetch(domain:marcgg.com)",
-      "WebFetch(domain:exploreswiftui.com)"
+      "WebFetch(domain:exploreswiftui.com)",
+      "Bash(yarn build:*)",
+      "Bash(npx firebase:*)",
+      "Bash(flutter pub:*)",
+      "Bash(gh pr:*)",
+      "Bash(flutter --version)",
+      "Bash(shorebird flutter:*)",
+      "Bash(npx next:*)",
+      "Bash(./node_modules/.bin/next build:*)"
     ]
   },
   "outputStyle": "default"
