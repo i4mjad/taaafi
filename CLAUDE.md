@@ -108,6 +108,40 @@ dart run build_runner build --delete-conflicting-outputs  # Generate Riverpod co
 dart run build_runner watch --delete-conflicting-outputs  # Watch mode for codegen
 ```
 
+### Mobile — Shorebird Release
+
+**iOS:**
+```bash
+cd apps/mobile
+shorebird release ios
+```
+
+**Android:**
+```bash
+cd apps/mobile
+shorebird release android --flutter-version=3.32.5 \
+  --build-name=<VERSION> \
+  --build-number=<BUILD_NUMBER> \
+  --target lib/main.dart
+```
+
+**Build number format:** `(MAJOR)(MINOR)(PATCH)(BUILD)`
+
+| Version | Build | Build Number |
+|---------|-------|--------------|
+| 5.5.1   | 01    | 55101        |
+| 5.5.3   | 01    | 55301        |
+| 5.6.0   | 02    | 56002        |
+| 6.0.0   | 01    | 60001        |
+
+Example:
+```bash
+shorebird release android --flutter-version=3.32.5 \
+  --build-name=5.5.3 \
+  --build-number=55301 \
+  --target lib/main.dart
+```
+
 ### Admin
 ```bash
 cd apps/admin
