@@ -73,6 +73,9 @@ enum ForceUpdateStatus {
 
 /// Service that checks Firestore for force update configuration
 class ForceUpdateService {
+  static const _iosAppStoreId = '1531562469';
+  static const _androidPackageId = 'com.amjadkhalfan.reboot_app_3';
+
   final FirebaseFirestore _firestore;
 
   ForceUpdateService({FirebaseFirestore? firestore})
@@ -96,17 +99,20 @@ class ForceUpdateService {
 
       // Get installed app version
       final packageInfo = await PackageInfo.fromPlatform();
-      final installedVersion = packageInfo.version; // e.g. "5.5.3"
+      final installedVersion = packageInfo.version;
 
-      // Compare versions
       if (!isVersionOutdated(installedVersion, config.minimumVersion)) {
         return ForceUpdateResult.noUpdate();
       }
 
-      // Update is needed — determine enforcement level
+      // Build store link from app IDs
+      final storeLink = Platform.isIOS
+          ? 'https://apps.apple.com/app/id$_iosAppStoreId'
+          : 'https://play.google.com/store/apps/details?id=$_androidPackageId';
+
       if (config.isCurrentlyForced) {
         return ForceUpdateResult.forced(
-          storeLink: config.storeLink,
+          storeLink: storeLink,
           title: config.title,
           message: config.message,
           minimumVersion: config.minimumVersion,
@@ -114,14 +120,13 @@ class ForceUpdateService {
       }
 
       return ForceUpdateResult.optional(
-        storeLink: config.storeLink,
+        storeLink: storeLink,
         title: config.title,
         message: config.message,
         dismissCooldownHours: config.dismissCooldownHours,
         minimumVersion: config.minimumVersion,
       );
     } catch (e) {
-      // FAIL OPEN: if we can't check, allow app usage
       debugPrint('Force update check failed: $e');
       return ForceUpdateResult.noUpdate();
     }

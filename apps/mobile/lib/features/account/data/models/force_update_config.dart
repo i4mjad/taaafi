@@ -7,7 +7,6 @@ class ForceUpdateConfig {
   final int dismissCooldownHours;
   final Map<String, String> title;
   final Map<String, String> message;
-  final String storeLink;
   final bool enabled;
 
   const ForceUpdateConfig({
@@ -17,7 +16,6 @@ class ForceUpdateConfig {
     this.dismissCooldownHours = 24,
     required this.title,
     required this.message,
-    required this.storeLink,
     required this.enabled,
   });
 
@@ -39,7 +37,6 @@ class ForceUpdateConfig {
       dismissCooldownHours: data['dismissCooldownHours'] as int? ?? 24,
       title: _parseLocalizedMap(data['title']),
       message: _parseLocalizedMap(data['message']),
-      storeLink: data['storeLink'] as String? ?? '',
       enabled: data['enabled'] as bool? ?? false,
     );
   }

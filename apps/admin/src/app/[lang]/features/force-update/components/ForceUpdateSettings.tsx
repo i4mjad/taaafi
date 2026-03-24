@@ -33,7 +33,6 @@ interface PlatformConfig {
   dismissCooldownHours: number;
   title: { ar: string; en: string };
   message: { ar: string; en: string };
-  storeLink: string;
   enabled: boolean;
 }
 
@@ -44,7 +43,6 @@ const defaultPlatformConfig: PlatformConfig = {
   dismissCooldownHours: 24,
   title: { ar: '', en: '' },
   message: { ar: '', en: '' },
-  storeLink: '',
   enabled: false,
 };
 
@@ -65,7 +63,6 @@ function parsePlatformConfig(data: Record<string, unknown> | undefined): Platfor
       ar: (data.message as Record<string, string>)?.ar ?? '',
       en: (data.message as Record<string, string>)?.en ?? '',
     },
-    storeLink: (data.storeLink as string) ?? '',
     enabled: (data.enabled as boolean) ?? false,
   };
 }
@@ -94,10 +91,6 @@ function PlatformCard({
   const handleSave = async () => {
     if (!form.minimumVersion.match(/^\d+\.\d+\.\d+$/)) {
       toast.error(t('modules.features.forceUpdate.invalidVersion'));
-      return;
-    }
-    if (form.enabled && !form.storeLink) {
-      toast.error(t('modules.features.forceUpdate.storeLinkRequired'));
       return;
     }
     await onSave(form);
@@ -223,24 +216,6 @@ function PlatformCard({
           </>
         )}
 
-        {/* Store Link */}
-        <div className="space-y-2">
-          <Label htmlFor={`${platform}-store`}>
-            {t('modules.features.forceUpdate.storeLink')}
-          </Label>
-          <Input
-            id={`${platform}-store`}
-            dir="ltr"
-            placeholder={
-              platform === 'iOS'
-                ? 'https://apps.apple.com/app/id...'
-                : 'https://play.google.com/store/apps/details?id=...'
-            }
-            value={form.storeLink}
-            onChange={(e) => setForm({ ...form, storeLink: e.target.value })}
-          />
-        </div>
-
         {/* Title AR */}
         <div className="space-y-2">
           <Label htmlFor={`${platform}-title-ar`}>
@@ -335,7 +310,6 @@ export function ForceUpdateSettings() {
         dismissCooldownHours: config.dismissCooldownHours,
         title: config.title,
         message: config.message,
-        storeLink: config.storeLink,
         enabled: config.enabled,
       };
 
