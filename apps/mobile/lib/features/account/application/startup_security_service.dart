@@ -239,6 +239,13 @@ class SecurityStartupResult {
   final String? error;
   final Map<String, bool>? featureAccessMap;
 
+  // Force update fields
+  final String? storeLink;
+  final Map<String, String>? updateTitle;
+  final Map<String, String>? updateMessage;
+  final int? dismissCooldownHours;
+  final String? minimumVersion;
+
   const SecurityStartupResult._({
     required this.status,
     required this.message,
@@ -246,6 +253,11 @@ class SecurityStartupResult {
     this.userId,
     this.error,
     this.featureAccessMap,
+    this.storeLink,
+    this.updateTitle,
+    this.updateMessage,
+    this.dismissCooldownHours,
+    this.minimumVersion,
   });
 
   factory SecurityStartupResult.success({
@@ -290,19 +302,63 @@ class SecurityStartupResult {
         error: error,
       );
 
+  factory SecurityStartupResult.updateRequired({
+    required String storeLink,
+    required Map<String, String> updateTitle,
+    required Map<String, String> updateMessage,
+    required String minimumVersion,
+  }) =>
+      SecurityStartupResult._(
+        status: SecurityStartupStatus.updateRequired,
+        message: 'App update required',
+        storeLink: storeLink,
+        updateTitle: updateTitle,
+        updateMessage: updateMessage,
+        minimumVersion: minimumVersion,
+      );
+
+  factory SecurityStartupResult.updateAvailable({
+    required String message,
+    required String deviceId,
+    required String storeLink,
+    required Map<String, String> updateTitle,
+    required Map<String, String> updateMessage,
+    required int dismissCooldownHours,
+    required String minimumVersion,
+    Map<String, bool>? featureAccessMap,
+  }) =>
+      SecurityStartupResult._(
+        status: SecurityStartupStatus.updateAvailable,
+        message: message,
+        deviceId: deviceId,
+        featureAccessMap: featureAccessMap,
+        storeLink: storeLink,
+        updateTitle: updateTitle,
+        updateMessage: updateMessage,
+        dismissCooldownHours: dismissCooldownHours,
+        minimumVersion: minimumVersion,
+      );
+
   bool get isBlocked =>
       status == SecurityStartupStatus.deviceBanned ||
-      status == SecurityStartupStatus.userBanned;
+      status == SecurityStartupStatus.userBanned ||
+      status == SecurityStartupStatus.updateRequired;
 
-  bool get isSuccess => status == SecurityStartupStatus.success;
+  bool get isSuccess =>
+      status == SecurityStartupStatus.success ||
+      status == SecurityStartupStatus.updateAvailable;
 
   bool get hasWarning => status == SecurityStartupStatus.warning;
+
+  bool get hasUpdate => status == SecurityStartupStatus.updateAvailable;
 }
 
 enum SecurityStartupStatus {
   success,
   deviceBanned,
   userBanned,
+  updateRequired,
+  updateAvailable,
   warning,
 }
 
