@@ -1183,7 +1183,6 @@ const Map<String, String> kAr = {
   "total": "المجموع",
   "minutes": "دقائق",
   "required-update": "إصدار جديد متاح!",
-  "update-now": "تحديث الآن",
   "role": "نوع الحساب",
   "required-update-p":
       "لا يمكنك استخدام هذا الإصدار، قم بالتحديث إلى أحدث إصدار.",

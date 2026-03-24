@@ -196,7 +196,7 @@ class RevenueCatService {
     }
 
     print('RevenueCat: Making purchase for user ${currentUser!.uid}');
-    final result = await Purchases.purchasePackage(package);
+    final result = await Purchases.purchase(PurchaseParams.package(package));
     print('RevenueCat: Purchase successful for user ${currentUser.uid}');
     return result.customerInfo;
   }

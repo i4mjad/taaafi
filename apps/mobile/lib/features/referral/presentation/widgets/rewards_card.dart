@@ -44,7 +44,7 @@ class RewardsCard extends ConsumerWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: theme.secondary[500]!.withOpacity(0.3),
+            color: theme.secondary[500]!.withValues(alpha: 0.3),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -95,7 +95,7 @@ class RewardsCard extends ConsumerWidget {
             Text(
               l10n.translate('referral.dashboard.no_rewards_yet'),
               style: TextStyles.body.copyWith(
-                color: Colors.white.withOpacity(0.9),
+                color: Colors.white.withValues(alpha: 0.9),
               ),
             ),
             const SizedBox(height: 16),
@@ -105,10 +105,10 @@ class RewardsCard extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.15),
+              color: Colors.white.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: Colors.white.withOpacity(0.3),
+                color: Colors.white.withValues(alpha: 0.3),
                 width: 1,
               ),
             ),
@@ -118,7 +118,7 @@ class RewardsCard extends ConsumerWidget {
                 Text(
                   l10n.translate('referral.dashboard.next_reward'),
                   style: TextStyles.caption.copyWith(
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withValues(alpha: 0.9),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -141,7 +141,7 @@ class RewardsCard extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(8),
                   child: LinearProgressIndicator(
                     value: progress,
-                    backgroundColor: Colors.white.withOpacity(0.2),
+                    backgroundColor: Colors.white.withValues(alpha: 0.2),
                     valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
                     minHeight: 8,
                   ),
@@ -195,7 +195,7 @@ class RewardsCard extends ConsumerWidget {
           child: Text(
             label,
             style: TextStyles.body.copyWith(
-              color: Colors.white.withOpacity(0.9),
+              color: Colors.white.withValues(alpha: 0.9),
             ),
           ),
         ),

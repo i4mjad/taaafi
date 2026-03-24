@@ -164,7 +164,7 @@ class _UpdateCommentsSectionState extends ConsumerState<UpdateCommentsSection> {
                         data: (author) => Text(
                           comment.isAnonymous
                               ? l10n.translate('anonymous-member')
-                              : author.displayName ?? 'Unknown',
+                              : author.displayName,
                           style: TextStyles.small.copyWith(
                             color: theme.grey[900],
                           ),

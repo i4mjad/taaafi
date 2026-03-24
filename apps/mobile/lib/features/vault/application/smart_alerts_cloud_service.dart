@@ -1,5 +1,6 @@
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 
 /// Service to communicate with Firebase Cloud Functions for Smart Alerts
@@ -15,7 +16,7 @@ class SmartAlertsCloudService {
         return locale.languageCode;
       }
       // Fallback to system locale or default
-      return WidgetsBinding.instance.window.locale.languageCode;
+      return PlatformDispatcher.instance.locale.languageCode;
     } catch (e) {
       // Default fallback
       return 'en';

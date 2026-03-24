@@ -253,7 +253,7 @@ class _EditChallengeScreenState extends ConsumerState<EditChallengeScreen> {
               color: currentColor,
               onColorChanged: (Color color) {
                 // Convert Color to hex string
-                final hexColor = '#${color.value.toRadixString(16).substring(2).toUpperCase()}';
+                final hexColor = '#${color.toARGB32().toRadixString(16).substring(2).toUpperCase()}';
                 setState(() => _color = hexColor);
               },
               pickersEnabled: const {

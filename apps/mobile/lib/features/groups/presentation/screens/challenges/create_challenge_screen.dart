@@ -259,7 +259,7 @@ class _CreateChallengeScreenState extends ConsumerState<CreateChallengeScreen> {
               color: currentColor,
               onColorChanged: (Color color) {
                 // Convert Color to hex string
-                final hexColor = '#${color.value.toRadixString(16).substring(2).toUpperCase()}';
+                final hexColor = '#${color.toARGB32().toRadixString(16).substring(2).toUpperCase()}';
                 ref.read(challengeCreationNotifierProvider.notifier).setColor(hexColor);
               },
               pickersEnabled: const {

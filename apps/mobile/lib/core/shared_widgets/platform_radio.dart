@@ -68,7 +68,9 @@ class PlatformRadio<T> extends StatelessWidget {
       // Use Material Design radio button
       radioWidget = Radio<T>(
         value: value,
+        // ignore: deprecated_member_use
         groupValue: groupValue,
+        // ignore: deprecated_member_use
         onChanged: enabled ? onChanged : null,
         activeColor: activeColor ?? theme.primary[600],
         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,

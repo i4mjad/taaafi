@@ -756,7 +756,7 @@ class ReferralDashboardScreen extends ConsumerWidget {
                   Text(
                     subtitle,
                     style: TextStyles.caption.copyWith(
-                      color: textColor.withOpacity(0.8),
+                      color: textColor.withValues(alpha: 0.8),
                     ),
                   ),
                 ],

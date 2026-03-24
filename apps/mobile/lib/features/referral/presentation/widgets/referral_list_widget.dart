@@ -136,7 +136,7 @@ class _ReferralListItem extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: statusInfo.color.withOpacity(0.1),
+                color: statusInfo.color.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Text(

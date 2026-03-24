@@ -185,7 +185,9 @@ class _CommunityProfileSetupModalState
                             style: TextStyles.body,
                           ),
                           value: 'male',
+                          // ignore: deprecated_member_use
                           groupValue: _selectedGender,
+                          // ignore: deprecated_member_use
                           onChanged: _isLoading
                               ? null
                               : (value) {
@@ -202,7 +204,9 @@ class _CommunityProfileSetupModalState
                             style: TextStyles.body,
                           ),
                           value: 'female',
+                          // ignore: deprecated_member_use
                           groupValue: _selectedGender,
+                          // ignore: deprecated_member_use
                           onChanged: _isLoading
                               ? null
                               : (value) {
@@ -314,7 +318,9 @@ class _CommunityProfileSetupModalState
                         style: TextStyles.footnote.copyWith(height: 1.4),
                       ),
                       value: 'default',
+                      // ignore: deprecated_member_use
                       groupValue: _imageOption,
+                      // ignore: deprecated_member_use
                       onChanged: _isLoading
                           ? null
                           : (value) {
@@ -329,7 +335,9 @@ class _CommunityProfileSetupModalState
                         style: TextStyles.footnote.copyWith(height: 1.4),
                       ),
                       value: 'none',
+                      // ignore: deprecated_member_use
                       groupValue: _imageOption,
+                      // ignore: deprecated_member_use
                       onChanged: _isLoading
                           ? null
                           : (value) {

@@ -530,19 +530,6 @@ class GroupOverviewCard extends ConsumerWidget {
     );
   }
 
-  IconData _getIconForJoinMethod(String joinMethod) {
-    switch (joinMethod) {
-      case 'code_only':
-        return LucideIcons.key;
-      case 'any':
-        return LucideIcons.users;
-      case 'admin_only':
-        return LucideIcons.userCheck;
-      default:
-        return LucideIcons.share;
-    }
-  }
-
   void _copyToClipboard(
       String text, BuildContext context, AppLocalizations l10n) {
     Clipboard.setData(ClipboardData(text: text));

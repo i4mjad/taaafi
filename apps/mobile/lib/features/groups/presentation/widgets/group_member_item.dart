@@ -426,10 +426,10 @@ class GroupMemberItem extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
-        color: badgeColor.withOpacity(0.1),
+        color: badgeColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: badgeColor.withOpacity(0.3),
+          color: badgeColor.withValues(alpha: 0.3),
           width: 1,
         ),
       ),

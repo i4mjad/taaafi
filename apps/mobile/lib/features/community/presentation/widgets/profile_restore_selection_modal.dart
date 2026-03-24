@@ -265,7 +265,9 @@ class _ProfileRestoreSelectionModalState
                       opacity: option.isAccessible ? 1.0 : 0.5,
                       child: Radio<String>(
                         value: option.profile.id,
+                        // ignore: deprecated_member_use
                         groupValue: _selectedProfileId,
+                        // ignore: deprecated_member_use
                         onChanged: option.isAccessible
                             ? (value) =>
                                 setState(() => _selectedProfileId = value)

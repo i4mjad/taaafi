@@ -112,11 +112,11 @@ class ReferralCodeCard extends ConsumerWidget {
         : null;
 
     // Share using the system share sheet
-    Share.share(
-      shareMessage,
+    SharePlus.instance.share(ShareParams(
+      text: shareMessage,
       subject: l10n.translate('referral.share.subject'),
       sharePositionOrigin: sharePositionOrigin,
-    );
+    ));
 
     // Track analytics
     FirebaseAnalytics.instance.logEvent(

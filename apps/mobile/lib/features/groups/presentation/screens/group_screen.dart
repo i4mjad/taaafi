@@ -6,7 +6,6 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
 import 'package:reboot_app_3/core/shared_widgets/container.dart';
-import 'package:reboot_app_3/core/shared_widgets/action_modal.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
@@ -20,7 +19,6 @@ import 'package:reboot_app_3/features/groups/presentation/modals/post_update_mod
 import 'package:reboot_app_3/features/groups/presentation/widgets/updates/update_card_widget.dart';
 import 'package:reboot_app_3/core/shared_widgets/snackbar.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
-import 'package:share_plus/share_plus.dart';
 
 /// Model for update items in the group
 class GroupUpdateItem {
@@ -657,59 +655,6 @@ class GroupScreen extends ConsumerWidget {
     context.goNamed(
       RouteNames.groupChallenges.name,
       pathParameters: {'groupId': groupId},
-    );
-  }
-
-  Widget _buildShareAction(BuildContext context, CustomThemeData theme,
-      AppLocalizations l10n, GroupMembership membership) {
-    return GestureDetector(
-      onTap: () => _showShareModal(context, l10n, membership),
-      child: Padding(
-        padding: const EdgeInsets.only(right: 16, left: 16),
-        child: Icon(
-          LucideIcons.share2,
-          color: theme.grey[900],
-        ),
-      ),
-    );
-  }
-
-  void _showShareModal(
-      BuildContext context, AppLocalizations l10n, GroupMembership membership) {
-    final joinCode = membership.group.joinCode;
-
-    if (joinCode == null) {
-      // Handle case where there's no join code (shouldn't happen but good to be safe)
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.translate('error-no-join-code'))),
-      );
-      return;
-    }
-
-    ActionModal.show(
-      context,
-      title: l10n.translate('share-group'),
-      actions: [
-        ActionItem(
-          icon: LucideIcons.share2,
-          title: l10n.translate('share-to-social'),
-          subtitle: l10n.translate('share-to-social-subtitle'),
-          onTap: () => _shareToSocial(context, l10n, joinCode),
-        ),
-      ],
-    );
-  }
-
-  void _shareToSocial(
-      BuildContext context, AppLocalizations l10n, String joinCode) {
-    final shareMessage =
-        l10n.translate('group-share-message').replaceAll('{code}', joinCode);
-
-    SharePlus.instance.share(
-      ShareParams(
-        text: shareMessage,
-        subject: l10n.translate('share-group'),
-      ),
     );
   }
 

@@ -939,7 +939,6 @@ const Map<String, String> kEn = {
   "reading-tips-text":
       "• Focus on triggers appearing in the outer rings (75%-100%) - these are your biggest patterns\n• Compare trigger positions to understand relative importance\n• Track changes over time to see if patterns shift\n• Use insights to develop targeted coping strategies",
   "required-update": "New Version Available!",
-  "update-now": "Update now",
   "role": "Account Type",
   "required-update-p":
       "You can't use this version, update to the latest version.",

@@ -522,7 +522,7 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(
@@ -536,7 +536,7 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
@@ -568,7 +568,7 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
                 AppLocalizations.of(context)
                     .translate('retention-offer-description'),
                 style: TextStyles.body.copyWith(
-                  color: Colors.white.withOpacity(0.9),
+                  color: Colors.white.withValues(alpha: 0.9),
                   height: 1.5,
                 ),
               ),

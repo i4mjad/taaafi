@@ -437,7 +437,9 @@ class _GroupsExplorationScreenState
                 title: Text(_getSortLabelForSort(l10n, sort)),
                 leading: Radio<GroupSort>(
                   value: sort,
+                  // ignore: deprecated_member_use
                   groupValue: _selectedSort,
+                  // ignore: deprecated_member_use
                   onChanged: (value) {
                     setState(() {
                       _selectedSort = value!;

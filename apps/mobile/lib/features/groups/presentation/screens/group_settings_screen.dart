@@ -210,7 +210,7 @@ class _GroupSettingsScreenState extends ConsumerState<GroupSettingsScreen> {
               height: 36,
               decoration: BoxDecoration(
                 color: isDestructive
-                    ? theme.error[100]!.withOpacity(0.5)
+                    ? theme.error[100]!.withValues(alpha: 0.5)
                     : theme.grey[50],
                 borderRadius: BorderRadius.circular(8),
               ),

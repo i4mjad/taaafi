@@ -158,8 +158,17 @@ class _EditGroupDetailsScreenState
     final l10n = AppLocalizations.of(context);
     final settingsAsync = ref.watch(groupSettingsProvider);
 
-    return WillPopScope(
-      onWillPop: _onWillPop,
+    return PopScope(
+      canPop: !_hasChanges,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) {
+          _onWillPop().then((shouldPop) {
+            if (shouldPop && context.mounted) {
+              Navigator.of(context).pop();
+            }
+          });
+        }
+      },
       child: Scaffold(
         backgroundColor: theme.backgroundColor,
         appBar: appBar(context, ref, "edit-group-details", false, true),

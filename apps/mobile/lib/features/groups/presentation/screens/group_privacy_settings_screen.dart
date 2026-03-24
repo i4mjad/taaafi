@@ -296,7 +296,7 @@ class GroupPrivacySettingsScreen extends ConsumerWidget {
               width: double.infinity,
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: theme.primary[100]!.withOpacity(0.3),
+                color: theme.primary[100]!.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: theme.primary[300]!),
               ),
