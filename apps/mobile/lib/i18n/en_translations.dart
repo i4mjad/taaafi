@@ -61,6 +61,19 @@ const Map<String, String> kEn = {
       "Update completed successfully! The app will restart to apply the changes.",
   "restart-now": "Restart Now",
   "update-error-generic": "Failed to download the update. Please try again.",
+
+  // Force update (Firestore-based)
+  "force-update-title": "Update Required",
+  "force-update-message":
+      "A new version of Ta'aafi is available. Please update to continue using the app.",
+  "force-update-refresh": "I've already updated",
+  "optional-update-title": "Update Available",
+  "optional-update-message":
+      "A new version of Ta'aafi is available with improvements and fixes.",
+  "update-now": "Update Now",
+  "not-now": "Not Now",
+  "open-store": "Open Store",
+
   "welcome": "Welcome!",
   "welcome-back": "Welcome Back",
   "dashboard-subtitle": "Your recovery journey at a glance",
