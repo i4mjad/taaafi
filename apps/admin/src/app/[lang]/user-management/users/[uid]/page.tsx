@@ -39,6 +39,7 @@ import WarningManagementCard from './components/WarningManagementCard';
 import BanManagementCard from './components/BanManagementCard';
 import GroupsBanManagementCard from './components/GroupsBanManagementCard';
 import DeletionManagementCard from './components/DeletionManagementCard';
+import DeviceHistoryCard from './components/DeviceHistoryCard';
 // Firebase imports
 import { useDocument } from 'react-firebase-hooks/firestore';
 import { doc } from 'firebase/firestore';
@@ -619,6 +620,7 @@ export default function UserDetailsPage() {
 
               {/* Devices Tab */}
               <TabsContent value="devices">
+                <div className="space-y-6">
                 {/* Device Information Card */}
                 <Card>
                   <CardHeader>
@@ -685,6 +687,14 @@ export default function UserDetailsPage() {
                     )}
                   </CardContent>
                 </Card>
+
+                {/* Device History & Ban Evasion Detection */}
+                <DeviceHistoryCard
+                  userId={uid}
+                  userDevices={user.devicesIds || []}
+                  lang={locale}
+                />
+                </div>
               </TabsContent>
 
               {/* Groups Tab */}
@@ -709,13 +719,18 @@ export default function UserDetailsPage() {
               {/* Bans Tab */}
               <TabsContent value="bans">
                 <div className="space-y-6">
-                  <BanManagementCard 
-                    userId={user.uid} 
+                  <DeviceHistoryCard
+                    userId={uid}
+                    userDevices={user.devicesIds || []}
+                    lang={locale}
+                  />
+                  <BanManagementCard
+                    userId={user.uid}
                     userDisplayName={user.displayName}
                     userDevices={user.devicesIds || []}
                   />
-                  <GroupsBanManagementCard 
-                    userId={user.uid} 
+                  <GroupsBanManagementCard
+                    userId={user.uid}
                     userDisplayName={user.displayName}
                   />
                 </div>

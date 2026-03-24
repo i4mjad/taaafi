@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:reboot_app_3/core/services/persistent_device_id_service.dart';
 import 'ban_warning_facade.dart';
 import '../data/models/ban.dart';
 import '../data/models/warning.dart';
@@ -20,6 +22,13 @@ class StartupSecurityService {
   /// Feature access is now checked lazily when needed
   Future<SecurityStartupResult> initializeAppSecurity() async {
     try {
+      // Step 0: PRE-AUTH device ban check against bannedDevices collection
+      // This runs BEFORE login, so banned devices can't even reach the login screen
+      final preAuthResult = await _checkBannedDevicesCollection();
+      if (preAuthResult != null) {
+        return preAuthResult;
+      }
+
       // Step 1 & 2: Initialize device tracking and get device ID in parallel-ish
       // (initializeDeviceTracking internally gets device ID anyway)
       await _facade.initializeDeviceTracking();
@@ -68,6 +77,46 @@ class StartupSecurityService {
         message: 'Security check failed, proceeding with limited functionality',
         error: e.toString(),
       );
+    }
+  }
+
+  /// Pre-auth check against the bannedDevices Firestore collection.
+  /// Returns a SecurityStartupResult if device is banned, null otherwise.
+  /// Fails open (returns null) if the check fails for any reason.
+  Future<SecurityStartupResult?> _checkBannedDevicesCollection() async {
+    try {
+      final deviceId = await PersistentDeviceIdService.instance.getDeviceId();
+
+      final bannedDeviceDoc = await FirebaseFirestore.instance
+          .collection('bannedDevices')
+          .doc(deviceId)
+          .get();
+
+      if (bannedDeviceDoc.exists) {
+        final data = bannedDeviceDoc.data();
+        if (data != null && data['isActive'] == true) {
+          // Check if ban has expired
+          final expiresAt = data['expiresAt'];
+          if (expiresAt != null) {
+            final expiryDate = (expiresAt as Timestamp).toDate();
+            if (expiryDate.isBefore(DateTime.now())) {
+              // Ban expired, allow access
+              return null;
+            }
+          }
+
+          return SecurityStartupResult.deviceBanned(
+            message:
+                'This device has been permanently restricted from accessing the application. Contact support if you believe this is an error.',
+            deviceId: deviceId,
+          );
+        }
+      }
+
+      return null; // Device not banned
+    } catch (e) {
+      // Fail open — if we can't check, allow access
+      return null;
     }
   }
 

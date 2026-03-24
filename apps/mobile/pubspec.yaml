@@ -42,6 +42,7 @@ dependencies:
   flutter_markdown: ^0.7.3
   flutter_quill: ^11.4.1
   flutter_riverpod: ^2.3.2
+  flutter_secure_storage: ^9.2.4
   flutter_svg: any
   go_router: ^16.0.0
   google_sign_in: ^5.4.4

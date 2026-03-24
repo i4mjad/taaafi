@@ -84,6 +84,23 @@ class Ban {
     this.relatedContent,
   });
 
+  /// Creates a synthetic device ban for use when the bannedDevices collection
+  /// indicates this device is banned. Not persisted to Firestore.
+  factory Ban.syntheticDeviceBan({required String deviceId}) {
+    return Ban(
+      id: 'synthetic_device_ban_$deviceId',
+      userId: 'system',
+      type: BanType.device_ban,
+      scope: BanScope.app_wide,
+      reason: 'Device banned via bannedDevices collection',
+      severity: BanSeverity.permanent,
+      issuedBy: 'system',
+      issuedAt: DateTime.now(),
+      isActive: true,
+      restrictedDevices: [deviceId],
+    );
+  }
+
   factory Ban.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
     return Ban(

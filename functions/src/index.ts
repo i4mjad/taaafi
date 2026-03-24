@@ -1737,3 +1737,6 @@ export { handleRevenueCatWebhook } from './referral/webhooks/revenuecatWebhook';
 
 // Group message moderation (unified from admin functions)
 export { moderateMessage } from './messageModeration';
+
+// Ban enforcement functions
+export { onBanCreated, onBanUpdated, validateDeviceOnAuth, checkBannedIdentifierBeforeSignup } from './bans';

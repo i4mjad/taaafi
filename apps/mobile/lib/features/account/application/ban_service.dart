@@ -182,9 +182,49 @@ class BanService {
     }
   }
 
+  /// Fast-path O(1) device ban check against bannedDevices collection.
+  /// Returns true if device is actively banned, false otherwise.
+  /// Fails open (returns false) if the check fails for any reason.
+  Future<bool> isDeviceBannedFastPath(String deviceId) async {
+    try {
+      final doc = await _firestore
+          .collection('bannedDevices')
+          .doc(deviceId)
+          .get();
+
+      if (doc.exists) {
+        final data = doc.data();
+        if (data != null && data['isActive'] == true) {
+          // Check expiry
+          final expiresAt = data['expiresAt'];
+          if (expiresAt != null) {
+            final expiryDate = (expiresAt as Timestamp).toDate();
+            if (expiryDate.isBefore(DateTime.now())) {
+              return false; // Expired
+            }
+          }
+          return true; // Actively banned
+        }
+      }
+      return false;
+    } catch (_) {
+      return false; // Fail open
+    }
+  }
+
   /// Get all active bans for a specific device (global check)
   Future<List<Ban>> getDeviceBans(String deviceId) async {
     try {
+      // Fast-path: O(1) lookup against bannedDevices collection
+      final isBannedFast = await isDeviceBannedFastPath(deviceId);
+      if (isBannedFast) {
+        // Return a synthetic ban to signal the device is banned
+        // The caller only checks isNotEmpty, so this is sufficient
+        return [
+          Ban.syntheticDeviceBan(deviceId: deviceId),
+        ];
+      }
+
       // Primary method: Query device bans directly
       try {
         final querySnapshot = await _firestore
