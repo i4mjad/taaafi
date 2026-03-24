@@ -1,11 +1,59 @@
+import type { Metadata } from "next"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { ArrowLeft } from "lucide-react"
-import { getPostBySlug, getRecentPosts } from "@/data/blog-data"
+import { getPostBySlug, getRecentPosts, blogPosts } from "@/data/blog-data"
 import { formatDate } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { BlogCard } from "@/components/blog/blog-card"
 import Header from "@/components/header"
+import { JsonLd, blogPostJsonLd, breadcrumbJsonLd } from "@/components/json-ld"
+import { languages } from "../../../i18n/settings"
+
+const BASE_URL = "https://ta3afi.app";
+
+export async function generateStaticParams() {
+  return blogPosts.flatMap((post) =>
+    languages.map((lang) => ({ lang, slug: post.slug }))
+  );
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: string; slug: string }>;
+}): Promise<Metadata> {
+  const { lang, slug } = await params;
+  const post = getPostBySlug(slug);
+
+  if (!post) {
+    return { title: "Post Not Found" };
+  }
+
+  return {
+    title: post.title,
+    description: post.excerpt,
+    alternates: {
+      canonical: `${BASE_URL}/${lang}/blog/${slug}`,
+      languages: Object.fromEntries(
+        languages.map((l) => [l, `${BASE_URL}/${l}/blog/${slug}`])
+      ),
+    },
+    openGraph: {
+      title: post.title,
+      description: post.excerpt,
+      type: "article",
+      publishedTime: post.publishedAt,
+      authors: [post.author.name],
+      url: `${BASE_URL}/${lang}/blog/${slug}`,
+    },
+    twitter: {
+      card: "summary",
+      title: post.title,
+      description: post.excerpt,
+    },
+  };
+}
 
 export default async function BlogPostPage({
   params,
@@ -26,6 +74,14 @@ export default async function BlogPostPage({
 
   return (
     <>
+    <JsonLd data={blogPostJsonLd(post, lang)} />
+    <JsonLd
+      data={breadcrumbJsonLd([
+        { name: "Home", url: `${BASE_URL}/${lang}` },
+        { name: "Blog", url: `${BASE_URL}/${lang}/blog` },
+        { name: post.title, url: `${BASE_URL}/${lang}/blog/${post.slug}` },
+      ])}
+    />
     <Header />
     <article className="container mx-auto px-4 py-12">
     

@@ -1,8 +1,40 @@
-import { Locale } from "../../i18n/settings";
+import type { Metadata } from "next";
+import { type Locale, languages } from "../../i18n/settings";
 import { getDictionary } from "../../dictionaries/get-dictonaries";
 import { fallbackLng } from "../../i18n/settings";
 import Header from "../../../components/header";
 import Footer from "../../../components/footer";
+
+const BASE_URL = "https://ta3afi.app";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: Locale }>;
+}): Promise<Metadata> {
+  const { lang } = await params;
+
+  const titles: Record<Locale, string> = {
+    ar: "الشروط والأحكام",
+    en: "Terms & Conditions",
+  };
+
+  const descriptions: Record<Locale, string> = {
+    ar: "الشروط والأحكام لاستخدام منصة تعافي وتطبيقاتها.",
+    en: "Terms and conditions for using the Ta'aafi platform and applications.",
+  };
+
+  return {
+    title: titles[lang],
+    description: descriptions[lang],
+    alternates: {
+      canonical: `${BASE_URL}/${lang}/terms`,
+      languages: Object.fromEntries(
+        languages.map((l) => [l, `${BASE_URL}/${l}/terms`])
+      ),
+    },
+  };
+}
 
 export default async function TermsPage({
   params,
@@ -58,4 +90,3 @@ export default async function TermsPage({
   );
 }
 
-export const dynamic = "force-dynamic";

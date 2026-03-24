@@ -1,8 +1,40 @@
-import { Locale } from "../../i18n/settings";
+import type { Metadata } from "next";
+import { type Locale, languages } from "../../i18n/settings";
 import { getDictionary } from "../../dictionaries/get-dictonaries";
 import { fallbackLng } from "../../i18n/settings";
 import Header from "../../../components/header";
 import Footer from "../../../components/footer";
+
+const BASE_URL = "https://ta3afi.app";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: Locale }>;
+}): Promise<Metadata> {
+  const { lang } = await params;
+
+  const titles: Record<Locale, string> = {
+    ar: "سياسة الخصوصية",
+    en: "Privacy Policy",
+  };
+
+  const descriptions: Record<Locale, string> = {
+    ar: "سياسة الخصوصية لمنصة تعافي - كيف نحمي بياناتك ونحترم خصوصيتك.",
+    en: "Ta'aafi Privacy Policy - How we protect your data and respect your privacy.",
+  };
+
+  return {
+    title: titles[lang],
+    description: descriptions[lang],
+    alternates: {
+      canonical: `${BASE_URL}/${lang}/privacy`,
+      languages: Object.fromEntries(
+        languages.map((l) => [l, `${BASE_URL}/${l}/privacy`])
+      ),
+    },
+  };
+}
 
 export default async function PrivacyPage({
   params,
@@ -58,4 +90,4 @@ export default async function PrivacyPage({
   );
 }
 
-export const dynamic = "force-dynamic"; 
+ 
