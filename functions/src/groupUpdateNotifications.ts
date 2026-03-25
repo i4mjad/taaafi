@@ -1,100 +1,109 @@
+import { onDocumentUpdated } from 'firebase-functions/v2/firestore';
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
+import { FieldValue } from 'firebase-admin/firestore';
 import { getUserLocale } from './utils/localeHelper';
 
-interface UpdateData {
-  groupId: string;
-  authorCpId: string;
-  type: string;
-  content: string;
-  isAnonymous: boolean;
-  createdAt: any;
-}
+const STALE_CLAIM_SECONDS = 30;
 
 /**
- * Send notifications when a new update is posted to a group
+ * Send notifications when a group update is approved by moderation.
+ * Migrated from v1 onCreate to v2 onDocumentUpdated — waits for moderation.
  */
-export const sendUpdateNotification = functions.firestore
-  .document('group_updates/{updateId}')
-  .onCreate(async (snapshot, context) => {
+export const sendUpdateNotificationV2 = onDocumentUpdated(
+  'group_updates/{updateId}',
+  async (event) => {
     try {
-      const updateId = context.params.updateId;
-      const updateData = snapshot.data() as UpdateData;
-      
-      console.log(`📢 [UPDATE_NOTIFICATION] New update posted: ${updateId}`);
+      const before = event.data?.before?.data();
+      const after = event.data?.after?.data();
+      if (!before || !after) return;
 
-      const { groupId, authorCpId, type, content, isAnonymous } = updateData;
+      // Gate: only fire when moderation just completed with approval
+      const wasNotModerated = !before.moderation?.completedAt;
+      const isNowApproved = after.moderation?.status === 'approved' && after.moderation?.completedAt;
+      if (!wasNotModerated || !isNowApproved) return;
 
-      // Get group data
-      const groupDoc = await admin.firestore().collection('groups').doc(groupId).get();
-      if (!groupDoc.exists) {
-        console.log('❌ Group not found');
+      if (after.isDeleted || after.isHidden) return;
+
+      const updateId = event.params.updateId;
+      console.log(`[UPDATE_NOTIFICATION] Moderation approved, sending notifications for: ${updateId}`);
+
+      const db = admin.firestore();
+      const docRef = db.collection('group_updates').doc(updateId);
+
+      // Two-phase notification dedupe
+      const claimed = await db.runTransaction(async (tx) => {
+        const doc = await tx.get(docRef);
+        const docData = doc.data();
+        if (!docData) return false;
+
+        const claimedAt = docData.notificationClaimedAt?.toDate?.();
+        if (docData.notifiedAt) return false;
+
+        if (claimedAt) {
+          const ageSeconds = (Date.now() - claimedAt.getTime()) / 1000;
+          if (ageSeconds < STALE_CLAIM_SECONDS) return false;
+        }
+
+        tx.update(docRef, { notificationClaimedAt: FieldValue.serverTimestamp() });
+        return true;
+      });
+
+      if (!claimed) {
+        console.log(`[UPDATE_NOTIFICATION] Already claimed/sent for ${updateId}`);
         return;
       }
-      
-      const groupData = groupDoc.data()!;
-      const groupName = groupData.name || 'Group';
 
-      // Get all group members except author
-      const membershipsSnapshot = await admin.firestore()
-        .collection('group_memberships')
+      const { groupId, authorCpId, isAnonymous } = after;
+
+      // Get group data
+      const groupDoc = await db.collection('groups').doc(groupId).get();
+      if (!groupDoc.exists) {
+        await docRef.update({ notificationClaimedAt: FieldValue.delete() });
+        return;
+      }
+      const groupName = groupDoc.data()!.name || 'Group';
+
+      // Get active members except author
+      const membershipsSnapshot = await db.collection('group_memberships')
         .where('groupId', '==', groupId)
         .where('isActive', '==', true)
         .get();
 
-      console.log(`👥 Found ${membershipsSnapshot.size} members`);
-
-      // Filter out author and get user IDs
       const memberPromises = membershipsSnapshot.docs
         .filter(doc => doc.data().cpId !== authorCpId)
         .map(async (memberDoc) => {
-          const memberData = memberDoc.data();
-          
-          // Get user mapping
-          const mappingDoc = await admin.firestore()
-            .collection('userProfileMappings')
-            .doc(memberData.cpId)
-            .get();
-          
-          if (!mappingDoc.exists) return null;
-          
-          const userUID = mappingDoc.data()?.userUID;
+          const cpId = memberDoc.data().cpId;
+
+          // Use communityProfiles for user mapping (consistent with other functions)
+          const profileDoc = await db.collection('communityProfiles').doc(cpId).get();
+          if (!profileDoc.exists) return null;
+
+          const userUID = profileDoc.data()?.userUID;
           if (!userUID) return null;
 
-          // Get user document for FCM token
-          const userDoc = await admin.firestore()
-            .collection('users')
-            .doc(userUID)
-            .get();
-          
+          const userDoc = await db.collection('users').doc(userUID).get();
           if (!userDoc.exists) return null;
-          
+
           const userData = userDoc.data()!;
           const fcmToken = userData.messagingToken || userData.fcmToken;
           const locale = getUserLocale(userData);
-          
-          if (!fcmToken) return null;
 
-          return { fcmToken, locale, cpId: memberData.cpId };
+          if (!fcmToken) return null;
+          return { fcmToken, locale, cpId };
         });
 
-      const members = (await Promise.all(memberPromises)).filter(m => m !== null);
-
-      console.log(`🎯 ${members.length} members with FCM tokens`);
+      const members = (await Promise.all(memberPromises)).filter((m): m is NonNullable<typeof m> => m !== null);
 
       if (members.length === 0) {
-        console.log('📭 No members to notify');
+        await docRef.update({ notifiedAt: FieldValue.serverTimestamp() });
         return;
       }
 
-      // Get author name if not anonymous
+      // Get author name
       let authorName = 'A member';
       if (!isAnonymous) {
-        const authorDoc = await admin.firestore()
-          .collection('communityProfiles')
-          .doc(authorCpId)
-          .get();
-        
+        const authorDoc = await db.collection('communityProfiles').doc(authorCpId).get();
         if (authorDoc.exists) {
           authorName = authorDoc.data()?.displayName || 'A member';
         }
@@ -104,12 +113,11 @@ export const sendUpdateNotification = functions.firestore
 
       // Send notifications
       const messaging = admin.messaging();
-      const notifications = members.map(async (member) => {
-        try {
-          const title = member.locale === 'arabic' 
+      const results = await Promise.allSettled(
+        members.map(async (member) => {
+          const title = member.locale === 'arabic'
             ? `تحديث جديد في ${groupName}`
             : `New update in ${groupName}`;
-          
           const body = member.locale === 'arabic'
             ? `${authorName} شارك تحديثاً جديداً`
             : `${authorName} shared an update`;
@@ -124,111 +132,69 @@ export const sendUpdateNotification = functions.firestore
               locale: member.locale,
             },
             android: {
-              priority: 'high',
-              notification: {
-                channelId: 'high_importance_channel',
-                priority: 'high',
-              },
+              priority: 'high' as const,
+              notification: { channelId: 'high_importance_channel', priority: 'high' as const },
             },
             apns: {
-              payload: {
-                aps: {
-                  alert: { title, body },
-                  badge: 1,
-                  sound: 'default',
-                },
-              },
+              payload: { aps: { alert: { title, body }, badge: 1, sound: 'default' } },
             },
           });
+        })
+      );
 
-          console.log(`✅ Notification sent to ${member.cpId}`);
-        } catch (error) {
-          console.error(`❌ Error sending to ${member.cpId}:`, error);
-        }
-      });
-
-      await Promise.all(notifications);
-      console.log(`✅ [UPDATE_NOTIFICATION] Complete: ${notifications.length} sent`);
+      const successCount = results.filter(r => r.status === 'fulfilled').length;
+      if (successCount > 0) {
+        await docRef.update({ notifiedAt: FieldValue.serverTimestamp() });
+        console.log(`[UPDATE_NOTIFICATION] Sent ${successCount}/${members.length} for ${updateId}`);
+      } else {
+        await docRef.update({ notificationClaimedAt: FieldValue.delete() });
+        console.error(`[UPDATE_NOTIFICATION] All sends failed for ${updateId}, releasing claim`);
+      }
 
     } catch (error) {
-      console.error('❌ [UPDATE_NOTIFICATION] Error:', error);
+      console.error('[UPDATE_NOTIFICATION] Error:', error);
     }
-  });
+  }
+);
 
 /**
- * Send notification when someone comments on an update
+ * Send notification when someone comments on an update.
+ * This is NOT moderated content — stays as v1 onCreate.
  */
 export const sendCommentNotification = functions.firestore
   .document('update_comments/{commentId}')
   .onCreate(async (snapshot, context) => {
     try {
       const commentData = snapshot.data();
-      const { updateId, groupId, authorCpId, content } = commentData;
-
-      console.log(`💬 [COMMENT_NOTIFICATION] New comment on update: ${updateId}`);
+      const { updateId, groupId, authorCpId } = commentData;
 
       // Get update data
-      const updateDoc = await admin.firestore()
-        .collection('group_updates')
-        .doc(updateId)
-        .get();
-      
-      if (!updateDoc.exists) {
-        console.log('❌ Update not found');
-        return;
-      }
+      const updateDoc = await admin.firestore().collection('group_updates').doc(updateId).get();
+      if (!updateDoc.exists) return;
 
-      const updateData = updateDoc.data()!;
-      const updateAuthorCpId = updateData.authorCpId;
+      const updateAuthorCpId = updateDoc.data()!.authorCpId;
+      if (updateAuthorCpId === authorCpId) return; // Don't notify self
 
-      // Don't notify if commenting on own update
-      if (updateAuthorCpId === authorCpId) {
-        console.log('⏭️ User commented on their own update');
-        return;
-      }
-
-      // Get update author's user ID and FCM token
-      const mappingDoc = await admin.firestore()
-        .collection('userProfileMappings')
-        .doc(updateAuthorCpId)
-        .get();
-      
+      // Get update author's FCM token
+      const mappingDoc = await admin.firestore().collection('userProfileMappings').doc(updateAuthorCpId).get();
       if (!mappingDoc.exists) return;
 
       const userUID = mappingDoc.data()?.userUID;
       if (!userUID) return;
 
-      const userDoc = await admin.firestore()
-        .collection('users')
-        .doc(userUID)
-        .get();
-      
+      const userDoc = await admin.firestore().collection('users').doc(userUID).get();
       if (!userDoc.exists) return;
 
       const userData = userDoc.data()!;
       const fcmToken = userData.messagingToken || userData.fcmToken;
       const locale = getUserLocale(userData);
-
-      if (!fcmToken) {
-        console.log('📭 No FCM token');
-        return;
-      }
+      if (!fcmToken) return;
 
       // Get commenter name
-      const commenterDoc = await admin.firestore()
-        .collection('communityProfiles')
-        .doc(authorCpId)
-        .get();
-      
-      const commenterName = commenterDoc.exists
-        ? commenterDoc.data()?.displayName || 'Someone'
-        : 'Someone';
+      const commenterDoc = await admin.firestore().collection('communityProfiles').doc(authorCpId).get();
+      const commenterName = commenterDoc.exists ? commenterDoc.data()?.displayName || 'Someone' : 'Someone';
 
-      // Send notification
-      const title = locale === 'arabic'
-        ? 'تعليق جديد'
-        : 'New comment';
-      
+      const title = locale === 'arabic' ? 'تعليق جديد' : 'New comment';
       const body = locale === 'arabic'
         ? `${commenterName} علق على تحديثك`
         : `${commenterName} commented on your update`;
@@ -236,34 +202,18 @@ export const sendCommentNotification = functions.firestore
       await admin.messaging().send({
         token: fcmToken,
         notification: { title, body },
-        data: {
-          type: 'update_comment',
-          groupId,
-          updateId,
-          locale,
-        },
+        data: { type: 'update_comment', groupId, updateId, locale },
         android: {
-          priority: 'high',
-          notification: {
-            channelId: 'high_importance_channel',
-            priority: 'high',
-          },
+          priority: 'high' as const,
+          notification: { channelId: 'high_importance_channel', priority: 'high' as const },
         },
         apns: {
-          payload: {
-            aps: {
-              alert: { title, body },
-              badge: 1,
-              sound: 'default',
-            },
-          },
+          payload: { aps: { alert: { title, body }, badge: 1, sound: 'default' } },
         },
       });
 
-      console.log(`✅ [COMMENT_NOTIFICATION] Sent to ${updateAuthorCpId}`);
-
+      console.log(`[COMMENT_NOTIFICATION] Sent to ${updateAuthorCpId}`);
     } catch (error) {
-      console.error('❌ [COMMENT_NOTIFICATION] Error:', error);
+      console.error('[COMMENT_NOTIFICATION] Error:', error);
     }
   });
-
