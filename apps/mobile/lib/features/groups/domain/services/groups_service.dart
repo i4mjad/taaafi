@@ -1,7 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../entities/group_entity.dart';
 import '../entities/group_membership_entity.dart';
 import '../entities/join_result_entity.dart';
 import '../repositories/groups_repository.dart';
+import '../../data/datasources/groups_datasource.dart';
 import 'dart:developer';
 
 class GroupsService {
@@ -29,6 +32,25 @@ class GroupsService {
       log('Error in GroupsService.getPublicGroups: $error',
           stackTrace: stackTrace);
       print('GroupsService.getPublicGroups error: $error');
+      rethrow;
+    }
+  }
+
+  /// Get public groups with pagination and gender filtering
+  Future<PaginatedGroupsResult> getPublicGroupsPaginated({
+    required int limit,
+    required String userGender,
+    DocumentSnapshot? startAfterDocument,
+  }) async {
+    try {
+      return await _repository.getPublicGroupsPaginated(
+        limit: limit,
+        userGender: userGender,
+        startAfterDocument: startAfterDocument,
+      );
+    } catch (error, stackTrace) {
+      log('Error in GroupsService.getPublicGroupsPaginated: $error',
+          stackTrace: stackTrace);
       rethrow;
     }
   }

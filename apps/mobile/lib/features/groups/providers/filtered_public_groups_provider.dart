@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:reboot_app_3/features/account/data/user_profile_notifier.dart';
 import 'package:reboot_app_3/features/groups/application/groups_providers.dart';
@@ -5,45 +6,91 @@ import 'package:reboot_app_3/features/groups/domain/entities/group_entity.dart';
 
 part 'filtered_public_groups_provider.g.dart';
 
-/// Provider that fetches public groups filtered by current user's gender
-@riverpod
-Stream<List<GroupEntity>> filteredPublicGroups(
-    FilteredPublicGroupsRef ref) async* {
-  // Get user profile to determine gender
-  final userProfile = await ref.watch(userProfileNotifierProvider.future);
+/// State for paginated group exploration
+class PaginatedGroupsState {
+  final List<GroupEntity> groups;
+  final DocumentSnapshot? lastDocument;
+  final bool hasMore;
+  final bool isLoadingMore;
 
-  if (userProfile == null) {
-    yield [];
-    return;
+  const PaginatedGroupsState({
+    this.groups = const [],
+    this.lastDocument,
+    this.hasMore = true,
+    this.isLoadingMore = false,
+  });
+
+  PaginatedGroupsState copyWith({
+    List<GroupEntity>? groups,
+    DocumentSnapshot? lastDocument,
+    bool? hasMore,
+    bool? isLoadingMore,
+  }) {
+    return PaginatedGroupsState(
+      groups: groups ?? this.groups,
+      lastDocument: lastDocument ?? this.lastDocument,
+      hasMore: hasMore ?? this.hasMore,
+      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
+    );
+  }
+}
+
+/// Paginated provider for public groups exploration
+@riverpod
+class PaginatedPublicGroups extends _$PaginatedPublicGroups {
+  static const _pageSize = 20;
+
+  @override
+  FutureOr<PaginatedGroupsState> build() async {
+    final userProfile = await ref.watch(userProfileNotifierProvider.future);
+    if (userProfile == null) {
+      return const PaginatedGroupsState(groups: [], hasMore: false);
+    }
+
+    final groupsService = ref.watch(groupsServiceProvider);
+    final result = await groupsService.getPublicGroupsPaginated(
+      limit: _pageSize,
+      userGender: userProfile.gender.toLowerCase(),
+    );
+
+    return PaginatedGroupsState(
+      groups: result.groups.map((g) => g.toEntity()).toList(),
+      lastDocument: result.lastDocument,
+      hasMore: result.hasMore,
+    );
   }
 
-  // Get public groups stream
-  final groupsService = ref.watch(groupsServiceProvider);
+  Future<void> loadMore() async {
+    final current = state.valueOrNull;
+    if (current == null || !current.hasMore || current.isLoadingMore) return;
 
-  // Listen to public groups and filter by user gender and group status
-  await for (final allGroups in groupsService.getPublicGroups()) {
-    // Filter groups by user's gender and group status
-    final filteredGroups = allGroups.where((group) {
-      // Only show active groups (exclude deleted/inactive groups)
-      if (!group.isActive) {
-        return false;
-      }
+    state = AsyncData(current.copyWith(isLoadingMore: true));
 
-      // Don't show paused groups
-      if (group.isPaused) {
-        return false;
-      }
+    try {
+      final userProfile =
+          await ref.read(userProfileNotifierProvider.future);
+      if (userProfile == null) return;
 
-      // Convert user gender to lowercase for comparison
-      final userGender = userProfile.gender.toLowerCase();
-      final groupGender = group.gender.toLowerCase();
+      final groupsService = ref.read(groupsServiceProvider);
+      final result = await groupsService.getPublicGroupsPaginated(
+        limit: _pageSize,
+        userGender: userProfile.gender.toLowerCase(),
+        startAfterDocument: current.lastDocument,
+      );
 
-      // Show groups that:
-      // 1. Match the user's gender exactly
-      // 2. Are marked as 'mixed' (if that's a valid option in your system)
-      return groupGender == userGender || groupGender == 'mixed';
-    }).toList();
+      final newGroups = result.groups.map((g) => g.toEntity()).toList();
+      state = AsyncData(PaginatedGroupsState(
+        groups: [...current.groups, ...newGroups],
+        lastDocument: result.lastDocument,
+        hasMore: result.hasMore,
+      ));
+    } catch (e) {
+      // Keep existing data but stop loading indicator
+      state = AsyncData(current.copyWith(isLoadingMore: false));
+    }
+  }
 
-    yield filteredGroups;
+  void refresh() {
+    ref.invalidateSelf();
   }
 }

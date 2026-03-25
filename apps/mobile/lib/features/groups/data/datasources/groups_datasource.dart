@@ -1,5 +1,20 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../models/group_model.dart';
 import '../models/group_membership_model.dart';
+
+/// Result of paginated group query
+class PaginatedGroupsResult {
+  final List<GroupModel> groups;
+  final DocumentSnapshot? lastDocument;
+  final bool hasMore;
+
+  const PaginatedGroupsResult({
+    required this.groups,
+    this.lastDocument,
+    required this.hasMore,
+  });
+}
 
 /// Abstract interface for groups data operations
 abstract class GroupsDataSource {
@@ -11,6 +26,13 @@ abstract class GroupsDataSource {
 
   /// Get public groups for discovery
   Stream<List<GroupModel>> getPublicGroups();
+
+  /// Get public groups with cursor-based pagination and gender filtering
+  Future<PaginatedGroupsResult> getPublicGroupsPaginated({
+    required int limit,
+    required String userGender,
+    DocumentSnapshot? startAfterDocument,
+  });
 
   /// Create a new group
   Future<String> createGroup(GroupModel group);

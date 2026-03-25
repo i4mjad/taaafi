@@ -1,7 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../entities/group_entity.dart';
 import '../entities/group_membership_entity.dart';
 import '../entities/join_result_entity.dart';
 import '../entities/bulk_operation_result.dart';
+import '../../data/datasources/groups_datasource.dart';
 
 abstract class GroupsRepository {
   /// Get current user's active membership
@@ -12,6 +15,13 @@ abstract class GroupsRepository {
 
   /// Get public groups for discovery
   Stream<List<GroupEntity>> getPublicGroups();
+
+  /// Get public groups with cursor-based pagination and gender filtering
+  Future<PaginatedGroupsResult> getPublicGroupsPaginated({
+    required int limit,
+    required String userGender,
+    DocumentSnapshot? startAfterDocument,
+  });
 
   /// Create a new group
   Future<CreateGroupResultEntity> createGroup({

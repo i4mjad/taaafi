@@ -63,6 +63,42 @@ class GroupsFirestoreDataSource implements GroupsDataSource {
   }
 
   @override
+  Future<PaginatedGroupsResult> getPublicGroupsPaginated({
+    required int limit,
+    required String userGender,
+    DocumentSnapshot? startAfterDocument,
+  }) async {
+    try {
+      var query = _firestore
+          .collection('groups')
+          .where('visibility', isEqualTo: 'public')
+          .where('isActive', isEqualTo: true)
+          .where('isPaused', isEqualTo: false)
+          .where('gender', whereIn: [userGender, 'mixed'])
+          .orderBy('createdAt', descending: true)
+          .limit(limit + 1);
+
+      if (startAfterDocument != null) {
+        query = query.startAfterDocument(startAfterDocument);
+      }
+
+      final snapshot = await query.get();
+      final docs = snapshot.docs;
+      final hasMore = docs.length > limit;
+      final resultDocs = hasMore ? docs.sublist(0, limit) : docs;
+
+      return PaginatedGroupsResult(
+        groups: resultDocs.map((doc) => GroupModel.fromFirestore(doc)).toList(),
+        lastDocument: resultDocs.isNotEmpty ? resultDocs.last : null,
+        hasMore: hasMore,
+      );
+    } catch (e, stackTrace) {
+      log('Error getting paginated public groups: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
   Future<String> createGroup(GroupModel group) async {
     try {
       final docRef =

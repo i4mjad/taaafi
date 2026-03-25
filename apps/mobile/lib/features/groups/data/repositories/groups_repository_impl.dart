@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../../domain/entities/group_entity.dart';
 import '../../domain/entities/group_membership_entity.dart';
 import '../../domain/entities/join_result_entity.dart';
@@ -83,6 +85,64 @@ class GroupsRepositoryImpl implements GroupsRepository {
       });
     } catch (e, stackTrace) {
       log('Error in getPublicGroups: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<PaginatedGroupsResult> getPublicGroupsPaginated({
+    required int limit,
+    required String userGender,
+    DocumentSnapshot? startAfterDocument,
+  }) async {
+    try {
+      final result = await _dataSource.getPublicGroupsPaginated(
+        limit: limit,
+        userGender: userGender,
+        startAfterDocument: startAfterDocument,
+      );
+
+      // Enrich each group with real member count
+      final enrichedGroups = <GroupModel>[];
+      for (final group in result.groups) {
+        try {
+          final memberCount =
+              await _dataSource.getGroupMemberCount(group.id);
+          enrichedGroups.add(GroupModel(
+            id: group.id,
+            name: group.name,
+            description: group.description,
+            gender: group.gender,
+            preferredLanguage: group.preferredLanguage,
+            memberCapacity: group.memberCapacity,
+            memberCount: memberCount,
+            adminCpId: group.adminCpId,
+            createdByCpId: group.createdByCpId,
+            visibility: group.visibility,
+            joinMethod: group.joinMethod,
+            joinCode: group.joinCode,
+            joinCodeExpiresAt: group.joinCodeExpiresAt,
+            joinCodeMaxUses: group.joinCodeMaxUses,
+            joinCodeUseCount: group.joinCodeUseCount,
+            isActive: group.isActive,
+            isPaused: group.isPaused,
+            pauseReason: group.pauseReason,
+            createdAt: group.createdAt,
+            updatedAt: group.updatedAt,
+          ));
+        } catch (e) {
+          log('Failed to get member count for group ${group.id}: $e');
+          enrichedGroups.add(group);
+        }
+      }
+
+      return PaginatedGroupsResult(
+        groups: enrichedGroups,
+        lastDocument: result.lastDocument,
+        hasMore: result.hasMore,
+      );
+    } catch (e, stackTrace) {
+      log('Error in getPublicGroupsPaginated: $e', stackTrace: stackTrace);
       rethrow;
     }
   }

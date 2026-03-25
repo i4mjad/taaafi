@@ -39,21 +39,25 @@ class GroupsExplorationScreen extends ConsumerStatefulWidget {
 class _GroupsExplorationScreenState
     extends ConsumerState<GroupsExplorationScreen> {
   final TextEditingController _searchController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
   GroupFilter _selectedFilter = GroupFilter.all;
   GroupSort _selectedSort = GroupSort.newest;
-  bool _isLoading = false;
+  bool _isJoining = false;
   String _searchQuery = '';
 
   @override
   void initState() {
     super.initState();
     _searchController.addListener(_onSearchChanged);
+    _scrollController.addListener(_onScroll);
   }
 
   @override
   void dispose() {
     _searchController.removeListener(_onSearchChanged);
     _searchController.dispose();
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -61,7 +65,15 @@ class _GroupsExplorationScreenState
     setState(() {
       _searchQuery = _searchController.text;
     });
-    _performSearch();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      // Near the bottom, load more
+      final notifier = ref.read(paginatedPublicGroupsProvider.notifier);
+      notifier.loadMore();
+    }
   }
 
   @override
@@ -111,6 +123,8 @@ class _GroupsExplorationScreenState
       );
     }
 
+    final groupsAsync = ref.watch(paginatedPublicGroupsProvider);
+
     return Scaffold(
       backgroundColor: theme.backgroundColor,
       appBar: appBar(context, ref, 'explore-groups', false, true),
@@ -136,7 +150,7 @@ class _GroupsExplorationScreenState
                   hint: l10n.translate('search-groups-placeholder'),
                   prefixIcon: LucideIcons.search,
                   inputType: TextInputType.text,
-                  validator: (value) => null, // No validation needed for search
+                  validator: (value) => null,
                 ),
 
                 verticalSpace(Spacing.points12),
@@ -215,43 +229,36 @@ class _GroupsExplorationScreenState
                     const Spacer(),
 
                     // Results Count
-                    Consumer(
-                      builder: (context, ref, child) {
-                        final groupsAsync =
-                            ref.watch(filteredPublicGroupsProvider);
-                        return groupsAsync.when(
-                          data: (groups) => Text(
-                            l10n.translate('groups-found').replaceAll(
-                                  '{count}',
-                                  _getFilteredGroups(groups).length.toString(),
-                                ),
-                            style: TextStyles.caption.copyWith(
-                              color: theme.grey[600],
+                    groupsAsync.when(
+                      data: (state) => Text(
+                        l10n.translate('groups-found').replaceAll(
+                              '{count}',
+                              _getFilteredGroups(state.groups)
+                                  .length
+                                  .toString(),
                             ),
-                          ),
-                          loading: () => Text(
-                            l10n.translate('groups-found').replaceAll(
-                                  '{count}',
-                                  '...',
-                                ),
-                            style: TextStyles.caption.copyWith(
-                              color: theme.grey[600],
+                        style: TextStyles.caption.copyWith(
+                          color: theme.grey[600],
+                        ),
+                      ),
+                      loading: () => Text(
+                        l10n.translate('groups-found').replaceAll(
+                              '{count}',
+                              '...',
                             ),
-                          ),
-                          error: (error, stackTrace) {
-                            print(error);
-                            return Text(
-                              l10n.translate('groups-found').replaceAll(
-                                    '{count}',
-                                    '0',
-                                  ),
-                              style: TextStyles.caption.copyWith(
-                                color: theme.grey[600],
-                              ),
-                            );
-                          },
-                        );
-                      },
+                        style: TextStyles.caption.copyWith(
+                          color: theme.grey[600],
+                        ),
+                      ),
+                      error: (error, stackTrace) => Text(
+                        l10n.translate('groups-found').replaceAll(
+                              '{count}',
+                              '0',
+                            ),
+                        style: TextStyles.caption.copyWith(
+                          color: theme.grey[600],
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -261,45 +268,40 @@ class _GroupsExplorationScreenState
 
           // Groups List
           Expanded(
-            child: _isLoading
+            child: _isJoining
                 ? const Center(child: Spinner())
-                : Consumer(
-                    builder: (context, ref, child) {
-                      final groupsAsync =
-                          ref.watch(filteredPublicGroupsProvider);
-                      return groupsAsync.when(
-                        data: (groups) => _buildGroupsList(theme, l10n, groups),
-                        loading: () => const Center(child: Spinner()),
-                        error: (error, stackTrace) => Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                LucideIcons.alertCircle,
-                                size: 64,
-                                color: theme.error[400],
-                              ),
-                              verticalSpace(Spacing.points16),
-                              Text(
-                                l10n.translate('error-loading-groups'),
-                                style: TextStyles.h6.copyWith(
-                                  color: theme.error[600],
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                              verticalSpace(Spacing.points8),
-                              Text(
-                                error.toString(),
-                                style: TextStyles.body.copyWith(
-                                  color: theme.grey[500],
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
+                : groupsAsync.when(
+                    data: (state) =>
+                        _buildGroupsList(theme, l10n, state),
+                    loading: () => const Center(child: Spinner()),
+                    error: (error, stackTrace) => Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            LucideIcons.alertCircle,
+                            size: 64,
+                            color: theme.error[400],
                           ),
-                        ),
-                      );
-                    },
+                          verticalSpace(Spacing.points16),
+                          Text(
+                            l10n.translate('error-loading-groups'),
+                            style: TextStyles.h6.copyWith(
+                              color: theme.error[600],
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          verticalSpace(Spacing.points8),
+                          Text(
+                            error.toString(),
+                            style: TextStyles.body.copyWith(
+                              color: theme.grey[500],
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
           ),
         ],
@@ -321,7 +323,6 @@ class _GroupsExplorationScreenState
         setState(() {
           _selectedFilter = filter;
         });
-        _performSearch();
       },
       child: Container(
         padding: EdgeInsets.symmetric(
@@ -358,9 +359,9 @@ class _GroupsExplorationScreenState
     );
   }
 
-  Widget _buildGroupsList(CustomThemeData theme, AppLocalizations l10n,
-      List<GroupEntity> allGroups) {
-    final filteredGroups = _getFilteredGroups(allGroups);
+  Widget _buildGroupsList(
+      CustomThemeData theme, AppLocalizations l10n, PaginatedGroupsState state) {
+    final filteredGroups = _getFilteredGroups(state.groups);
 
     if (filteredGroups.isEmpty) {
       return Center(
@@ -396,18 +397,36 @@ class _GroupsExplorationScreenState
       );
     }
 
-    return ListView.separated(
-      padding: EdgeInsets.all(Spacing.points16.value),
-      itemCount: filteredGroups.length,
-      separatorBuilder: (context, index) => verticalSpace(Spacing.points16),
-      itemBuilder: (context, index) {
-        final group = filteredGroups[index];
-        return PublicGroupCard(
-          group: group,
-          onTap: () => _showGroupDetails(context, group),
-          onJoin: () => _joinGroup(context, group),
-        );
+    final itemCount =
+        filteredGroups.length + (state.hasMore || state.isLoadingMore ? 1 : 0);
+
+    return RefreshIndicator(
+      onRefresh: () async {
+        ref.read(paginatedPublicGroupsProvider.notifier).refresh();
+        // Wait for the provider to reload
+        await ref.read(paginatedPublicGroupsProvider.future);
       },
+      child: ListView.separated(
+        controller: _scrollController,
+        padding: EdgeInsets.all(Spacing.points16.value),
+        itemCount: itemCount,
+        separatorBuilder: (context, index) => verticalSpace(Spacing.points16),
+        itemBuilder: (context, index) {
+          if (index == filteredGroups.length) {
+            // Loading more indicator
+            return const Padding(
+              padding: EdgeInsets.symmetric(vertical: 16),
+              child: Center(child: Spinner()),
+            );
+          }
+          final group = filteredGroups[index];
+          return PublicGroupCard(
+            group: group,
+            onTap: () => _showGroupDetails(context, group),
+            onJoin: () => _joinGroup(context, group),
+          );
+        },
+      ),
     );
   }
 
@@ -446,7 +465,6 @@ class _GroupsExplorationScreenState
                       _selectedSort = value!;
                     });
                     Navigator.pop(context);
-                    _performSearch();
                   },
                 ),
               );
@@ -532,7 +550,7 @@ class _GroupsExplorationScreenState
     final l10n = AppLocalizations.of(context);
 
     setState(() {
-      _isLoading = true;
+      _isJoining = true;
     });
 
     try {
@@ -573,25 +591,10 @@ class _GroupsExplorationScreenState
     } finally {
       if (mounted) {
         setState(() {
-          _isLoading = false;
+          _isJoining = false;
         });
       }
     }
-  }
-
-  void _performSearch() {
-    setState(() {
-      _isLoading = true;
-    });
-
-    // Simulate search delay
-    Future.delayed(const Duration(milliseconds: 500), () {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    });
   }
 
   List<DiscoverableGroup> _getFilteredGroups(List<GroupEntity> allGroups) {
@@ -612,7 +615,7 @@ class _GroupsExplorationScreenState
       }).toList();
     }
 
-    // Apply category filter (no gender filters anymore)
+    // Apply category filter
     switch (_selectedFilter) {
       case GroupFilter.needsCode:
         groups = groups.where((g) => g.joinMethod == 'code_only').toList();
@@ -639,7 +642,6 @@ class _GroupsExplorationScreenState
         groups.sort((a, b) => a.memberCount.compareTo(b.memberCount));
         break;
       case GroupSort.mostActive:
-        // Sort by creation time since we don't have lastActivityTime in GroupEntity
         groups.sort((a, b) => b.createdAt.compareTo(a.createdAt));
         break;
     }
@@ -672,7 +674,7 @@ class _GroupsExplorationScreenState
       id: group.id,
       name: group.name,
       description: group.description,
-      memberCount: group.memberCount, // Real member count from backend
+      memberCount: group.memberCount,
       capacity: group.memberCapacity,
       gender: group.gender,
       preferredLanguage: group.preferredLanguage,
@@ -680,7 +682,7 @@ class _GroupsExplorationScreenState
       createdAt: group.createdAt,
       lastActivityTime:
           _formatLastActivity(group.updatedAt, AppLocalizations.of(context)),
-      tags: [], // Only show real tags when available from backend
+      tags: [],
     );
   }
 
