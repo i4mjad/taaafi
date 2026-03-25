@@ -78,7 +78,7 @@ class ChallengeNotificationService {
         'type': 'challenge_complete',
         'challengeId': challengeId,
         'recipientCpId': cpId,
-        'data': {'challengeName': challenge.title},
+        'data': {'challengeName': challenge.name},
       });
 
       log('Challenge complete notification sent for user $cpId');
@@ -144,7 +144,7 @@ class ChallengeNotificationService {
         'challengeId': challengeId,
         'recipientCpId': cpId,
         'data': {
-          'challengeName': challenge.title,
+          'challengeName': challenge.name,
           'timeText': timeText,
         },
       });
