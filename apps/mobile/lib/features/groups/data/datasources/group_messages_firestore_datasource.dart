@@ -197,10 +197,11 @@ class GroupMessagesFirestoreDataSource implements GroupMessagesDataSource {
     }
 
     // Create new stream with caching and profile enrichment
+    // Limit to most recent 50 messages for performance; older messages loaded via pagination
     final stream = _messagesCollection
         .where('groupId', isEqualTo: groupId)
-        .orderBy('createdAt', descending: false) // Ascending for chat UI
-        // Remove limit to get all messages in real-time stream
+        .orderBy('createdAt', descending: true)
+        .limit(50)
         .snapshots()
         .asyncMap((snapshot) async {
       try {

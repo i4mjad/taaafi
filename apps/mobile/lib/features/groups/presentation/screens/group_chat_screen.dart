@@ -171,6 +171,7 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
   final ScrollController _scrollController = ScrollController();
   bool _isSubmitting = false;
   bool _isSearchMode = false;
+  bool _isLoadingMore = false;
   ChatReplyState _replyState = const ChatReplyState();
 
   // Animation for reply preview dismissal
@@ -335,8 +336,21 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
             ),
           ),
           data: (messageEntities) {
+            // Merge streamed messages with paginated older messages
+            final paginatedAsync = ref
+                .watch(groupChatMessagesPaginatedProvider(widget.groupId ?? ''));
+            final paginatedResult = paginatedAsync.valueOrNull;
+            final hasMore = paginatedResult?.hasMore ?? true;
+
+            // Deduplicate: stream IDs take priority, add unique older messages
+            final streamIds = messageEntities.map((m) => m.id).toSet();
+            final olderEntities = (paginatedResult?.messages ?? [])
+                .where((m) => !streamIds.contains(m.id))
+                .toList();
+            final allEntities = [...messageEntities, ...olderEntities];
+
             final messages =
-                _convertEntitiesToChatMessages(messageEntities, l10n);
+                _convertEntitiesToChatMessages(allEntities, l10n);
 
             if (messages.isEmpty) {
               return Center(
@@ -346,11 +360,6 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
                 ),
               );
             }
-
-            // Check if we can load more from paginated provider (for navigation only)
-            final paginatedAsync = ref
-                .read(groupChatMessagesPaginatedProvider(widget.groupId ?? ''));
-            final hasMore = paginatedAsync.valueOrNull?.hasMore ?? false;
 
             return _buildMessageListViewWithPagination(
                 context, theme, chatTextSize, messages, hasMore);
@@ -384,6 +393,7 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
       onNotification: (ScrollNotification scrollInfo) {
         // Load more messages when scrolling to the top (older messages)
         if (hasMore &&
+            !_isLoadingMore &&
             scrollInfo.metrics.pixels >=
                 scrollInfo.metrics.maxScrollExtent * 0.9) {
           _loadMoreMessages();
@@ -398,16 +408,14 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
           vertical: (screenHeight * 0.01).clamp(6.0, 12.0),
         ),
         itemCount: sortedMessages.length +
-            (hasMore ? 1 : 0), // +1 for loading indicator
+            (_isLoadingMore ? 1 : 0), // +1 for loading indicator
         itemBuilder: (context, index) {
           // Show loading indicator at the top when loading more
-          if (index == sortedMessages.length) {
-            return hasMore
-                ? const Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: Center(child: CircularProgressIndicator()),
-                  )
-                : const SizedBox.shrink();
+          if (index >= sortedMessages.length) {
+            return const Padding(
+              padding: EdgeInsets.symmetric(vertical: 16.0),
+              child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+            );
           }
 
           final message = sortedMessages[index];
@@ -437,13 +445,21 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
   }
 
   /// Load more messages (for infinite scroll)
-  void _loadMoreMessages() {
-    if (widget.groupId == null) return;
+  Future<void> _loadMoreMessages() async {
+    if (widget.groupId == null || _isLoadingMore) return;
 
-    final paginatedProvider =
-        groupChatMessagesPaginatedProvider(widget.groupId!);
-    final paginatedNotifier = ref.read(paginatedProvider.notifier);
-    paginatedNotifier.loadMore();
+    setState(() => _isLoadingMore = true);
+
+    try {
+      final paginatedProvider =
+          groupChatMessagesPaginatedProvider(widget.groupId!);
+      final paginatedNotifier = ref.read(paginatedProvider.notifier);
+      await paginatedNotifier.loadMore();
+    } finally {
+      if (mounted) {
+        setState(() => _isLoadingMore = false);
+      }
+    }
   }
 
   /// Convert GroupMessageEntity list to ChatMessage list for UI compatibility

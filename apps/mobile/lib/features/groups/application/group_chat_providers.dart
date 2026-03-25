@@ -74,11 +74,9 @@ class GroupChatMessagesPaginated extends _$GroupChatMessagesPaginated {
     final currentState = state.valueOrNull;
     if (currentState == null || !currentState.hasMore) return;
 
-    final repository = ref.watch(groupChatRepositoryProvider);
+    final repository = ref.read(groupChatRepositoryProvider);
 
     try {
-      state = const AsyncValue.loading();
-
       final moreMessages = await repository.loadMessages(
         groupId,
         MessagePaginationEntityParams(
@@ -104,7 +102,8 @@ class GroupChatMessagesPaginated extends _$GroupChatMessagesPaginated {
       );
     } catch (error) {
       print('Error loading more messages for group $groupId: $error');
-      state = AsyncValue.error(error, StackTrace.current);
+      // Keep existing data on error
+      state = AsyncValue.data(currentState);
     }
   }
 
