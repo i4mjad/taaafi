@@ -383,7 +383,7 @@ export default function ForumCommentsManagement() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <span className="text-sm text-muted-foreground">{format(comment.createdAt, 'MMM dd, yyyy')}</span>
+                        <span className="text-sm text-muted-foreground">{format(comment.createdAt, 'MMM dd, yyyy HH:mm')}</span>
                       </TableCell>
                       <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
                         <DropdownMenu>

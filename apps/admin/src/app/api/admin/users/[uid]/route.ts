@@ -65,6 +65,7 @@ export async function GET(
       lastTokenUpdate: firestoreProfile.lastTokenUpdate ? firestoreProfile.lastTokenUpdate.toDate() : null,
       messagingToken: firestoreProfile.messagingToken || null,
       platform: firestoreProfile.platform || null,
+      appVersion: firestoreProfile.appVersion || null,
       userFirstDate: firestoreProfile.userFirstDate ? firestoreProfile.userFirstDate.toDate() : null,
       devicesIds: firestoreProfile.devicesIds || [],
       metadata: {

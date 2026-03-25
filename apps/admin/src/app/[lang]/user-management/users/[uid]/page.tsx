@@ -64,6 +64,7 @@ interface UserProfile {
   lastTokenUpdate?: Date | null;
   messagingToken?: string;
   platform?: string;
+  appVersion?: string;
   userFirstDate?: Date | null;
   devicesIds?: string[];
   isRequestedToBeDeleted?: boolean;
@@ -164,6 +165,7 @@ export default function UserDetailsPage() {
       lastTokenUpdate: userData.lastTokenUpdate?.toDate() || null,
       messagingToken: userData.messagingToken,
       platform: userData.platform,
+      appVersion: userData.appVersion || null,
       userFirstDate: userData.userFirstDate?.toDate() || null,
       devicesIds: userData.devicesIds || [],
       isRequestedToBeDeleted: userData.isRequestedToBeDeleted || false,
@@ -504,6 +506,16 @@ export default function UserDetailsPage() {
                           <p className="text-sm text-muted-foreground">{formatPlatform(user.platform)}</p>
                         </div>
                       </div>
+
+                      <div className="flex items-center gap-3">
+                        <Smartphone className="h-4 w-4 text-muted-foreground" />
+                        <div>
+                          <p className="text-sm font-medium">{t('modules.userManagement.appVersion') || 'App Version'}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {user.appVersion || t('modules.userManagement.notSpecified') || 'Not specified'}
+                          </p>
+                        </div>
+                      </div>
                     </CardContent>
                   </Card>
                 </div>
@@ -550,7 +562,7 @@ export default function UserDetailsPage() {
                       <div className="flex items-center gap-3">
                         <Clock className="h-4 w-4 text-muted-foreground" />
                         <div>
-                          <p className="text-sm font-medium">{t('modules.userManagement.lastTokenUpdate') || 'Last Token Update'}</p>
+                          <p className="text-sm font-medium">{t('modules.userManagement.lastTokenUpdate') || 'Last Active'}</p>
                           <p className="text-sm text-muted-foreground">
                             {formatDate(user.lastTokenUpdate)}
                           </p>

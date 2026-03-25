@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'fcm_repository.g.dart';
@@ -90,10 +91,13 @@ class FirebaseMessagingRepository {
       
       print('📄 FCM TOKEN: User document exists, updating token...');
 
+      final packageInfo = await PackageInfo.fromPlatform();
+
       await _firestore.collection('users').doc(uid).set({
         'messagingToken': token,
         'lastTokenUpdate': FieldValue.serverTimestamp(),
         'platform': Platform.isIOS ? 'ios' : 'android',
+        'appVersion': packageInfo.version,
       }, SetOptions(merge: true));
       
       print('✅ FCM TOKEN: Successfully updated messaging token in Firestore');

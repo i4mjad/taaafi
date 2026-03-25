@@ -697,7 +697,7 @@ export default function ForumPostsManagement() {
                       </TableCell>
                       <TableCell>
                         <span className="text-sm text-muted-foreground">
-                          {format(post.createdAt, 'MMM dd, yyyy')}
+                          {format(post.createdAt, 'MMM dd, yyyy HH:mm')}
                         </span>
                       </TableCell>
                       <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
