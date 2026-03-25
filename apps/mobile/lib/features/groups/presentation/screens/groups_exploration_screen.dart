@@ -20,6 +20,7 @@ import 'package:reboot_app_3/features/groups/domain/entities/group_entity.dart';
 import 'package:reboot_app_3/features/groups/application/groups_controller.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/groups/domain/entities/join_result_entity.dart';
+import 'package:reboot_app_3/features/groups/providers/group_membership_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:reboot_app_3/core/routing/route_names.dart';
 
@@ -67,8 +68,8 @@ class _GroupsExplorationScreenState
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
     final l10n = AppLocalizations.of(context);
-    // TODO: Check group membership properly
-    const groupMembership = null;
+    final membership = ref.watch(groupMembershipNotifierProvider).valueOrNull;
+    final groupMembership = membership;
 
     // Don't show exploration if user is already in a group
     if (groupMembership != null) {
