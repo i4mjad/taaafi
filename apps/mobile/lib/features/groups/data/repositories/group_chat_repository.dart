@@ -389,9 +389,11 @@ class GroupChatRepositoryImpl implements GroupChatRepository {
     int limit = 50,
   }) async {
     try {
+      // Normalize the search query the same way tokens are normalized
+      final normalizedQuery = _normalizeArabic(query);
       final models = await _dataSource.searchMessages(
         groupId: groupId,
-        query: query,
+        query: normalizedQuery,
         limit: limit,
       );
       final entities = models.map((model) => model.toEntity()).toList();
@@ -403,16 +405,28 @@ class GroupChatRepositoryImpl implements GroupChatRepository {
     }
   }
 
+  /// Normalize text for Arabic-aware search (shared by tokenizer and search)
+  static String _normalizeArabic(String text) {
+    // Remove Arabic diacritics (harakat)
+    var normalized = text.replaceAll(RegExp(r'[\u0610-\u061A\u064B-\u065F]'), '');
+    // Remove tatweel (elongation mark)
+    normalized = normalized.replaceAll('\u0640', '');
+    // Normalize alef variants → bare alef
+    normalized = normalized.replaceAll(RegExp(r'[أإآٱ]'), 'ا');
+    // Normalize teh marbuta → heh
+    normalized = normalized.replaceAll('ة', 'ه');
+    return normalized;
+  }
+
   /// Generate search tokens from message body
-  /// TODO: Implement proper Arabic-aware tokenization
   List<String> _generateTokens(String body) {
-    // Basic tokenization - split by spaces and common punctuation
-    // TODO: Replace with proper Arabic/English tokenization service
-    final tokens = body
+    final normalized = _normalizeArabic(body);
+    // Lowercase + split on whitespace and punctuation
+    final tokens = normalized
         .toLowerCase()
         .split(RegExp(r'[\s\p{P}]+', unicode: true))
-        .where((token) => token.isNotEmpty && token.length > 2)
-        .toSet() // Remove duplicates
+        .where((t) => t.isNotEmpty && t.length > 1)
+        .toSet()
         .toList();
 
     log('Generated ${tokens.length} tokens from message body');
