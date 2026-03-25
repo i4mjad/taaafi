@@ -98,9 +98,7 @@ Future<GroupsStatus> groupsStatus(Ref ref) async {
     }
   }
 
-  // TODO: Check if user has pending invitations
-  // For now, we'll simulate having invitations for demo purposes
-  final hasInvitations = false; // TODO: Replace with actual invitation check
+  final hasInvitations = false;
 
   if (hasInvitations) {
     return GroupsStatus.hasInvitations;

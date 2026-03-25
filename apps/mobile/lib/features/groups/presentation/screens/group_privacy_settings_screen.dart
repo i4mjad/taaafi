@@ -273,12 +273,6 @@ class GroupPrivacySettingsScreen extends ConsumerWidget {
                     ? l10n.translate('join-method-any-description')
                     : l10n.translate('join-method-any-requires-public'),
               ),
-              // TODO: Re-enable admin invite functionality later
-              // PlatformRadioOption<String>(
-              //   value: 'admin_only',
-              //   title: l10n.translate('join-method-admin-only'),
-              //   subtitle: l10n.translate('join-method-admin-only-description'),
-              // ),
               PlatformRadioOption<String>(
                 value: 'code_only',
                 title: l10n.translate('join-method-code-only'),

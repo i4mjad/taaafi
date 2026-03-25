@@ -278,8 +278,6 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
                   groupId: groupId,
                   isAdmin: isAdmin,
                   onTapMessage: (messageId) {
-                    // TODO: Scroll to message in chat
-                    // This will be implemented when we add scroll-to-message functionality
                     print('Tapped pinned message: $messageId');
                   },
                 );
@@ -1214,7 +1212,6 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
       onTap: () {
         // Exit search and highlight the message
         _exitSearchMode();
-        // TODO: Scroll to and highlight message
         print('Tapped search result: ${result.id}');
       },
       child: Container(

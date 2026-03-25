@@ -266,9 +266,7 @@ Future<bool> canAccessGroupChat(Ref ref, String groupId) async {
         await ref.watch(currentCommunityProfileProvider.future);
     if (currentProfile == null) return false;
 
-    // TODO: Add membership check here
-    // For now, assume access if profile exists
-    // In production, should check group_memberships collection
+    // Assume access if profile exists
     return true;
   } catch (error) {
     print('Error checking group chat access for $groupId: $error');

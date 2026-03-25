@@ -17,7 +17,6 @@ class RevenueCatNotAvailableException implements Exception {
 }
 
 class RevenueCatService {
-  //TODO: consider adding those to a .env file
   static const String _apiKeyIOS = 'appl_VJlBGrlcGTKcySomcGMsBdazXTo';
   static const String _apiKeyAndroid = 'goog_CuAPzQlQmGCxsqzDgdkgmAmcWVB';
 
