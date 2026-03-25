@@ -1016,8 +1016,7 @@ class ForumRepository {
     return _comments
         .where('parentFor', isEqualTo: 'comment')
         .where('parentId', isEqualTo: commentId)
-        .orderBy(
-            'createdAt') // TODO: Index required - see firestore_indexes_required.md
+        .orderBy('createdAt')
         .snapshots()
         .map((snapshot) {
       final comments = snapshot.docs

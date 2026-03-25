@@ -30,8 +30,6 @@ import 'package:reboot_app_3/core/shared_widgets/account_action_banner.dart';
 import 'package:reboot_app_3/core/shared_widgets/complete_registration_banner.dart';
 import 'package:reboot_app_3/core/shared_widgets/confirm_details_banner.dart';
 import 'package:reboot_app_3/core/shared_widgets/confirm_email_banner.dart';
-// TODO: Temporarily disabled - uncomment when chats tab is re-enabled
-// import 'package:reboot_app_3/features/direct_messaging/presentation/screens/community_chats_screen.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/groups_main_screen.dart';
 
 class CommunityMainScreen extends ConsumerStatefulWidget {
@@ -58,7 +56,6 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
     super.initState();
 
     // Initialize tab controller with 2 tabs (Community and Groups)
-    // TODO: Chats tab temporarily disabled - change back to length: 3 when re-enabled
     // Dispose any existing controller first (in case of hot reload)
     _tabController?.dispose();
     _tabController = TabController(length: 2, vsync: this);
@@ -405,8 +402,6 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
               controller: _tabController!,
               children: [
                 _buildForumTab(),
-                // TODO: Chats tab temporarily disabled - uncomment when re-enabled
-                // const CommunityChatsScreen(showAppBar: false),
                 const GroupsMainScreen(),
               ],
             ),

@@ -15,8 +15,6 @@ import 'package:reboot_app_3/features/vault/data/diaries/diary.dart';
 import 'package:reboot_app_3/features/vault/data/diaries/diary_notifier.dart';
 import 'package:reboot_app_3/features/vault/presentation/diaries/diary_settings_sheet.dart';
 
-//TODO: review this logic
-
 class DiaryScreen extends ConsumerStatefulWidget {
   const DiaryScreen({super.key, required this.diaryId});
 

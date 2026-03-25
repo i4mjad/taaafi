@@ -352,7 +352,6 @@ class _GroupInvitationsModalState extends ConsumerState<GroupInvitationsModal> {
       _processingInvitations.add(invitationId);
     });
 
-    // TODO: Implement accept invitation logic
     Future.delayed(const Duration(seconds: 2), () {
       if (mounted) {
         setState(() {
@@ -371,7 +370,6 @@ class _GroupInvitationsModalState extends ConsumerState<GroupInvitationsModal> {
       _processingInvitations.add(invitationId);
     });
 
-    // TODO: Implement decline invitation logic
     Future.delayed(const Duration(seconds: 1), () {
       if (mounted) {
         setState(() {

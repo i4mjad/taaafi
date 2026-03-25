@@ -1,4 +1,5 @@
 import 'dart:developer';
+import '../domain/entities/challenge_task_entity.dart';
 import '../domain/repositories/challenges_repository.dart';
 
 /// Service for automatically tracking challenge progress based on user activities
@@ -11,16 +12,33 @@ class ChallengeProgressTrackerService {
 
   /// Track when a user sends a message
   ///
-  /// In task-based system, this can be used to auto-complete specific tasks
-  /// For now, this is a placeholder for future auto-tracking
+  /// Checks active challenges for messageCount tasks and increments progress
   Future<void> trackMessageSent({
     required String cpId,
     required String groupId,
   }) async {
     try {
-      // TODO: Implement auto-tracking for message-based tasks
-      // This would check for tasks like "Send X messages" and auto-complete them
-      log('trackMessageSent: Auto-tracking not yet implemented for task-based system');
+      final participations = await _repository.getUserActiveChallenges(cpId);
+
+      for (final participation in participations) {
+        final challenge =
+            await _repository.getChallengeById(participation.challengeId);
+        if (challenge == null) continue;
+
+        for (final task in challenge.tasks) {
+          if (task.taskType != TaskType.messageCount) continue;
+          if (!participation.canCompleteTask(task.id, task.frequency)) continue;
+
+          await _repository.completeTask(
+            challengeId: participation.challengeId,
+            cpId: cpId,
+            taskId: task.id,
+            pointsEarned: task.points,
+          );
+
+          log('Auto-completed messageCount task ${task.id} for $cpId in challenge ${participation.challengeId}');
+        }
+      }
     } catch (e, stackTrace) {
       log('Error in trackMessageSent: $e', stackTrace: stackTrace);
     }
@@ -28,14 +46,32 @@ class ChallengeProgressTrackerService {
 
   /// Track daily activity
   ///
-  /// In task-based system, can auto-complete daily tasks
-  /// For now, this is a placeholder
+  /// Checks active challenges for dailyCheckin tasks and increments progress
   Future<void> trackDailyActivity({
     required String cpId,
   }) async {
     try {
-      // TODO: Implement auto-tracking for daily tasks
-      log('trackDailyActivity: Auto-tracking not yet implemented for task-based system');
+      final participations = await _repository.getUserActiveChallenges(cpId);
+
+      for (final participation in participations) {
+        final challenge =
+            await _repository.getChallengeById(participation.challengeId);
+        if (challenge == null) continue;
+
+        for (final task in challenge.tasks) {
+          if (task.taskType != TaskType.dailyCheckin) continue;
+          if (!participation.canCompleteTask(task.id, task.frequency)) continue;
+
+          await _repository.completeTask(
+            challengeId: participation.challengeId,
+            cpId: cpId,
+            taskId: task.id,
+            pointsEarned: task.points,
+          );
+
+          log('Auto-completed dailyCheckin task ${task.id} for $cpId in challenge ${participation.challengeId}');
+        }
+      }
     } catch (e, stackTrace) {
       log('Error in trackDailyActivity: $e', stackTrace: stackTrace);
     }
@@ -65,4 +101,3 @@ class ChallengeProgressTrackerService {
     }
   }
 }
-

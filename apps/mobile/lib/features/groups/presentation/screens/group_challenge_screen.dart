@@ -98,46 +98,96 @@ class _GroupChallengeScreenState extends ConsumerState<GroupChallengeScreen> {
               );
             }
 
-            // For now, show leaderboard from first challenge
-            // TODO: Combine leaderboards from all challenges
-            final firstChallenge = challenges.first;
-            final leaderboardAsync = ref.watch(
-                challengeLeaderboardProvider(firstChallenge.id, limit: 4));
+            // Watch leaderboards for ALL active challenges
+            final allLeaderboards = <String, AsyncValue<List<ChallengeParticipationEntity>>>{};
+            for (final challenge in challenges) {
+              allLeaderboards[challenge.id] = ref.watch(
+                challengeLeaderboardProvider(challenge.id),
+              );
+            }
 
-            return leaderboardAsync.when(
-              data: (participants) {
-                if (participants.isEmpty) {
-                  return _buildEmptyState(
-                    theme,
-                    l10n,
-                    LucideIcons.users,
-                    'no-participants-yet',
-                  );
-                }
+            // Check if any are still loading
+            final isLoading = allLeaderboards.values.any((v) => v.isLoading);
+            final hasError = allLeaderboards.values.any((v) => v.hasError);
 
-                return LeaderboardList(
-                  participants: participants,
-                  groupId: widget.groupId,
-                  showLeftUsers: _showLeftUsers,
-                  onToggleLeftUsers: () {
-                    setState(() {
-                      _showLeftUsers = !_showLeftUsers;
-                    });
-                  },
-                );
-              },
-              loading: () => const Center(
+            if (isLoading) {
+              return const Center(
                 child: Padding(
                   padding: EdgeInsets.all(24),
                   child: CircularProgressIndicator(),
                 ),
-              ),
-              error: (error, stack) => _buildEmptyState(
+              );
+            }
+
+            if (hasError) {
+              return _buildEmptyState(
                 theme,
                 l10n,
                 LucideIcons.alertCircle,
                 'error-loading-leaderboard',
-              ),
+              );
+            }
+
+            // Aggregate points by cpId across all challenges
+            final pointsByCpId = <String, int>{};
+            for (final leaderboardAsync in allLeaderboards.values) {
+              final participants = leaderboardAsync.valueOrNull ?? [];
+              for (final p in participants) {
+                pointsByCpId[p.cpId] = (pointsByCpId[p.cpId] ?? 0) + p.earnedPoints;
+              }
+            }
+
+            if (pointsByCpId.isEmpty) {
+              return _buildEmptyState(
+                theme,
+                l10n,
+                LucideIcons.users,
+                'no-participants-yet',
+              );
+            }
+
+            // Sort by total points descending and build aggregated participation list
+            final sortedEntries = pointsByCpId.entries.toList()
+              ..sort((a, b) => b.value.compareTo(a.value));
+
+            // Take top entries and build ChallengeParticipationEntity with aggregated points
+            // Reuse the first matching participation as a template for each cpId
+            final allParticipants = <ChallengeParticipationEntity>[];
+            for (final entry in sortedEntries.take(10)) {
+              // Find original participation to use as template
+              ChallengeParticipationEntity? template;
+              for (final leaderboardAsync in allLeaderboards.values) {
+                final participants = leaderboardAsync.valueOrNull ?? [];
+                final match = participants.where((p) => p.cpId == entry.key);
+                if (match.isNotEmpty) {
+                  template = match.first;
+                  break;
+                }
+              }
+              if (template != null) {
+                allParticipants.add(ChallengeParticipationEntity(
+                  id: template.id,
+                  challengeId: template.challengeId,
+                  cpId: entry.key,
+                  groupId: template.groupId,
+                  earnedPoints: entry.value,
+                  taskCompletions: template.taskCompletions,
+                  status: template.status,
+                  joinedAt: template.joinedAt,
+                  lastUpdateAt: template.lastUpdateAt,
+                ));
+              }
+            }
+
+            return LeaderboardList(
+              participants: allParticipants,
+              groupId: widget.groupId,
+              showLeftUsers: _showLeftUsers,
+              onToggleLeftUsers: () {
+                setState(() {
+                  _showLeftUsers = !_showLeftUsers;
+                });
+              },
             );
           },
           loading: () => const Center(

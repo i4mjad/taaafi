@@ -43,7 +43,8 @@ FollowUpRepository followUpRepository(Ref ref) {
 @riverpod
 FollowupIntegrationService followupIntegrationService(Ref ref) {
   final followupRepo = ref.watch(followUpRepositoryProvider);
-  return FollowupIntegrationService(followupRepo);
+  final firestore = ref.watch(firestoreProvider);
+  return FollowupIntegrationService(followupRepo, firestore);
 }
 
 /// Updates service provider
@@ -294,11 +295,9 @@ class PostUpdateController extends _$PostUpdateController {
         return PostUpdateResult.failure('User profile not found');
       }
 
-      // TODO: Get the followup by ID
-      // For now, this would need the actual followup model
-      // You'll need to implement this based on your followup service
-
-      return PostUpdateResult.failure('Followup integration pending');
+      final followup = await ref.read(followUpRepositoryProvider).readFollowUp(followUpId: followupId);
+      if (followup == null) return PostUpdateResult.failure('Followup not found');
+      return postUpdateFromFollowup(groupId: groupId, followup: followup, isAnonymous: isAnonymous);
     } finally {
       state = false;
     }

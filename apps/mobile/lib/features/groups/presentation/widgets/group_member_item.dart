@@ -499,7 +499,6 @@ class GroupMemberItem extends ConsumerWidget {
         // Only provide onMessage for other members
         onMessage: !isOwnProfile
             ? () {
-                // TODO: Navigate to direct message (Future sprint)
                 Navigator.of(modalContext).pop();
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(

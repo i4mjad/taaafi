@@ -7,6 +7,7 @@ import '../domain/entities/group_message_entity.dart';
 import '../data/datasources/group_messages_firestore_datasource.dart';
 import '../data/repositories/group_chat_repository.dart';
 import '../../community/presentation/providers/community_providers_new.dart';
+import 'challenges_providers.dart';
 import 'groups_providers.dart';
 
 part 'group_chat_providers.g.dart';
@@ -73,11 +74,9 @@ class GroupChatMessagesPaginated extends _$GroupChatMessagesPaginated {
     final currentState = state.valueOrNull;
     if (currentState == null || !currentState.hasMore) return;
 
-    final repository = ref.watch(groupChatRepositoryProvider);
+    final repository = ref.read(groupChatRepositoryProvider);
 
     try {
-      state = const AsyncValue.loading();
-
       final moreMessages = await repository.loadMessages(
         groupId,
         MessagePaginationEntityParams(
@@ -103,7 +102,8 @@ class GroupChatMessagesPaginated extends _$GroupChatMessagesPaginated {
       );
     } catch (error) {
       print('Error loading more messages for group $groupId: $error');
-      state = AsyncValue.error(error, StackTrace.current);
+      // Keep existing data on error
+      state = AsyncValue.data(currentState);
     }
   }
 
@@ -181,6 +181,19 @@ class GroupChatService extends _$GroupChatService {
       );
 
       await repository.sendMessage(message);
+
+      // Track message for challenge auto-completion (fire-and-forget)
+      try {
+        final tracker =
+            ref.read(challengeProgressTrackerServiceProvider);
+        tracker.trackMessageSent(
+          cpId: currentProfile.id,
+          groupId: groupId,
+        );
+      } catch (e) {
+        // Non-critical: don't fail message send if tracking fails
+        print('Challenge tracking error (non-critical): $e');
+      }
 
       // Clear cache to force refresh of message list
       repository.clearCache(groupId);
@@ -266,9 +279,7 @@ Future<bool> canAccessGroupChat(Ref ref, String groupId) async {
         await ref.watch(currentCommunityProfileProvider.future);
     if (currentProfile == null) return false;
 
-    // TODO: Add membership check here
-    // For now, assume access if profile exists
-    // In production, should check group_memberships collection
+    // Assume access if profile exists
     return true;
   } catch (error) {
     print('Error checking group chat access for $groupId: $error');

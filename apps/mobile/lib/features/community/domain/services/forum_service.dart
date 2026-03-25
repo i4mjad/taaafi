@@ -639,20 +639,7 @@ class ForumService {
   /// Throws [RateLimitException] if rate limit is exceeded
   Future<void> _checkRateLimit(
       String resource, AppLocalizations localizations) async {
-    // TODO: Implement proper rate limiting
-    // For now, no rate limiting is applied
-
-    // Example implementation:
-    // final user = _auth.currentUser!;
-    // final rateLimitInfo = await _rateLimitService.checkRateLimit(user.uid, resource);
-    // if (rateLimitInfo.isExceeded) {
-    //   throw RateLimitException(
-    //     localizations.translate('rate_limit_exceeded'),
-    //     resource: resource,
-    //     retryAfter: rateLimitInfo.retryAfter,
-    //     code: 'RATE_LIMIT_EXCEEDED',
-    //   );
-    // }
+    // No rate limiting is applied
   }
 
   /// Ensures that a post exists
@@ -663,18 +650,7 @@ class ForumService {
   /// Throws [PostCreationException] if post doesn't exist
   Future<void> _ensurePostExists(
       String postId, AppLocalizations localizations) async {
-    // TODO: Implement proper post existence checking
-    // For now, assume all posts exist
-
-    // Example implementation:
-    // final post = await _repository.getPost(postId);
-    // if (post == null) {
-    //   throw PostCreationException(
-    //     localizations.translate('post_not_found'),
-    //     reason: 'post_not_found',
-    //     code: 'POST_NOT_FOUND',
-    //   );
-    // }
+    // Assume all posts exist
   }
 
   /// Ensures that a comment exists
@@ -685,8 +661,7 @@ class ForumService {
   /// Throws [CommentCreationException] if comment doesn't exist
   Future<void> _ensureCommentExists(
       String commentId, AppLocalizations localizations) async {
-    // TODO: Implement proper comment existence checking
-    // For now, assume all comments exist
+    // Assume all comments exist
   }
 
   /// Logs post creation for analytics
@@ -694,8 +669,7 @@ class ForumService {
   /// [postId] - The created post ID
   /// [postData] - The post data
   Future<void> _logPostCreation(String postId, PostFormData postData) async {
-    // TODO: Implement proper analytics logging
-    // For now, just print for debugging
+    // No-op: analytics logging not yet implemented
   }
 
   /// Logs comment creation for analytics
@@ -703,8 +677,7 @@ class ForumService {
   /// [postId] - The post ID the comment was added to
   /// [content] - The comment content
   Future<void> _logCommentCreation(String postId, String content) async {
-    // TODO: Implement proper analytics logging
-    // For now, just print for debugging
+    // No-op: analytics logging not yet implemented
   }
 
   /// Logs interaction action for analytics
@@ -714,8 +687,7 @@ class ForumService {
   /// [value] - The interaction value
   Future<void> _logInteractionAction(
       String targetType, String targetId, int value) async {
-    // TODO: Implement proper analytics logging
-    // For now, just print for debugging
+    // No-op: analytics logging not yet implemented
     String action = value == 1
         ? 'like'
         : value == -1

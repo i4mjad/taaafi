@@ -51,6 +51,7 @@ import 'package:reboot_app_3/features/groups/presentation/screens/group_detail_s
 import 'package:reboot_app_3/features/groups/presentation/screens/group_chat_screen.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/group_challenge_screen.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/updates/all_updates_screen.dart';
+import 'package:reboot_app_3/features/groups/presentation/screens/updates/group_update_comments_screen.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/group_settings_screen.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/challenges/create_challenge_screen.dart';
 import 'package:reboot_app_3/features/groups/presentation/screens/challenges/edit_challenge_screen.dart';
@@ -59,8 +60,6 @@ import 'package:reboot_app_3/features/groups/presentation/screens/challenges/cha
 import 'package:reboot_app_3/features/groups/presentation/screens/challenges/challenge_leaderboard_screen.dart';
 import 'package:reboot_app_3/features/community/presentation/challenges/global_challenge_list_screen.dart';
 import 'package:reboot_app_3/features/community/presentation/profile/community_profile_settings_screen.dart';
-// TODO: Temporarily disabled - uncomment when chats tab is re-enabled
-// import 'package:reboot_app_3/features/direct_messaging/presentation/screens/community_chats_screen.dart';
 import 'package:reboot_app_3/features/direct_messaging/presentation/screens/direct_chat_screen.dart';
 import 'package:reboot_app_3/features/vault/presentation/day_overview/day_overview_screen.dart';
 import 'package:reboot_app_3/features/home/presentation/home/home_screen.dart';
@@ -559,16 +558,6 @@ GoRouter goRouter(Ref<GoRouter> ref) {
                       child: CommunityProfileSettingsScreen(),
                     ),
                   ),
-                  // Direct Messaging routes
-                  // TODO: Temporarily disabled - uncomment when chats tab is re-enabled
-                  // GoRoute(
-                  //   path: 'chats',
-                  //   name: RouteNames.communityChats.name,
-                  //   pageBuilder: (context, state) => MaterialPage<void>(
-                  //     name: RouteNames.communityChats.name,
-                  //     child: CommunityChatsScreen(),
-                  //   ),
-                  // ),
                   GoRoute(
                     path: 'chats/:conversationId',
                     name: RouteNames.directChat.name,
@@ -647,6 +636,17 @@ GoRouter goRouter(Ref<GoRouter> ref) {
                         child: AllUpdatesScreen(groupId: groupId),
                       );
                     },
+                  ),
+                  GoRoute(
+                    path: 'groups/:groupId/updates/:updateId/comments',
+                    name: RouteNames.groupUpdateComments.name,
+                    pageBuilder: (context, state) => MaterialPage<void>(
+                      name: RouteNames.groupUpdateComments.name,
+                      child: GroupUpdateCommentsScreen(
+                        groupId: state.pathParameters['groupId']!,
+                        updateId: state.pathParameters['updateId']!,
+                      ),
+                    ),
                   ),
                   GoRoute(
                     path: 'groups/:groupId/settings',
