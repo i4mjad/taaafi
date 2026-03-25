@@ -43,7 +43,8 @@ FollowUpRepository followUpRepository(Ref ref) {
 @riverpod
 FollowupIntegrationService followupIntegrationService(Ref ref) {
   final followupRepo = ref.watch(followUpRepositoryProvider);
-  return FollowupIntegrationService(followupRepo);
+  final firestore = ref.watch(firestoreProvider);
+  return FollowupIntegrationService(followupRepo, firestore);
 }
 
 /// Updates service provider

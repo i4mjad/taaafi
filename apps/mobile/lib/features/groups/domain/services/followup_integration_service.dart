@@ -1,15 +1,17 @@
 import 'dart:developer' as developer;
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:reboot_app_3/features/shared/models/follow_up.dart';
 import 'package:reboot_app_3/features/vault/data/follow_up/follow_up_repository.dart';
 import '../entities/group_update_entity.dart';
 
 /// Service for integrating followup system with group updates
-/// 
+///
 /// Generates update content based on followup entries
 class FollowupIntegrationService {
   final FollowUpRepository _followupRepository;
+  final FirebaseFirestore _firestore;
 
-  FollowupIntegrationService(this._followupRepository);
+  FollowupIntegrationService(this._followupRepository, this._firestore);
 
   void log(String message, {StackTrace? stackTrace}) {
     developer.log(
@@ -49,9 +51,13 @@ class FollowupIntegrationService {
   /// Note: This would require storing the linkedFollowupId in updates
   /// For now, we'll return false (always allow sharing)
   Future<bool> isFollowupShared(String followupId, String groupId) async {
-    // TODO: Implement proper check by querying group_updates
-    // where linkedFollowupId == followupId and groupId == groupId
-    return false;
+    final snapshot = await _firestore
+        .collection('group_updates')
+        .where('linkedFollowupId', isEqualTo: followupId)
+        .where('groupId', isEqualTo: groupId)
+        .limit(1)
+        .get();
+    return snapshot.docs.isNotEmpty;
   }
 
   /// Generate update content based on followup entry
