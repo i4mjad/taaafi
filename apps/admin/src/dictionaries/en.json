@@ -2578,6 +2578,7 @@
             "high": "High"
           },
           "violationTypes": {
+            "account_sharing": "Account/Contact Sharing",
             "social_media_sharing": "Social Media Sharing",
             "sexual_content": "Sexual Content",
             "cuckoldry_content": "Cuckoldry Content",
@@ -2698,6 +2699,7 @@
             "support": "Support"
           },
           "violationTypes": {
+            "account_sharing": "Account/Contact Sharing",
             "social_media_sharing": "Social Media Sharing",
             "sexual_content": "Sexual Content",
             "cuckoldry_content": "Cuckoldry Content",
@@ -3693,6 +3695,7 @@
           "violationType": "Violation Type",
           "selectViolationType": "Select violation type",
           "violationTypes": {
+            "account_sharing": "Sharing personal contact info",
             "social_media_sharing": "Sharing social media accounts",
             "sexual_content": "Sexual content",
             "cuckoldry_content": "Cuckoldry content",

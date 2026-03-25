@@ -663,10 +663,8 @@ export default function GroupUpdatesModerationPage() {
                         <SelectContent>
                           <SelectItem value="all">{t('modules.community.groupUpdates.filters.allViolations')}</SelectItem>
                           <SelectItem value="none">{t('modules.community.groupUpdates.violationTypes.none')}</SelectItem>
+                          <SelectItem value="account_sharing">{t('modules.community.groupUpdates.violationTypes.account_sharing') || 'Account Sharing'}</SelectItem>
                           <SelectItem value="social_media_sharing">{t('modules.community.groupUpdates.violationTypes.social_media_sharing')}</SelectItem>
-                          <SelectItem value="sexual_content">{t('modules.community.groupUpdates.violationTypes.sexual_content')}</SelectItem>
-                          <SelectItem value="harassment">{t('modules.community.groupUpdates.violationTypes.harassment')}</SelectItem>
-                          <SelectItem value="spam">{t('modules.community.groupUpdates.violationTypes.spam')}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>

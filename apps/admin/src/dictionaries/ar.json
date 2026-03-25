@@ -2596,6 +2596,7 @@
             "high": "عالية"
           },
           "violationTypes": {
+            "account_sharing": "مشاركة معلومات التواصل الشخصية",
             "social_media_sharing": "مشاركة حسابات التواصل الاجتماعي",
             "sexual_content": "محتوى جنسي",
             "cuckoldry_content": "محتوى الدياثة",
@@ -2715,6 +2716,7 @@
             "support": "دعم"
           },
           "violationTypes": {
+            "account_sharing": "مشاركة معلومات التواصل الشخصية",
             "social_media_sharing": "مشاركة حسابات التواصل الاجتماعي",
             "sexual_content": "محتوى جنسي",
             "cuckoldry_content": "محتوى الدياثة",
@@ -3649,6 +3651,7 @@
           "violationType": "نوع المخالفة",
           "selectViolationType": "اختر نوع المخالفة",
           "violationTypes": {
+            "account_sharing": "مشاركة معلومات التواصل الشخصية",
             "social_media_sharing": "مشاركة حسابات وسائل التواصل الاجتماعي",
             "sexual_content": "المحتوى الجنسي",
             "cuckoldry_content": "محتوى الديوثة",

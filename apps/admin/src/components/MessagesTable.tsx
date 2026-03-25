@@ -1710,36 +1710,15 @@ export function MessagesTable({
                       />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="account_sharing">
+                        {t(
+                          "modules.admin.content.violationTypes.account_sharing"
+                        ) || "Account Sharing"}
+                      </SelectItem>
                       <SelectItem value="social_media_sharing">
                         {t(
                           "modules.admin.content.violationTypes.social_media_sharing"
                         )}
-                      </SelectItem>
-                      <SelectItem value="sexual_content">
-                        {t(
-                          "modules.admin.content.violationTypes.sexual_content"
-                        )}
-                      </SelectItem>
-                      <SelectItem value="cuckoldry_content">
-                        {t(
-                          "modules.admin.content.violationTypes.cuckoldry_content"
-                        )}
-                      </SelectItem>
-                      <SelectItem value="homosexuality_content">
-                        {t(
-                          "modules.admin.content.violationTypes.homosexuality_content"
-                        )}
-                      </SelectItem>
-                      <SelectItem value="inappropriate_content">
-                        {t(
-                          "modules.admin.content.violationTypes.inappropriate_content"
-                        )}
-                      </SelectItem>
-                      <SelectItem value="spam">
-                        {t("modules.admin.content.violationTypes.spam")}
-                      </SelectItem>
-                      <SelectItem value="harassment">
-                        {t("modules.admin.content.violationTypes.harassment")}
                       </SelectItem>
                       <SelectItem value="other">
                         {t("modules.admin.content.violationTypes.other")}
