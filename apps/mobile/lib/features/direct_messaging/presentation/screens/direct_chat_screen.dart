@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -19,6 +20,7 @@ import 'package:reboot_app_3/core/theming/chat_text_size_provider.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 import 'package:reboot_app_3/features/direct_messaging/application/direct_messaging_providers.dart';
 import 'package:reboot_app_3/features/direct_messaging/application/direct_messaging_ban_providers.dart';
+import 'package:reboot_app_3/features/direct_messaging/data/datasources/direct_messages_firestore_datasource.dart';
 import 'package:reboot_app_3/features/direct_messaging/domain/entities/direct_message_entity.dart';
 import 'package:reboot_app_3/features/shared/data/notifiers/user_reports_notifier.dart';
 
@@ -43,6 +45,12 @@ class _DirectChatScreenState extends ConsumerState<DirectChatScreen>
   bool _isSubmitting = false;
   bool _hasMarkedAsRead = false; // Track if we've already marked as read
   bool _hasAutoScrolled = false; // Track if we've already auto-scrolled
+
+  // Pagination state
+  DocumentSnapshot? _lastDocument;
+  bool _isLoadingMore = false;
+  bool _hasMoreMessages = true;
+  List<DirectMessageEntity> _olderMessages = [];
 
   // Animation for reply preview dismissal
   late AnimationController _replyPreviewController;
@@ -104,6 +112,37 @@ class _DirectChatScreenState extends ConsumerState<DirectChatScreen>
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeOut,
       );
+    }
+  }
+
+  Future<void> _loadMoreMessages() async {
+    if (_isLoadingMore || !_hasMoreMessages) return;
+
+    setState(() => _isLoadingMore = true);
+
+    try {
+      final repository = ref.read(directChatRepositoryProvider);
+      final result = await repository.loadMessages(
+        widget.conversationId,
+        MessagePaginationParams(
+          limit: 50,
+          startAfter: _lastDocument,
+        ),
+      );
+
+      if (!mounted) return;
+
+      setState(() {
+        _olderMessages.addAll(
+          result.messages.cast<DirectMessageEntity>(),
+        );
+        _lastDocument = result.lastDocument;
+        _hasMoreMessages = result.hasMore;
+        _isLoadingMore = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isLoadingMore = false);
     }
   }
 
@@ -911,8 +950,15 @@ class _DirectChatScreenState extends ConsumerState<DirectChatScreen>
                 .where((msg) => msg.isVisibleToUser(currentProfile.id))
                 .toList();
 
+            // Merge streamed messages with paginated older messages
+            final streamIds = visibleMessages.map((m) => m.id).toSet();
+            final uniqueOlder = _olderMessages
+                .where((m) => !streamIds.contains(m.id) && m.isVisibleToUser(currentProfile.id))
+                .toList();
+            final allMessages = [...visibleMessages, ...uniqueOlder];
+
             // Sort messages by creation time (latest first for reverse ListView)
-            final sortedMessages = List<DirectMessageEntity>.from(visibleMessages);
+            final sortedMessages = List<DirectMessageEntity>.from(allMessages);
             sortedMessages.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
             // Auto-scroll to bottom when messages first load (only once)
@@ -925,13 +971,14 @@ class _DirectChatScreenState extends ConsumerState<DirectChatScreen>
               });
             }
 
+            final itemCount = sortedMessages.length + (_isLoadingMore ? 1 : 0);
+
             return NotificationListener<ScrollNotification>(
               onNotification: (ScrollNotification scrollInfo) {
                 // Load more messages when scrolling to the top (older messages)
                 if (scrollInfo.metrics.pixels >=
                     scrollInfo.metrics.maxScrollExtent * 0.9) {
-                  // TODO: Implement pagination for DM messages
-                  // _loadMoreMessages();
+                  _loadMoreMessages();
                 }
                 return false;
               },
@@ -943,8 +990,16 @@ class _DirectChatScreenState extends ConsumerState<DirectChatScreen>
                   horizontal: (MediaQuery.of(context).size.width * 0.04).clamp(12.0, 20.0),
                   vertical: (MediaQuery.of(context).size.height * 0.01).clamp(6.0, 12.0),
                 ),
-                itemCount: sortedMessages.length,
+                itemCount: itemCount,
                 itemBuilder: (context, index) {
+                  // Loading indicator at the end (top of chat since reversed)
+                  if (index >= sortedMessages.length) {
+                    return const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16.0),
+                      child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                    );
+                  }
+
                   final message = sortedMessages[index];
                   final nextMessage = index < sortedMessages.length - 1
                       ? sortedMessages[index + 1]
