@@ -7,6 +7,7 @@ import '../domain/entities/group_message_entity.dart';
 import '../data/datasources/group_messages_firestore_datasource.dart';
 import '../data/repositories/group_chat_repository.dart';
 import '../../community/presentation/providers/community_providers_new.dart';
+import 'challenges_providers.dart';
 import 'groups_providers.dart';
 
 part 'group_chat_providers.g.dart';
@@ -181,6 +182,19 @@ class GroupChatService extends _$GroupChatService {
       );
 
       await repository.sendMessage(message);
+
+      // Track message for challenge auto-completion (fire-and-forget)
+      try {
+        final tracker =
+            ref.read(challengeProgressTrackerServiceProvider);
+        tracker.trackMessageSent(
+          cpId: currentProfile.id,
+          groupId: groupId,
+        );
+      } catch (e) {
+        // Non-critical: don't fail message send if tracking fails
+        print('Challenge tracking error (non-critical): $e');
+      }
 
       // Clear cache to force refresh of message list
       repository.clearCache(groupId);
