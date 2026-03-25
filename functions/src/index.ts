@@ -1305,10 +1305,8 @@ import {
   sendDirectMessageNotification 
 } from './directMessageNotifications';
 
-// Import direct message moderation function
-import { 
-  moderateDirectMessage 
-} from './moderateDirectMessage';
+// Import retry stuck messages scheduler
+import { retryStuckMessages } from './moderation/retryStuckMessages';
 
 // Import group update moderation function
 import { 
@@ -1351,10 +1349,8 @@ export {
   sendDirectMessageNotification
 };
 
-// Export direct message moderation function
-export {
-  moderateDirectMessage
-};
+// Export retry stuck messages scheduler
+export { retryStuckMessages };
 
 // Export group update moderation function
 export {
@@ -1651,7 +1647,7 @@ export const onInteractionUpdate = onDocumentUpdated(
 
 // ==================== GROUP UPDATES NOTIFICATIONS ====================
 // Export group update notification functions
-export { sendUpdateNotification, sendCommentNotification } from './groupUpdateNotifications';
+export { sendUpdateNotificationV2, sendCommentNotification } from './groupUpdateNotifications';
 
 // ==================== CHALLENGE TASK COMPLETION NOTIFICATIONS ====================
 // Export challenge task completion notification function
