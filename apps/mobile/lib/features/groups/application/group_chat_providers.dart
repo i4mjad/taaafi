@@ -176,7 +176,7 @@ class GroupChatService extends _$GroupChatService {
         createdAt: DateTime.now(),
         moderation: const ModerationStatus(
           status: ModerationStatusType
-              .approved, // Start as approved - cloud function will change if needed
+              .pending, // Start as pending - cloud function will approve after moderation
         ),
       );
 

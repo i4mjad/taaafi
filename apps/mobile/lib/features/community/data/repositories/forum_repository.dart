@@ -245,8 +245,8 @@ class ForumRepository {
   }) async {
     try {
       Query query = _posts
-          .where('isDeleted',
-              isEqualTo: false) // Filter deleted posts at source
+          .where('isDeleted', isEqualTo: false)
+          .where('isHidden', isEqualTo: false)
           .orderBy('createdAt', descending: true);
 
       if (category != null && category.isNotEmpty) {
@@ -308,6 +308,7 @@ class ForumRepository {
       // This avoids the need for 67 separate queries!
       Query query = _posts
           .where('isDeleted', isEqualTo: false)
+          .where('isHidden', isEqualTo: false)
           .orderBy('createdAt', descending: true);
 
       if (category != null && category.isNotEmpty) {
@@ -412,7 +413,8 @@ class ForumRepository {
     bool? isPinned,
   }) {
     Query query = _posts
-        .where('isDeleted', isEqualTo: false) // Filter deleted posts at source
+        .where('isDeleted', isEqualTo: false)
+        .where('isHidden', isEqualTo: false)
         .orderBy('createdAt', descending: true);
 
     if (category != null && category.isNotEmpty) {
@@ -482,6 +484,7 @@ class ForumRepository {
 
         Query query = _posts
             .where('authorCPId', whereIn: batch)
+            .where('isHidden', isEqualTo: false)
             .orderBy('createdAt', descending: true);
 
         if (category != null && category.isNotEmpty) {
@@ -773,7 +776,7 @@ class ForumRepository {
     return snapshot.docs
         .map((doc) => Comment.fromFirestore(
             doc as DocumentSnapshot<Map<String, dynamic>>))
-        .where((comment) => !comment.isDeleted)
+        .where((comment) => !comment.isDeleted && !comment.isHidden)
         .toList();
   }
 
@@ -803,7 +806,7 @@ class ForumRepository {
       final batchComments = snapshot.docs
           .map((doc) => Comment.fromFirestore(
               doc as DocumentSnapshot<Map<String, dynamic>>))
-          .where((comment) => !comment.isDeleted)
+          .where((comment) => !comment.isDeleted && !comment.isHidden)
           .toList();
 
       allComments.addAll(batchComments);
@@ -836,7 +839,7 @@ class ForumRepository {
         .map((snapshot) => snapshot.docs
             .map((doc) => Comment.fromFirestore(
                 doc as DocumentSnapshot<Map<String, dynamic>>))
-            .where((comment) => !comment.isDeleted)
+            .where((comment) => !comment.isDeleted && !comment.isHidden)
             .toList());
   }
 
@@ -866,7 +869,7 @@ class ForumRepository {
             .map((snapshot) => snapshot.docs
                 .map((doc) => Comment.fromFirestore(
                     doc as DocumentSnapshot<Map<String, dynamic>>))
-                .where((comment) => !comment.isDeleted)
+                .where((comment) => !comment.isDeleted && !comment.isHidden)
                 .toList());
 
         streamBatches.add(batchStream);
@@ -941,6 +944,7 @@ class ForumRepository {
         'replyCount': 0,
         'createdAt': FieldValue.serverTimestamp(),
         'updatedAt': null,
+        'moderation': {'status': 'pending'},
       };
 
       // Use a batch write to add comment and update parent reply count
@@ -976,7 +980,7 @@ class ForumRepository {
       final comments = snapshot.docs
           .map((doc) => Comment.fromFirestore(
               doc as DocumentSnapshot<Map<String, dynamic>>))
-          .where((comment) => !comment.isDeleted)
+          .where((comment) => !comment.isDeleted && !comment.isHidden)
           .toList();
 
       // Manual sort as fallback (in case index is not ready)
@@ -994,7 +998,7 @@ class ForumRepository {
           final comments = fallbackSnapshot.docs
               .map((doc) => Comment.fromFirestore(
                   doc as DocumentSnapshot<Map<String, dynamic>>))
-              .where((comment) => !comment.isDeleted)
+              .where((comment) => !comment.isDeleted && !comment.isHidden)
               .toList();
 
           // Sort manually since we can't use orderBy
@@ -1020,7 +1024,7 @@ class ForumRepository {
       final comments = snapshot.docs
           .map((doc) => Comment.fromFirestore(
               doc as DocumentSnapshot<Map<String, dynamic>>))
-          .where((comment) => !comment.isDeleted)
+          .where((comment) => !comment.isDeleted && !comment.isHidden)
           .toList();
 
       // Manual sort to ensure correct order
@@ -1039,7 +1043,7 @@ class ForumRepository {
       final comments = snapshot.docs
           .map((doc) => Comment.fromFirestore(
               doc as DocumentSnapshot<Map<String, dynamic>>))
-          .where((comment) => !comment.isDeleted)
+          .where((comment) => !comment.isDeleted && !comment.isHidden)
           .toList();
 
       // Manual sort since we can't use orderBy
@@ -1087,7 +1091,7 @@ class ForumRepository {
       final allComments = snapshot.docs
           .map((doc) => Comment.fromFirestore(
               doc as DocumentSnapshot<Map<String, dynamic>>))
-          .where((comment) => !comment.isDeleted)
+          .where((comment) => !comment.isDeleted && !comment.isHidden)
           .toList();
 
       // Group comments by parentId
@@ -1204,6 +1208,7 @@ class ForumRepository {
         'attachmentsPreview': null,
         'attachmentsVersion': 1,
         'attachmentsComputedAt': FieldValue.serverTimestamp(),
+        'moderation': {'status': 'pending'},
       };
 
       // Add to Firestore and get the document reference
@@ -1619,7 +1624,7 @@ class ForumRepository {
                 doc as DocumentSnapshot<Map<String, dynamic>>);
             return comment;
           })
-          .where((comment) => !comment.isDeleted)
+          .where((comment) => !comment.isDeleted && !comment.isHidden)
           .toList(); // Filter out deleted comments
 
       return CommentsPage(
@@ -1760,8 +1765,11 @@ class ForumRepository {
   Future<List<Post>> _getOrphanedPosts(
       int limit, String? category, bool? isPinned) async {
     try {
-      // Get all posts first
-      Query query = _posts.orderBy('createdAt', descending: true);
+      // Get all posts first (exclude deleted and hidden)
+      Query query = _posts
+          .where('isDeleted', isEqualTo: false)
+          .where('isHidden', isEqualTo: false)
+          .orderBy('createdAt', descending: true);
 
       if (category != null && category.isNotEmpty) {
         query = query.where('category', isEqualTo: category);

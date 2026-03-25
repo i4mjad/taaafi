@@ -94,7 +94,7 @@ class GroupUpdateModel {
       'isPinned': isPinned,
       'isHidden': isHidden,
       'locale': locale,
-      'moderation': moderation,
+      'moderation': moderation ?? {'status': 'pending'},
       'createdAt': createdAt,
       'updatedAt': updatedAt,
     };
