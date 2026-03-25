@@ -760,18 +760,20 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
                               message.isCurrentUser
                           ? Colors.red
                               .shade50 // Red background for blocked messages
-                          : isHighlighted
-                              ? Color.lerp(
-                                  message.isCurrentUser
+                          : message.isHidden && message.isCurrentUser
+                              ? theme.warn[50] // Amber/warning background for under review messages
+                              : isHighlighted
+                                  ? Color.lerp(
+                                      message.isCurrentUser
+                                          ? theme.primary[50]
+                                          : theme.grey[50],
+                                      theme.primary[100],
+                                      highlightIntensity *
+                                          0.6, // Fade between normal and highlight color
+                                    )
+                                  : (message.isCurrentUser
                                       ? theme.primary[50]
-                                      : theme.grey[50],
-                                  theme.primary[100],
-                                  highlightIntensity *
-                                      0.6, // Fade between normal and highlight color
-                                )
-                              : (message.isCurrentUser
-                                  ? theme.primary[50]
-                                  : theme.grey[50]),
+                                      : theme.grey[50]),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
                         color: isHighlighted
