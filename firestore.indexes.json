@@ -1,6 +1,24 @@
 {
   "indexes": [
     {
+      "collectionGroup": "accountDeleteRequests",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "isProcessed",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "isCanceled",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "requestedAt",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
       "collectionGroup": "scheduledTasks",
       "queryScope": "COLLECTION_GROUP",
       "fields": [

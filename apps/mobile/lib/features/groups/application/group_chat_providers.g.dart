@@ -958,7 +958,7 @@ class _SearchGroupMessagesProviderElement
 }
 
 String _$groupChatMessagesPaginatedHash() =>
-    r'9fcdd95dcdebdc1b4da7e4ac9359960b57d3e08a';
+    r'3c5d885f93130160f995a4363d9b65f324ffc7ca';
 
 abstract class _$GroupChatMessagesPaginated
     extends BuildlessAutoDisposeAsyncNotifier<PaginatedMessagesEntityResult> {
@@ -1120,7 +1120,7 @@ class _GroupChatMessagesPaginatedProviderElement
   String get groupId => (origin as GroupChatMessagesPaginatedProvider).groupId;
 }
 
-String _$groupChatServiceHash() => r'db50ae1e1534db71457201f75b24d53f35238ce5';
+String _$groupChatServiceHash() => r'61dfd32c0bb23ffba85e3fc0cefc684c3bfd40f8';
 
 /// Service for sending messages (stateless)
 ///

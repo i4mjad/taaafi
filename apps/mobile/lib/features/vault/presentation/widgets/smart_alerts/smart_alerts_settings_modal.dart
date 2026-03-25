@@ -371,7 +371,12 @@ class _SmartAlertsSettingsModalState
                   value: isEnabled,
                   onChanged:
                       _isLoading ? null : (value) => _toggleAlert(type, value),
-                  activeThumbColor: theme.primary[600],
+                  thumbColor: MaterialStateProperty.resolveWith((states) {
+                    if (states.contains(MaterialState.selected)) {
+                      return theme.primary[600];
+                    }
+                    return null;
+                  }),
                 ),
             ],
           ),

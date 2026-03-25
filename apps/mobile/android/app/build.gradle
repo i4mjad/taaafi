@@ -41,12 +41,12 @@ android {
     defaultConfig {
         applicationId "com.amjadkhalfan.reboot_app_3"
         targetSdkVersion 36
-        minSdkVersion flutter.minSdkVersion
+        minSdkVersion 23
         versionCode flutterVersionCode
         versionName flutterVersionName
         //TODO: uncomment this to create a new version
-        // 
-        
+        //
+
     }
 
     // compileOptions {

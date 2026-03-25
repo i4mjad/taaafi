@@ -41,7 +41,12 @@ class PlatformSwitch extends StatelessWidget {
       switchWidget = Switch(
         value: value,
         onChanged: onChanged,
-        activeThumbColor: activeColor ?? theme.primary[600],
+        thumbColor: MaterialStateProperty.resolveWith((states) {
+          if (states.contains(MaterialState.selected)) {
+            return activeColor ?? theme.primary[600];
+          }
+          return null;
+        }),
         inactiveTrackColor: inactiveColor ?? theme.grey[300],
       );
     }

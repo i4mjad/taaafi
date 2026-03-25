@@ -259,9 +259,13 @@ class _CommunityProfileSetupModalState
                     ),
                     Switch(
                       value: _isAnonymous,
-                      activeThumbColor: theme.success[500],
+                      thumbColor: MaterialStateProperty.resolveWith((states) {
+                        if (states.contains(MaterialState.selected)) {
+                          return theme.success[500];
+                        }
+                        return theme.grey[900];
+                      }),
                       inactiveTrackColor: theme.grey[200],
-                      inactiveThumbColor: theme.grey[900],
                       onChanged: _isLoading
                           ? null
                           : (value) {

@@ -66,7 +66,7 @@ final followUpRepositoryProvider =
 // ignore: unused_element
 typedef FollowUpRepositoryRef = AutoDisposeProviderRef<FollowUpRepository>;
 String _$followupIntegrationServiceHash() =>
-    r'd382a7ff91da2657843168d09678b98559f1fb94';
+    r'3c36371de27bdc568270e255e073279e110787e6';
 
 /// Followup integration service provider
 ///
@@ -1879,7 +1879,7 @@ class _UpdateSuggestionsProviderElement
 }
 
 String _$postUpdateControllerHash() =>
-    r'29b5a8fd715e656a8b4e75ceaaa34c96cf36c1e7';
+    r'8da278b9c9ad8d8d1f37893d0224d7f201e5f1cc';
 
 /// Controller for posting updates
 ///
