@@ -63,10 +63,7 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
     _tabController?.dispose();
     _tabController = TabController(length: 2, vsync: this);
 
-    // Listen to tab changes to update UI (e.g., floating action button)
-    _tabController!.addListener(() {
-      setState(() {});
-    });
+    // Tab changes handled by ListenableBuilder where needed (FAB, tab icons)
 
     // Set initial filter based on widget parameter or default to 'posts'
     _selectedFilter = widget.initialTab ?? 'posts';
@@ -155,8 +152,8 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
           error: (error, stack) {},
         );
       }
-    } catch (e) {
-      print('🎯 UserStatus: Error checking user status: $e');
+    } catch (_) {
+      // Silently handle status check errors
     }
   }
 
@@ -201,7 +198,7 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
           // Priority 2: Check account status
           switch (accountStatus) {
             case AccountStatus.loading:
-              return Center(
+              return const Center(
                 child: Spinner(),
               );
             case AccountStatus.needCompleteRegistration:
@@ -242,8 +239,6 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
                   child: const Center(child: Spinner()),
                 ),
                 error: (error, stackTrace) {
-                  print('❌ Community Main Screen: Profile error: $error');
-                  print("stackTrace: $stackTrace");
                   return const Center(child: Text('Error loading profile'));
                 },
                 data: (profile) {
@@ -263,9 +258,8 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
 
   Widget _buildMainCommunityContent() {
     final theme = AppTheme.of(context);
-    final shorebirdUpdateState = ref.watch(shorebirdUpdateProvider);
     final shouldBlockForShorebird =
-        _shouldBlockForShorebirdUpdate(shorebirdUpdateState.status);
+        _shouldBlockForShorebirdUpdate(ref.read(shorebirdUpdateProvider).status);
 
     return Scaffold(
       appBar: appBar(
@@ -341,93 +335,69 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
       backgroundColor: theme.backgroundColor,
       body: Column(
         children: [
-          // Tab bar
-          TabBar(
-            controller: _tabController!,
-            indicatorColor: theme.primary[600],
-            labelColor: theme.primary[600],
-            unselectedLabelColor: theme.grey[600],
-            tabs: [
-              Tab(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      LucideIcons.users,
-                      size: 18,
-                      color: _tabController!.index == 0
-                          ? theme.primary[600]
-                          : theme.grey[600],
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      AppLocalizations.of(context).translate('community'),
-                      style: (_tabController!.index == 0
-                              ? TextStyles.footnoteSelected
-                              : TextStyles.footnote)
-                          .copyWith(
-                              color: _tabController!.index == 0
-                                  ? theme.primary[600]
-                                  : theme.grey[600],
-                              fontSize: 12),
-                    ),
-                  ],
+          // Tab bar — uses ListenableBuilder so only icons/labels rebuild on tab switch
+          ListenableBuilder(
+            listenable: _tabController!,
+            builder: (context, _) => TabBar(
+              controller: _tabController!,
+              indicatorColor: theme.primary[600],
+              labelColor: theme.primary[600],
+              unselectedLabelColor: theme.grey[600],
+              tabs: [
+                Tab(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        LucideIcons.users,
+                        size: 18,
+                        color: _tabController!.index == 0
+                            ? theme.primary[600]
+                            : theme.grey[600],
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        AppLocalizations.of(context).translate('community'),
+                        style: (_tabController!.index == 0
+                                ? TextStyles.footnoteSelected
+                                : TextStyles.footnote)
+                            .copyWith(
+                                color: _tabController!.index == 0
+                                    ? theme.primary[600]
+                                    : theme.grey[600],
+                                fontSize: 12),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              // TODO: Chats tab temporarily disabled - uncomment when re-enabled
-              // Tab(
-              //   child: Row(
-              //     mainAxisAlignment: MainAxisAlignment.center,
-              //     children: [
-              //       Icon(
-              //         LucideIcons.messageSquare,
-              //         size: 18,
-              //         color: _tabController!.index == 1
-              //             ? theme.primary[600]
-              //             : theme.grey[600],
-              //       ),
-              //       const SizedBox(width: 8),
-              //       Text(
-              //         AppLocalizations.of(context).translate('community-chats'),
-              //         style: (_tabController!.index == 1
-              //                 ? TextStyles.footnoteSelected
-              //                 : TextStyles.footnote)
-              //             .copyWith(
-              //                 color: _tabController!.index == 1
-              //                     ? theme.primary[600]
-              //                     : theme.grey[600],
-              //                 fontSize: 12),
-              //       ),
-              //     ],
-              //   ),
-              // ),
-              Tab(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      LucideIcons.users2,
-                      size: 18,
-                      color: _tabController!.index == 1
-                          ? theme.primary[600]
-                          : theme.grey[600],
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      AppLocalizations.of(context).translate('group'),
-                      style: (_tabController!.index == 1
-                              ? TextStyles.footnoteSelected
-                              : TextStyles.footnote)
-                          .copyWith(
-                              color: _tabController!.index == 1
-                                  ? theme.primary[600]
-                                  : theme.grey[600],
-                              fontSize: 12),
-                    ),
-                  ],
+                Tab(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        LucideIcons.users2,
+                        size: 18,
+                        color: _tabController!.index == 1
+                            ? theme.primary[600]
+                            : theme.grey[600],
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        AppLocalizations.of(context).translate('group'),
+                        style: (_tabController!.index == 1
+                                ? TextStyles.footnoteSelected
+                                : TextStyles.footnote)
+                            .copyWith(
+                                color: _tabController!.index == 1
+                                    ? theme.primary[600]
+                                    : theme.grey[600],
+                                fontSize: 12),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           // Tab bar view
           Expanded(
@@ -443,24 +413,27 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
           ),
         ],
       ),
-      floatingActionButton:
-          !shouldBlockForShorebird && _tabController!.index == 0
-              ? CommunityPostGuard(
-                  onAccessGranted: () {
-                    showModalBottomSheet(
-                      context: context,
-                      isScrollControlled: true,
-                      useSafeArea: true,
-                      builder: (context) => NewPostScreen(),
-                    );
-                  },
-                  child: FloatingActionButton(
-                    onPressed: null, // Handled by CommunityPostGuard
-                    backgroundColor: theme.primary[500],
-                    child: const Icon(LucideIcons.plus, color: Colors.white),
-                  ),
-                )
-              : null,
+      floatingActionButton: ListenableBuilder(
+        listenable: _tabController!,
+        builder: (context, _) =>
+            !shouldBlockForShorebird && _tabController!.index == 0
+                ? CommunityPostGuard(
+                    onAccessGranted: () {
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        useSafeArea: true,
+                        builder: (context) => NewPostScreen(),
+                      );
+                    },
+                    child: FloatingActionButton(
+                      onPressed: null, // Handled by CommunityPostGuard
+                      backgroundColor: theme.primary[500],
+                      child: const Icon(LucideIcons.plus, color: Colors.white),
+                    ),
+                  )
+                : const SizedBox.shrink(),
+      ),
     );
   }
 
@@ -548,10 +521,8 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
           ),
         ),
 
-        // Scrollable Content
-        SliverToBoxAdapter(
-          child: _buildMainContent(),
-        ),
+        // Scrollable Content — rendered as slivers for lazy loading
+        ..._buildPostsSlivers(),
       ],
     );
 
@@ -577,8 +548,87 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
     }
   }
 
-  Widget _buildMainContent() {
-    return _buildPostsView();
+  /// Build posts as slivers for true lazy rendering inside CustomScrollView
+  List<Widget> _buildPostsSlivers() {
+    final theme = AppTheme.of(context);
+    final localizations = AppLocalizations.of(context);
+    final postsState = ref.watch(postsPaginationProvider);
+
+    if (postsState.posts.isEmpty && postsState.isLoading) {
+      return [
+        SliverToBoxAdapter(
+          child: Container(
+            width: double.infinity,
+            height: 200,
+            child: const Center(child: Spinner()),
+          ),
+        ),
+      ];
+    }
+
+    if (postsState.posts.isEmpty && postsState.error != null) {
+      return [
+        SliverToBoxAdapter(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  localizations.translate('error_loading_posts'),
+                  style: TextStyles.body.copyWith(color: theme.error[500]),
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () {
+                    ref.read(postsPaginationProvider.notifier).refresh();
+                  },
+                  child: Text(localizations.translate('retry')),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ];
+    }
+
+    final posts = postsState.posts;
+
+    if (posts.isEmpty) {
+      return [
+        SliverToBoxAdapter(
+          child: Container(
+            width: double.infinity,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  localizations.translate('no_posts_found'),
+                  style: TextStyles.body.copyWith(color: theme.grey[600]),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ];
+    }
+
+    return [
+      SliverList.builder(
+        itemCount: posts.length,
+        itemBuilder: (context, index) {
+          if (index >= posts.length) return const SizedBox.shrink();
+          final post = posts[index];
+          return ThreadsPostCard(
+            post: post,
+            onTap: () {
+              context.goNamed(RouteNames.postDetail.name,
+                  pathParameters: {'postId': post.id});
+            },
+          );
+        },
+      ),
+    ];
   }
 
   /// Build the pinned posts section that appears above the tabs
@@ -736,15 +786,6 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
     );
   }
 
-  Widget _buildPostsView() {
-    final theme = AppTheme.of(context);
-    final localizations = AppLocalizations.of(context);
-    // Use the pagination provider instead of stream for better performance
-    final postsState = ref.watch(postsPaginationProvider);
-
-    return _buildPaginatedPostsContent(postsState, localizations, theme);
-  }
-
   /// Build the news posts section that appears above the tabs
   Widget _buildNewsSection() {
     final theme = AppTheme.of(context);
@@ -900,81 +941,6 @@ class _CommunityMainScreenState extends ConsumerState<CommunityMainScreen>
     );
   }
 
-  Widget _buildPaginatedPostsContent(
-      dynamic postsState, AppLocalizations localizations, theme) {
-    if (postsState.posts.isEmpty && postsState.isLoading) {
-      return Container(
-        width: double.infinity,
-        height: 200,
-        child: const Center(
-          child: Spinner(),
-        ),
-      );
-    }
-
-    if (postsState.posts.isEmpty && postsState.error != null) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              localizations.translate('error_loading_posts'),
-              style: TextStyles.body.copyWith(
-                color: theme.error[500],
-              ),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                ref.read(postsPaginationProvider.notifier).refresh();
-              },
-              child: Text(localizations.translate('retry')),
-            ),
-          ],
-        ),
-      );
-    }
-
-    final posts = postsState.posts;
-
-    if (posts.isEmpty) {
-      return Container(
-        width: double.infinity,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              localizations.translate('no_posts_found'),
-              style: TextStyles.body.copyWith(
-                color: theme.grey[600],
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: posts.length,
-      itemBuilder: (context, index) {
-        // Safe index access to prevent range errors
-        if (index >= posts.length) return Container();
-
-        final post = posts[index];
-        return ThreadsPostCard(
-          post: post,
-          onTap: () {
-            context.goNamed(RouteNames.postDetail.name,
-                pathParameters: {'postId': post.id});
-          },
-        );
-      },
-    );
-  }
-
   /// Determines if Shorebird update status should block the entire screen
   bool _shouldBlockForShorebirdUpdate(AppUpdateStatus status) {
     return status == AppUpdateStatus.available ||
@@ -1008,7 +974,7 @@ class _FilterChipsDelegate extends SliverPersistentHeaderDelegate {
   double get minExtent => 40;
 
   @override
-  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) {
-    return true;
+  bool shouldRebuild(covariant _FilterChipsDelegate oldDelegate) {
+    return filterChips != oldDelegate.filterChips;
   }
 }

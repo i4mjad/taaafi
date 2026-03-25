@@ -244,9 +244,10 @@ class ForumRepository {
     bool? isPinned,
   }) async {
     try {
+      // Note: isHidden is filtered client-side because older posts may not have
+      // this field, and Firestore excludes documents missing a queried field.
       Query query = _posts
           .where('isDeleted', isEqualTo: false)
-          .where('isHidden', isEqualTo: false)
           .orderBy('createdAt', descending: true);
 
       if (category != null && category.isNotEmpty) {
@@ -265,10 +266,11 @@ class ForumRepository {
 
       final QuerySnapshot snapshot = await query.get();
 
-      // Convert to Post objects - no need for client-side filtering since we filtered at source
+      // Filter out hidden posts client-side (some older posts lack the isHidden field)
       final posts = snapshot.docs
           .map((doc) =>
               Post.fromFirestore(doc as DocumentSnapshot<Map<String, dynamic>>))
+          .where((post) => !post.isHidden)
           .toList();
 
       final result = PostsPage(
@@ -279,9 +281,6 @@ class ForumRepository {
 
       return result;
     } catch (e) {
-      print('🔥 ERROR: Failed to fetch unfiltered posts: $e');
-      print(
-          '🔗 If this is an index error, check the link in the error message above for Firestore index requirements');
       throw Exception('Failed to fetch posts: $e');
     }
   }
@@ -304,11 +303,10 @@ class ForumRepository {
         return const PostsPage(posts: [], hasMore: false);
       }
 
-      // NEW EFFICIENT APPROACH: Get posts first, then filter by gender
-      // This avoids the need for 67 separate queries!
+      // Note: isHidden is filtered client-side because older posts may not have
+      // this field, and Firestore excludes documents missing a queried field.
       Query query = _posts
           .where('isDeleted', isEqualTo: false)
-          .where('isHidden', isEqualTo: false)
           .orderBy('createdAt', descending: true);
 
       if (category != null && category.isNotEmpty) {
@@ -334,13 +332,14 @@ class ForumRepository {
       // Convert visible profile IDs to Set for O(1) lookup
       final visibleProfileSet = visibleProfileIds.toSet();
 
-      // Filter posts by visible profile IDs
+      // Filter posts by visible profile IDs and hidden status
       final filteredPosts = <Post>[];
       DocumentSnapshot? lastValidDoc;
 
       for (final doc in snapshot.docs) {
         final post =
             Post.fromFirestore(doc as DocumentSnapshot<Map<String, dynamic>>);
+        if (post.isHidden) continue;
         if (visibleProfileSet.contains(post.authorCPId)) {
           filteredPosts.add(post);
           lastValidDoc = doc;
@@ -414,7 +413,6 @@ class ForumRepository {
   }) {
     Query query = _posts
         .where('isDeleted', isEqualTo: false)
-        .where('isHidden', isEqualTo: false)
         .orderBy('createdAt', descending: true);
 
     if (category != null && category.isNotEmpty) {
@@ -426,10 +424,11 @@ class ForumRepository {
     }
 
     return query.limit(limit).snapshots().map((snapshot) {
-      // Convert to Post objects - no client-side filtering needed
+      // Filter isHidden client-side (older posts may lack this field)
       final posts = snapshot.docs
           .map((doc) =>
               Post.fromFirestore(doc as DocumentSnapshot<Map<String, dynamic>>))
+          .where((post) => !post.isHidden)
           .toList();
 
       return posts;
@@ -484,7 +483,6 @@ class ForumRepository {
 
         Query query = _posts
             .where('authorCPId', whereIn: batch)
-            .where('isHidden', isEqualTo: false)
             .orderBy('createdAt', descending: true);
 
         if (category != null && category.isNotEmpty) {
@@ -497,10 +495,11 @@ class ForumRepository {
 
         final snapshot = await query.limit(limit).get();
 
+        // Filter isDeleted and isHidden client-side (older posts may lack isHidden)
         final batchPosts = snapshot.docs
             .map((doc) => Post.fromFirestore(
                 doc as DocumentSnapshot<Map<String, dynamic>>))
-            .where((post) => !post.isDeleted)
+            .where((post) => !post.isDeleted && !post.isHidden)
             .toList();
 
         allPosts.addAll(batchPosts);
@@ -1765,10 +1764,9 @@ class ForumRepository {
   Future<List<Post>> _getOrphanedPosts(
       int limit, String? category, bool? isPinned) async {
     try {
-      // Get all posts first (exclude deleted and hidden)
+      // Get all posts first (exclude deleted; filter isHidden client-side)
       Query query = _posts
           .where('isDeleted', isEqualTo: false)
-          .where('isHidden', isEqualTo: false)
           .orderBy('createdAt', descending: true);
 
       if (category != null && category.isNotEmpty) {
@@ -1785,7 +1783,7 @@ class ForumRepository {
       final allPosts = postsSnapshot.docs
           .map((doc) =>
               Post.fromFirestore(doc as DocumentSnapshot<Map<String, dynamic>>))
-          .where((post) => !post.isDeleted)
+          .where((post) => !post.isDeleted && !post.isHidden)
           .toList();
 
       // Check which posts have non-existent authorCPId

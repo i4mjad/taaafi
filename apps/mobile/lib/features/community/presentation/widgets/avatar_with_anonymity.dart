@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -56,15 +57,14 @@ class AvatarWithAnonymity extends ConsumerWidget {
                         ? const EdgeInsets.all(2.5)
                         : EdgeInsets.zero,
                     child: ClipOval(
-                      child: Image.network(
-                        avatarUrl!,
+                      child: CachedNetworkImage(
+                        imageUrl: avatarUrl!,
                         width: size - (isPlusUser ? 5 : 0),
                         height: size - (isPlusUser ? 5 : 0),
                         fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          // Fallback to default avatar if image fails to load
-                          print(
-                              'DEBUG: AvatarWithAnonymity - Image load error for cpId: $cpId, avatarUrl: $avatarUrl, error: $error');
+                        memCacheWidth: ((size - (isPlusUser ? 5 : 0)) * 2).toInt(),
+                        memCacheHeight: ((size - (isPlusUser ? 5 : 0)) * 2).toInt(),
+                        errorWidget: (context, _, error) {
                           return Container(
                             color: theme.primary[100],
                             child: Icon(
@@ -74,8 +74,7 @@ class AvatarWithAnonymity extends ConsumerWidget {
                             ),
                           );
                         },
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
+                        placeholder: (context, url) {
                           return Container(
                             color: theme.primary[100],
                             child: Center(

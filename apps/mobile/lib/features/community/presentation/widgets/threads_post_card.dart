@@ -234,57 +234,9 @@ class ThreadsPostCard extends ConsumerWidget {
                           const SizedBox(width: 8),
 
                           // Streak badge
-                          Wrap(
-                            spacing: 8,
-                            runSpacing: 4,
-                            children: [
-                              // Real-time streak badge
-                              ...() {
-                                return authorProfileAsync.maybeWhen(
-                                  data: (authorProfile) {
-                                    // Check if user is plus AND allows sharing
-                                    final isPlusUser =
-                                        authorProfile.hasPlusSubscription();
-                                    final allowsSharing =
-                                        authorProfile.shareRelapseStreaks;
-
-                                    if (!isPlusUser || !allowsSharing) {
-                                      return <Widget>[];
-                                    }
-
-                                    // Calculate streak in real-time
-                                    return [
-                                      Consumer(
-                                        builder: (context, ref, child) {
-                                          final streakAsync = ref.watch(
-                                              userStreakCalculatorProvider(
-                                                  post.authorCPId));
-
-                                          return streakAsync.when(
-                                            data: (streakDays) {
-                                              if (streakDays == null ||
-                                                  streakDays <= 0) {
-                                                return const SizedBox.shrink();
-                                              }
-
-                                              return StreakDisplayWidget(
-                                                streakDays: streakDays,
-                                              );
-                                            },
-                                            loading: () =>
-                                                const SizedBox.shrink(),
-                                            error: (error, stackTrace) {
-                                              return const SizedBox.shrink();
-                                            },
-                                          );
-                                        },
-                                      ),
-                                    ];
-                                  },
-                                  orElse: () => <Widget>[],
-                                );
-                              }(),
-                            ],
+                          _AuthorStreakBadge(
+                            authorProfileAsync: authorProfileAsync,
+                            authorCPId: post.authorCPId,
                           ),
 
                           const Spacer(),
@@ -1055,4 +1007,44 @@ class _RoleIconData {
     required this.icon,
     required this.color,
   });
+}
+
+/// Extracted streak badge widget to avoid IIFE closures in build methods
+class _AuthorStreakBadge extends ConsumerWidget {
+  final AsyncValue authorProfileAsync;
+  final String authorCPId;
+
+  const _AuthorStreakBadge({
+    required this.authorProfileAsync,
+    required this.authorCPId,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return authorProfileAsync.maybeWhen(
+      data: (authorProfile) {
+        final isPlusUser = authorProfile.hasPlusSubscription();
+        final allowsSharing = authorProfile.shareRelapseStreaks;
+
+        if (!isPlusUser || !allowsSharing) {
+          return const SizedBox.shrink();
+        }
+
+        final streakAsync =
+            ref.watch(userStreakCalculatorProvider(authorCPId));
+
+        return streakAsync.when(
+          data: (streakDays) {
+            if (streakDays == null || streakDays <= 0) {
+              return const SizedBox.shrink();
+            }
+            return StreakDisplayWidget(streakDays: streakDays);
+          },
+          loading: () => const SizedBox.shrink(),
+          error: (_, __) => const SizedBox.shrink(),
+        );
+      },
+      orElse: () => const SizedBox.shrink(),
+    );
+  }
 }

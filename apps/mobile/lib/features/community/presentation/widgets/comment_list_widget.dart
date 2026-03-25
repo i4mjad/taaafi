@@ -40,6 +40,8 @@ class CommentListWidget extends ConsumerWidget {
         return ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
+          addAutomaticKeepAlives: false,
+          addRepaintBoundaries: true,
           itemCount: comments.length,
           itemBuilder: (context, index) {
             final comment = comments[index];
@@ -115,7 +117,6 @@ class CommentListWidget extends ConsumerWidget {
     AppLocalizations localizations,
     Object error,
   ) {
-    print('❌ Error loading comments: $error');
     return Container(
       padding: const EdgeInsets.all(32),
       child: Column(

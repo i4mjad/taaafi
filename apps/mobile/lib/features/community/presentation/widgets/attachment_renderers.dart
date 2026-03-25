@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
@@ -129,26 +130,17 @@ class _ImageAttachmentRenderer extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         child: AspectRatio(
           aspectRatio: 16 / 9, // Default aspect ratio for single images
-          child: Image.network(
-            image['downloadUrl'] ??
-                image['thumbnailUrl'], // Use full resolution for single images
+          child: CachedNetworkImage(
+            imageUrl: image['downloadUrl'] ?? image['thumbnailUrl'],
             fit: BoxFit.cover,
-            loadingBuilder: (context, child, loadingProgress) {
-              if (loadingProgress == null) return child;
-              return Container(
-                color: theme.grey[100],
-                child: Center(
-                  child: CircularProgressIndicator(
-                    value: loadingProgress.expectedTotalBytes != null
-                        ? loadingProgress.cumulativeBytesLoaded /
-                            loadingProgress.expectedTotalBytes!
-                        : null,
-                    strokeWidth: 2,
-                  ),
-                ),
-              );
-            },
-            errorBuilder: (context, error, stackTrace) => Container(
+            memCacheWidth: 600,
+            placeholder: (context, url) => Container(
+              color: theme.grey[100],
+              child: const Center(
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            ),
+            errorWidget: (context, url, error) => Container(
               color: theme.grey[100],
               child: Center(
                 child: Icon(
@@ -202,32 +194,21 @@ class _ImageAttachmentRenderer extends StatelessWidget {
                     child: (images[index]['downloadUrl'] ??
                                 images[index]['thumbnailUrl']) !=
                             null
-                        ? Image.network(
-                            images[index]['downloadUrl'] ??
-                                images[index][
-                                    'thumbnailUrl'], // Use full resolution everywhere
+                        ? CachedNetworkImage(
+                            imageUrl: images[index]['downloadUrl'] ??
+                                images[index]['thumbnailUrl'],
                             fit: BoxFit.cover,
                             width: double.infinity,
                             height: double.infinity,
-                            loadingBuilder: (context, child, loadingProgress) {
-                              if (loadingProgress == null) return child;
-                              return Container(
-                                color: theme.grey[100],
-                                child: Center(
-                                  child: CircularProgressIndicator(
-                                    value: loadingProgress.expectedTotalBytes !=
-                                            null
-                                        ? loadingProgress
-                                                .cumulativeBytesLoaded /
-                                            loadingProgress.expectedTotalBytes!
-                                        : null,
-                                    strokeWidth: 2,
-                                  ),
-                                ),
-                              );
-                            },
-                            errorBuilder: (context, error, stackTrace) =>
-                                Center(
+                            memCacheWidth: 300,
+                            placeholder: (context, url) => Container(
+                              color: theme.grey[100],
+                              child: const Center(
+                                child: CircularProgressIndicator(
+                                    strokeWidth: 2),
+                              ),
+                            ),
+                            errorWidget: (context, url, error) => Center(
                               child: Icon(
                                 LucideIcons.imageOff,
                                 color: theme.grey[400],
@@ -313,7 +294,7 @@ class _ImageAttachmentRenderer extends StatelessWidget {
             color: AppTheme.of(context).grey[100],
             image: (image['downloadUrl'] ?? image['thumbnailUrl']) != null
                 ? DecorationImage(
-                    image: NetworkImage(
+                    image: CachedNetworkImageProvider(
                         image['downloadUrl'] ?? image['thumbnailUrl']),
                     fit: BoxFit.cover,
                   )
@@ -425,7 +406,7 @@ class _ImageAttachmentRenderer extends StatelessWidget {
           color: AppTheme.of(context).grey[100],
           image: (image['downloadUrl'] ?? image['thumbnailUrl']) != null
               ? DecorationImage(
-                  image: NetworkImage(
+                  image: CachedNetworkImageProvider(
                       image['downloadUrl'] ?? image['thumbnailUrl']),
                   fit: BoxFit.cover,
                 )
@@ -480,24 +461,15 @@ class _ImageAttachmentRenderer extends StatelessWidget {
               return Center(
                 child: imageUrl != null
                     ? InteractiveViewer(
-                        child: Image.network(
-                          imageUrl,
+                        child: CachedNetworkImage(
+                          imageUrl: imageUrl,
                           fit: BoxFit.contain,
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return Center(
-                              child: CircularProgressIndicator(
-                                value: loadingProgress.expectedTotalBytes !=
-                                        null
-                                    ? loadingProgress.cumulativeBytesLoaded /
-                                        loadingProgress.expectedTotalBytes!
-                                    : null,
-                                color: Colors.white,
-                              ),
-                            );
-                          },
-                          errorBuilder: (context, error, stackTrace) =>
-                              Container(
+                          placeholder: (context, url) => const Center(
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                            ),
+                          ),
+                          errorWidget: (context, url, error) => Container(
                             padding: const EdgeInsets.all(16),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
