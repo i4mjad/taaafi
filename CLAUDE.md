@@ -197,6 +197,49 @@ Do NOT manually create shadcn components. The CLI handles styling and dependenci
 ### Native Changes Warning (Mobile)
 When touching `android/` or `ios/` directories: **WARN the user** that Shorebird cannot OTA-update native changes. These require a full app store release.
 
+### Mobile App Build Process
+
+**Incrementing Build Numbers:**
+1. Update `pubspec.yaml` version: `version: X.Y.Z+BUILD`
+   - BUILD is a single-digit counter (1, 2, 3, etc.)
+   - Example: `5.5.3+3` means version 5.5.3, build 3
+
+2. For Android Shorebird builds, convert to 4-digit format:
+   - Android build-number = `(MAJOR)(MINOR)(PATCH)(BUILD)`
+   - Example: Version 5.5.3, Build 3 → `55303`
+
+**Building with Shorebird:**
+```bash
+cd apps/mobile
+
+# iOS (uses latest stable Flutter version)
+shorebird release ios
+
+# Android (specify Flutter version explicitly)
+shorebird release android --flutter-version=3.32.5 \
+  --build-name=5.5.3 \
+  --build-number=55303 \
+  --target lib/main.dart
+```
+
+**Build Outputs:**
+- iOS IPA: `build/ios/ipa/Ta'aafi Platform.ipa`
+- Android AAB: `build/app/outputs/bundle/release/app-release.aab`
+- Copy to `/builds/` folder in repository root for version control
+
+**Flutter API Compatibility Issues:**
+When updating Flutter versions, watch for these breaking changes:
+1. **Switch widget:** `activeThumbColor` parameter → `thumbColor` (use `MaterialStateProperty.resolveWith`)
+2. **DropdownButtonFormField:** `initialValue` parameter → `value`
+3. **BottomAppBar theme:** `BottomAppBarThemeData` class → `BottomAppBarTheme`
+
+These changes typically affect files with Material Design widgets. Test builds carefully when updating Flutter versions.
+
+**Android SDK Constraints:**
+- minSdkVersion **MUST be 23** — enforced by Firebase Auth v23+
+- Set explicitly in `android/app/build.gradle`: `minSdkVersion 23`
+- Never use `flutter.minSdkVersion` fallback; it may be too low
+
 ### Platform Constraints (Mobile)
 - Android minSdk must remain **>= 23** — never lower it
 - Dart SDK must stay within `>=3.0.0 <=4.0.0`
@@ -257,6 +300,7 @@ docs(infra): update claude.md with new patterns
 3. **Mixed lockfiles** — Admin has both `yarn.lock` and `package-lock.json`. Prefer `yarn.lock`; `package-lock.json` can be removed.
 4. **Legacy app name** — The Flutter app is still named `reboot_app_3` internally. This is a known legacy artifact; do not rename without explicit approval.
 5. **Duplicate setGlobalOptions** — `messageModeration.ts` calls `setGlobalOptions` with the same settings as `index.ts`. Harmless but could be cleaned up.
+6. **Flutter API breakage** — When upgrading Flutter versions, Material Design widgets experience breaking changes (see "Mobile App Build Process" section). These are usually straightforward to fix but require careful testing.
 
 ---
 
