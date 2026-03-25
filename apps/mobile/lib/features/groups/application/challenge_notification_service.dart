@@ -1,9 +1,10 @@
 import 'dart:developer';
+import 'package:cloud_functions/cloud_functions.dart';
 import '../domain/repositories/challenges_repository.dart';
 
 /// Service for sending challenge-related notifications
 ///
-/// Integrates with the app's notification system to send timely alerts
+/// Integrates with Firebase Cloud Functions to send timely alerts
 class ChallengeNotificationService {
   final ChallengesRepository _repository;
 
@@ -24,13 +25,13 @@ class ChallengeNotificationService {
 
       if (participation == null) return;
 
-      // TODO: Integrate with your notification service
-      // Example:
-      // await notificationService.sendNotification(
-      //   userId: cpId,
-      //   title: 'Challenge Reminder',
-      //   body: 'Don\'t forget to complete your tasks today!',
-      // );
+      await FirebaseFunctions.instance
+          .httpsCallable('sendChallengeNotification')
+          .call({
+        'type': 'daily_reminder',
+        'challengeId': challengeId,
+        'recipientCpId': cpId,
+      });
 
       log('Daily reminder sent for challenge $challengeId to user $cpId');
     } catch (e, stackTrace) {
@@ -47,13 +48,14 @@ class ChallengeNotificationService {
     required int milestone,
   }) async {
     try {
-      // TODO: Integrate with your notification service
-      // Example:
-      // await notificationService.sendNotification(
-      //   userId: cpId,
-      //   title: 'Milestone Reached! 🎉',
-      //   body: 'You\'ve reached $milestone% in your challenge!',
-      // );
+      await FirebaseFunctions.instance
+          .httpsCallable('sendChallengeNotification')
+          .call({
+        'type': 'milestone',
+        'challengeId': challengeId,
+        'recipientCpId': cpId,
+        'data': {'milestone': milestone},
+      });
 
       log('Milestone notification sent: $milestone% for user $cpId');
     } catch (e, stackTrace) {
@@ -70,13 +72,14 @@ class ChallengeNotificationService {
       final challenge = await _repository.getChallengeById(challengeId);
       if (challenge == null) return;
 
-      // TODO: Integrate with your notification service
-      // Example:
-      // await notificationService.sendNotification(
-      //   userId: cpId,
-      //   title: 'Challenge Completed! 🏆',
-      //   body: 'Congratulations! You\'ve completed "${challenge.title}"',
-      // );
+      await FirebaseFunctions.instance
+          .httpsCallable('sendChallengeNotification')
+          .call({
+        'type': 'challenge_complete',
+        'challengeId': challengeId,
+        'recipientCpId': cpId,
+        'data': {'challengeName': challenge.title},
+      });
 
       log('Challenge complete notification sent for user $cpId');
     } catch (e, stackTrace) {
@@ -98,13 +101,14 @@ class ChallengeNotificationService {
 
       if (rankChange <= 0) return; // Only notify on improvements
 
-      // TODO: Integrate with your notification service
-      // Example:
-      // await notificationService.sendNotification(
-      //   userId: cpId,
-      //   title: 'Rank Update! 📊',
-      //   body: 'You moved up $rankChange positions! You\'re now #$newRank',
-      // );
+      await FirebaseFunctions.instance
+          .httpsCallable('sendChallengeNotification')
+          .call({
+        'type': 'rank_update',
+        'challengeId': challengeId,
+        'recipientCpId': cpId,
+        'data': {'newRank': newRank, 'rankChange': rankChange},
+      });
 
       log('Rank update notification sent: $oldRank -> $newRank for user $cpId');
     } catch (e, stackTrace) {
@@ -133,13 +137,17 @@ class ChallengeNotificationService {
         timeText = '$hoursRemaining hours';
       }
 
-      // TODO: Integrate with your notification service
-      // Example:
-      // await notificationService.sendNotification(
-      //   userId: cpId,
-      //   title: 'Challenge Ending Soon! ⏰',
-      //   body: '"${challenge.title}" ends in $timeText',
-      // );
+      await FirebaseFunctions.instance
+          .httpsCallable('sendChallengeNotification')
+          .call({
+        'type': 'challenge_ending_soon',
+        'challengeId': challengeId,
+        'recipientCpId': cpId,
+        'data': {
+          'challengeName': challenge.title,
+          'timeText': timeText,
+        },
+      });
 
       log('Challenge ending notification sent: $timeText for user $cpId');
     } catch (e, stackTrace) {
@@ -149,12 +157,14 @@ class ChallengeNotificationService {
 
   /// Schedule daily reminders for a challenge
   ///
-  /// Should be implemented with Cloud Functions scheduled tasks
+  /// Calls Cloud Function to set up recurring reminder schedule
   Future<void> scheduleDailyReminders(String challengeId) async {
     try {
-      // TODO: Implement with Cloud Functions
-      // This would set up a recurring scheduled task to check
-      // all participants and send reminders at a specific time (e.g., 8 PM)
+      await FirebaseFunctions.instance
+          .httpsCallable('scheduleChallengeReminders')
+          .call({
+        'challengeId': challengeId,
+      });
 
       log('Daily reminders scheduled for challenge $challengeId');
     } catch (e, stackTrace) {
@@ -162,4 +172,3 @@ class ChallengeNotificationService {
     }
   }
 }
-

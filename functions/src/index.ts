@@ -1736,3 +1736,6 @@ export { moderateMessage } from './messageModeration';
 
 // Ban enforcement functions
 export { onBanCreated, onBanUpdated, validateDeviceOnAuth, checkBannedIdentifierBeforeSignup } from './bans';
+
+// Challenge notification functions
+export { sendChallengeNotification, scheduleChallengeReminders } from './challengeNotifications';
