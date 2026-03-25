@@ -460,22 +460,23 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
     // Remove duplicates by ID first (keep all messages including hidden ones)
     final uniqueEntities = <String, GroupMessageEntity>{};
     for (final entity in entities.where((entity) => !entity.isDeleted)) {
-      // Hide blocked messages from OTHER users only
+      // Hidden messages (flagged by moderation) — only show to sender
+      if (entity.isHidden) {
+        if (currentCpId != null && entity.senderCpId == currentCpId) {
+          uniqueEntities[entity.id] = entity;
+        }
+        continue;
+      }
+
+      // Blocked messages — only show to sender
       if (entity.moderation.status == ModerationStatusType.blocked) {
-        // Only show blocked messages to the sender
         if (currentCpId != null && entity.senderCpId == currentCpId) {
           uniqueEntities[entity.id] = entity;
         }
       } else if (entity.moderation.status == ModerationStatusType.manual_review) {
-        // For manual_review, hide messages with confidence >= 0.85
-        final confidence = entity.moderation.confidence ?? 0.0;
-        if (confidence >= 0.85) {
-          // Hide high-confidence violations from everyone
-          continue;
-        } else {
-          // Show low-confidence manual reviews
-          uniqueEntities[entity.id] = entity;
-        }
+        // For manual_review without isHidden, show to everyone
+        // (isHidden cases are already handled above)
+        uniqueEntities[entity.id] = entity;
       } else {
         // Show all other messages (pending, approved)
         uniqueEntities[entity.id] = entity;
@@ -838,26 +839,21 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
                           _buildMessageReplyPreview(
                               context, theme, message.replyToMessage!),
 
-                        // Check for blocked message and show special UI to sender
-                        if (message.moderationStatus ==
+                        // Hidden message (flagged by moderation) — show "under review" to sender
+                        if (message.isHidden && message.isCurrentUser)
+                          _buildUnderReviewContent(context, theme, message)
+                        // Blocked message — show "blocked" to sender
+                        else if (message.moderationStatus ==
                                 ModerationStatusType.blocked &&
                             message.isCurrentUser)
                           _buildBlockedMessageContent(context, theme, message)
                         else
                           // Regular message content
                           Text(
-                            message.isHidden
-                                ? AppLocalizations.of(context)
-                                    .translate('message-hidden-by-admin')
-                                : message.content,
+                            message.content,
                             style: chatTextSize.textStyle.copyWith(
-                              color: message.isHidden
-                                  ? theme.grey[500]
-                                  : theme.grey[800],
+                              color: theme.grey[800],
                               height: 1.5,
-                              fontStyle: message.isHidden
-                                  ? FontStyle.italic
-                                  : FontStyle.normal,
                             ),
                             textAlign:
                                 Directionality.of(context) == TextDirection.rtl
@@ -2398,6 +2394,44 @@ ${l10n.translate('reported-message')}:
       }
     }
     // });
+  }
+
+  /// Under review message UI (only visible to sender when flagged)
+  Widget _buildUnderReviewContent(
+      BuildContext context, CustomThemeData theme, ChatMessage message) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(Icons.hourglass_top, color: Colors.amber.shade700, size: 18),
+            const SizedBox(width: 8),
+            Text(
+              'رسالة قيد المراجعة',
+              style: TextStyles.footnote.copyWith(
+                color: Colors.amber.shade700,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Text(
+          message.content,
+          style: TextStyles.small.copyWith(
+            color: theme.grey[500],
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'رسالتك تحت المراجعة وهي مرئية لك فقط.',
+          style: TextStyles.caption.copyWith(
+            color: Colors.grey.shade600,
+            fontStyle: FontStyle.italic,
+          ),
+        ),
+      ],
+    );
   }
 
   /// Blocked message UI (only visible to sender)
