@@ -1,6 +1,11 @@
 {
   "version": 1,
   "skills": {
+    "Performance Optimization": {
+      "source": "kaakati/rails-enterprise-dev",
+      "sourceType": "github",
+      "computedHash": "26ad6ab6f7383bf183b3813f2ff4c10c5272c14d81a91e1ca07ecd353fedad27"
+    },
     "mobile-ios-design": {
       "source": "wshobson/agents",
       "sourceType": "github",
