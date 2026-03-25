@@ -128,7 +128,12 @@
       "Bash(flutter --version)",
       "Bash(shorebird flutter:*)",
       "Bash(npx next:*)",
-      "Bash(./node_modules/.bin/next build:*)"
+      "Bash(./node_modules/.bin/next build:*)",
+      "Bash(firebase deploy:*)",
+      "Bash(firebase functions:config:get)",
+      "Bash(gcloud functions:*)",
+      "Bash(firebase:*)",
+      "Bash(shorebird releases:*)"
     ]
   },
   "outputStyle": "default"
