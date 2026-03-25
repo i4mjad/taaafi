@@ -1800,6 +1800,8 @@ const Map<String, String> kAr = {
       "تابع تحديثات من قبل زملائك في الزمالة وساعدهم واستفد من خبراتهم في التعافي",
   "groups-main-join-button": "الإنضمام إلى زمالة",
   "groups-main-create-button": "إنشاء زمالة",
+  "groups-main-explore-button": "استكشاف الزمالات",
+  "groups-main-have-code-button": "لدي رمز انضمام",
   "groups-need-profile-message":
       "تحتاج إلى إعداد ملفك الشخصي في المجتمع أولاً للانضمام أو إنشاء زمالات",
   "groups-already-in-group-button": "بالفعل في زمالة",

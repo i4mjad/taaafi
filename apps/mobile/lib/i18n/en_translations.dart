@@ -1859,6 +1859,8 @@ const Map<String, String> kEn = {
       "Follow updates from your colleagues in the group and help them and benefit from their experiences in recovery",
   "groups-main-join-button": "Join a Group",
   "groups-main-create-button": "Create Group",
+  "groups-main-explore-button": "Explore Groups",
+  "groups-main-have-code-button": "I Have a Code",
   "groups-need-profile-message":
       "You need to set up your community profile first to join or create groups",
   "groups-already-in-group-button": "Already in Group",

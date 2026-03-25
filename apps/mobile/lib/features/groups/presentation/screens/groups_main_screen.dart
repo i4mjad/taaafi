@@ -16,6 +16,8 @@ import 'package:reboot_app_3/features/groups/presentation/screens/modals/group_i
 import 'package:reboot_app_3/features/shared/models/group_invitation_entity.dart';
 import 'package:reboot_app_3/features/groups/presentation/widgets/join_cooldown_timer.dart';
 import 'package:reboot_app_3/features/direct_messaging/presentation/screens/groups_chats_tabbed_screen.dart';
+import 'package:go_router/go_router.dart';
+import 'package:reboot_app_3/core/routing/route_names.dart';
 
 // Feature access guard imports
 import '../../../account/presentation/widgets/feature_access_guard.dart';
@@ -422,9 +424,9 @@ class GroupsMainScreen extends ConsumerWidget {
       CustomThemeData theme, AppLocalizations l10n) {
     return Column(
       children: [
-        // Join Group button
+        // Primary: Explore Groups button
         GestureDetector(
-          onTap: () => _showJoinGroupModal(context, ref),
+          onTap: () => _navigateToExplore(context, ref),
           child: WidgetsContainer(
             padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
             backgroundColor: theme.primary[600],
@@ -433,8 +435,14 @@ class GroupsMainScreen extends ConsumerWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                Icon(
+                  LucideIcons.search,
+                  size: 18,
+                  color: Colors.white,
+                ),
+                const SizedBox(width: 8),
                 Text(
-                  l10n.translate('groups-main-join-button'),
+                  l10n.translate('groups-main-explore-button'),
                   style: TextStyles.footnote.copyWith(
                     color: Colors.white,
                   ),
@@ -446,29 +454,81 @@ class GroupsMainScreen extends ConsumerWidget {
 
         const SizedBox(height: 16),
 
-        // Create Group button
-        GestureDetector(
-          onTap: () => _showCreateGroupModal(context, ref),
-          child: WidgetsContainer(
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-            backgroundColor: theme.primary[100],
-            borderRadius: BorderRadius.circular(10.5),
-            borderSide: BorderSide(
-              color: theme.primary[200]!,
-              width: 1,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  l10n.translate('groups-main-create-button'),
-                  style: TextStyles.footnote.copyWith(
-                    color: theme.primary[900],
+        // Secondary row: "I have a code" + "Create group"
+        Row(
+          children: [
+            // I have a code
+            Expanded(
+              child: GestureDetector(
+                onTap: () => _showJoinGroupModal(context, ref),
+                child: WidgetsContainer(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+                  backgroundColor: theme.primary[50],
+                  borderRadius: BorderRadius.circular(10.5),
+                  borderSide: BorderSide(
+                    color: theme.primary[200]!,
+                    width: 1,
+                  ),
+                  child: Column(
+                    children: [
+                      Icon(
+                        LucideIcons.key,
+                        size: 22,
+                        color: theme.primary[600],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        l10n.translate('groups-main-have-code-button'),
+                        style: TextStyles.caption.copyWith(
+                          color: theme.primary[900],
+                          fontWeight: FontWeight.w600,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
                   ),
                 ),
-              ],
+              ),
             ),
-          ),
+
+            const SizedBox(width: 12),
+
+            // Create group
+            Expanded(
+              child: GestureDetector(
+                onTap: () => _showCreateGroupModal(context, ref),
+                child: WidgetsContainer(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+                  backgroundColor: theme.primary[50],
+                  borderRadius: BorderRadius.circular(10.5),
+                  borderSide: BorderSide(
+                    color: theme.primary[200]!,
+                    width: 1,
+                  ),
+                  child: Column(
+                    children: [
+                      Icon(
+                        LucideIcons.plusCircle,
+                        size: 22,
+                        color: theme.primary[600],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        l10n.translate('groups-main-create-button'),
+                        style: TextStyles.caption.copyWith(
+                          color: theme.primary[900],
+                          fontWeight: FontWeight.w600,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ],
     );
@@ -524,6 +584,25 @@ class GroupsMainScreen extends ConsumerWidget {
       backgroundColor: Colors.transparent,
       builder: (context) => const CommunityProfileSetupModal(),
     );
+  }
+
+  void _navigateToExplore(BuildContext context, WidgetRef ref) async {
+    final canAccess =
+        await checkFeatureAccess(ref, AppFeaturesConfig.createOrJoinGroups);
+
+    if (!context.mounted) return;
+
+    if (!canAccess) {
+      await checkFeatureAccessAndShowBanSnackbar(
+        context,
+        ref,
+        AppFeaturesConfig.createOrJoinGroups,
+        customMessage:
+            AppLocalizations.of(context).translate('group-joining-restricted'),
+      );
+    } else {
+      context.goNamed(RouteNames.groupExploration.name);
+    }
   }
 
   void _showJoinGroupModal(BuildContext context, WidgetRef ref) async {
