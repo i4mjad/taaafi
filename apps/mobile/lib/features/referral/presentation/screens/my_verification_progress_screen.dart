@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -282,9 +283,15 @@ class MyVerificationProgressScreen extends ConsumerWidget {
   }
 
   Future<String> _getReferrerName(WidgetRef ref, String referrerId) async {
-    // Try to get referrer's name from Firestore
-    // For now, return a placeholder
-    // TODO: Implement actual user name fetching from communityProfiles
+    final snapshot = await FirebaseFirestore.instance
+        .collection('communityProfiles')
+        .where('userUID', isEqualTo: referrerId)
+        .where('isDeleted', isEqualTo: false)
+        .limit(1)
+        .get();
+    if (snapshot.docs.isNotEmpty) {
+      return snapshot.docs.first.data()['displayName'] as String? ?? 'Your Friend';
+    }
     return 'Your Friend';
   }
 }

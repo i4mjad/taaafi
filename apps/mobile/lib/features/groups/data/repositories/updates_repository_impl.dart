@@ -34,10 +34,9 @@ class UpdatesRepositoryImpl implements UpdatesRepository {
       log('Creating update in group ${update.groupId}');
 
       final docRef = _updatesCollection.doc();
-      // TODO: Get locale from user profile or device
       final model = GroupUpdateModel.fromEntity(update.copyWith(
         id: docRef.id,
-        locale: update.locale.isEmpty ? 'en' : update.locale,
+        locale: update.locale.isEmpty ? 'ar' : update.locale,
       ));
 
       await docRef.set(model.toFirestore());

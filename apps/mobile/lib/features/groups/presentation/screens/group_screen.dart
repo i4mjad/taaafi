@@ -311,7 +311,6 @@ class GroupScreen extends ConsumerWidget {
                       const SizedBox(height: 8),
                       TextButton(
                         onPressed: () {
-                          // TODO: Open post update modal
                           _showPostUpdateModal(context, ref, groupId);
                         },
                         child: Text(
@@ -488,7 +487,6 @@ class GroupScreen extends ConsumerWidget {
   //         const SizedBox(width: 12),
   //
   //         // User Avatar (middle)
-  //         //TODO: Change this to the real avatar
   //         Container(
   //           width: 36,
   //           height: 36,
