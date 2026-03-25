@@ -1,33 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:go_router/go_router.dart';
 import 'package:reboot_app_3/core/localization/localization.dart';
-import 'package:reboot_app_3/core/routing/route_names.dart';
+import 'package:reboot_app_3/core/shared_widgets/app_bar.dart';
 import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/groups/application/updates_providers.dart';
 import 'package:reboot_app_3/features/community/presentation/providers/community_providers_new.dart';
 
-/// Widget to display comments on an update
-class UpdateCommentsSection extends ConsumerStatefulWidget {
-  final String updateId;
+/// Full-page screen showing ALL comments for a group update
+class GroupUpdateCommentsScreen extends ConsumerStatefulWidget {
   final String groupId;
-  final int maxVisible;
+  final String updateId;
 
-  const UpdateCommentsSection({
+  const GroupUpdateCommentsScreen({
     super.key,
-    required this.updateId,
     required this.groupId,
-    this.maxVisible = 3,
+    required this.updateId,
   });
 
   @override
-  ConsumerState<UpdateCommentsSection> createState() =>
-      _UpdateCommentsSectionState();
+  ConsumerState<GroupUpdateCommentsScreen> createState() =>
+      _GroupUpdateCommentsScreenState();
 }
 
-class _UpdateCommentsSectionState extends ConsumerState<UpdateCommentsSection> {
+class _GroupUpdateCommentsScreenState
+    extends ConsumerState<GroupUpdateCommentsScreen> {
   final TextEditingController _commentController = TextEditingController();
   bool _isAnonymous = false;
 
@@ -43,61 +41,71 @@ class _UpdateCommentsSectionState extends ConsumerState<UpdateCommentsSection> {
     final l10n = AppLocalizations.of(context);
     final commentsAsync = ref.watch(updateCommentsProvider(widget.updateId));
 
-    return commentsAsync.when(
-      data: (comments) {
-        final visibleComments = widget.maxVisible > 0
-            ? comments.take(widget.maxVisible).toList()
-            : comments;
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (comments.isNotEmpty) ...[
-              // Comments list
-              ...visibleComments.map((comment) {
-                return _buildCommentTile(context, ref, theme, l10n, comment);
-              }),
-
-              // View all button if there are more
-              if (comments.length > widget.maxVisible) ...[
-                TextButton(
-                  onPressed: () => context.pushNamed(
-                    RouteNames.groupUpdateComments.name,
-                    pathParameters: {
-                      'groupId': widget.groupId,
-                      'updateId': widget.updateId,
-                    },
-                  ),
-                  child: Text(
-                    l10n
-                        .translate('view-all-comments')
-                        .replaceAll('{count}', comments.length.toString()),
-                    style: TextStyles.small.copyWith(
-                      color: theme.primary[700],
-                      fontWeight: FontWeight.w600,
+    return Scaffold(
+      backgroundColor: theme.backgroundColor,
+      appBar: plainAppBar(
+          context, ref, l10n.translate('comments'), false, true),
+      body: Column(
+        children: [
+          // Comments list
+          Expanded(
+            child: commentsAsync.when(
+              data: (comments) {
+                if (comments.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          LucideIcons.messageCircle,
+                          size: 48,
+                          color: theme.grey[400],
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          l10n.translate('no-comments-yet'),
+                          style: TextStyles.body.copyWith(
+                            color: theme.grey[600],
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                ),
-              ],
-              const SizedBox(height: 8),
-            ],
+                  );
+                }
 
-            // Add comment input
-            _buildCommentInput(context, theme, l10n),
-          ],
-        );
-      },
-      loading: () => const Center(
-        child: Padding(
-          padding: EdgeInsets.all(16),
-          child: CircularProgressIndicator(),
-        ),
-      ),
-      error: (error, stack) => Center(
-        child: Text(
-          'Error loading comments',
-          style: TextStyles.small.copyWith(color: theme.error[600]),
-        ),
+                return ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: comments.length,
+                  itemBuilder: (context, index) {
+                    final comment = comments[index];
+                    return _buildCommentTile(context, ref, theme, l10n, comment);
+                  },
+                );
+              },
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (error, stack) => Center(
+                child: Text(
+                  'Error loading comments',
+                  style: TextStyles.small.copyWith(color: theme.error[600]),
+                ),
+              ),
+            ),
+          ),
+
+          // Comment input at bottom
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: theme.backgroundColor,
+              border: Border(
+                top: BorderSide(color: theme.grey[200]!, width: 1),
+              ),
+            ),
+            child: SafeArea(
+              child: _buildCommentInput(context, theme, l10n),
+            ),
+          ),
+        ],
       ),
     );
   }

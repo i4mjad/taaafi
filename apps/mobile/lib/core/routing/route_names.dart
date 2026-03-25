@@ -73,6 +73,7 @@ enum RouteNames {
   allPosts,
   categoriesList,
   categoryPosts,
+  groupUpdateComments,
   // Direct Messaging routes
   communityChats,
   directChat,
