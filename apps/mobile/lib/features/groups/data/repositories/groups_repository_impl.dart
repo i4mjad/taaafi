@@ -102,39 +102,40 @@ class GroupsRepositoryImpl implements GroupsRepository {
         startAfterDocument: startAfterDocument,
       );
 
-      // Enrich each group with real member count
-      final enrichedGroups = <GroupModel>[];
-      for (final group in result.groups) {
-        try {
-          final memberCount =
-              await _dataSource.getGroupMemberCount(group.id);
-          enrichedGroups.add(GroupModel(
-            id: group.id,
-            name: group.name,
-            description: group.description,
-            gender: group.gender,
-            preferredLanguage: group.preferredLanguage,
-            memberCapacity: group.memberCapacity,
-            memberCount: memberCount,
-            adminCpId: group.adminCpId,
-            createdByCpId: group.createdByCpId,
-            visibility: group.visibility,
-            joinMethod: group.joinMethod,
-            joinCode: group.joinCode,
-            joinCodeExpiresAt: group.joinCodeExpiresAt,
-            joinCodeMaxUses: group.joinCodeMaxUses,
-            joinCodeUseCount: group.joinCodeUseCount,
-            isActive: group.isActive,
-            isPaused: group.isPaused,
-            pauseReason: group.pauseReason,
-            createdAt: group.createdAt,
-            updatedAt: group.updatedAt,
-          ));
-        } catch (e) {
-          log('Failed to get member count for group ${group.id}: $e');
-          enrichedGroups.add(group);
-        }
-      }
+      // Enrich all groups with member counts in parallel
+      final enrichedGroups = await Future.wait(
+        result.groups.map((group) async {
+          try {
+            final memberCount =
+                await _dataSource.getGroupMemberCount(group.id);
+            return GroupModel(
+              id: group.id,
+              name: group.name,
+              description: group.description,
+              gender: group.gender,
+              preferredLanguage: group.preferredLanguage,
+              memberCapacity: group.memberCapacity,
+              memberCount: memberCount,
+              adminCpId: group.adminCpId,
+              createdByCpId: group.createdByCpId,
+              visibility: group.visibility,
+              joinMethod: group.joinMethod,
+              joinCode: group.joinCode,
+              joinCodeExpiresAt: group.joinCodeExpiresAt,
+              joinCodeMaxUses: group.joinCodeMaxUses,
+              joinCodeUseCount: group.joinCodeUseCount,
+              isActive: group.isActive,
+              isPaused: group.isPaused,
+              pauseReason: group.pauseReason,
+              createdAt: group.createdAt,
+              updatedAt: group.updatedAt,
+            );
+          } catch (e) {
+            log('Failed to get member count for group ${group.id}: $e');
+            return group;
+          }
+        }),
+      );
 
       return PaginatedGroupsResult(
         groups: enrichedGroups,

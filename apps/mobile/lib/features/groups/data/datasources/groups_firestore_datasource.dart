@@ -288,13 +288,14 @@ class GroupsFirestoreDataSource implements GroupsDataSource {
   @override
   Future<int> getGroupMemberCount(String groupId) async {
     try {
-      final querySnapshot = await _firestore
+      final countQuery = _firestore
           .collection('group_memberships')
           .where('groupId', isEqualTo: groupId)
           .where('isActive', isEqualTo: true)
-          .get();
+          .count();
 
-      return querySnapshot.docs.length;
+      final snapshot = await countQuery.get();
+      return snapshot.count ?? 0;
     } catch (e, stackTrace) {
       log('Error getting group member count: $e', stackTrace: stackTrace);
       rethrow;
