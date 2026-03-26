@@ -172,6 +172,8 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
   bool _isSubmitting = false;
   bool _isSearchMode = false;
   bool _isLoadingMore = false;
+  bool _hasScrolledToBottom = false;
+  List<ChatMessage> _cachedSortedMessages = [];
   ChatReplyState _replyState = const ChatReplyState();
 
   // Animation for reply preview dismissal
@@ -378,16 +380,28 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    // Sort messages by creation time (latest first for reverse ListView)
-    final sortedMessages = List<ChatMessage>.from(messages);
-    sortedMessages.sort((a, b) => b.dateTime.compareTo(a.dateTime));
+    // Sort messages by creation time (latest first for reverse ListView).
+    // Cache the sorted result — only re-sort when the message list changes.
+    if (_cachedSortedMessages.length != messages.length ||
+        (messages.isNotEmpty &&
+            (_cachedSortedMessages.isEmpty ||
+                _cachedSortedMessages.first.id != messages.first.id ||
+                _cachedSortedMessages.last.id != messages.last.id))) {
+      _cachedSortedMessages = List<ChatMessage>.from(messages)
+        ..sort((a, b) => b.dateTime.compareTo(a.dateTime));
+    }
+    final sortedMessages = _cachedSortedMessages;
 
-    // Auto-scroll to bottom when messages first load
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_scrollController.hasClients && messages.isNotEmpty) {
-        _scrollController.jumpTo(0); // Jump to bottom (latest messages)
-      }
-    });
+    // Auto-scroll to bottom on first load only — never on subsequent rebuilds
+    // (pagination loads, new messages) to preserve the user's scroll position.
+    if (!_hasScrolledToBottom) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _scrollController.hasClients && messages.isNotEmpty) {
+          _scrollController.jumpTo(0);
+          _hasScrolledToBottom = true;
+        }
+      });
+    }
 
     return NotificationListener<ScrollNotification>(
       onNotification: (ScrollNotification scrollInfo) {
@@ -407,17 +421,9 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
           horizontal: (screenWidth * 0.04).clamp(12.0, 20.0),
           vertical: (screenHeight * 0.01).clamp(6.0, 12.0),
         ),
-        itemCount: sortedMessages.length +
-            (_isLoadingMore ? 1 : 0), // +1 for loading indicator
+        cacheExtent: 500,
+        itemCount: sortedMessages.length,
         itemBuilder: (context, index) {
-          // Show loading indicator at the top when loading more
-          if (index >= sortedMessages.length) {
-            return const Padding(
-              padding: EdgeInsets.symmetric(vertical: 16.0),
-              child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
-            );
-          }
-
           final message = sortedMessages[index];
           final nextMessage = index < sortedMessages.length - 1
               ? sortedMessages[index + 1]
@@ -448,7 +454,7 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
   Future<void> _loadMoreMessages() async {
     if (widget.groupId == null || _isLoadingMore) return;
 
-    setState(() => _isLoadingMore = true);
+    _isLoadingMore = true;
 
     try {
       final paginatedProvider =
@@ -456,9 +462,7 @@ class _GroupChatScreenState extends ConsumerState<GroupChatScreen>
       final paginatedNotifier = ref.read(paginatedProvider.notifier);
       await paginatedNotifier.loadMore();
     } finally {
-      if (mounted) {
-        setState(() => _isLoadingMore = false);
-      }
+      _isLoadingMore = false;
     }
   }
 
