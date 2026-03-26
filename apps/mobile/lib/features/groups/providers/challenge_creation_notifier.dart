@@ -24,7 +24,7 @@ class ChallengeCreationState {
     this.name = '',
     this.description = '',
     this.endDate,
-    this.color = 'blue',
+    this.color = '#2563EB',
     this.tasks = const [],
     this.isLoading = false,
     this.error,

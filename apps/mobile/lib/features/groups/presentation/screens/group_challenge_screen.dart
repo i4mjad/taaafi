@@ -11,6 +11,7 @@ import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/core/theming/custom_theme_data.dart';
 import 'package:reboot_app_3/features/groups/application/challenges_providers.dart';
+import 'package:reboot_app_3/features/groups/application/group_chat_providers.dart';
 import 'package:reboot_app_3/features/groups/domain/entities/challenge_task_instance.dart';
 import 'package:reboot_app_3/features/groups/domain/entities/challenge_participation_entity.dart';
 import 'package:reboot_app_3/features/groups/providers/group_members_provider.dart';
@@ -33,15 +34,49 @@ class _GroupChallengeScreenState extends ConsumerState<GroupChallengeScreen> {
   Widget build(BuildContext context) {
     final theme = AppTheme.of(context);
     final l10n = AppLocalizations.of(context);
+    final isAdminAsync = ref.watch(isCurrentUserGroupAdminProvider(widget.groupId));
+    final isAdmin = isAdminAsync.valueOrNull ?? false;
 
     return Scaffold(
       backgroundColor: theme.backgroundColor,
       appBar:
           plainAppBar(context, ref, l10n.translate('challenges'), false, true),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: Spacing.points16.value),
-          child: Column(
+      floatingActionButton: isAdmin
+          ? FloatingActionButton.extended(
+              onPressed: () {
+                context.pushNamed(
+                  RouteNames.createChallenge.name,
+                  pathParameters: {'groupId': widget.groupId},
+                );
+              },
+              backgroundColor: theme.primary[600],
+              label: Row(
+                children: [
+                  Icon(LucideIcons.plus, color: Colors.white, size: 20),
+                  const SizedBox(width: 8),
+                  Text(
+                    l10n.translate('create-challenge'),
+                    style: TextStyles.small.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            )
+          : null,
+      body: RefreshIndicator(
+        onRefresh: () async {
+          ref.invalidate(activeChallengesProvider(widget.groupId));
+          ref.invalidate(groupTodayTasksProvider(widget.groupId));
+          ref.invalidate(challengeLeaderboardProvider);
+          await ref.read(activeChallengesProvider(widget.groupId).future);
+        },
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: Spacing.points16.value),
+            child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               verticalSpace(Spacing.points16),
@@ -62,6 +97,7 @@ class _GroupChallengeScreenState extends ConsumerState<GroupChallengeScreen> {
               verticalSpace(Spacing.points32),
             ],
           ),
+        ),
         ),
       ),
     );
@@ -485,7 +521,7 @@ class _GroupChallengeScreenState extends ConsumerState<GroupChallengeScreen> {
                   children: [
                     TodayTaskItemChallenges(
                       key: ValueKey(
-                          '${widget.groupId}_${taskInstance.task.id}_${taskInstance.scheduledDate}'),
+                          '${taskInstance.challengeId}_${taskInstance.task.id}_${taskInstance.scheduledDate}'),
                       taskInstance: taskInstance,
                       number: index + 1,
                       groupId: widget.groupId,

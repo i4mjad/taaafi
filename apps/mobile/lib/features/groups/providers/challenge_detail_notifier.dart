@@ -214,6 +214,7 @@ class ChallengeDetailNotifier extends _$ChallengeDetailNotifier {
       if (result.success) {
         // Refresh state
         ref.invalidateSelf();
+        ref.invalidate(challengeLeaderboardProvider(currentState.challenge!.id));
 
         String message = 'Task completed! +$points points';
         if (result.isCompleted) {

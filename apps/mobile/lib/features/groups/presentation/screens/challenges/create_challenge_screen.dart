@@ -12,6 +12,7 @@ import 'package:reboot_app_3/core/theming/app-themes.dart';
 import 'package:reboot_app_3/core/theming/spacing.dart';
 import 'package:reboot_app_3/core/theming/text_styles.dart';
 import 'package:reboot_app_3/features/groups/domain/entities/challenge_task_entity.dart';
+import 'package:reboot_app_3/features/groups/application/challenges_providers.dart';
 import 'package:reboot_app_3/features/groups/providers/challenge_creation_notifier.dart';
 import 'package:reboot_app_3/features/groups/presentation/widgets/add_task_modal.dart';
 
@@ -77,30 +78,6 @@ class _CreateChallengeScreenState extends ConsumerState<CreateChallengeScreen> {
                       },
                       decoration: InputDecoration(
                         hintText: l10n.translate('challenge-name-hint'),
-                        hintStyle: TextStyles.caption.copyWith(color: theme.grey[600]),
-                        border: InputBorder.none,
-                      ),
-                      style: TextStyles.caption,
-                    ),
-                  ),
-
-                  verticalSpace(Spacing.points16),
-
-                  // Challenge Description
-                  _buildSectionLabel(theme, l10n, 'description'),
-                  WidgetsContainer(
-                    backgroundColor: theme.backgroundColor,
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: theme.grey[800]!, width: 1),
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: TextField(
-                      controller: _descriptionController,
-                      onChanged: (value) {
-                        ref.read(challengeCreationNotifierProvider.notifier).setDescription(value);
-                      },
-                      maxLines: 3,
-                      decoration: InputDecoration(
-                        hintText: l10n.translate('challenge-description-hint'),
                         hintStyle: TextStyles.caption.copyWith(color: theme.grey[600]),
                         border: InputBorder.none,
                       ),
@@ -441,6 +418,9 @@ class _CreateChallengeScreenState extends ConsumerState<CreateChallengeScreen> {
     if (!mounted) return;
 
     if (result.success) {
+      ref.invalidate(activeChallengesProvider(widget.groupId));
+      ref.invalidate(groupChallengesProvider(widget.groupId));
+      ref.invalidate(groupTodayTasksProvider(widget.groupId));
       getSuccessSnackBar(context, 'challenge-created-successfully');
       context.pop();
     } else {

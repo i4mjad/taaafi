@@ -3654,6 +3654,7 @@ const Map<String, String> kAr = {
   'all-participants': 'جميع المشاركين',
   'view-tasks-history': 'عرض سجل المهام',
   'pick-color': 'اختر لون',
+  'select-date': 'اختر التاريخ',
   'select-color': 'اختر اللون',
   'select-shade': 'اختر الدرجة',
   'tap-to-change-color': 'اضغط لتغيير اللون',

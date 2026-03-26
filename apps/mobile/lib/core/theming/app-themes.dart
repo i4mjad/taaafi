@@ -92,7 +92,7 @@ ThemeData get darkTheme {
     cardColor: darkCustomTheme.grey[700],
     canvasColor: darkCustomTheme.primary[900],
     focusColor: darkCustomTheme.primary[500],
-    bottomAppBarTheme: BottomAppBarTheme(color: darkCustomTheme.grey[600]),
+    bottomAppBarTheme: BottomAppBarThemeData(color: darkCustomTheme.grey[600]),
     appBarTheme: AppBarTheme(
       backgroundColor: darkCustomTheme.backgroundColor,
     ),

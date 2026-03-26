@@ -381,15 +381,16 @@ class ChallengesRepositoryImpl implements ChallengesRepository {
   }) async {
     try {
       // Get all participants (active and completed) for leaderboard
+      // Sort client-side to avoid requiring a composite Firestore index
       final querySnapshot = await _participationsCollection
           .where('challengeId', isEqualTo: challengeId)
-          .orderBy('earnedPoints', descending: true)
-          .limit(limit)
-          .get();
+          .get(const GetOptions(source: Source.server));
 
-      return querySnapshot.docs
+      final participants = querySnapshot.docs
           .map((doc) => ChallengeParticipationModel.fromFirestore(doc))
           .toList();
+      participants.sort((a, b) => b.earnedPoints.compareTo(a.earnedPoints));
+      return participants.take(limit).toList();
     } catch (e, stackTrace) {
       log('Error getting leaderboard: $e', stackTrace: stackTrace);
       rethrow;

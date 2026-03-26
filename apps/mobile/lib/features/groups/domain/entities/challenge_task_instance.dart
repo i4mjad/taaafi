@@ -3,12 +3,14 @@ import 'challenge_task_entity.dart';
 /// UI-only entity for displaying task instances by date
 /// Not stored in database - generated on-demand
 class ChallengeTaskInstance {
+  final String challengeId;
   final ChallengeTaskEntity task;
   final DateTime scheduledDate;
   final TaskInstanceStatus status;
   final DateTime? completedAt;
 
   const ChallengeTaskInstance({
+    required this.challengeId,
     required this.task,
     required this.scheduledDate,
     required this.status,

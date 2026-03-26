@@ -267,17 +267,6 @@ class UpdateCardWidget extends ConsumerWidget {
           isActive: hasReacted,
           onTap: () => _toggleReaction(ref, '❤️'),
         ),
-        const SizedBox(width: 16),
-        // Comments
-        _buildEngagementButton(
-          theme,
-          icon: LucideIcons.messageCircle,
-          count: update.commentCount,
-        ),
-        const SizedBox(width: 16),
-        // Share
-        if (!isCompact)
-          Icon(LucideIcons.share2, size: 16, color: theme.grey[600]),
       ],
     );
   }
@@ -313,22 +302,6 @@ class UpdateCardWidget extends ConsumerWidget {
     );
   }
 
-  Widget _buildEngagementButton(
-    dynamic theme, {
-    required IconData icon,
-    required int count,
-  }) {
-    return Row(
-      children: [
-        Icon(icon, size: 16, color: theme.grey[600]),
-        const SizedBox(width: 4),
-        Text(
-          count.toString(),
-          style: TextStyles.caption.copyWith(color: theme.grey[700]),
-        ),
-      ],
-    );
-  }
 
   String _formatUpdateTime(DateTime time, AppLocalizations l10n) {
     final now = DateTime.now();

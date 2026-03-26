@@ -80,11 +80,10 @@ class ChallengesService {
       }
 
       // Validation: Color
-      const validColors = ['yellow', 'coral', 'blue', 'teal'];
-      if (!validColors.contains(color)) {
+      if (color.trim().isEmpty) {
         return const CreateChallengeResult.failure(
           CreateChallengeError.invalidGoal,
-          'Invalid color selected',
+          'Color cannot be empty',
         );
       }
 

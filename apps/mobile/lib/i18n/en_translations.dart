@@ -3738,6 +3738,7 @@ const Map<String, String> kEn = {
   "all-participants": "All Participants",
   "view-tasks-history": "View Tasks History",
   "pick-color": "Pick a Color",
+  "select-date": "Select date",
   "select-color": "Select color",
   "select-shade": "Select shade",
   "tap-to-change-color": "Tap to change color",

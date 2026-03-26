@@ -125,6 +125,7 @@ class ChallengeHistoryService {
         }
 
         instances.add(ChallengeTaskInstance(
+          challengeId: challenge.id,
           task: task,
           scheduledDate: scheduledDate,
           status: status,
@@ -270,6 +271,7 @@ class ChallengeHistoryService {
         // Only add if NOT completed - completed tasks should not appear in "today's tasks"
         if (completion == null) {
           instances.add(ChallengeTaskInstance(
+            challengeId: challenge.id,
             task: task,
             scheduledDate: today,
             status: TaskInstanceStatus.today,

@@ -420,7 +420,7 @@ class GroupScreen extends ConsumerWidget {
                   final taskInstance = entry.value;
                   return TodayTaskItem(
                     key: ValueKey(
-                        '${groupId}_${taskInstance.task.id}_${taskInstance.scheduledDate}'),
+                        '${taskInstance.challengeId}_${taskInstance.task.id}_${taskInstance.scheduledDate}'),
                     taskInstance: taskInstance,
                     number: index + 1,
                     groupId: groupId,
@@ -1005,6 +1005,7 @@ class _TodayTaskItemState extends ConsumerState<TodayTaskItem> {
       ref.invalidate(groupTodayTasksProvider(widget.groupId));
       ref.invalidate(activeChallengesProvider(widget.groupId));
       ref.invalidate(latestUpdatesProvider(widget.groupId));
+      ref.invalidate(challengeLeaderboardProvider(targetChallenge.id));
 
       // Show success feedback
       getSuccessSnackBar(context, 'task-completed');
