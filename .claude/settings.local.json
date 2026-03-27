@@ -139,7 +139,10 @@
       "mcp__plugin_firebase_firebase__firestore_list_collections",
       "Bash(grep -E \"\\\\.\\(dart\\)$\")",
       "Bash(xxd)",
-      "Bash(echo \"EXIT: $?\")"
+      "Bash(echo \"EXIT: $?\")",
+      "mcp__plugin_code-review-graph_code-review-graph__query_graph_tool",
+      "mcp__plugin_code-review-graph_code-review-graph__semantic_search_nodes_tool",
+      "Bash(pod install:*)"
     ]
   },
   "outputStyle": "default"

@@ -1,125 +1,86 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useTranslation } from '@/contexts/TranslationContext';
-import { useCollection } from 'react-firebase-hooks/firestore';
-import { collection, query, orderBy } from 'firebase/firestore';
+import { collection, query, orderBy, where, getDocs, Timestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { BarChart, Users, MessageSquare, ThumbsUp, TrendingUp, Calendar, Download, RefreshCw } from 'lucide-react';
-import { format, subDays, startOfDay, endOfDay } from 'date-fns';
+import { BarChart, Users, MessageSquare, ThumbsUp, TrendingUp, Download, RefreshCw } from 'lucide-react';
+import { format, subDays, startOfDay } from 'date-fns';
 import { ForumPost, Comment, Interaction, CommunityProfile } from '@/types/community';
 import { toast } from 'sonner';
+
+interface AnalyticsData {
+  posts: ForumPost[];
+  comments: Comment[];
+  interactions: Interaction[];
+  profiles: CommunityProfile[];
+  allProfiles: CommunityProfile[];
+  categories: { id: string; name: string; nameAr: string }[];
+}
 
 export default function CommunityAnalytics() {
   const { t } = useTranslation();
   const [dateRange, setDateRange] = useState<string>('7');
+  const [isLoading, setIsLoading] = useState(true);
+  const [data, setData] = useState<AnalyticsData>({
+    posts: [],
+    comments: [],
+    interactions: [],
+    profiles: [],
+    allProfiles: [],
+    categories: [],
+  });
 
-  // Fetch all data for analytics
-  const [postsValue, postsLoading] = useCollection(
-    query(collection(db, 'forumPosts'), orderBy('createdAt', 'desc'))
-  );
+  const fetchData = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const days = parseInt(dateRange);
+      const startDate = startOfDay(subDays(new Date(), days));
+      const startTimestamp = Timestamp.fromDate(startDate);
 
-  const [commentsValue] = useCollection(
-    query(collection(db, 'comments'), orderBy('createdAt', 'desc'))
-  );
+      const [postsSnap, commentsSnap, interactionsSnap, profilesSnap, allProfilesSnap, categoriesSnap] =
+        await Promise.all([
+          getDocs(query(collection(db, 'forumPosts'), where('createdAt', '>=', startTimestamp), orderBy('createdAt', 'desc'))),
+          getDocs(query(collection(db, 'comments'), where('createdAt', '>=', startTimestamp), orderBy('createdAt', 'desc'))),
+          getDocs(query(collection(db, 'interactions'), where('createdAt', '>=', startTimestamp), orderBy('createdAt', 'desc'))),
+          getDocs(query(collection(db, 'communityProfiles'), where('createdAt', '>=', startTimestamp), orderBy('createdAt', 'desc'))),
+          getDocs(query(collection(db, 'communityProfiles'), orderBy('createdAt', 'desc'))),
+          getDocs(query(collection(db, 'postCategories'), orderBy('sortOrder'))),
+        ]);
 
-  const [interactionsValue] = useCollection(
-    query(collection(db, 'interactions'), orderBy('createdAt', 'desc'))
-  );
+      setData({
+        posts: postsSnap.docs.map(doc => ({ id: doc.id, ...doc.data(), createdAt: doc.data().createdAt?.toDate() || new Date() })) as ForumPost[],
+        comments: commentsSnap.docs.map(doc => ({ id: doc.id, ...doc.data(), createdAt: doc.data().createdAt?.toDate() || new Date() })) as Comment[],
+        interactions: interactionsSnap.docs.map(doc => ({ id: doc.id, ...doc.data(), createdAt: doc.data().createdAt?.toDate() || new Date() })) as Interaction[],
+        profiles: profilesSnap.docs.map(doc => ({ id: doc.id, ...doc.data(), createdAt: doc.data().createdAt?.toDate() || new Date() })) as CommunityProfile[],
+        allProfiles: allProfilesSnap.docs.map(doc => ({ id: doc.id, ...doc.data(), createdAt: doc.data().createdAt?.toDate() || new Date() })) as CommunityProfile[],
+        categories: categoriesSnap.docs.map(doc => ({ id: doc.id, name: doc.data().name || 'Unknown', nameAr: doc.data().nameAr || 'غير معروف', ...doc.data() })),
+      });
+    } catch (error) {
+      console.error('Error fetching analytics:', error);
+      toast.error('Failed to load analytics data');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [dateRange]);
 
-  const [profilesValue] = useCollection(
-    query(collection(db, 'communityProfiles'), orderBy('createdAt', 'desc'))
-  );
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
-  const [categoriesValue] = useCollection(
-    query(collection(db, 'postCategories'), orderBy('sortOrder'))
-  );
+  const { posts, comments, interactions, profiles, allProfiles, categories } = data;
 
-  const [groupsValue] = useCollection(
-    query(collection(db, 'groups'), orderBy('createdAt', 'desc'))
-  );
-
-  // Process data
-  const posts = useMemo(() => {
-    if (!postsValue) return [];
-    return postsValue.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-      createdAt: doc.data().createdAt?.toDate() || new Date(),
-    })) as ForumPost[];
-  }, [postsValue]);
-
-  const comments = useMemo(() => {
-    if (!commentsValue) return [];
-    return commentsValue.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-      createdAt: doc.data().createdAt?.toDate() || new Date(),
-    })) as Comment[];
-  }, [commentsValue]);
-
-  const interactions = useMemo(() => {
-    if (!interactionsValue) return [];
-    return interactionsValue.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-      createdAt: doc.data().createdAt?.toDate() || new Date(),
-    })) as Interaction[];
-  }, [interactionsValue]);
-
-  const profiles = useMemo(() => {
-    if (!profilesValue) return [];
-    return profilesValue.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-      createdAt: doc.data().createdAt?.toDate() || new Date(),
-    })) as CommunityProfile[];
-  }, [profilesValue]);
-
-  const categories = useMemo(() => {
-    if (!categoriesValue) return [];
-    return categoriesValue.docs.map(doc => ({
-      id: doc.id,
-      name: doc.data().name || 'Unknown',
-      nameAr: doc.data().nameAr || 'غير معروف',
-      ...doc.data(),
-    }));
-  }, [categoriesValue]);
-
-  const groups = useMemo(() => {
-    if (!groupsValue) return [];
-    return groupsValue.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-      createdAt: doc.data().createdAt?.toDate() || new Date(),
-    }));
-  }, [groupsValue]);
-
-  // Filter data by date range
-  const filteredData = useMemo(() => {
-    const days = parseInt(dateRange);
-    const startDate = startOfDay(subDays(new Date(), days));
-    const endDate = endOfDay(new Date());
-
-    const filteredPosts = posts.filter(post => 
-      post.createdAt >= startDate && post.createdAt <= endDate
-    );
-    const filteredComments = comments.filter(comment => 
-      comment.createdAt >= startDate && comment.createdAt <= endDate
-    );
-    const filteredInteractions = interactions.filter(interaction => 
-      interaction.createdAt >= startDate && interaction.createdAt <= endDate
-    );
-    const filteredProfiles = profiles.filter(profile => 
-      profile.createdAt >= startDate && profile.createdAt <= endDate
-    );
-
-    return { filteredPosts, filteredComments, filteredInteractions, filteredProfiles };
-  }, [posts, comments, interactions, profiles, dateRange]);
+  // filteredData alias kept for useMemo below
+  const filteredData = useMemo(() => ({
+    filteredPosts: posts,
+    filteredComments: comments,
+    filteredInteractions: interactions,
+    filteredProfiles: profiles,
+  }), [posts, comments, interactions, profiles]);
 
   // Calculate analytics
   const analytics = useMemo(() => {
@@ -149,11 +110,11 @@ export default function CommunityAnalytics() {
       };
     }).sort((a, b) => b.postCount - a.postCount);
 
-    // Gender distribution
+    // Gender distribution (all-time, not date-filtered)
     const genderStats = {
-      male: profiles.filter(p => p.gender === 'male').length,
-      female: profiles.filter(p => p.gender === 'female').length,
-      other: profiles.filter(p => p.gender === 'other').length,
+      male: allProfiles.filter(p => p.gender === 'male').length,
+      female: allProfiles.filter(p => p.gender === 'female').length,
+      other: allProfiles.filter(p => p.gender === 'other').length,
     };
 
     // Anonymous vs identified posts
@@ -185,17 +146,17 @@ export default function CommunityAnalytics() {
       identifiedPosts,
       topPosts,
     };
-  }, [filteredData, categories, profiles]);
+  }, [filteredData, categories, allProfiles]);
 
   const handleExportData = () => {
     toast.info(t('modules.community.analytics.exportComingSoon'));
   };
 
   const handleRefreshData = () => {
-    window.location.reload();
+    fetchData();
   };
 
-  if (postsLoading) {
+  if (isLoading) {
     return (
       <div className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -371,8 +332,8 @@ export default function CommunityAnalytics() {
                   <Badge variant="outline">{analytics.genderStats.male}</Badge>
                 </div>
                 <div className="text-sm text-muted-foreground">
-                  {profiles.length > 0 
-                    ? `${Math.round((analytics.genderStats.male / profiles.length) * 100)}%`
+                  {allProfiles.length > 0
+                    ? `${Math.round((analytics.genderStats.male / allProfiles.length) * 100)}%`
                     : '0%'
                   }
                 </div>
@@ -383,8 +344,8 @@ export default function CommunityAnalytics() {
                   <Badge variant="outline">{analytics.genderStats.female}</Badge>
                 </div>
                 <div className="text-sm text-muted-foreground">
-                  {profiles.length > 0 
-                    ? `${Math.round((analytics.genderStats.female / profiles.length) * 100)}%`
+                  {allProfiles.length > 0
+                    ? `${Math.round((analytics.genderStats.female / allProfiles.length) * 100)}%`
                     : '0%'
                   }
                 </div>
@@ -395,8 +356,8 @@ export default function CommunityAnalytics() {
                   <Badge variant="outline">{analytics.genderStats.other}</Badge>
                 </div>
                 <div className="text-sm text-muted-foreground">
-                  {profiles.length > 0 
-                    ? `${Math.round((analytics.genderStats.other / profiles.length) * 100)}%`
+                  {allProfiles.length > 0
+                    ? `${Math.round((analytics.genderStats.other / allProfiles.length) * 100)}%`
                     : '0%'
                   }
                 </div>
